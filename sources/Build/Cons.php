@@ -74,7 +74,7 @@ class _Cons extends Singleton
             }
 
             Member::loggedIn()->language()->words[ $tab . '_tab' ] = $tab;
-            $form->add( $key )->label( $key )->empty( $value[ 'current' ] )->description( $value[ 'description' ] ?? null )->tab( $tab );
+            $form->add( $key )->label( $key )->empty( $value[ 'current' ] )->description( $value[ 'description' ] ?? '' )->tab( $tab );
 
             switch ( gettype( $value[ 'current' ] ) ) {
                 case 'boolean':
