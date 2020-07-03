@@ -46,6 +46,11 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 class _generator extends Controller
 {
     /**
+     * @brief	Has been CSRF-protected
+     */
+    public static $csrfProtected = TRUE;
+
+    /**
      * @inheritdoc
      * @throws Exception
      */
