@@ -49,9 +49,10 @@ class toolbox_hook_developer extends _HOOK_CLASS_
         $tables = Db::i()->query('SHOW TABLES');
         $t = [];
         $t[0] = 'Select Table';
+        $prefix = \IPS\Db::i()->prefix;
 
         foreach ($tables as $table) {
-            $foo = array_values($table);
+            $foo = str_replace($prefix, '', array_values($table));
             $t[$foo[0]] = $foo[0];
         }
 
