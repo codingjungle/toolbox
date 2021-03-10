@@ -507,7 +507,7 @@ class _Proxy extends GeneratorAbstract
                 }
             }
         } catch (Exception $e) {
-            //            Debug::add( 'helpers', $e );
+                        Debug::add( 'helpers', $e );
         }
     }
 

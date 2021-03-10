@@ -477,7 +477,7 @@ class _Sources
             'placeholder' => 'Namespace',
             'autocomplete' => $this->findNameSpace,
         ];
-        $this->form->add('namespace')->options($options)->prefix("IPS\\{$this->application->directory}\\")->required()->validation(static function($data){});
+        $this->form->add('namespace')->options($options)->prefix("IPS\\{$this->application->directory}\\");
     }
 
     /**

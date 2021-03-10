@@ -31,6 +31,7 @@ class _Item implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
+
         try {
             $config = [
                 'name'   => 'application',

@@ -24,6 +24,7 @@ use IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract as devPlusGenerato
 use IPS\toolbox\Proxy\Helpers\GeneratorAbstract;
 use IPS\toolbox\Proxy\Helpers\Request as HelpersRequest;
 use IPS\toolbox\Proxy\Helpers\Store as HelpersStore;
+use IPS\Patterns\ActiveRecord;
 use IPS\Widget;
 
 use function defined;
@@ -81,7 +82,7 @@ class _proxy
         $helpers[ Item::class ][] = \IPS\toolbox\Proxy\Helpers\Item::class;
         $helpers[ Singleton::class ][] = \IPS\toolbox\Proxy\Helpers\Singleton::class;
         $helpers[ Theme::class ][] = \IPS\toolbox\Proxy\Helpers\Theme::class;
-
+        $helpers[ ActiveRecord::class ][] = \IPS\toolbox\Proxy\Helpers\ActiveRecord::class;
 
     }
 }

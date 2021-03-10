@@ -21,6 +21,8 @@ use IPS\babble\Profiler\Debug;
 use ReflectionClass;
 use ReflectionNamedType;
 
+use ReflectionType;
+
 use function count;
 use function is_array;
 use function is_numeric;
@@ -198,7 +200,7 @@ EOF;
                     $position = $param->getPosition();
                     $newParams[$position]['name'] = $param->getName();
                     $hint = $param->getType();
-                    if ($hint instanceof ReflectionNamedType) {
+                    if ($hint instanceof ReflectionType) {
                         $newParams[$position]['hint'] = $hint->getName();
                         $newParams[$position]['nullable'] = (bool)$hint->allowsNull();
                     }

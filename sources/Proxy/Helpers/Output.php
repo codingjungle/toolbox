@@ -13,10 +13,13 @@
 namespace IPS\toolbox\Proxy\Helpers;
 
 use Zend\Code\Generator\DocBlock\Tag\ParamTag;
+use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\ParameterGenerator;
+
+use Zend\Code\Generator\PropertyGenerator;
 
 use function defined;
 use function header;
@@ -33,14 +36,46 @@ class _Output implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
-        $methodDocBlock = new DocBlockGenerator(
-            'Send JSON output', \null, [
-            new ParamTag('data', 'array|string'),
-            new ParamTag('httpStatusCode', 'int'),
-        ]
-        );
+        try{
+            $propertyDocBlock = new DocBlockGenerator(
+                'Instance of  class', null, [ new ReturnTag('static')]
+            );
+            $body[] = PropertyGenerator::fromArray(
+                [
+                    'name' => 'instance',
+                    'static' => true,
+                    'docblock' => $propertyDocBlock,
+                    'visibility' => 'protected'
+                ]
+            );
+        }
+        catch(InvalidArgumentException $e){
+        }
+        try {
+            $methodDocBlock = new DocBlockGenerator(
+                'Instance of  class', \null, [
+                                      new ReturnTag('static')
+                                  ]
+            );
+            $body[] = MethodGenerator::fromArray(
+                [
+                    'name'       => 'i',
+                    'parameters' => [],
+                    'body'       => 'return parent::i();',
+                    'docblock'   => $methodDocBlock,
+                    'static'     => true,
+                ]
+            );
+        } catch (InvalidArgumentException $e) {
+        }
 
         try {
+            $methodDocBlock = new DocBlockGenerator(
+                'Send JSON output', \null, [
+                                      new ParamTag('data', 'array|string'),
+                                      new ParamTag('httpStatusCode', 'int'),
+                                  ]
+            );
             $body[] = MethodGenerator::fromArray(
                 [
                     'name'       => 'json',

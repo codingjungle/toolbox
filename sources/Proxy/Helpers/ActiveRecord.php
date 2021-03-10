@@ -29,7 +29,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 
-class _Singleton implements HelpersAbstract
+class _ActiveRecord implements HelpersAbstract
 {
     /**
      * @inheritdoc
@@ -43,7 +43,7 @@ class _Singleton implements HelpersAbstract
             );
             $body[] = PropertyGenerator::fromArray(
                 [
-                    'name' => 'instance',
+                    'name' => 'multiton',
                     'static' => true,
                     'docblock' => $propertyDocBlock,
                     'visibility' => 'protected'
@@ -53,20 +53,27 @@ class _Singleton implements HelpersAbstract
         catch(InvalidArgumentException $e){
         }
 
-        $methodDocBlock = new DocBlockGenerator(
-            'Send JSON output', \null, [
-                new ReturnTag('static')
-            ]
-        );
-
         try {
+            $methodDocBlock = new DocBlockGenerator(
+                'Load Record', \null, [
+                                      new ParamTag('id', 'int|string'),
+                                      new ParamTag('idField', 'string',),
+                                 new ParamTag('extraWhereClause', 'mixed'),
+                                 new ReturnTag('static')
+
+                             ]
+            );
             $body[] = MethodGenerator::fromArray(
                 [
-                    'name'       => 'i',
-                    'parameters' => [],
-                    'body'       => 'return parent::i();',
+                    'name'       => 'load',
+                    'parameters' => [
+                        new ParameterGenerator('id', null, null, 0),
+                        new ParameterGenerator('idField', 'string', 'null', 1),
+                        new ParameterGenerator('extraWhereClause', null, 'null', 2),
+                    ],
+                    'body'       => 'return parent::load($id,$idField,$extraWhereClause);',
                     'docblock'   => $methodDocBlock,
-                    'static'     => \true,
+                    'static'     => true,
                 ]
             );
         } catch (InvalidArgumentException $e) {

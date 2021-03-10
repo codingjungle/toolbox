@@ -13,6 +13,8 @@
 
 namespace Generator\Builders\Traits;
 
+use ReflectionNamedType;
+
 use function array_key_exists;
 use function array_pop;
 use function explode;
@@ -147,7 +149,14 @@ trait ClassMethods
 
                 $hint = $param[ 'hint' ];
                 if ( method_exists( $this, 'addImport' ) ) {
-                    $hint = $this->addImport( $hint );
+                    try {
+                        if ($hint instanceof ReflectionNamedType) {
+                            $hint = $hint->getName();
+                        }
+                        $hint = $this->addImport($hint);
+                    }catch(\Exception $e){
+                        _p($hint);
+                    }
                 }
 
                 $p .= $hint . ' ';
