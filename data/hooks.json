@@ -118,5 +118,9 @@
     "Content": {
         "type": "C",
         "class": "\\IPS\\Content"
+    },
+    "themeAdminGlobal": {
+        "type": "S",
+        "class": "\\IPS\\Theme\\class_core_admin_global"
     }
 }

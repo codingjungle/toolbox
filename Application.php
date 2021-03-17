@@ -12,7 +12,9 @@
 namespace IPS\toolbox;
 
 use IPS\Application;
+use IPS\Http\Url;
 use IPS\Output;
+use IPS\Request;
 use IPS\Theme;
 
 use const IPS\ROOT_PATH;
@@ -197,5 +199,39 @@ class _Application extends Application
     protected function get__icon()
     {
         return 'wrench';
+    }
+
+    public static function getSidebar(){
+        $app = Application::load( Request::i()->appKey );
+        $schema	= json_decode( file_get_contents( $app->getApplicationPath() . "/data/schema.json" ), TRUE );
+        $html = '<div class="ipsBox ipsPadding:half">';
+        $html .= '<h4>Tables</h4>';
+        $html .= '<ul class="ipsList_reset">';
+        foreach($schema as $key => $val){
+            $active = '';
+            if( \IPS\Request::i()->_name === $key){
+                $active = ' style="text-decoration:underline;font-weight:bolder;"';
+            }
+            $url = Url::internal('app=core&module=applications&controller=developer')
+                ->setQueryString([
+                                     'appKey' => $app->directory,
+                                     'do' => 'editSchema',
+                                     '_name' => $key,
+                                     'existing' => 1,
+                                     'tab' => 'columns'
+                                 ]);
+            $html .=<<<EOF
+<li>
+<a href="{$url}"{$active}>
+{$key}
+</a>
+</li>
+EOF;
+
+        }
+
+        $html .= '</ul></div>';
+
+        return $html;
     }
 }

@@ -312,7 +312,7 @@ abstract class _GeneratorAbstract
             $this->generator->save();
             if ($this->scaffolding_create && in_array($this->type, static::$arDescendent, false)) {
                 $this->_createRelation($file, $dir, $this->database);
-                if (in_array('db', $this->scaffolding_type, false)) {
+                if (\is_array($this->scaffolding_type) && in_array('db', $this->scaffolding_type, false)) {
                     try {
                         $this->db->add('bitwise');
                         $this->db->createTable()->_buildSchemaFile($this->database, $this->application);
@@ -321,7 +321,7 @@ abstract class _GeneratorAbstract
                     }
                 }
 
-                if (in_array('modules', $this->scaffolding_type, false)) {
+                if (\is_array($this->scaffolding_type) && in_array('modules', $this->scaffolding_type, false)) {
                     try {
                         $this->_buildModule(
                             $this->application,
