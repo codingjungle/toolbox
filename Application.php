@@ -220,11 +220,29 @@ class _Application extends Application
                                      'existing' => 1,
                                      'tab' => 'columns'
                                  ]);
+            $html2 = '<ul class="ipsMenu ipsHide" id="toolbox_schema_fields_'.$key.'_menu">';
+            foreach( $val['columns'] as $kk => $vv ){
+                $url2 = Url::internal('app=core&module=applications&controller=developer&appKey=chrono&do=editSchemaColumn&_name=chrono_timecards&column=timecard_id')
+                    ->setQueryString([
+                        'appKey' => $app->directory,
+                        'do' => 'editSchemaColumn',
+                        '_name' => $key,
+                        'column' => $kk
+                                     ]);
+                $html2 .= <<<EOF
+<li class="ipsMenu_item">
+<a href="{$url2}" data-ipsDialog data-ipsDialog-desctructOnClose="true" data-ipsDialog-title="{$kk}">{$kk}({$vv['type']})</a>
+</li>
+EOF;
+            }
+            $html2 .= '</ul>';
             $html .=<<<EOF
 <li>
 <a href="{$url}"{$active}>
 {$key}
 </a>
+<a href="#toolbox_schema_fields_{$key}_menu" id="toolbox_schema_fields_{$key}" data-ipsMenu><i class="fa fa-chevron-circle-down"></i></a>
+{$html2}
 </li>
 EOF;
 
