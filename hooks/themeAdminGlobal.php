@@ -19,7 +19,7 @@ public static function hookData() {
       'selector' => 'div.acpBlock',
       'type' => 'replace',
       'content' => '
-{{if \IPS\Request::i()->do === \'editSchema\'}}
+{{if \IPS\Request::i()->controller === \'developer\' && !\IPS\Request::i()->isAjax()}}
 <div class="ipsColumns">
 	<div class="ipsColumn ipsColumn_wide">
   	{{$sideBar = \IPS\toolbox\Application::getSidebar();}}

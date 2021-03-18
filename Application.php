@@ -203,9 +203,13 @@ class _Application extends Application
 
     public static function getSidebar(){
         $app = Application::load( Request::i()->appKey );
+        $createTable = Url::internal('app=core&module=applications&controller=developer')->setQueryString([
+            'appKey' => $app->directory,
+            'do' => 'addTable'
+                                                                                                                                    ]);
         $schema	= json_decode( file_get_contents( $app->getApplicationPath() . "/data/schema.json" ), TRUE );
         $html = '<div class="ipsBox ipsPadding:half">';
-        $html .= '<h4>Tables</h4>';
+        $html .= '<h4>Tables<a href="'.$createTable.'" class="ipsButton ipsButton_primary ipsButton_veryVerySmall ipsPos_right" title="Add Table" data-ipsDialog><i class="fa fa-plus"></i></a></h4>';
         $html .= '<ul class="ipsList_reset">';
         foreach($schema as $key => $val){
             $active = ' style="width:150px;display:block;" ';
