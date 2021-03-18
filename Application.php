@@ -208,9 +208,9 @@ class _Application extends Application
         $html .= '<h4>Tables</h4>';
         $html .= '<ul class="ipsList_reset">';
         foreach($schema as $key => $val){
-            $active = '';
+            $active = ' style="width:150px;display:block;" ';
             if( \IPS\Request::i()->_name === $key){
-                $active = ' style="text-decoration:underline;font-weight:bolder;"';
+                $active = ' style="width:150px;display:block;text-decoration:underline;font-weight:bolder;"';
             }
             $url = Url::internal('app=core&module=applications&controller=developer')
                 ->setQueryString([
@@ -236,13 +236,19 @@ class _Application extends Application
 EOF;
             }
             $html2 .= '</ul>';
+            $addColumn = Url::internal('app=core&module=applications&controller=developer&appKey=chrono&do=editSchemaColumn&_name=chrono_timesheets')->setQueryString([
+                'appKey' => $app->directory,
+                'do' => 'editSchemaColumn',
+                '_name' => $key
+                                                                                                                                                                      ]);
             $html .=<<<EOF
-<li>
-<a href="{$url}"{$active}>
+<li class="ipsClearfix ipsMargin_bottom:half"> 
+<a href="{$url}"{$active} class="ipsPos_left ipsType_break">
 {$key}
-</a>
-<a href="#toolbox_schema_fields_{$key}_menu" id="toolbox_schema_fields_{$key}" data-ipsMenu><i class="fa fa-chevron-circle-down"></i></a>
-{$html2}
+</a> 
+<a href="{$addColumn}" class="ipsButton ipsButton_alternate ipsButton_veryVerySmall ipsPos_right" data-ipsdialog data-ipsDialog-desctructOnClose="true" data-ipsDialog-title="Add Column"><i class="fa fa-plus"></i></a>
+<a href="#toolbox_schema_fields_{$key}_menu" id="toolbox_schema_fields_{$key}" class="ipsButton ipsButton_positive ipsButton_veryVerySmall ipsPos_right" data-ipsMenu><i class="fa fa-chevron-circle-down"></i></a>
+{$html2} 
 </li>
 EOF;
 
