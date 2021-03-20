@@ -29,7 +29,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 
-class _Singleton implements HelpersAbstract
+class _Session implements HelpersAbstract
 {
     /**
      * @inheritdoc

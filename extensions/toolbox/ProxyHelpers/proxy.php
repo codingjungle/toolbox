@@ -19,7 +19,9 @@ use IPS\Node\Model;
 use IPS\Output;
 use IPS\Patterns\Singleton;
 use IPS\Request;
+use IPS\Session;
 use IPS\Theme;
+use IPS\toolbox\Content\Member;
 use IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract as devPlusGeneratorAbstract;
 use IPS\toolbox\Proxy\Helpers\GeneratorAbstract;
 use IPS\toolbox\Proxy\Helpers\Request as HelpersRequest;
@@ -63,6 +65,10 @@ class _proxy
      */
     public function request(&$classDoc)
     {
+        $classDoc[] = ['pt' => 'p', 'prop' => 'uid', 'type' => 'int'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dashboard', 'type' => 'int'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'iid', 'type' => 'int'];
+
     }
 
     /**
@@ -83,6 +89,8 @@ class _proxy
         $helpers[ Singleton::class ][] = \IPS\toolbox\Proxy\Helpers\Singleton::class;
         $helpers[ Theme::class ][] = \IPS\toolbox\Proxy\Helpers\Theme::class;
         $helpers[ ActiveRecord::class ][] = \IPS\toolbox\Proxy\Helpers\ActiveRecord::class;
+        $helpers[ Session::class ][] = \IPS\toolbox\Proxy\Helpers\Session::class;
+        $helpers[ \IPS\Member::class ][] = \IPS\toolbox\Proxy\Helpers\Member::class;
 
     }
 }

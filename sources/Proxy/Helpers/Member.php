@@ -23,13 +23,14 @@ use Zend\Code\Generator\PropertyGenerator;
 
 use function defined;
 use function header;
+use IPS\Lang;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header((isset($_SERVER[ 'SERVER_PROTOCOL' ]) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
-class _Singleton implements HelpersAbstract
+class _Member implements HelpersAbstract
 {
     /**
      * @inheritdoc
@@ -39,11 +40,11 @@ class _Singleton implements HelpersAbstract
 
         try{
             $propertyDocBlock = new DocBlockGenerator(
-                'Singleton Instances', null, [ new ReturnTag('static')]
+                'Store a reference to the language object', null, [ new ReturnTag('\\'.Lang::class)]
             );
             $body[] = PropertyGenerator::fromArray(
                 [
-                    'name' => 'instance',
+                    'name' => '_lang',
                     'static' => true,
                     'docblock' => $propertyDocBlock,
                     'visibility' => 'protected'
@@ -54,19 +55,21 @@ class _Singleton implements HelpersAbstract
         }
 
         $methodDocBlock = new DocBlockGenerator(
-            'Get instance', \null, [
-                new ReturnTag('static')
+            'Return the language object to use for this member - returns default if member has not selected a language', \null, [
+                new ReturnTag('\\'.Lang::class)
             ]
         );
 
         try {
             $body[] = MethodGenerator::fromArray(
                 [
-                    'name'       => 'i',
-                    'parameters' => [],
-                    'body'       => 'return parent::i();',
+                    'name'       => 'language',
+                    'parameters' => [
+                        new ParameterGenerator('frontOnly', null, 'false', 0),
+                    ],
+                    'body'       => 'return parent::language();',
                     'docblock'   => $methodDocBlock,
-                    'static'     => \true,
+                    'static'     => \false,
                 ]
             );
         } catch (InvalidArgumentException $e) {
