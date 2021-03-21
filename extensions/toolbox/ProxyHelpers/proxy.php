@@ -68,6 +68,8 @@ class _proxy
         $classDoc[] = ['pt' => 'p', 'prop' => 'uid', 'type' => 'int'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'dashboard', 'type' => 'int'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'iid', 'type' => 'int'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'rrid', 'type' => 'int'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'noshow', 'type' => 'int'];
 
     }
 
