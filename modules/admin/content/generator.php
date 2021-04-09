@@ -46,7 +46,10 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
  */
 class _generator extends Controller
 {
-
+    /**
+     * @brief    Has been CSRF-protected
+     */
+    public static $csrfProtected = true;
     /**
      * @inheritdoc
      * @throws Exception
@@ -165,9 +168,8 @@ class _generator extends Controller
 
             $limit = 100;
 
-            $select = Db::i()->select( '*', 'toolbox_generator', [], 'generator_id ASC', $limit, \null, \null, Db::SELECT_SQL_CALC_FOUND_ROWS );
-
-            if ( !$select->count() ) {
+            $count = Db::i()->select('COUNT(*)', 'toolbox_generator')->first();
+            if ( !$count ) {
                 return \null;
             }
 

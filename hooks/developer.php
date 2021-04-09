@@ -21,6 +21,8 @@ use function array_merge;
 use function array_values;
 use function count;
 use function in_array;
+use function mb_strlen;
+use function mb_substr;
 use function str_replace;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -52,9 +54,16 @@ class toolbox_hook_developer extends _HOOK_CLASS_
         $t = [];
         $t[0] = 'Select Table';
         $prefix = \IPS\Db::i()->prefix;
+        $ipsApps = \IPS\IPS::$ipsApps;
 
         foreach ($tables as $table) {
             $foo = str_replace($prefix, '', array_values($table));
+            foreach( $ipsApps as $app){
+                $tt = mb_substr($foo[0], 0, mb_strlen($app));
+                if( $tt === $app){
+                    continue 2;
+                }
+            }
             $t[$foo[0]] = $foo[0];
         }
 

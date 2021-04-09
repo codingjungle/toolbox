@@ -191,7 +191,11 @@ class _bt extends Controller
         ob_start();
         phpinfo();
         $content = ob_get_clean();
-        ob_end_clean();
+        try {
+            ob_end_clean();
+        }
+        catch (\Exception $e) {
+        }
         $content = preg_replace('#<head>(?:.|\n|\r)+?</head>#miu', '', $content);
         Output::i()->title = 'phpinfo()';
         Output::i()->output = Theme::i()->getTemplate('bt', 'toolbox', 'front')->phpinfo($content);

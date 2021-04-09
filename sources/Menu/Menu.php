@@ -81,7 +81,7 @@ class _Menu extends Singleton
         ];
 
         $store[ 'toolbox' ][] = [
-            'id'   => 'proxy',
+            'id'   => 'DevFolder',
             'name' => 'Generate Application Dev Folder',
             'url'  => (string)Url::internal( 'app=toolbox&module=devfolder&controller=applications' ),
         ];
