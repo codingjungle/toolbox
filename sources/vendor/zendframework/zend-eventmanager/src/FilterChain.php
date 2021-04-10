@@ -30,12 +30,25 @@ class FilterChain implements Filter\FilterInterface
     }
 
     /**
+     * Connect a filter to the chain
+     *
+     * @param callable $callback PHP Callback
+     * @param int $priority Priority in the queue at which to execute;
+     *     defaults to 1 (higher numbers == higher priority)
+     * @return CallbackHandler (to allow later unsubscribe)
+     * @throws Exception\InvalidCallbackException
+     */
+    public function attach(callable $callback, $priority = 1)
+    {
+        $this->filters->insert($callback, $priority);
+        return $callback;
+    }    /**
      * Apply the filters
      *
      * Begins iteration of the filters.
      *
-     * @param  mixed $context Object under observation
-     * @param  mixed $argv Associative array of arguments
+     * @param mixed $context Object under observation
+     * @param mixed $argv Associative array of arguments
      * @return mixed
      */
     public function run($context, array $argv = [])
@@ -52,24 +65,19 @@ class FilterChain implements Filter\FilterInterface
     }
 
     /**
-     * Connect a filter to the chain
+     * Clear all filters
      *
-     * @param  callable $callback PHP Callback
-     * @param  int $priority Priority in the queue at which to execute;
-     *     defaults to 1 (higher numbers == higher priority)
-     * @return CallbackHandler (to allow later unsubscribe)
-     * @throws Exception\InvalidCallbackException
+     * @return void
      */
-    public function attach(callable $callback, $priority = 1)
+    public function clearFilters()
     {
-        $this->filters->insert($callback, $priority);
-        return $callback;
+        $this->filters = new Filter\FilterIterator();
     }
 
     /**
      * Detach a filter from the chain
      *
-     * @param  callable $filter
+     * @param callable $filter
      * @return bool Returns true if filter found and unsubscribed; returns false otherwise
      */
     public function detach(callable $filter)
@@ -87,15 +95,7 @@ class FilterChain implements Filter\FilterInterface
         return $this->filters;
     }
 
-    /**
-     * Clear all filters
-     *
-     * @return void
-     */
-    public function clearFilters()
-    {
-        $this->filters = new Filter\FilterIterator();
-    }
+
 
     /**
      * Return current responses

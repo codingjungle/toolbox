@@ -24,14 +24,18 @@ use IPS\toolbox\GitHooks;
 use RuntimeException;
 
 use function defined;
+use function file_get_contents;
+use function file_put_contents;
 use function function_exists;
 use function header;
-use function property_exists;
-
-use const IPS\NO_WRITES;
-
 use function is_file;
 use function preg_replace_callback;
+use function property_exists;
+
+use function str_replace;
+
+use const DIRECTORY_SEPARATOR;
+use const IPS\NO_WRITES;
 
 
 \IPS\toolbox\Application::loadAutoLoader();
@@ -39,7 +43,7 @@ use function preg_replace_callback;
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -70,9 +74,9 @@ class _settings extends Controller
      */
     protected function manage()
     {
-        if (NO_WRITES === \false) {
+        if (NO_WRITES === false) {
             if (!property_exists(IPS::class, 'beenPatched')) {
-                Output::i()->sidebar[ 'actions' ][ 'init' ] = [
+                Output::i()->sidebar['actions']['init'] = [
                     'icon'  => 'plus',
                     'title' => 'Patch init.php',
                     'link'  => Request::i()->url()->setQueryString(['do' => 'patchInit'])->csrf(),
@@ -97,7 +101,7 @@ class _settings extends Controller
 //            }
 
             if (!function_exists('_p')) {
-                Output::i()->sidebar[ 'actions' ][ 'helpers' ] = [
+                Output::i()->sidebar['actions']['helpers'] = [
                     'icon'  => 'plus',
                     'title' => 'Patch Helpers',
                     'link'  => Request::i()->url()->setQueryString(['do' => 'patchHelpers'])->csrf(),
@@ -121,7 +125,7 @@ class _settings extends Controller
         if ($values = $form->values()) {
             /** @var Application $app */
             foreach (Application::appsWithExtension('toolbox', 'settings') as $app) {
-                $extensions = $app->extensions('toolbox', 'settings', \true);
+                $extensions = $app->extensions('toolbox', 'settings', true);
                 /* @var \IPS\toolbox\extensions\toolbox\Settings\_settings $extension */
                 foreach ($extensions as $extension) {
                     $extension->formatValues($values);
@@ -154,20 +158,20 @@ class _settings extends Controller
 
     protected function patchHelpers()
     {
-        if (\IPS\NO_WRITES === \false && !function_exists('_p')) {
-            $path = \IPS\ROOT_PATH . \DIRECTORY_SEPARATOR;
+        if (NO_WRITES === false && !function_exists('_p')) {
+            $path = \IPS\ROOT_PATH . DIRECTORY_SEPARATOR;
             $init = $path . 'init.php';
-            $content = \file_get_contents($init);
+            $content = file_get_contents($init);
 
-            if (!is_file(\IPS\ROOT_PATH . \DIRECTORY_SEPARATOR . 'init.bu.php')) {
-                \file_put_contents(\IPS\ROOT_PATH . \DIRECTORY_SEPARATOR . 'init.bu.php', $content);
+            if (!is_file(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php')) {
+                file_put_contents(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
             }
             $r = <<<EOF
 require __DIR__ . '/applications/toolbox/sources/Debug/Helpers.php';
 class IPS
 EOF;
-            $content = \str_replace('class IPS', $r, $content);
-            \file_put_contents($init, $content);
+            $content = str_replace('class IPS', $r, $content);
+            file_put_contents($init, $content);
         }
 
         Output::i()->redirect($this->url->csrf(), 'init.php patched with Debug Helpers');
@@ -175,12 +179,12 @@ EOF;
 
     protected function patchInit()
     {
-        if (\IPS\NO_WRITES === \false && !property_exists(IPS::class, 'beenPatched')) {
-            $path = \IPS\ROOT_PATH . \DIRECTORY_SEPARATOR;
+        if (NO_WRITES === false && !property_exists(IPS::class, 'beenPatched')) {
+            $path = \IPS\ROOT_PATH . DIRECTORY_SEPARATOR;
             $init = $path . 'init.php';
-            $content = \file_get_contents($init);
-            if (!is_file(\IPS\ROOT_PATH . \DIRECTORY_SEPARATOR . 'init.bu.php')) {
-                \file_put_contents(\IPS\ROOT_PATH . \DIRECTORY_SEPARATOR . 'init.bu.php', $content);
+            $content = file_get_contents($init);
+            if (!is_file(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php')) {
+                file_put_contents(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
             }
             $preg = "#public static function monkeyPatch\((.*?)public#msu";
             $before = <<<'eof'
@@ -239,7 +243,7 @@ eof;
                 $content
             );
 
-            \file_put_contents($init, $content);
+            file_put_contents($init, $content);
         }
 
         Output::i()->redirect($this->url->csrf(), 'init.php patched');

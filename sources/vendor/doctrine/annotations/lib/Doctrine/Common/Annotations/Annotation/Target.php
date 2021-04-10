@@ -20,6 +20,8 @@
 
 namespace Doctrine\Common\Annotations\Annotation;
 
+use InvalidArgumentException;
+
 /**
  * Annotation that can be used to signal to the parser
  * to check the annotation target during the parsing process.
@@ -30,11 +32,11 @@ namespace Doctrine\Common\Annotations\Annotation;
  */
 final class Target
 {
-    const TARGET_CLASS              = 1;
-    const TARGET_METHOD             = 2;
-    const TARGET_PROPERTY           = 4;
-    const TARGET_ANNOTATION         = 8;
-    const TARGET_ALL                = 15;
+    public const TARGET_CLASS = 1;
+    public const TARGET_METHOD = 2;
+    public const TARGET_PROPERTY = 4;
+    public const TARGET_ANNOTATION = 8;
+    public const TARGET_ALL = 15;
 
     /**
      * @var array
@@ -55,14 +57,14 @@ final class Target
     /**
      * Targets as bitmask.
      *
-     * @var integer
+     * @var int
      */
     public $targets;
 
     /**
      * Literal target declaration.
      *
-     * @var integer
+     * @var int
      */
     public $literal;
 
@@ -71,18 +73,18 @@ final class Target
      *
      * @param array $values
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(array $values)
     {
-        if (!isset($values['value'])){
+        if (!isset($values['value'])) {
             $values['value'] = null;
         }
-        if (is_string($values['value'])){
+        if (is_string($values['value'])) {
             $values['value'] = array($values['value']);
         }
-        if (!is_array($values['value'])){
-            throw new \InvalidArgumentException(
+        if (!is_array($values['value'])) {
+            throw new InvalidArgumentException(
                 sprintf('@Target expects either a string value, or an array of strings, "%s" given.',
                     is_object($values['value']) ? get_class($values['value']) : gettype($values['value'])
                 )
@@ -91,17 +93,17 @@ final class Target
 
         $bitmask = 0;
         foreach ($values['value'] as $literal) {
-            if(!isset(self::$map[$literal])){
-                throw new \InvalidArgumentException(
+            if (!isset(self::$map[$literal])) {
+                throw new InvalidArgumentException(
                     sprintf('Invalid Target "%s". Available targets: [%s]',
-                            $literal,  implode(', ', array_keys(self::$map)))
+                        $literal, implode(', ', array_keys(self::$map)))
                 );
             }
             $bitmask |= self::$map[$literal];
         }
 
-        $this->targets  = $bitmask;
-        $this->value    = $values['value'];
-        $this->literal  = implode(', ', $this->value);
+        $this->targets = $bitmask;
+        $this->value = $values['value'];
+        $this->literal = implode(', ', $this->value);
     }
 }

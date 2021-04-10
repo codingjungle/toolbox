@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use ArrayIterator;
+use SplFileInfo;
 use Symfony\Component\Finder\Iterator\FileTypeFilterIterator;
 
 class FileTypeFilterIteratorTest extends RealIteratorTestCase
@@ -63,16 +65,16 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
     }
 }
 
-class InnerTypeIterator extends \ArrayIterator
+class InnerTypeIterator extends ArrayIterator
 {
-    public function current()
-    {
-        return new \SplFileInfo(parent::current());
-    }
-
     public function isFile()
     {
         return $this->current()->isFile();
+    }
+
+    public function current()
+    {
+        return new SplFileInfo(parent::current());
     }
 
     public function isDir()

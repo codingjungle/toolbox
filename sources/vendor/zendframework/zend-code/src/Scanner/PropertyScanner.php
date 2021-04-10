@@ -11,6 +11,7 @@ namespace Zend\Code\Scanner;
 
 use Zend\Code\Annotation;
 use Zend\Code\Exception;
+use Zend\Code\Exception\RuntimeException;
 use Zend\Code\NameInformation;
 
 use function is_array;
@@ -25,11 +26,11 @@ use function var_export;
 
 class PropertyScanner implements ScannerInterface
 {
-    const T_BOOLEAN = 'boolean';
-    const T_INTEGER = 'int';
-    const T_STRING  = 'string';
-    const T_ARRAY   = 'array';
-    const T_UNKNOWN = 'unknown';
+    public const T_BOOLEAN = 'boolean';
+    public const T_INTEGER = 'int';
+    public const T_STRING = 'string';
+    public const T_ARRAY = 'array';
+    public const T_UNKNOWN = 'unknown';
 
     /**
      * @var bool
@@ -147,6 +148,100 @@ class PropertyScanner implements ScannerInterface
     }
 
     /**
+     * Scan tokens
+     *
+     * @throws RuntimeException
+     */
+    protected function scan()
+    {
+        if ($this->isScanned) {
+            return;
+        }
+
+        if (!$this->tokens) {
+            throw new RuntimeException('No tokens were provided');
+        }
+
+        /**
+         * Variables & Setup
+         */
+        $value = '';
+        $concatenateValue = false;
+
+        $tokens = &$this->tokens;
+        reset($tokens);
+
+        foreach ($tokens as $token) {
+            $tempValue = $token;
+            if (!is_string($token)) {
+                list($tokenType, $tokenContent, $tokenLine) = $token;
+
+                switch ($tokenType) {
+                    case T_DOC_COMMENT:
+                        if ($this->docComment === null && $this->name === null) {
+                            $this->docComment = $tokenContent;
+                        }
+                        break;
+
+                    case T_VARIABLE:
+                        $this->name = ltrim($tokenContent, '$');
+                        break;
+
+                    case T_PUBLIC:
+                        // use defaults
+                        break;
+
+                    case T_PROTECTED:
+                        $this->isProtected = true;
+                        $this->isPublic = false;
+                        break;
+
+                    case T_PRIVATE:
+                        $this->isPrivate = true;
+                        $this->isPublic = false;
+                        break;
+
+                    case T_STATIC:
+                        $this->isStatic = true;
+                        break;
+                    default:
+                        $tempValue = trim($tokenContent);
+                        break;
+                }
+            }
+
+            //end value concatenation
+            if (!is_array($token) && trim($token) == ';') {
+                $concatenateValue = false;
+            }
+
+            if (true === $concatenateValue) {
+                $value .= $tempValue;
+            }
+
+            //start value concatenation
+            if (!is_array($token) && trim($token) == '=') {
+                $concatenateValue = true;
+            }
+        }
+
+        $this->valueType = self::T_UNKNOWN;
+        if ($value == 'false' || $value == 'true') {
+            $this->valueType = self::T_BOOLEAN;
+        } elseif (is_numeric($value)) {
+            $this->valueType = self::T_INTEGER;
+        } elseif (0 === strpos($value, 'array') || 0 === strpos($value, '[')) {
+            $this->valueType = self::T_ARRAY;
+        } elseif (0 === strpos($value, '"') || 0 === strpos($value, "'")) {
+            $value = substr($value, 1, -1); // Remove quotes
+            $this->valueType = self::T_STRING;
+        }
+
+        $this->value = empty($value) ? null : $value;
+        $this->isScanned = true;
+    }
+
+    /**
      * @return string
      */
     public function getValueType()
@@ -201,15 +296,6 @@ class PropertyScanner implements ScannerInterface
     }
 
     /**
-     * @return string
-     */
-    public function getDocComment()
-    {
-        $this->scan();
-        return $this->docComment;
-    }
-
-    /**
      * @param Annotation\AnnotationManager $annotationManager
      * @return AnnotationScanner|false
      */
@@ -225,103 +311,18 @@ class PropertyScanner implements ScannerInterface
     /**
      * @return string
      */
+    public function getDocComment()
+    {
+        $this->scan();
+        return $this->docComment;
+    }
+
+    /**
+     * @return string
+     */
     public function __toString()
     {
         $this->scan();
         return var_export($this, true);
-    }
-
-    /**
-     * Scan tokens
-     *
-     * @throws \Zend\Code\Exception\RuntimeException
-     */
-    protected function scan()
-    {
-        if ($this->isScanned) {
-            return;
-        }
-
-        if (! $this->tokens) {
-            throw new Exception\RuntimeException('No tokens were provided');
-        }
-
-        /**
-         * Variables & Setup
-         */
-        $value            = '';
-        $concatenateValue = false;
-
-        $tokens = &$this->tokens;
-        reset($tokens);
-
-        foreach ($tokens as $token) {
-            $tempValue = $token;
-            if (! is_string($token)) {
-                list($tokenType, $tokenContent, $tokenLine) = $token;
-
-                switch ($tokenType) {
-                    case T_DOC_COMMENT:
-                        if ($this->docComment === null && $this->name === null) {
-                            $this->docComment = $tokenContent;
-                        }
-                        break;
-
-                    case T_VARIABLE:
-                        $this->name = ltrim($tokenContent, '$');
-                        break;
-
-                    case T_PUBLIC:
-                        // use defaults
-                        break;
-
-                    case T_PROTECTED:
-                        $this->isProtected = true;
-                        $this->isPublic = false;
-                        break;
-
-                    case T_PRIVATE:
-                        $this->isPrivate = true;
-                        $this->isPublic = false;
-                        break;
-
-                    case T_STATIC:
-                        $this->isStatic = true;
-                        break;
-                    default:
-                        $tempValue = trim($tokenContent);
-                        break;
-                }
-            }
-
-            //end value concatenation
-            if (! is_array($token) && trim($token) == ';') {
-                $concatenateValue = false;
-            }
-
-            if (true === $concatenateValue) {
-                $value .= $tempValue;
-            }
-
-            //start value concatenation
-            if (! is_array($token) && trim($token) == '=') {
-                $concatenateValue = true;
-            }
-        }
-
-        $this->valueType = self::T_UNKNOWN;
-        if ($value == 'false' || $value == 'true') {
-            $this->valueType = self::T_BOOLEAN;
-        } elseif (is_numeric($value)) {
-            $this->valueType = self::T_INTEGER;
-        } elseif (0 === strpos($value, 'array') || 0 === strpos($value, '[')) {
-            $this->valueType = self::T_ARRAY;
-        } elseif (0 === strpos($value, '"') || 0 === strpos($value, "'")) {
-            $value = substr($value, 1, -1); // Remove quotes
-            $this->valueType = self::T_STRING;
-        }
-
-        $this->value = empty($value) ? null : $value;
-        $this->isScanned = true;
     }
 }

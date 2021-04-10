@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\Code;
 
+use InvalidArgumentException;
 use IPS\toolbox\ReservedWords;
 use Symfony\Component\Finder\Finder;
 
@@ -43,20 +44,9 @@ class _Template extends ParserAbstract
     }
 
     /**
-     * @inheritdoc
-     */
-    public function verify(): array
-    {
-        foreach ($this->finder as $invalidTemplate) {
-            $this->warnings[] = $invalidTemplate->getPath();
-        }
-        return $this->warnings;
-    }
-
-    /**
      * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function getFiles()
     {
@@ -65,6 +55,17 @@ class _Template extends ParserAbstract
         foreach (ReservedWords::get() as $invalidName) {
             $this->finder->name($invalidName . '.php');
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function verify(): array
+    {
+        foreach ($this->finder as $invalidTemplate) {
+            $this->warnings[] = $invalidTemplate->getPath();
+        }
+        return $this->warnings;
     }
 
 }

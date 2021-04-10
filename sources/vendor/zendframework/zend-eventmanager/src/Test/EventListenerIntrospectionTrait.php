@@ -11,6 +11,7 @@ namespace Zend\EventManager\Test;
 
 use PHPUnit\Framework\Assert;
 use ReflectionProperty;
+use Traversable;
 use Zend\EventManager\EventManager;
 
 /**
@@ -45,40 +46,6 @@ trait EventListenerIntrospectionTrait
     }
 
     /**
-     * Retrieve an interable list of listeners for an event.
-     *
-     * Given an event and an event manager, returns an iterator with the
-     * listeners for that event, in priority order.
-     *
-     * If $withPriority is true, the key values will be the priority at which
-     * the given listener is attached.
-     *
-     * Do not pass $withPriority if you want to cast the iterator to an array,
-     * as many listeners will likely have the same priority, and thus casting
-     * will collapse to the last added.
-     *
-     * @param string $event
-     * @param EventManager $events
-     * @param bool $withPriority
-     * @return \Traversable
-     */
-    private function getListenersForEvent($event, EventManager $events, $withPriority = false)
-    {
-        $r = new ReflectionProperty($events, 'events');
-        $r->setAccessible(true);
-        $internal = $r->getValue($events);
-
-        $listeners = [];
-        foreach (isset($internal[$event]) ? $internal[$event] : [] as $p => $listOfListeners) {
-            foreach ($listOfListeners as $l) {
-                $listeners[$p] = isset($listeners[$p]) ? array_merge($listeners[$p], $l) : $l;
-            }
-        }
-
-        return $this->traverseListeners($listeners, $withPriority);
-    }
-
-    /**
      * Assert that a given listener exists at the specified priority.
      *
      * @param callable $expectedListener
@@ -100,7 +67,7 @@ trait EventListenerIntrospectionTrait
             $expectedPriority
         );
         $listeners = $this->getListenersForEvent($event, $events, true);
-        $found     = false;
+        $found = false;
         foreach ($listeners as $priority => $listener) {
             if ($listener === $expectedListener
                 && $priority === $expectedPriority
@@ -110,6 +77,62 @@ trait EventListenerIntrospectionTrait
             }
         }
         Assert::assertTrue($found, $message);
+    }
+
+    /**
+     * Retrieve an interable list of listeners for an event.
+     *
+     * Given an event and an event manager, returns an iterator with the
+     * listeners for that event, in priority order.
+     *
+     * If $withPriority is true, the key values will be the priority at which
+     * the given listener is attached.
+     *
+     * Do not pass $withPriority if you want to cast the iterator to an array,
+     * as many listeners will likely have the same priority, and thus casting
+     * will collapse to the last added.
+     *
+     * @param string $event
+     * @param EventManager $events
+     * @param bool $withPriority
+     * @return Traversable
+     */
+    private function getListenersForEvent($event, EventManager $events, $withPriority = false)
+    {
+        $r = new ReflectionProperty($events, 'events');
+        $r->setAccessible(true);
+        $internal = $r->getValue($events);
+
+        $listeners = [];
+        foreach (isset($internal[$event]) ? $internal[$event] : [] as $p => $listOfListeners) {
+            foreach ($listOfListeners as $l) {
+                $listeners[$p] = isset($listeners[$p]) ? array_merge($listeners[$p], $l) : $l;
+            }
+        }
+
+        return $this->traverseListeners($listeners, $withPriority);
+    }
+
+    /**
+     * Generator for traversing listeners in priority order.
+     *
+     * @param array $listeners
+     * @param bool $withPriority When true, yields priority as key.
+     */
+    public function traverseListeners(array $queue, $withPriority = false)
+    {
+        krsort($queue, SORT_NUMERIC);
+
+        foreach ($queue as $priority => $listeners) {
+            $priority = (int)$priority;
+            foreach ($listeners as $listener) {
+                if ($withPriority) {
+                    yield $priority => $listener;
+                } else {
+                    yield $listener;
+                }
+            }
+        }
     }
 
     /**
@@ -126,27 +149,5 @@ trait EventListenerIntrospectionTrait
     private function getArrayOfListenersForEvent($event, EventManager $events)
     {
         return iterator_to_array($this->getListenersForEvent($event, $events));
-    }
-
-    /**
-     * Generator for traversing listeners in priority order.
-     *
-     * @param array $listeners
-     * @param bool $withPriority When true, yields priority as key.
-     */
-    public function traverseListeners(array $queue, $withPriority = false)
-    {
-        krsort($queue, SORT_NUMERIC);
-
-        foreach ($queue as $priority => $listeners) {
-            $priority = (int) $priority;
-            foreach ($listeners as $listener) {
-                if ($withPriority) {
-                    yield $priority => $listener;
-                } else {
-                    yield $listener;
-                }
-            }
-        }
     }
 }

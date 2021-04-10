@@ -14,6 +14,7 @@
 namespace IPS\toolbox\Shared;
 
 use IPS\Patterns\Singleton;
+
 use function array_merge;
 use function array_reverse;
 use function array_slice;
@@ -252,7 +253,7 @@ class _Lorem extends Singleton
      * Whether or not we should be starting the string with "Lorem ipsum..."
      *
      * @access private
-     * @var    boolean
+     * @var    bool
      */
     protected $first = true;
 
@@ -267,10 +268,9 @@ class _Lorem extends Singleton
      *
      * @return string generated lorem ipsum word
      */
-    public function word( $tags = false )
+    public function word($tags = false)
     {
-
-        return $this->words( 1, $tags );
+        return $this->words(1, $tags);
     }
 
     /**
@@ -280,39 +280,38 @@ class _Lorem extends Singleton
      *
      * @access public
      *
-     * @param integer $count how many words to generate
-     * @param mixed   $tags  string or array of HTML tags to wrap output with
-     * @param boolean $array whether an array or a string should be returned
+     * @param int $count how many words to generate
+     * @param mixed $tags string or array of HTML tags to wrap output with
+     * @param bool $array whether an array or a string should be returned
      *
      * @return mixed   string or array of generated lorem ipsum words
      */
-    public function words( $count = 1, $tags = false, $array = false )
+    public function words($count = 1, $tags = false, $array = false)
     {
-
         $words = [];
         $word_count = 0;
 
         // Shuffles and appends the word list to compensate for count
         // arguments that exceed the size of our vocabulary list
-        while ( $word_count < $count ) {
+        while ($word_count < $count) {
             $shuffle = true;
 
-            while ( $shuffle ) {
+            while ($shuffle) {
                 $this->shuffle();
 
                 // Checks that the last word of the list and the first word of
                 // the list that's about to be appended are not the same
-                if ( !$word_count || $words[ $word_count - 1 ] != $this->words[ 0 ] ) {
-                    $words = array_merge( $words, $this->words );
-                    $word_count = count( $words );
+                if (!$word_count || $words[$word_count - 1] != $this->words[0]) {
+                    $words = array_merge($words, $this->words);
+                    $word_count = count($words);
                     $shuffle = false;
                 }
             }
         }
 
-        $words = array_slice( $words, 0, $count );
+        $words = array_slice($words, 0, $count);
 
-        return $this->output( $words, $tags, $array );
+        return $this->output($words, $tags, $array);
     }
 
     /**
@@ -325,19 +324,17 @@ class _Lorem extends Singleton
      */
     protected function shuffle()
     {
+        if ($this->first) {
+            $this->first = array_slice($this->words, 0, 8);
+            $this->words = array_slice($this->words, 8);
 
-        if ( $this->first ) {
-            $this->first = array_slice( $this->words, 0, 8 );
-            $this->words = array_slice( $this->words, 8 );
-
-            shuffle( $this->words );
+            shuffle($this->words);
 
             $this->words = $this->first + $this->words;
 
             $this->first = false;
-        }
-        else {
-            shuffle( $this->words );
+        } else {
+            shuffle($this->words);
         }
     }
 
@@ -351,42 +348,39 @@ class _Lorem extends Singleton
      *
      * @access private
      *
-     * @param array   $strings   an array of generated strings
-     * @param mixed   $tags      string or array of HTML tags to wrap output with
-     * @param boolean $array     whether an array or a string should be returned
-     * @param string  $delimiter the string to use when calling implode()
+     * @param array $strings an array of generated strings
+     * @param mixed $tags string or array of HTML tags to wrap output with
+     * @param bool $array whether an array or a string should be returned
+     * @param string $delimiter the string to use when calling implode()
      *
      * @return mixed   string or array of generated lorem ipsum text
      */
-    protected function output( $strings, $tags, $array, $delimiter = ' ' )
+    protected function output($strings, $tags, $array, $delimiter = ' ')
     {
-
-        if ( $tags ) {
-            if ( !is_array( $tags ) ) {
-                $tags = [ $tags ];
-            }
-            else {
+        if ($tags) {
+            if (!is_array($tags)) {
+                $tags = [$tags];
+            } else {
                 // Flips the array so we can work from the inside out
-                $tags = array_reverse( $tags );
+                $tags = array_reverse($tags);
             }
 
-            foreach ( $strings as $key => $string ) {
-                foreach ( $tags as $tag ) {
+            foreach ($strings as $key => $string) {
+                foreach ($tags as $tag) {
                     // Detects / applies back reference
-                    if ( $tag[ 0 ] == '<' ) {
-                        $string = str_replace( '$1', $string, $tag );
-                    }
-                    else {
-                        $string = sprintf( '<%1$s>%2$s</%1$s>', $tag, $string );
+                    if ($tag[0] == '<') {
+                        $string = str_replace('$1', $string, $tag);
+                    } else {
+                        $string = sprintf('<%1$s>%2$s</%1$s>', $tag, $string);
                     }
 
-                    $strings[ $key ] = $string;
+                    $strings[$key] = $string;
                 }
             }
         }
 
-        if ( !$array ) {
-            $strings = implode( $delimiter, $strings );
+        if (!$array) {
+            $strings = implode($delimiter, $strings);
         }
 
         return $strings;
@@ -403,10 +397,9 @@ class _Lorem extends Singleton
      *
      * @return string generated lorem ipsum sentence
      */
-    public function sentence( $tags = false )
+    public function sentence($tags = false)
     {
-
-        return $this->sentences( 1, $tags );
+        return $this->sentences(1, $tags);
     }
 
     /**
@@ -416,24 +409,23 @@ class _Lorem extends Singleton
      *
      * @access public
      *
-     * @param integer $count how many sentences to generate
-     * @param mixed   $tags  string or array of HTML tags to wrap output with
-     * @param boolean $array whether an array or a string should be returned
+     * @param int $count how many sentences to generate
+     * @param mixed $tags string or array of HTML tags to wrap output with
+     * @param bool $array whether an array or a string should be returned
      *
      * @return mixed   string or array of generated lorem ipsum sentences
      */
-    public function sentences( $count = 1, $tags = false, $array = false )
+    public function sentences($count = 1, $tags = false, $array = false)
     {
-
         $sentences = [];
 
-        for ( $i = 0; $i < $count; $i++ ) {
-            $sentences[] = $this->wordsArray( $this->gauss( 24.46, 5.08 ) );
+        for ($i = 0; $i < $count; $i++) {
+            $sentences[] = $this->wordsArray($this->gauss(24.46, 5.08));
         }
 
-        $this->punctuate( $sentences );
+        $this->punctuate($sentences);
 
-        return $this->output( $sentences, $tags, $array );
+        return $this->output($sentences, $tags, $array);
     }
 
     /**
@@ -443,15 +435,14 @@ class _Lorem extends Singleton
      *
      * @access public
      *
-     * @param integer $count how many words to generate
-     * @param mixed   $tags  string or array of HTML tags to wrap output with
+     * @param int $count how many words to generate
+     * @param mixed $tags string or array of HTML tags to wrap output with
      *
      * @return array   generated lorem ipsum words
      */
-    public function wordsArray( $count = 1, $tags = false )
+    public function wordsArray($count = 1, $tags = false)
     {
-
-        return $this->words( $count, $tags, true );
+        return $this->words($count, $tags, true);
     }
 
     /**
@@ -464,17 +455,16 @@ class _Lorem extends Singleton
      *
      * @access private
      *
-     * @param double $mean    average value
+     * @param double $mean average value
      * @param double $std_dev stadnard deviation
      *
      * @return double  calculated distribution
      */
-    protected function gauss( $mean, $std_dev )
+    protected function gauss($mean, $std_dev)
     {
-
         $x = mt_rand() / mt_getrandmax();
         $y = mt_rand() / mt_getrandmax();
-        $z = sqrt( -2 * log( $x ) ) * cos( 2 * M_PI * $y );
+        $z = sqrt(-2 * log($x)) * cos(2 * M_PI * $y);
 
         return $z * $std_dev + $mean;
     }
@@ -490,28 +480,27 @@ class _Lorem extends Singleton
      *
      * @param array $sentences the sentences we would like to punctuate
      */
-    protected function punctuate( &$sentences )
+    protected function punctuate(&$sentences)
     {
-
-        foreach ( $sentences as $key => $sentence ) {
-            $words = count( $sentence );
+        foreach ($sentences as $key => $sentence) {
+            $words = count($sentence);
 
             // Only worry about commas on sentences longer than 4 words
-            if ( $words > 4 ) {
-                $mean = log( $words, 6 );
+            if ($words > 4) {
+                $mean = log($words, 6);
                 $std_dev = $mean / 6;
-                $commas = round( $this->gauss( $mean, $std_dev ) );
+                $commas = round($this->gauss($mean, $std_dev));
 
-                for ( $i = 1; $i <= $commas; $i++ ) {
-                    $word = round( $i * $words / ( $commas + 1 ) );
+                for ($i = 1; $i <= $commas; $i++) {
+                    $word = round($i * $words / ($commas + 1));
 
-                    if ( $word < ( $words - 1 ) && $word > 0 ) {
-                        $sentence[ $word ] .= ',';
+                    if ($word < ($words - 1) && $word > 0) {
+                        $sentence[$word] .= ',';
                     }
                 }
             }
 
-            $sentences[ $key ] = mb_ucfirst( implode( ' ', $sentence ) . '.' );
+            $sentences[$key] = mb_ucfirst(implode(' ', $sentence) . '.');
         }
     }
 
@@ -522,15 +511,14 @@ class _Lorem extends Singleton
      *
      * @access public
      *
-     * @param integer $count how many sentences to generate
-     * @param mixed   $tags  string or array of HTML tags to wrap output with
+     * @param int $count how many sentences to generate
+     * @param mixed $tags string or array of HTML tags to wrap output with
      *
      * @return array   generated lorem ipsum sentences
      */
-    public function sentencesArray( $count = 1, $tags = false )
+    public function sentencesArray($count = 1, $tags = false)
     {
-
-        return $this->sentences( $count, $tags, true );
+        return $this->sentences($count, $tags, true);
     }
 
     /**
@@ -544,10 +532,9 @@ class _Lorem extends Singleton
      *
      * @return string generated lorem ipsum paragraph
      */
-    public function paragraph( $tags = false )
+    public function paragraph($tags = false)
     {
-
-        return $this->paragraphs( 1, $tags );
+        return $this->paragraphs(1, $tags);
     }
 
     /**
@@ -557,22 +544,21 @@ class _Lorem extends Singleton
      *
      * @access public
      *
-     * @param integer $count how many paragraphs to generate
-     * @param mixed   $tags  string or array of HTML tags to wrap output with
-     * @param boolean $array whether an array or a string should be returned
+     * @param int $count how many paragraphs to generate
+     * @param mixed $tags string or array of HTML tags to wrap output with
+     * @param bool $array whether an array or a string should be returned
      *
      * @return mixed   string or array of generated lorem ipsum paragraphs
      */
-    public function paragraphs( $count = 1, $tags = false, $array = false )
+    public function paragraphs($count = 1, $tags = false, $array = false)
     {
-
         $paragraphs = [];
 
-        for ( $i = 0; $i < $count; $i++ ) {
-            $paragraphs[] = $this->sentences( $this->gauss( 5.8, 1.93 ) );
+        for ($i = 0; $i < $count; $i++) {
+            $paragraphs[] = $this->sentences($this->gauss(5.8, 1.93));
         }
 
-        return $this->output( $paragraphs, $tags, $array, "\n\n" );
+        return $this->output($paragraphs, $tags, $array, "\n\n");
     }
 
     /**
@@ -582,14 +568,13 @@ class _Lorem extends Singleton
      *
      * @access public
      *
-     * @param integer $count how many paragraphs to generate
-     * @param mixed   $tags  string or array of HTML tags to wrap output with
+     * @param int $count how many paragraphs to generate
+     * @param mixed $tags string or array of HTML tags to wrap output with
      *
      * @return array   generated lorem ipsum paragraphs
      */
-    public function paragraphsArray( $count = 1, $tags = false )
+    public function paragraphsArray($count = 1, $tags = false)
     {
-
-        return $this->paragraphs( $count, $tags, true );
+        return $this->paragraphs($count, $tags, true);
     }
 }

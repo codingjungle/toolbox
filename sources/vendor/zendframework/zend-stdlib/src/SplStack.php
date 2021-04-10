@@ -17,6 +17,16 @@ use Serializable;
 class SplStack extends \SplStack implements Serializable
 {
     /**
+     * Serialize
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        return serialize($this->toArray());
+    }
+
+    /**
      * Serialize to an array representing the stack
      *
      * @return array
@@ -31,19 +41,9 @@ class SplStack extends \SplStack implements Serializable
     }
 
     /**
-     * Serialize
-     *
-     * @return string
-     */
-    public function serialize()
-    {
-        return serialize($this->toArray());
-    }
-
-    /**
      * Unserialize
      *
-     * @param  string $data
+     * @param string $data
      * @return void
      */
     public function unserialize($data)

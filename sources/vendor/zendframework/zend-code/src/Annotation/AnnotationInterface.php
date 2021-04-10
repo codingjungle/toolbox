@@ -14,7 +14,7 @@ interface AnnotationInterface
     /**
      * Initialize
      *
-     * @param  string $content
+     * @param string $content
      * @return void
      */
     public function initialize($content);

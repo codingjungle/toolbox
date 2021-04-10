@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Node;
 
 use PhpParser\NodeAbstract;
+
+use function is_string;
 
 /**
  * @property Name $namespacedName Namespaced name (for class constants, if using NameResolver)
@@ -17,21 +20,24 @@ class Const_ extends NodeAbstract
     /**
      * Constructs a const node for use in class const and const statements.
      *
-     * @param string|Identifier $name       Name
-     * @param Expr              $value      Value
-     * @param array             $attributes Additional attributes
+     * @param string|Identifier $name Name
+     * @param Expr $value Value
+     * @param array $attributes Additional attributes
      */
-    public function __construct($name, Expr $value, array $attributes = []) {
+    public function __construct($name, Expr $value, array $attributes = [])
+    {
         parent::__construct($attributes);
-        $this->name = \is_string($name) ? new Identifier($name) : $name;
+        $this->name = is_string($name) ? new Identifier($name) : $name;
         $this->value = $value;
     }
 
-    public function getSubNodeNames() : array {
+    public function getSubNodeNames(): array
+    {
         return ['name', 'value'];
     }
-    
-    public function getType() : string {
+
+    public function getType(): string
+    {
         return 'Const';
     }
 }

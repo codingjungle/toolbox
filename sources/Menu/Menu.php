@@ -17,6 +17,7 @@ use IPS\Http\Url;
 use IPS\Patterns\Singleton;
 use IPS\Plugin;
 use IPS\Theme;
+use UnexpectedValueException;
 
 class _Menu extends Singleton
 {
@@ -28,12 +29,11 @@ class _Menu extends Singleton
 
     /**
      * @return string
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function build(): string
     {
-
-        return Theme::i()->getTemplate( 'devBar', 'toolbox' )->devBar( $this->execute() );
+        return Theme::i()->getTemplate('devBar', 'toolbox')->devBar($this->execute());
     }
 
     /**
@@ -41,54 +41,53 @@ class _Menu extends Singleton
      */
     public function execute(): array
     {
-
         $store = [];
-        $store[ 'roots' ][ 'toolbox' ] = [
+        $store['roots']['toolbox'] = [
             'id'   => 'toolbox',
             'name' => 'Dev Toolbox',
             'url'  => 'elDevToolstoolbox',
         ];
 
-        $store[ 'toolbox' ][] = [
+        $store['toolbox'][] = [
             'id'   => 'settings',
             'name' => 'Settings',
-            'url'  => (string)Url::internal( 'app=toolbox&module=settings&controller=settings' ),
+            'url'  => (string)Url::internal('app=toolbox&module=settings&controller=settings'),
         ];
-        $store[ 'toolbox' ][] = [
+        $store['toolbox'][] = [
             'id'   => 'cons',
             'name' => 'Change Constants',
-            'url'  => (string)Url::internal( 'app=toolbox&module=settings&controller=cons' ),
+            'url'  => (string)Url::internal('app=toolbox&module=settings&controller=cons'),
         ];
-        $store[ 'toolbox' ][] = [
+        $store['toolbox'][] = [
             'id'   => 'proxy',
             'name' => 'Proxy Class Generator',
-            'url'  => (string)Url::internal( 'app=toolbox&module=proxy&controller=proxy' ),
+            'url'  => (string)Url::internal('app=toolbox&module=proxy&controller=proxy'),
         ];
         /**
          * @var Application $app
          */
-        foreach ( Application::appsWithExtension( 'toolbox', 'menu' ) as $app ) {
+        foreach (Application::appsWithExtension('toolbox', 'menu') as $app) {
             /* @var \IPS\toolbox\extensions\toolbox\menu\menu $menu */
-            foreach ( $app->extensions( 'toolbox', 'menu', \true ) as $menu ) {
-                $menu->menu( $store );
+            foreach ($app->extensions('toolbox', 'menu', true) as $menu) {
+                $menu->menu($store);
             }
         }
 
-        $store[ 'toolbox' ][] = [
+        $store['toolbox'][] = [
             'id'   => 'content',
             'name' => 'Content Generator',
-            'url'  => (string)Url::internal( 'app=toolbox&module=content&controller=generator' ),
+            'url'  => (string)Url::internal('app=toolbox&module=content&controller=generator'),
         ];
 
-        $store[ 'toolbox' ][] = [
+        $store['toolbox'][] = [
             'id'   => 'DevFolder',
             'name' => 'Generate Application Dev Folder',
-            'url'  => (string)Url::internal( 'app=toolbox&module=devfolder&controller=applications' ),
+            'url'  => (string)Url::internal('app=toolbox&module=devfolder&controller=applications'),
         ];
 
-        $this->menu( $store );
+        $this->menu($store);
 
-        $store[ 'roots' ][] = [
+        $store['roots'][] = [
             'id'   => 'apps',
             'name' => 'Apps',
             'url'  => 'elDevToolBoxApps',
@@ -97,27 +96,27 @@ class _Menu extends Singleton
         /**
          * @var $apps Application
          */
-        foreach ( Application::applications() as $apps ) {
-            $store[ 'apps' ][ $apps->directory ] = [
+        foreach (Application::applications() as $apps) {
+            $store['apps'][$apps->directory] = [
                 'id'   => $apps->directory,
                 'name' => '__app_' . $apps->directory,
-                'url'  => (string)Url::internal( 'app=core&module=applications&controller=developer&appKey=' . $apps->directory ),
+                'url'  => (string)Url::internal('app=core&module=applications&controller=developer&appKey=' . $apps->directory),
             ];
         }
 
-        $plugins = \false;
+        $plugins = false;
 
-        foreach ( Plugin::plugins() as $plugin ) {
-            $plugins = \true;
-            $store[ 'plugins' ][ $plugin->name ] = [
+        foreach (Plugin::plugins() as $plugin) {
+            $plugins = true;
+            $store['plugins'][$plugin->name] = [
                 'id'   => $plugin->name,
                 'name' => $plugin->name,
-                'url'  => (string)Url::internal( 'app=core&module=applications&controller=plugins&do=developer&id=' . $plugin->id ),
+                'url'  => (string)Url::internal('app=core&module=applications&controller=plugins&do=developer&id=' . $plugin->id),
             ];
         }
 
-        if ( $plugins ) {
-            $store[ 'roots' ][] = [
+        if ($plugins) {
+            $store['roots'][] = [
                 'id'   => 'plugins',
                 'name' => 'Plugins',
                 'url'  => 'elDevToolsPlugins',
@@ -132,97 +131,96 @@ class _Menu extends Singleton
      *
      * @param $store
      */
-    protected function menu( &$store )
+    protected function menu(&$store)
     {
-
-        $store[ 'roots' ][] = [
+        $store['roots'][] = [
             'id'   => 'ips',
             'name' => 'IPS',
             'url'  => 'elDevToolboxIPS',
         ];
 
-        $store[ 'ips' ][] = [
+        $store['ips'][] = [
             'id'   => 'guides',
             'name' => 'Guides',
             'url'  => 'https://invisioncommunity.com/4guides/how-to-use-ips-community-suite/first-steps/terminology-r7/',
         ];
 
-        $store[ 'ips' ][] = [
+        $store['ips'][] = [
             'id'   => 'devdocs',
             'name' => 'Developer Documentation',
             'url'  => 'https://invisioncommunity.com/developers/',
         ];
 
-        $store[ 'ips' ][] = [
+        $store['ips'][] = [
             'id'   => 'comms',
             'name' => 'Community Forums',
             'url'  => 'https://invisioncommunity.com/forums/forum/503-customization-resources/',
         ];
 
-        $store[ 'ips' ][] = [
+        $store['ips'][] = [
             'id'   => 'notes',
             'name' => 'Release Notes',
             'url'  => 'https://invisioncommunity.com/release-notes/',
         ];
 
-        $store[ 'roots' ][] = [
+        $store['roots'][] = [
             'id'   => 'sys',
             'name' => 'System',
             'url'  => 'elDevToolboxsys',
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'apps',
             'name' => 'Applications',
-            'url'  => (string)Url::internal( 'app=core&module=applications&controller=applications' ),
+            'url'  => (string)Url::internal('app=core&module=applications&controller=applications'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'plugins',
             'name' => 'Plugins',
-            'url'  => (string)Url::internal( 'app=core&module=applications&controller=plugins' ),
+            'url'  => (string)Url::internal('app=core&module=applications&controller=plugins'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'logs',
             'name' => 'Logs',
-            'url'  => (string)Url::internal( 'app=core&module=support&controller=systemLogs' ),
+            'url'  => (string)Url::internal('app=core&module=support&controller=systemLogs'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'task',
             'name' => 'Tasks',
-            'url'  => (string)Url::internal( 'app=core&module=settings&controller=advanced&do=tasks' ),
+            'url'  => (string)Url::internal('app=core&module=settings&controller=advanced&do=tasks'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'sql',
             'name' => 'SQL Toolbox',
-            'url'  => (string)Url::internal( 'app=core&module=support&controller=sql' ),
+            'url'  => (string)Url::internal('app=core&module=support&controller=sql'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'support',
             'name' => 'Support',
-            'url'  => (string)Url::internal( 'app=core&module=support&controller=support' ),
+            'url'  => (string)Url::internal('app=core&module=support&controller=support'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'error',
             'name' => 'Error Logs',
-            'url'  => (string)Url::internal( 'app=core&module=support&controller=errorLogs' ),
+            'url'  => (string)Url::internal('app=core&module=support&controller=errorLogs'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'syscheck',
             'name' => 'System Check',
-            'url'  => (string)Url::internal( 'app=core&module=support&controller=support&do=systemCheck' ),
+            'url'  => (string)Url::internal('app=core&module=support&controller=support&do=systemCheck'),
         ];
 
-        $store[ 'sys' ][] = [
+        $store['sys'][] = [
             'id'   => 'phpinfo',
             'name' => 'PHP Info',
-            'url'  => (string)Url::internal( 'app=core&module=support&controller=support&do=phpinfo' ),
+            'url'  => (string)Url::internal('app=core&module=support&controller=support&do=phpinfo'),
         ];
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Comparator;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 
@@ -29,8 +30,9 @@ class NumberComparatorTest extends TestCase
             try {
                 new NumberComparator($f);
                 $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
-            } catch (\Exception $e) {
-                $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
+            } catch (Exception $e) {
+                $this->assertInstanceOf('InvalidArgumentException', $e,
+                    '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
             }
         }
     }
@@ -86,21 +88,52 @@ class NumberComparatorTest extends TestCase
         return [
             [
                 [
-                    '1', '0',
-                    '3.5', '33.55', '123.456', '123456.78',
-                    '.1', '.123',
-                    '.0', '0.0',
-                    '1.', '0.', '123.',
-                    '==1', '!=1', '<1', '>1', '<=1', '>=1',
-                    '==1k', '==1ki', '==1m', '==1mi', '==1g', '==1gi',
-                    '1k', '1ki', '1m', '1mi', '1g', '1gi',
+                    '1',
+                    '0',
+                    '3.5',
+                    '33.55',
+                    '123.456',
+                    '123456.78',
+                    '.1',
+                    '.123',
+                    '.0',
+                    '0.0',
+                    '1.',
+                    '0.',
+                    '123.',
+                    '==1',
+                    '!=1',
+                    '<1',
+                    '>1',
+                    '<=1',
+                    '>=1',
+                    '==1k',
+                    '==1ki',
+                    '==1m',
+                    '==1mi',
+                    '==1g',
+                    '==1gi',
+                    '1k',
+                    '1ki',
+                    '1m',
+                    '1mi',
+                    '1g',
+                    '1gi',
                 ],
                 [
-                    false, null, '',
-                    ' ', 'foobar',
-                    '=1', '===1',
-                    '0 . 1', '123 .45', '234. 567',
-                    '..', '.0.', '0.1.2',
+                    false,
+                    null,
+                    '',
+                    ' ',
+                    'foobar',
+                    '=1',
+                    '===1',
+                    '0 . 1',
+                    '123 .45',
+                    '234. 567',
+                    '..',
+                    '.0.',
+                    '0.1.2',
                 ],
             ],
         ];

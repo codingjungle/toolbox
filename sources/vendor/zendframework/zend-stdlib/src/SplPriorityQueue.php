@@ -25,24 +25,6 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
     protected $serial = PHP_INT_MAX;
 
     /**
-     * Insert a value with a given priority
-     *
-     * Utilizes {@var $serial} to ensure that values of equal priority are
-     * emitted in the same order in which they are inserted.
-     *
-     * @param  mixed $datum
-     * @param  mixed $priority
-     * @return void
-     */
-    public function insert($datum, $priority)
-    {
-        if (! is_array($priority)) {
-            $priority = [$priority, $this->serial--];
-        }
-        parent::insert($datum, $priority);
-    }
-
-    /**
      * Serialize to an array
      *
      * Array will be priority => data pairs
@@ -79,7 +61,7 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
     /**
      * Deserialize
      *
-     * @param  string $data
+     * @param string $data
      * @return void
      */
     public function unserialize($data)
@@ -89,5 +71,23 @@ class SplPriorityQueue extends \SplPriorityQueue implements Serializable
             $this->serial--;
             $this->insert($item['data'], $item['priority']);
         }
+    }
+
+    /**
+     * Insert a value with a given priority
+     *
+     * Utilizes {@var $serial} to ensure that values of equal priority are
+     * emitted in the same order in which they are inserted.
+     *
+     * @param mixed $datum
+     * @param mixed $priority
+     * @return void
+     */
+    public function insert($datum, $priority)
+    {
+        if (!is_array($priority)) {
+            $priority = [$priority, $this->serial--];
+        }
+        parent::insert($datum, $priority);
     }
 }

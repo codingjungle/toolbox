@@ -13,12 +13,13 @@
 namespace IPS\toolbox\extensions\toolbox\Settings;
 
 use IPS\toolbox\Form;
+
 use function defined;
 use function header;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -33,13 +34,12 @@ class _proxy
      *
      * @param Form $form
      */
-    public function elements( &$form ): void
+    public function elements(&$form): void
     {
-
         $form->tab('dtproxy');
-        $form->add( 'dtproxy_do_props', 'yn' )->toggles( [ 'do_props_doc' ] );
-        $form->add( 'dtproxy_do_constants', 'yn' );
-        $form->add( 'dtproxy_do_proxies', 'yn' );
+        $form->add('dtproxy_do_props', 'yn')->toggles(['do_props_doc']);
+        $form->add('dtproxy_do_constants', 'yn');
+        $form->add('dtproxy_do_proxies', 'yn');
     }
 
     /**
@@ -49,8 +49,7 @@ class _proxy
      *
      * @return void
      */
-    public function formatValues( &$values )
+    public function formatValues(&$values)
     {
-
     }
 }

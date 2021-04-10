@@ -26,7 +26,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
     /**
      * Constructor
      *
-     * @param  array|Traversable|null $options
+     * @param array|Traversable|null $options
      */
     public function __construct($options = null)
     {
@@ -38,9 +38,9 @@ abstract class AbstractOptions implements ParameterObjectInterface
     /**
      * Set one or more configuration properties
      *
-     * @param  array|Traversable|AbstractOptions $options
-     * @throws Exception\InvalidArgumentException
+     * @param array|Traversable|AbstractOptions $options
      * @return AbstractOptions Provides fluent interface
+     * @throws Exception\InvalidArgumentException
      */
     public function setFromArray($options)
     {
@@ -48,7 +48,7 @@ abstract class AbstractOptions implements ParameterObjectInterface
             $options = $options->toArray();
         }
 
-        if (! is_array($options) && ! $options instanceof Traversable) {
+        if (!is_array($options) && !$options instanceof Traversable) {
             throw new Exception\InvalidArgumentException(
                 sprintf(
                     'Parameter provided to %s must be an %s, %s or %s',
@@ -92,11 +92,11 @@ abstract class AbstractOptions implements ParameterObjectInterface
     /**
      * Set a configuration property
      *
-     * @see ParameterObject::__set()
      * @param string $key
      * @param mixed $value
-     * @throws Exception\BadMethodCallException
      * @return void
+     * @throws Exception\BadMethodCallException
+     * @see ParameterObject::__set()
      */
     public function __set($key, $value)
     {
@@ -121,10 +121,10 @@ abstract class AbstractOptions implements ParameterObjectInterface
     /**
      * Get a configuration property
      *
-     * @see ParameterObject::__get()
      * @param string $key
-     * @throws Exception\BadMethodCallException
      * @return mixed
+     * @throws Exception\BadMethodCallException
+     * @see ParameterObject::__get()
      */
     public function __get($key)
     {
@@ -143,9 +143,9 @@ abstract class AbstractOptions implements ParameterObjectInterface
 
     /**
      * Test if a configuration property is null
-     * @see ParameterObject::__isset()
      * @param string $key
      * @return bool
+     * @see ParameterObject::__isset()
      */
     public function __isset($key)
     {
@@ -157,10 +157,10 @@ abstract class AbstractOptions implements ParameterObjectInterface
     /**
      * Set a configuration property to NULL
      *
-     * @see ParameterObject::__unset()
      * @param string $key
-     * @throws Exception\InvalidArgumentException
      * @return void
+     * @throws Exception\InvalidArgumentException
+     * @see ParameterObject::__unset()
      */
     public function __unset($key)
     {

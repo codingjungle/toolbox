@@ -19,7 +19,7 @@ use function defined;
 use function header;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -31,7 +31,6 @@ class _Item implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
-
         try {
             $config = [
                 'name'   => 'application',

@@ -16,12 +16,69 @@ use function strtolower;
 
 class TraitGenerator extends ClassGenerator
 {
-    const OBJECT_TYPE = 'trait';
+    public const OBJECT_TYPE = 'trait';
+
+    /**
+     * @param string $flag
+     * @return self
+     */
+    public function addFlag($flag)
+    {
+        return $this;
+    }
+
+    /**
+     * Generate from array
+     *
+     * @configkey name           string        [required] Class Name
+     * @configkey filegenerator  FileGenerator File generator that holds this class
+     * @configkey namespacename  string        The namespace for this class
+     * @configkey docblock       string        The docblock information
+     * @configkey properties
+     * @configkey methods
+     *
+     * @param array $array
+     * @return TraitGenerator
+     * @throws Exception\InvalidArgumentException
+     */
+    public static function fromArray(array $array)
+    {
+        if (!isset($array['name'])) {
+            throw new Exception\InvalidArgumentException(
+                'Class generator requires that a name is provided for this object'
+            );
+        }
+
+        $cg = new static($array['name']);
+        foreach ($array as $name => $value) {
+            // normalize key
+            switch (strtolower(str_replace(['.', '-', '_'], '', $name))) {
+                case 'containingfile':
+                    $cg->setContainingFileGenerator($value);
+                    break;
+                case 'namespacename':
+                    $cg->setNamespaceName($value);
+                    break;
+                case 'docblock':
+                    $docBlock = $value instanceof DocBlockGenerator ? $value : DocBlockGenerator::fromArray($value);
+                    $cg->setDocBlock($docBlock);
+                    break;
+                case 'properties':
+                    $cg->addProperties($value);
+                    break;
+                case 'methods':
+                    $cg->addMethods($value);
+                    break;
+            }
+        }
+
+        return $cg;
+    }
 
     /**
      * Build a Code Generation Php Object from a Class Reflection
      *
-     * @param  ClassReflection $classReflection
+     * @param ClassReflection $classReflection
      * @return TraitGenerator
      */
     public static function fromReflection(ClassReflection $classReflection)
@@ -64,73 +121,7 @@ class TraitGenerator extends ClassGenerator
     }
 
     /**
-     * Generate from array
-     *
-     * @configkey name           string        [required] Class Name
-     * @configkey filegenerator  FileGenerator File generator that holds this class
-     * @configkey namespacename  string        The namespace for this class
-     * @configkey docblock       string        The docblock information
-     * @configkey properties
-     * @configkey methods
-     *
-     * @throws Exception\InvalidArgumentException
-     * @param  array $array
-     * @return TraitGenerator
-     */
-    public static function fromArray(array $array)
-    {
-        if (! isset($array['name'])) {
-            throw new Exception\InvalidArgumentException(
-                'Class generator requires that a name is provided for this object'
-            );
-        }
-
-        $cg = new static($array['name']);
-        foreach ($array as $name => $value) {
-            // normalize key
-            switch (strtolower(str_replace(['.', '-', '_'], '', $name))) {
-                case 'containingfile':
-                    $cg->setContainingFileGenerator($value);
-                    break;
-                case 'namespacename':
-                    $cg->setNamespaceName($value);
-                    break;
-                case 'docblock':
-                    $docBlock = $value instanceof DocBlockGenerator ? $value : DocBlockGenerator::fromArray($value);
-                    $cg->setDocBlock($docBlock);
-                    break;
-                case 'properties':
-                    $cg->addProperties($value);
-                    break;
-                case 'methods':
-                    $cg->addMethods($value);
-                    break;
-            }
-        }
-
-        return $cg;
-    }
-
-    /**
-     * @param  array|string $flags
-     * @return self
-     */
-    public function setFlags($flags)
-    {
-        return $this;
-    }
-
-    /**
-     * @param  string $flag
-     * @return self
-     */
-    public function addFlag($flag)
-    {
-        return $this;
-    }
-
-    /**
-     * @param  string $flag
+     * @param string $flag
      * @return self
      */
     public function removeFlag($flag)
@@ -139,16 +130,16 @@ class TraitGenerator extends ClassGenerator
     }
 
     /**
-     * @param  bool $isFinal
+     * @param bool $isAbstract
      * @return self
      */
-    public function setFinal($isFinal)
+    public function setAbstract($isAbstract)
     {
         return $this;
     }
 
     /**
-     * @param  string $extendedClass
+     * @param string $extendedClass
      * @return self
      */
     public function setExtendedClass($extendedClass)
@@ -157,19 +148,28 @@ class TraitGenerator extends ClassGenerator
     }
 
     /**
-     * @param  array $implementedInterfaces
+     * @param bool $isFinal
      * @return self
      */
-    public function setImplementedInterfaces(array $implementedInterfaces)
+    public function setFinal($isFinal)
     {
         return $this;
     }
 
     /**
-     * @param  bool $isAbstract
+     * @param array|string $flags
      * @return self
      */
-    public function setAbstract($isAbstract)
+    public function setFlags($flags)
+    {
+        return $this;
+    }
+
+    /**
+     * @param array $implementedInterfaces
+     * @return self
+     */
+    public function setImplementedInterfaces(array $implementedInterfaces)
     {
         return $this;
     }

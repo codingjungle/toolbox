@@ -40,8 +40,8 @@ interface EventInterface
     /**
      * Get a single parameter by name
      *
-     * @param  string $name
-     * @param  mixed $default Default value to return if parameter does not exist
+     * @param string $name
+     * @param mixed $default Default value to return if parameter does not exist
      * @return mixed
      */
     public function getParam($name, $default = null);
@@ -49,7 +49,7 @@ interface EventInterface
     /**
      * Set the event name
      *
-     * @param  string $name
+     * @param string $name
      * @return void
      */
     public function setName($name);
@@ -57,7 +57,7 @@ interface EventInterface
     /**
      * Set the event target/context
      *
-     * @param  null|string|object $target
+     * @param null|string|object $target
      * @return void
      */
     public function setTarget($target);
@@ -65,7 +65,7 @@ interface EventInterface
     /**
      * Set event parameters
      *
-     * @param  array|ArrayAccess $params
+     * @param array|ArrayAccess $params
      * @return void
      */
     public function setParams($params);
@@ -73,8 +73,8 @@ interface EventInterface
     /**
      * Set a single parameter by key
      *
-     * @param  string $name
-     * @param  mixed $value
+     * @param string $name
+     * @param mixed $value
      * @return void
      */
     public function setParam($name, $value);
@@ -82,7 +82,7 @@ interface EventInterface
     /**
      * Indicate whether or not the parent EventManagerInterface should stop propagating events
      *
-     * @param  bool $flag
+     * @param bool $flag
      * @return void
      */
     public function stopPropagation($flag = true);

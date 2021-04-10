@@ -10,8 +10,8 @@ use function defined;
 use function header;
 
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( isset( $_SERVER[ 'SERVER_PROTOCOL' ] ) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -21,10 +21,9 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 class _devcenter
 {
 
-    public function addJsonMeta( &$jsonMeta )
+    public function addJsonMeta(&$jsonMeta)
     {
-
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signatures' => [
                 [
                     'class'  => Form::class,
@@ -36,9 +35,9 @@ class _devcenter
             'language'   => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'           => 'FormAddMethod',
-            'lookup_strings' => array_keys( Element::$helpers ),
+            'lookup_strings' => array_keys(Element::$helpers),
         ];
     }
 }

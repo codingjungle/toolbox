@@ -12,7 +12,6 @@
 
 namespace IPS\toolbox\Proxy\Helpers;
 
-use IPS\toolbox\Profiler\Debug;
 use Zend\Code\Generator\DocBlock\Tag\ParamTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
@@ -25,7 +24,7 @@ use function defined;
 use function header;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER[ 'SERVER_PROTOCOL' ]) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0') . ' 403 Forbidden');
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -36,32 +35,30 @@ class _ActiveRecord implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
-
-        try{
+        try {
             $propertyDocBlock = new DocBlockGenerator(
-                'Instance of  class', null, [ new ReturnTag('static')]
+                'Instance of  class', null, [new ReturnTag('static')]
             );
             $body[] = PropertyGenerator::fromArray(
                 [
-                    'name' => 'multiton',
-                    'static' => true,
-                    'docblock' => $propertyDocBlock,
+                    'name'       => 'multiton',
+                    'static'     => true,
+                    'docblock'   => $propertyDocBlock,
                     'visibility' => 'protected'
                 ]
             );
-        }
-        catch(InvalidArgumentException $e){
+        } catch (InvalidArgumentException $e) {
         }
 
         try {
             $methodDocBlock = new DocBlockGenerator(
-                'Load Record', \null, [
-                                      new ParamTag('id', 'int|string'),
-                                      new ParamTag('idField', 'string',),
-                                 new ParamTag('extraWhereClause', 'mixed'),
-                                 new ReturnTag('static')
+                'Load Record', null, [
+                    new ParamTag('id', 'int|string'),
+                    new ParamTag('idField', 'string',),
+                    new ParamTag('extraWhereClause', 'mixed'),
+                    new ReturnTag('static')
 
-                             ]
+                ]
             );
             $body[] = MethodGenerator::fromArray(
                 [

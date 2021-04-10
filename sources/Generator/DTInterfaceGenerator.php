@@ -12,14 +12,16 @@
 
 namespace IPS\toolbox\Generator;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
-\IPS\toolbox\Application::loadAutoLoader();
+Application::loadAutoLoader();
 
+use IPS\toolbox\Application;
 use Zend\Code\Generator\InterfaceGenerator;
+
 use function defined;
 use function header;
 use function preg_replace;
@@ -42,7 +44,8 @@ if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
 }
 eof;
 
-        $parent = preg_replace( '/namespace(.+?)([^\n]+)/', 'namespace $2' . self::LINE_FEED . self::LINE_FEED . $addIn, $parent );
+        $parent = preg_replace('/namespace(.+?)([^\n]+)/', 'namespace $2' . self::LINE_FEED . self::LINE_FEED . $addIn,
+            $parent);
 
         return $parent;
     }

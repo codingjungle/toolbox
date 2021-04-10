@@ -14,12 +14,12 @@
 namespace Generator\Tokenizers;
 
 use Generator\Builders\ClassGenerator;
-use IPS\babble\Profiler\Debug;
 
 use function implode;
 use function in_array;
 use function mb_substr;
 use function trim;
+
 use const T_PRIVATE;
 use const T_PROTECTED;
 
@@ -35,10 +35,9 @@ trait ClassTrait
      *
      * @return $this
      */
-    public function replaceMethod( string $name, string $body )
+    public function replaceMethod(string $name, string $body)
     {
-
-        $this->replaceMethods[ $name ] = $body;
+        $this->replaceMethods[$name] = $body;
     }
 
     /**
@@ -46,181 +45,171 @@ trait ClassTrait
      *
      * @return $this
      */
-    public function removemethod( $name )
+    public function removemethod($name)
     {
-
-        $this->removeMethods[ trim( $name ) ] = 1;
+        $this->removeMethods[trim($name)] = 1;
     }
 
-    public function beforeLine( int $line, string $content )
+    public function beforeLine(int $line, string $content)
     {
-
-        $this->beforeLines[ $line ][] = $content;
+        $this->beforeLines[$line][] = $content;
     }
 
-    public function afterLine( int $line, string $content )
+    public function afterLine(int $line, string $content)
     {
-
-        $this->afterLines[ $line ][] = $content;
+        $this->afterLines[$line][] = $content;
     }
 
-    public function replaceLine( int $line, string $content )
+    public function replaceLine(int $line, string $content)
     {
-
-        $this->replaceLines[ $line ][] = $content;
+        $this->replaceLines[$line][] = $content;
     }
 
-    public function startOfMethod( $method, $content )
+    public function startOfMethod($method, $content)
     {
-
-        $this->startOfMethods[ $method ][] = $content;
+        $this->startOfMethods[$method][] = $content;
     }
 
-    public function endOfMethod( $method, $content )
+    public function endOfMethod($method, $content)
     {
-
-        $this->endofMethods[ $method ][] = $content;
+        $this->endofMethods[$method][] = $content;
     }
 
-    public function afterMethod( $method, $content )
+    public function afterMethod($method, $content)
     {
-
-        $this->afterMethod[ $method ][] = $content;
+        $this->afterMethod[$method][] = $content;
     }
 
     public function getMethods()
     {
-
         return $this->methods;
     }
 
-    protected function prepImport( $import, $type, $use = false )
+    protected function prepImport($import, $type, $use = false)
     {
-
         $alias = null;
 
-        if ( $use !== true || $type !== 'const' ) {
-            if ( in_array( 'as', $import, false ) ) {
+        if ($use !== true || $type !== 'const') {
+            if (in_array('as', $import, false)) {
                 $as = false;
-                foreach ( $import as $key => $item ) {
-                    if ( $as === true && $item ) {
+                foreach ($import as $key => $item) {
+                    if ($as === true && $item) {
                         $alias[] = $item;
-                        unset( $import[ $key ] );
+                        unset($import[$key]);
                     }
-                    if ( $item === 'as' ) {
-                        unset( $import[ $key ] );
+                    if ($item === 'as') {
+                        unset($import[$key]);
                         $as = true;
                     }
                 }
 
-                $alias = implode( '\\', $alias );
+                $alias = implode('\\', $alias);
             }
         }
 
-        $import = implode( '\\', $import );
+        $import = implode('\\', $import);
 
-        if ( $use === true ) {
-            $this->addUse( $import );
-        }
-        else if ( $type === 'use' ) {
-            $this->addImport( $import, $alias );
-        }
-        else if ( $type === 'function' ) {
-            $this->addImportFunction( $import, $alias );
-        }
-        else if ( $type === 'const' ) {
-            $this->addImportConstant( $import );
+        if ($use === true) {
+            $this->addUse($import);
+        } else {
+            if ($type === 'use') {
+                $this->addImport($import, $alias);
+            } else {
+                if ($type === 'function') {
+                    $this->addImportFunction($import, $alias);
+                } else {
+                    if ($type === 'const') {
+                        $this->addImportConstant($import);
+                    }
+                }
+            }
         }
     }
 
-    protected function prepMethod( $data )
+    protected function prepMethod($data)
     {
-
         $this->preppedMethod[] = $data;
 
-        $this->buildMethod( $data );
+        $this->buildMethod($data);
     }
 
-    protected function buildMethod( $data )
+    protected function buildMethod($data)
     {
-
         $newParams = [];
-        $abstract = $data[ 'abstract' ] ?? null;
-        $name = $data[ 'name' ];
-        $static = $data[ 'static' ];
-        $final = $data[ 'final' ];
+        $abstract = $data['abstract'] ?? null;
+        $name = $data['name'];
+        $static = $data['static'];
+        $final = $data['final'];
         $visibility = 'public';
-        $params = $data[ 'params' ] ?? null;
-        $document = $data[ 'document' ] ?? null;
-        $returnType = $data[ 'returnType' ] ?? null;
-        $body = $data[ 'body' ] ?? '';
-        if ( $data[ 'visibility' ] === T_PRIVATE ) {
+        $params = $data['params'] ?? null;
+        $document = $data['document'] ?? null;
+        $returnType = $data['returnType'] ?? null;
+        $body = $data['body'] ?? '';
+        if ($data['visibility'] === T_PRIVATE) {
             $visibility = 'private';
-        }
-        else if ( $data[ 'visibility' ] === T_PROTECTED ) {
-            $visibility = 'protected';
+        } else {
+            if ($data['visibility'] === T_PROTECTED) {
+                $visibility = 'protected';
+            }
         }
 
-        if ( empty( $params ) !== true ) {
+        if (empty($params) !== true) {
             //            if ( trim( $name ) === 'featured' ) {
             //                _p( $params );
             //            }
-            $params = ClassGenerator::paramsFromString( $params );
-            if ( trim( $name ) === 'monkeyPatch' ) {
+            $params = ClassGenerator::paramsFromString($params);
+            if (trim($name) === 'monkeyPatch') {
                 //_d( $params );
             }
         }
 
         $params = $params ?? [];
 
-        if ( $body !== null ) {
+        if ($body !== null) {
             $nb = '';
 
-            foreach ( $body as $item ) {
-                if ( isset( $item[ 'content' ] ) ) {
-                    if ( isset( $this->beforeLines[ $item[ 'line' ] ] ) ) {
-                        foreach ( $this->beforeLines[ $item[ 'line' ] ] as $content ) {
-                            $nb .= $this->tab2space( $content );
+            foreach ($body as $item) {
+                if (isset($item['content'])) {
+                    if (isset($this->beforeLines[$item['line']])) {
+                        foreach ($this->beforeLines[$item['line']] as $content) {
+                            $nb .= $this->tab2space($content);
                             $nb .= "\n" . $this->tab . $this->tab;
                         }
-                        unset( $this->beforeLines[ $item[ 'line' ] ] );
+                        unset($this->beforeLines[$item['line']]);
                     }
 
-                    if ( isset( $this->replaceLines[ $item[ 'line' ] ] ) ) {
-
-                        foreach ( $this->replaceLines[ $item[ 'line' ] ] as $content ) {
-                            $nb .= $this->tab2space( $content );
+                    if (isset($this->replaceLines[$item['line']])) {
+                        foreach ($this->replaceLines[$item['line']] as $content) {
+                            $nb .= $this->tab2space($content);
                             $nb .= "\n" . $this->tab . $this->tab;
                         }
-                        unset( $this->replaceLines[ $item[ 'line' ] ] );
-                    }
-                    else {
-                        $nb .= $this->tab2space( $item[ 'content' ] );
+                        unset($this->replaceLines[$item['line']]);
+                    } else {
+                        $nb .= $this->tab2space($item['content']);
                     }
 
-                    if ( isset( $this->afterLines[ $item[ 'line' ] ] ) ) {
-                        foreach ( $this->afterLines[ $item[ 'line' ] ] as $content ) {
-                            $nb .= $this->tab2space( $content );
+                    if (isset($this->afterLines[$item['line']])) {
+                        foreach ($this->afterLines[$item['line']] as $content) {
+                            $nb .= $this->tab2space($content);
                             $nb .= "\n" . $this->tab . $this->tab;
                         }
-                        unset( $this->afterLines[ $item[ 'line' ] ] );
+                        unset($this->afterLines[$item['line']]);
                     }
-
                 }
             }
 
-            $nb = trim( $nb );
-            if ( mb_substr( $nb, 0, 1 ) === '{' ) {
-                $nb = mb_substr( $nb, 1 );
+            $nb = trim($nb);
+            if (mb_substr($nb, 0, 1) === '{') {
+                $nb = mb_substr($nb, 1);
             }
             //
             //            if ( mb_substr( $nb, -1 ) === '}' ) {
             //                $nb = mb_substr( $nb, 0, -1 );
             //            }
 
-            if ( isset( $this->startOfMethods[ $name ] ) ) {
+            if (isset($this->startOfMethods[$name])) {
                 $first = '';
-                foreach ( $this->startOfMethods[ $name ] as $content ) {
+                foreach ($this->startOfMethods[$name] as $content) {
                     $first .= "\n" . $this->tab . $this->tab;
                     $first .= $content;
                     $first .= "\n" . $this->tab . $this->tab;
@@ -228,9 +217,8 @@ trait ClassTrait
                 $nb = $first . $nb;
             }
 
-            if ( isset( $this->endofMethods[ $name ] ) ) {
-
-                foreach ( $this->endofMethods[ $name ] as $content ) {
+            if (isset($this->endofMethods[$name])) {
+                foreach ($this->endofMethods[$name] as $content) {
                     $nb .= "\n" . $this->tab . $this->tab;
                     $nb .= $content;
                     $nb .= "\n" . $this->tab . $this->tab;
@@ -248,20 +236,18 @@ trait ClassTrait
             'returnType' => $returnType,
         ];
 
-        $this->addMethod( $name, $body, $params, $extra );
+        $this->addMethod($name, $body, $params, $extra);
     }
 
     protected function rebuildMethods()
     {
-
-        foreach ( $this->preppedMethod as $data ) {
-            $this->buildMethod( $data );
+        foreach ($this->preppedMethod as $data) {
+            $this->buildMethod($data);
         }
     }
 
-    protected function addToExtra( $data )
+    protected function addToExtra($data)
     {
-
         $this->extra[] = $data;
     }
 

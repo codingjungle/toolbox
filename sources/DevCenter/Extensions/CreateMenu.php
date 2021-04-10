@@ -24,10 +24,22 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  * Class _CreateMenu
  *
  * @package IPS\toolbox\DevCenter\Extensions
- * @mixin \IPS\toolbox\DevCenter\Extensions\ExtensionsAbstract
+ * @mixin ExtensionsAbstract
  */
 class _CreateMenu extends ExtensionsAbstract
 {
+
+    /**
+     * @inheritdoc
+     */
+    protected function _content()
+    {
+        $this->link = 'app=' . $this->application->directory . '&' . $this->link;
+        $this->seo = $this->seo ? "'" . $this->seo . "'" : null;
+        $this->seoTitle = $this->seoTitle ? "'" . $this->seoTitle . "'" : null;
+
+        return $this->_getFile($this->extension);
+    }
 
     /**
      * @inheritdoc
@@ -39,17 +51,5 @@ class _CreateMenu extends ExtensionsAbstract
         $this->form->add('link')->required()->prefix('app=' . $this->application->directory . '&');
         $this->form->add('seo');
         $this->form->add('seoTitle');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function _content()
-    {
-        $this->link = 'app=' . $this->application->directory . '&' . $this->link;
-        $this->seo = $this->seo ? "'" . $this->seo . "'" : \null;
-        $this->seoTitle = $this->seoTitle ? "'" . $this->seoTitle . "'" : \null;
-
-        return $this->_getFile($this->extension);
     }
 }

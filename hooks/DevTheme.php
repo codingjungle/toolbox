@@ -1,7 +1,16 @@
 //<?php namespace toolbox_IPS_Theme_Dev_Theme_afcc5c2b0a1f633008ea23a3d93c885d0;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
-if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
+
+use GlobIterator;
+use IPS\Dispatcher;
+
+use IPS\toolbox\Application;
+
+use function defined;
+use function stristr;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 
@@ -10,11 +19,10 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
 
     protected static function _getCssPath($app, $location = null, $path = null)
     {
-        if( defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
+        if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
             //$this->sourceFolder = \IPS\ROOT_PATH . '/themes/28/html/' . $app . '/' . $templateLocation . '/' . $templateName . '/';
-            $themedir = \IPS\ROOT_PATH . '/themes/' . \IPS\toolbox\Application::getThemeId(
-                ) . '/css/' . $app . '/' . $location . '/' . $path . '/';
-            $return = rtrim($themedir, '/') . (\stristr($path, '.css') ? '' : '/');
+            $themedir = \IPS\ROOT_PATH . '/themes/' . Application::getThemeId() . '/css/' . $app . '/' . $location . '/' . $path . '/';
+            $return = rtrim($themedir, '/') . (stristr($path, '.css') ? '' : '/');
             return $return;
         }
 
@@ -23,10 +31,9 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
 
     protected static function _getHtmlPath($app, $location = null, $path = null)
     {
-        if( defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
+        if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
             //$this->sourceFolder = \IPS\ROOT_PATH . '/themes/28/html/' . $app . '/' . $templateLocation . '/' . $templateName . '/';
-            $themedir = \IPS\ROOT_PATH . '/themes/' . \IPS\toolbox\Application::getThemeId(
-                ) . '/html/' . $app . '/' . $location . '/';
+            $themedir = \IPS\ROOT_PATH . '/themes/' . Application::getThemeId() . '/html/' . $app . '/' . $location . '/';
 
             return rtrim($themedir, '/');
         }
@@ -35,10 +42,10 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
 
     protected static function _getResourcePath($app, $location = null, $path = null)
     {
-        if( defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
+        if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
             if ($app == 'core' and $location == 'global' and mb_substr($path, 0, mb_strpos($path, '/')) === 'plugins') {
                 foreach (
-                    new \GlobIterator(
+                    new GlobIterator(
                         \IPS\ROOT_PATH . '/plugins/*/dev/resources/' . mb_substr($path, mb_strpos($path, '/') + 1)
                     ) as $file
                 ) {
@@ -47,10 +54,9 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
             }
 
             return rtrim(
-                    \IPS\ROOT_PATH . '/themes/' . \IPS\toolbox\Application::getThemeId(
-                    ) . '/resources/' . $app . '/' . $location . '/' . $path,
+                    \IPS\ROOT_PATH . '/themes/' . Application::getThemeId() . '/resources/' . $app . '/' . $location . '/' . $path,
                     '/'
-                ) . ((\stristr($path, '.') || \stristr($path, '{')) ? '' : '/');
+                ) . ((stristr($path, '.') || stristr($path, '{')) ? '' : '/');
         }
 
         return parent::_getResourcePath($app, $location, $path);
@@ -58,20 +64,19 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
 
     public function css($file, $app = null, $location = null)
     {
-        $loc = \IPS\Dispatcher::hasInstance() ? \IPS\Dispatcher::i()->controllerLocation : null;
+        $loc = Dispatcher::hasInstance() ? Dispatcher::i()->controllerLocation : null;
 
         $return = parent::css($file, $app, $location);
-        if( defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
+        if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
             $new = [];
             foreach ($return as $k => $v) {
-
                 $link = str_replace(
                     'applications/core/interface/css/css.php',
                     'applications/toolbox/interface/css/css.php',
                     $v
                 );
 
-                if( $loc === 'admin'){
+                if ($loc === 'admin') {
                     $link .= '&admin=1';
                 }
 

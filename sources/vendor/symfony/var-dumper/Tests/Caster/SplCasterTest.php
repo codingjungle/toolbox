@@ -11,7 +11,15 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use ArrayIterator;
+use ArrayObject;
+use DateTime;
 use PHPUnit\Framework\TestCase;
+use SplDoublyLinkedList;
+use SplFileInfo;
+use SplFileObject;
+use SplObjectStorage;
+use stdClass;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
@@ -24,7 +32,9 @@ class SplCasterTest extends TestCase
     public function getCastFileInfoTests()
     {
         return [
-            [__FILE__, <<<'EOTXT'
+            [
+                __FILE__,
+                <<<'EOTXT'
 SplFileInfo {
 %Apath: "%sCaster"
   filename: "SplCasterTest.php"
@@ -50,7 +60,9 @@ SplFileInfo {
 %A}
 EOTXT
             ],
-            ['https://google.com/about', <<<'EOTXT'
+            [
+                'https://google.com/about',
+                <<<'EOTXT'
 SplFileInfo {
 %Apath: "https://google.com"
   filename: "about"
@@ -67,13 +79,13 @@ EOTXT
     /** @dataProvider getCastFileInfoTests */
     public function testCastFileInfo($file, $dump)
     {
-        $this->assertDumpMatchesFormat($dump, new \SplFileInfo($file));
+        $this->assertDumpMatchesFormat($dump, new SplFileInfo($file));
     }
 
     public function testCastFileObject()
     {
-        $var = new \SplFileObject(__FILE__);
-        $var->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::SKIP_EMPTY);
+        $var = new SplFileObject(__FILE__);
+        $var->setFlags(SplFileObject::DROP_NEW_LINE | SplFileObject::SKIP_EMPTY);
         $dump = <<<'EOTXT'
 SplFileObject {
 %Apath: "%sCaster"
@@ -124,7 +136,7 @@ EOTXT;
      */
     public function testCastSplDoublyLinkedList($modeValue, $modeDump)
     {
-        $var = new \SplDoublyLinkedList();
+        $var = new SplDoublyLinkedList();
         $var->setIteratorMode($modeValue);
         $dump = <<<EOTXT
 SplDoublyLinkedList {
@@ -138,17 +150,23 @@ EOTXT;
     public function provideCastSplDoublyLinkedList()
     {
         return [
-            [\SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'],
-            [\SplDoublyLinkedList::IT_MODE_LIFO, 'IT_MODE_LIFO | IT_MODE_KEEP'],
-            [\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_FIFO | IT_MODE_DELETE'],
-            [\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_LIFO | IT_MODE_DELETE'],
+            [SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'],
+            [SplDoublyLinkedList::IT_MODE_LIFO, 'IT_MODE_LIFO | IT_MODE_KEEP'],
+            [
+                SplDoublyLinkedList::IT_MODE_FIFO | SplDoublyLinkedList::IT_MODE_DELETE,
+                'IT_MODE_FIFO | IT_MODE_DELETE'
+            ],
+            [
+                SplDoublyLinkedList::IT_MODE_LIFO | SplDoublyLinkedList::IT_MODE_DELETE,
+                'IT_MODE_LIFO | IT_MODE_DELETE'
+            ],
         ];
     }
 
     public function testCastObjectStorageIsntModified()
     {
-        $var = new \SplObjectStorage();
-        $var->attach(new \stdClass());
+        $var = new SplObjectStorage();
+        $var->attach(new stdClass());
         $var->rewind();
         $current = $var->current();
 
@@ -158,15 +176,15 @@ EOTXT;
 
     public function testCastObjectStorageDumpsInfo()
     {
-        $var = new \SplObjectStorage();
-        $var->attach(new \stdClass(), new \DateTime());
+        $var = new SplObjectStorage();
+        $var->attach(new stdClass(), new DateTime());
 
         $this->assertDumpMatchesFormat('%ADateTime%A', $var);
     }
 
     public function testCastArrayObject()
     {
-        $var = new \ArrayObject([123]);
+        $var = new ArrayObject([123]);
         $var->foo = 234;
 
         $expected = <<<EOTXT
@@ -201,7 +219,7 @@ EOTXT;
     }
 }
 
-class MyArrayIterator extends \ArrayIterator
+class MyArrayIterator extends ArrayIterator
 {
     private $foo = 123;
 }

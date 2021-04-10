@@ -19,6 +19,8 @@
 
 namespace Doctrine\Common\Annotations;
 
+use BadMethodCallException;
+
 /**
  * Annotations class.
  *
@@ -41,7 +43,7 @@ class Annotation
      *
      * @param array $data Key-value for properties to be defined in this class.
      */
-    public final function __construct(array $data)
+    final public function __construct(array $data)
     {
         foreach ($data as $key => $value) {
             $this->$key = $value;
@@ -53,11 +55,11 @@ class Annotation
      *
      * @param string $name Unknown property name.
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function __get($name)
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             sprintf("Unknown property '%s' on annotation '%s'.", $name, get_class($this))
         );
     }
@@ -65,14 +67,14 @@ class Annotation
     /**
      * Error handler for unknown property mutator in Annotation class.
      *
-     * @param string $name  Unknown property name.
-     * @param mixed  $value Property value.
+     * @param string $name Unknown property name.
+     * @param mixed $value Property value.
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function __set($name, $value)
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             sprintf("Unknown property '%s' on annotation '%s'.", $name, get_class($this))
         );
     }

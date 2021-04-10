@@ -1,24 +1,24 @@
 //<?php
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
-if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
-{
-	exit;
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    exit;
 }
 
 class toolbox_hook_themeAdminGlobal extends _HOOK_CLASS_
 {
 
-/* !Hook Data - DO NOT REMOVE */
-public static function hookData() {
- return array_merge_recursive( array (
-  'tabs' => 
-  array (
-    0 => 
-    array (
-      'selector' => 'div.acpBlock',
-      'type' => 'replace',
-      'content' => '
+    /* !Hook Data - DO NOT REMOVE */
+    public static function hookData()
+    {
+        return array_merge_recursive(array(
+            'tabs' =>
+                array(
+                    0 =>
+                        array(
+                            'selector' => 'div.acpBlock',
+                            'type'     => 'replace',
+                            'content'  => '
 {{if \IPS\Request::i()->controller === \'developer\' && !\IPS\Request::i()->isAjax()}}
 <div class="ipsColumns">
 	<div class="ipsColumn ipsColumn_wide">
@@ -56,11 +56,11 @@ public static function hookData() {
 </div>
 {{endif}}
 ',
-    ),
-  ),
-), parent::hookData() );
-}
-/* End Hook Data */
+                        ),
+                ),
+        ), parent::hookData());
+    }
+    /* End Hook Data */
 
 
 }

@@ -11,17 +11,18 @@
 
 namespace IPS\toolbox\Proxy\Generator;
 
+use function defined;
 use function header;
 
-if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
  * Url Class
  *
- * @mixin \IPS\toolbox\Proxy\Generator\Writer
+ * @mixin Writer
  */
 class _Writer extends GeneratorAbstract
 {

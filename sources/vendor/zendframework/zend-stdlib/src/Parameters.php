@@ -19,7 +19,7 @@ class Parameters extends PhpArrayObject implements ParametersInterface
      * Enforces that we have an array, and enforces parameter access to array
      * elements.
      *
-     * @param  array $values
+     * @param array $values
      */
     public function __construct(array $values = null)
     {
@@ -32,7 +32,7 @@ class Parameters extends PhpArrayObject implements ParametersInterface
     /**
      * Populate from native PHP array
      *
-     * @param  array $values
+     * @param array $values
      * @return void
      */
     public function fromArray(array $values)
@@ -43,7 +43,7 @@ class Parameters extends PhpArrayObject implements ParametersInterface
     /**
      * Populate from query string
      *
-     * @param  string $string
+     * @param string $string
      * @return void
      */
     public function fromString($string)
@@ -78,7 +78,7 @@ class Parameters extends PhpArrayObject implements ParametersInterface
      *
      * Returns null if the key does not exist.
      *
-     * @param  string $name
+     * @param string $name
      * @return mixed
      */
     public function offsetGet($name)

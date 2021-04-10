@@ -1,17 +1,23 @@
 <?php
-$path =  str_replace( '/applications/toolbox/sources/Profiler/Adminer/db.php', '', str_replace( '\\', '/', __FILE__ ) ).'/';
-require_once $path. 'init.php';
-\IPS\Session\Front::i();
 
-$member = \IPS\Member::loggedIn();
-if( $member->isAdmin() ) {
-    $_GET["username"] = \IPS\Settings::i()->getFromConfGlobal('sql_user');
+use IPS\Member;
+use IPS\Session\Front;
+use IPS\Settings;
 
-use function str_replace;
+$path = str_replace('/applications/toolbox/sources/Profiler/Adminer/db.php', '',
+        str_replace('\\', '/', __FILE__)) . '/';
+require_once $path . 'init.php';
+Front::i();
 
-    $_GET["password"] = \IPS\Settings::i()->getFromConfGlobal('sql_pass');
-    $_GET["db"] = \IPS\Settings::i()->getFromConfGlobal('sql_database');
-    $_GET["server"] = \IPS\Settings::i()->getFromConfGlobal('sql_host');
+$member = Member::loggedIn();
+if ($member->isAdmin()) {
+    $_GET["username"] = Settings::i()->getFromConfGlobal('sql_user');
+
+    use function str_replace;
+
+    $_GET["password"] = Settings::i()->getFromConfGlobal('sql_pass');
+    $_GET["db"] = Settings::i()->getFromConfGlobal('sql_database');
+    $_GET["server"] = Settings::i()->getFromConfGlobal('sql_host');
     function adminer_object()
     {
         // required to run any plugin

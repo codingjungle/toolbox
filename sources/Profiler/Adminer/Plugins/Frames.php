@@ -6,18 +6,21 @@
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
  */
-class AdminerFrames {
+class AdminerFrames
+{
     /** @access protected */
-    var $sameOrigin;
+    public $sameOrigin;
 
     /**
      * @param bool allow running from the same origin only
      */
-    function __construct($sameOrigin = false) {
+    public function __construct($sameOrigin = false)
+    {
         $this->sameOrigin = $sameOrigin;
     }
 
-    function headers() {
+    public function headers()
+    {
         if ($this->sameOrigin) {
             header("X-Frame-Options: SameOrigin");
         } elseif (function_exists('header_remove')) {

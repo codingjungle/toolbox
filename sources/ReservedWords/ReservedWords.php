@@ -94,7 +94,6 @@ class _ReservedWords
      */
     public function __construct()
     {
-
     }
 
     /**
@@ -104,13 +103,13 @@ class _ReservedWords
      *
      * @return bool
      */
-    public static function check( $data ): bool
+    public static function check($data): bool
     {
-        if ( in_array( mb_strtolower( $data ), static::$reserved, \true ) ) {
-            return \true;
+        if (in_array(mb_strtolower($data), static::$reserved, true)) {
+            return true;
         }
 
-        return \false;
+        return false;
     }
 
     /**

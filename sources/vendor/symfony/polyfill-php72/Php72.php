@@ -11,6 +11,18 @@
 
 namespace Symfony\Polyfill\Php72;
 
+use function chr;
+use function function_exists;
+use function gettype;
+use function in_array;
+use function is_resource;
+use function ord;
+use function strlen;
+
+use const DIRECTORY_SEPARATOR;
+use const PHP_INT_SIZE;
+use const PHP_VERSION_ID;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
@@ -24,13 +36,21 @@ final class Php72
     public static function utf8_encode($s)
     {
         $s .= $s;
-        $len = \strlen($s);
+        $len = strlen($s);
 
         for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
             switch (true) {
-                case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
-                case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
-                default: $s[$j] = "\xC3"; $s[++$j] = \chr(\ord($s[$i]) - 64); break;
+                case $s[$i] < "\x80":
+                    $s[$j] = $s[$i];
+                    break;
+                case $s[$i] < "\xC0":
+                    $s[$j] = "\xC2";
+                    $s[++$j] = $s[$i];
+                    break;
+                default:
+                    $s[$j] = "\xC3";
+                    $s[++$j] = chr(ord($s[$i]) - 64);
+                    break;
             }
         }
 
@@ -39,20 +59,20 @@ final class Php72
 
     public static function utf8_decode($s)
     {
-        $s = (string) $s;
-        $len = \strlen($s);
+        $s = (string)$s;
+        $len = strlen($s);
 
         for ($i = 0, $j = 0; $i < $len; ++$i, ++$j) {
             switch ($s[$i] & "\xF0") {
                 case "\xC0":
                 case "\xD0":
-                    $c = (\ord($s[$i] & "\x1F") << 6) | \ord($s[++$i] & "\x3F");
-                    $s[$j] = $c < 256 ? \chr($c) : '?';
+                    $c = (ord($s[$i] & "\x1F") << 6) | ord($s[++$i] & "\x3F");
+                    $s[$j] = $c < 256 ? chr($c) : '?';
                     break;
 
                 case "\xF0":
                     ++$i;
-                    // no break
+                // no break
 
                 case "\xE0":
                     $s[$j] = '?';
@@ -69,18 +89,18 @@ final class Php72
 
     public static function php_os_family()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             return 'Windows';
         }
 
         $map = array(
-            'Darwin' => 'Darwin',
+            'Darwin'    => 'Darwin',
             'DragonFly' => 'BSD',
-            'FreeBSD' => 'BSD',
-            'NetBSD' => 'BSD',
-            'OpenBSD' => 'BSD',
-            'Linux' => 'Linux',
-            'SunOS' => 'Solaris',
+            'FreeBSD'   => 'BSD',
+            'NetBSD'    => 'BSD',
+            'OpenBSD'   => 'BSD',
+            'Linux'     => 'Linux',
+            'SunOS'     => 'Solaris',
         );
 
         return isset($map[PHP_OS]) ? $map[PHP_OS] : 'Unknown';
@@ -95,13 +115,37 @@ final class Php72
             return;
         }
 
-        return self::$hashMask ^ hexdec(substr($hash, 16 - \PHP_INT_SIZE, \PHP_INT_SIZE));
+        return self::$hashMask ^ hexdec(substr($hash, 16 - PHP_INT_SIZE, PHP_INT_SIZE));
+    }
+
+    private static function initHashMask()
+    {
+        $obj = (object)array();
+        self::$hashMask = -1;
+
+        // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
+        $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
+        foreach (debug_backtrace(PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false) as $frame) {
+            if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'],
+                    $obFuncs)) {
+                $frame['line'] = 0;
+                break;
+            }
+        }
+        if (!empty($frame['line'])) {
+            ob_start();
+            debug_zval_dump($obj);
+            self::$hashMask = (int)substr(ob_get_clean(), 17);
+        }
+
+        self::$hashMask ^= hexdec(substr(spl_object_hash($obj), 16 - PHP_INT_SIZE, PHP_INT_SIZE));
     }
 
     public static function sapi_windows_vt100_support($stream, $enable = null)
     {
-        if (!\is_resource($stream)) {
-            trigger_error('sapi_windows_vt100_support() expects parameter 1 to be resource, '.\gettype($stream).' given', E_USER_WARNING);
+        if (!is_resource($stream)) {
+            trigger_error('sapi_windows_vt100_support() expects parameter 1 to be resource, ' . gettype($stream) . ' given',
+                E_USER_WARNING);
 
             return false;
         }
@@ -125,60 +169,39 @@ final class Php72
 
         return !$stdin
             && (false !== getenv('ANSICON')
-            || 'ON' === getenv('ConEmuANSI')
-            || 'xterm' === getenv('TERM')
-            || 'Hyper' === getenv('TERM_PROGRAM'));
+                || 'ON' === getenv('ConEmuANSI')
+                || 'xterm' === getenv('TERM')
+                || 'Hyper' === getenv('TERM_PROGRAM'));
     }
 
     public static function stream_isatty($stream)
     {
-        if (!\is_resource($stream)) {
-            trigger_error('stream_isatty() expects parameter 1 to be resource, '.\gettype($stream).' given', E_USER_WARNING);
+        if (!is_resource($stream)) {
+            trigger_error('stream_isatty() expects parameter 1 to be resource, ' . gettype($stream) . ' given',
+                E_USER_WARNING);
 
             return false;
         }
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $stat = @fstat($stream);
             // Check if formatted mode is S_IFCHR
             return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
         }
 
-        return \function_exists('posix_isatty') && @posix_isatty($stream);
-    }
-
-    private static function initHashMask()
-    {
-        $obj = (object) array();
-        self::$hashMask = -1;
-
-        // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
-        $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
-        foreach (debug_backtrace(\PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false) as $frame) {
-            if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && \in_array($frame['function'], $obFuncs)) {
-                $frame['line'] = 0;
-                break;
-            }
-        }
-        if (!empty($frame['line'])) {
-            ob_start();
-            debug_zval_dump($obj);
-            self::$hashMask = (int) substr(ob_get_clean(), 17);
-        }
-
-        self::$hashMask ^= hexdec(substr(spl_object_hash($obj), 16 - \PHP_INT_SIZE, \PHP_INT_SIZE));
+        return function_exists('posix_isatty') && @posix_isatty($stream);
     }
 
     public static function mb_chr($code, $encoding = null)
     {
         if (0x80 > $code %= 0x200000) {
-            $s = \chr($code);
+            $s = chr($code);
         } elseif (0x800 > $code) {
-            $s = \chr(0xC0 | $code >> 6).\chr(0x80 | $code & 0x3F);
+            $s = chr(0xC0 | $code >> 6) . chr(0x80 | $code & 0x3F);
         } elseif (0x10000 > $code) {
-            $s = \chr(0xE0 | $code >> 12).\chr(0x80 | $code >> 6 & 0x3F).\chr(0x80 | $code & 0x3F);
+            $s = chr(0xE0 | $code >> 12) . chr(0x80 | $code >> 6 & 0x3F) . chr(0x80 | $code & 0x3F);
         } else {
-            $s = \chr(0xF0 | $code >> 18).\chr(0x80 | $code >> 12 & 0x3F).\chr(0x80 | $code >> 6 & 0x3F).\chr(0x80 | $code & 0x3F);
+            $s = chr(0xF0 | $code >> 18) . chr(0x80 | $code >> 12 & 0x3F) . chr(0x80 | $code >> 6 & 0x3F) . chr(0x80 | $code & 0x3F);
         }
 
         if ('UTF-8' !== $encoding) {
@@ -196,8 +219,8 @@ final class Php72
             $s = mb_convert_encoding($s, 'UTF-8', $encoding);
         }
 
-        if (1 === \strlen($s)) {
-            return \ord($s);
+        if (1 === strlen($s)) {
+            return ord($s);
         }
 
         $code = ($s = unpack('C*', substr($s, 0, 4))) ? $s[1] : 0;

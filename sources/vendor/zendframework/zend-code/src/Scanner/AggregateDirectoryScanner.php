@@ -18,8 +18,10 @@ class AggregateDirectoryScanner extends DirectoryScanner
      */
     protected $isScanned = false;
 
-    /**
-     * @param  bool $returnScannerClass
+    public function getIncludes($returnScannerClass = false)
+    {
+    }    /**
+     * @param bool $returnScannerClass
      * @todo not implemented
      */
     public function getNamespaces($returnScannerClass = false)
@@ -27,8 +29,25 @@ class AggregateDirectoryScanner extends DirectoryScanner
         // @todo
     }
 
-    public function getIncludes($returnScannerClass = false)
+    /**
+     * @param bool $returnScannerClass
+     */
+    public function getFunctions($returnScannerClass = false)
     {
+        $this->scan();
+
+        if (!$returnScannerClass) {
+            $functions = [];
+            foreach ($this->infos as $info) {
+                if ($info['type'] == 'function') {
+                    $functions[] = $info['name'];
+                }
+            }
+
+            return $functions;
+        }
+        $scannerClass = new FunctionScanner();
+        // @todo
     }
 
     public function getClasses($returnScannerClass = false, $returnDerivedScannerClass = false)
@@ -47,7 +66,7 @@ class AggregateDirectoryScanner extends DirectoryScanner
     }
 
     /**
-     * @param  string $class
+     * @param string $class
      * @return bool
      */
     public function hasClass($class)
@@ -64,9 +83,9 @@ class AggregateDirectoryScanner extends DirectoryScanner
     }
 
     /**
-     * @param  string $class
-     * @param  bool $returnScannerClass
-     * @param  bool $returnDerivedScannerClass
+     * @param string $class
+     * @param bool $returnScannerClass
+     * @param bool $returnDerivedScannerClass
      * @return ClassScanner|DerivedClassScanner
      * @throws Exception\RuntimeException
      */
@@ -80,7 +99,7 @@ class AggregateDirectoryScanner extends DirectoryScanner
             }
         }
 
-        if (! isset($scanner)) {
+        if (!isset($scanner)) {
             throw new Exception\RuntimeException('Class by that name was not found.');
         }
 
@@ -89,24 +108,5 @@ class AggregateDirectoryScanner extends DirectoryScanner
         return new DerivedClassScanner($classScanner, $this);
     }
 
-    /**
-     * @param bool $returnScannerClass
-     */
-    public function getFunctions($returnScannerClass = false)
-    {
-        $this->scan();
 
-        if (! $returnScannerClass) {
-            $functions = [];
-            foreach ($this->infos as $info) {
-                if ($info['type'] == 'function') {
-                    $functions[] = $info['name'];
-                }
-            }
-
-            return $functions;
-        }
-        $scannerClass = new FunctionScanner();
-        // @todo
-    }
 }

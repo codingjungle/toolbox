@@ -18,13 +18,13 @@ use IPS\Data\Store;
 use IPS\DateTime;
 use IPS\Db;
 use IPS\Dispatcher\Controller;
-use IPS\Helpers\MultipleRedirect;
-use IPS\Http\Url;
 use IPS\Log;
 use IPS\Member;
 use IPS\Output;
+use IPS\Output\Cache;
 use IPS\Plugin;
 use IPS\Request;
+use IPS\Theme;
 use IPS\toolbox\Application;
 use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\Proxy\Generator\Proxy;
@@ -32,14 +32,12 @@ use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\Shared\Lorem;
 use Symfony\Component\Filesystem\Filesystem;
 use UnexpectedValueException;
-use IPS\Theme;
 
 use function base64_decode;
 use function count;
 use function defined;
 use function header;
 use function htmlentities;
-use function in_array;
 use function ini_get;
 use function is_array;
 use function is_dir;
@@ -56,6 +54,7 @@ use function sleep;
 use function str_replace;
 use function time;
 
+use const IPS\NO_WRITES;
 use const IPS\ROOT_PATH;
 
 
@@ -193,8 +192,7 @@ class _bt extends Controller
         $content = ob_get_clean();
         try {
             ob_end_clean();
-        }
-        catch (\Exception $e) {
+        } catch (Exception $e) {
         }
         $content = preg_replace('#<head>(?:.|\n|\r)+?</head>#miu', '', $content);
         Output::i()->title = 'phpinfo()';
@@ -223,19 +221,19 @@ class _bt extends Controller
             Output::clearJsFiles();
 
             /* Reset theme maps to make sure bad data hasn't been cached by visits mid-setup */
-            \IPS\Theme::deleteCompiledCss();
-            \IPS\Theme::deleteCompiledResources();
+            Theme::deleteCompiledCss();
+            Theme::deleteCompiledResources();
 
-            foreach (\IPS\Theme::themes() as $id => $set) {
+            foreach (Theme::themes() as $id => $set) {
                 /* Invalidate template disk cache */
                 $set->cache_key = md5(microtime() . mt_rand(0, 1000));
                 $set->save();
             }
         }
 
-        \IPS\Data\Store::i()->clearAll();
+        Store::i()->clearAll();
         \IPS\Data\Cache::i()->clearAll();
-        \IPS\Output\Cache::i()->clearAll();
+        Cache::i()->clearAll();
 
         Member::clearCreateMenu();
     }
@@ -382,7 +380,7 @@ class _bt extends Controller
 
     protected function proxy()
     {
-        if (\IPS\NO_WRITES === true) {
+        if (NO_WRITES === true) {
             Output::i()->error(
                 'Proxy generator can not be used atm, NO_WRITES is enabled in the constants.php.',
                 '100foo'
@@ -399,7 +397,7 @@ class _bt extends Controller
         $step = 1;
         do {
             $step = Proxyclass::i()->makeToolboxMeta($step);
-        }while($step !== null);
+        } while ($step !== null);
         Proxy::i()->generateSettings();
         Proxyclass::i()->buildCss();
         unset(Store::i()->dtproxy_proxy_files, Store::i()->dtproxy_templates);

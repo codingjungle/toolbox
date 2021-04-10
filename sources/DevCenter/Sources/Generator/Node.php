@@ -20,17 +20,16 @@ use IPS\Node\Permissions;
 use IPS\Node\Ratings;
 
 use function defined;
+use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function header;
 use function in_array;
 use function is_array;
-
-use const IPS\ROOT_PATH;
-
-use function file_exists;
 use function json_decode;
 use function json_encode;
+
+use const IPS\ROOT_PATH;
 use const JSON_PRETTY_PRINT;
 use const T_PUBLIC;
 
@@ -42,6 +41,26 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Node extends GeneratorAbstract
 {
+
+    protected function addFurl($value, $url)
+    {
+        $furlFile = ROOT_PATH . '/applications/' . $this->application->directory . '/data/furl.json';
+        if (file_exists($furlFile)) {
+            $furls = json_decode(file_get_contents($furlFile), true);
+        } else {
+            $furls = [
+                'topLevel' => $this->app,
+                'pages'    => [],
+            ];
+        }
+
+        $furls['pages'][$value] = [
+            'friendly' => $this->classname_lower . '/{#project}-{?}',
+            'real'     => $url,
+        ];
+
+        file_put_contents($furlFile, json_encode($furls, JSON_PRETTY_PRINT));
+    }
 
     /**
      * @inheritdoc
@@ -69,7 +88,7 @@ class _Node extends GeneratorAbstract
         $this->urlTemplate();
         $this->_url();
 
-        if ($this->content_item_class !== \null) {
+        if ($this->content_item_class !== null) {
             $this->nodeItemClass();
         }
 
@@ -123,8 +142,8 @@ class _Node extends GeneratorAbstract
             'parent',
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }
@@ -142,8 +161,8 @@ class _Node extends GeneratorAbstract
             0,
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }
@@ -160,8 +179,8 @@ class _Node extends GeneratorAbstract
             'order',
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }
@@ -178,8 +197,8 @@ class _Node extends GeneratorAbstract
             'enabled',
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }
@@ -196,8 +215,8 @@ class _Node extends GeneratorAbstract
             $this->app . '_' . $this->classname_lower . '_node',
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }
@@ -214,8 +233,8 @@ class _Node extends GeneratorAbstract
             false,
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }
@@ -238,8 +257,8 @@ class _Node extends GeneratorAbstract
             $contentItemClass,
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
 
@@ -254,8 +273,8 @@ class _Node extends GeneratorAbstract
             $this->app . '_' . $this->classname_lower,
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }
@@ -263,7 +282,7 @@ class _Node extends GeneratorAbstract
     protected function permissions()
     {
         try {
-            if (in_array(Permissions::class, $this->implements, \true)) {
+            if (in_array(Permissions::class, $this->implements, true)) {
                 //index
                 $doc = [
                     '@brief [Node] App for permission index',
@@ -275,8 +294,8 @@ class _Node extends GeneratorAbstract
                     $this->app,
                     [
                         'visibility' => T_PUBLIC,
-                        'static' => true,
-                        'document' => $doc,
+                        'static'     => true,
+                        'document'   => $doc,
                     ]
                 );
 
@@ -291,18 +310,18 @@ class _Node extends GeneratorAbstract
                     $this->classname_lower,
                     [
                         'visibility' => T_PUBLIC,
-                        'static' => true,
-                        'document' => $doc,
+                        'static'     => true,
+                        'document'   => $doc,
                     ]
                 );
 
                 //perms map
                 $map = [
-                    'view' => 'view',
-                    'read' => 2,
-                    'add' => 3,
+                    'view'   => 'view',
+                    'read'   => 2,
+                    'add'    => 3,
                     'delete' => 4,
-                    'reply' => 5,
+                    'reply'  => 5,
                     'review' => 6,
                 ];
 
@@ -316,8 +335,8 @@ class _Node extends GeneratorAbstract
                     $map,
                     [
                         'visibility' => T_PUBLIC,
-                        'static' => true,
-                        'document' => $doc,
+                        'static'     => true,
+                        'document'   => $doc,
                     ]
                 );
 
@@ -332,8 +351,8 @@ class _Node extends GeneratorAbstract
                     $this->app . '_' . $this->classname_lower . '_',
                     [
                         'visibility' => T_PUBLIC,
-                        'static' => true,
-                        'document' => $doc,
+                        'static'     => true,
+                        'document'   => $doc,
                     ]
                 );
             }
@@ -343,11 +362,11 @@ class _Node extends GeneratorAbstract
 
     protected function ratings(&$dbColumns)
     {
-        if (in_array(Ratings::class, $this->implements, \true)) {
+        if (in_array(Ratings::class, $this->implements, true)) {
             $map = [
                 'rating_average' => 'rating_average',
-                'rating_total' => 'rating_total',
-                'rating_hits' => 'rating_hits',
+                'rating_total'   => 'rating_total',
+                'rating_hits'    => 'rating_hits',
             ];
 
             foreach ($map as $m) {
@@ -364,8 +383,8 @@ class _Node extends GeneratorAbstract
                 $map,
                 [
                     'visibility' => T_PUBLIC,
-                    'static' => true,
-                    'document' => $doc,
+                    'static'     => true,
+                    'document'   => $doc,
                 ]
             );
         }
@@ -373,7 +392,7 @@ class _Node extends GeneratorAbstract
 
     protected function clubs(&$dbColumns)
     {
-        if (in_array(ClubContainer::class, $this->traits, \false)) {
+        if (in_array(ClubContainer::class, $this->traits, false)) {
             $doc = [
                 'Get the database column which stores the club ID',
                 '@return string',
@@ -384,31 +403,11 @@ class _Node extends GeneratorAbstract
                 'return \'club_id\';',
                 [],
                 [
-                    'static' => true,
+                    'static'     => true,
                     'visibility' => T_PUBLIC,
-                    'document' => $doc,
+                    'document'   => $doc,
                 ]
             );
         }
-    }
-
-    protected function addFurl($value, $url)
-    {
-        $furlFile = ROOT_PATH . '/applications/' . $this->application->directory . '/data/furl.json';
-        if (file_exists($furlFile)) {
-            $furls = json_decode(file_get_contents($furlFile), true);
-        } else {
-            $furls = [
-                'topLevel' => $this->app,
-                'pages' => [],
-            ];
-        }
-
-        $furls['pages'][$value] = [
-            'friendly' => $this->classname_lower . '/{#project}-{?}',
-            'real' => $url,
-        ];
-
-        file_put_contents($furlFile, json_encode($furls, JSON_PRETTY_PRINT));
     }
 }

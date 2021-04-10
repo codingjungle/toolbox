@@ -19,6 +19,7 @@ use IPS\Http\Url;
 use IPS\Output;
 use IPS\Patterns\Singleton;
 use IPS\Request;
+use IPS\toolbox\Dev\Compiler\CompilerAbstract;
 use IPS\toolbox\DevCenter\Dev\Compiler\Javascript;
 use IPS\toolbox\DevCenter\Dev\Compiler\Template;
 use IPS\toolbox\Form;
@@ -26,6 +27,7 @@ use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\ReservedWords;
 use IPS\Xml\XMLReader;
 use LogicException;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -36,10 +38,11 @@ use function header;
 use function in_array;
 use function is_array;
 use function is_file;
+use function ksort;
 use function mb_ucfirst;
 use function preg_match;
 
-use function ksort;
+use const DIRECTORY_SEPARATOR;
 use const SORT_REGULAR;
 
 
@@ -119,7 +122,7 @@ class _Dev extends Singleton
                 $class = Javascript::class;
             }
             /**
-             * @var \IPS\toolbox\Dev\Compiler\CompilerAbstract $class ;
+             * @var CompilerAbstract $class ;
              */
             $class = new $class($values, $this->application, $this->type);
             $class->process();
@@ -212,7 +215,7 @@ class _Dev extends Singleton
     protected function elArguments()
     {
         $this->elements[] = [
-            'name' => 'arguments',
+            'name'  => 'arguments',
             'class' => 'stack',
         ];
         $this->form->add('arguments', 'stack');
@@ -314,21 +317,21 @@ class _Dev extends Singleton
      * @param string $altPath
      *
      * @throws InvalidArgumentException
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
+     * @throws IOException
      */
     protected function _getGroups($path = 'html', $altPath = 'controllers')
     {
         $options = [];
 
         try {
-            $base = \IPS\ROOT_PATH . \DIRECTORY_SEPARATOR . 'applications' . \DIRECTORY_SEPARATOR . $this->app . \DIRECTORY_SEPARATOR . 'dev' . \DIRECTORY_SEPARATOR . $path . \DIRECTORY_SEPARATOR;
+            $base = \IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'applications' . DIRECTORY_SEPARATOR . $this->app . DIRECTORY_SEPARATOR . 'dev' . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR;
 
             /* @var Finder $groups */
             $groups = new Finder();
             $fs = new Filesystem();
             $extended = '';
             if ($path === 'js') {
-                $extended = \DIRECTORY_SEPARATOR . $altPath;
+                $extended = DIRECTORY_SEPARATOR . $altPath;
             }
             if ($fs->exists($base . 'admin' . $extended)) {
                 $groups->in($base . 'admin' . $extended);
@@ -344,7 +347,7 @@ class _Dev extends Singleton
             $groups->directories();
             foreach ($groups as $group) {
                 $paths = $group->getRealPath();
-                $paths = explode(\DIRECTORY_SEPARATOR, $paths);
+                $paths = explode(DIRECTORY_SEPARATOR, $paths);
                 array_pop($paths);
                 $location = array_pop($paths);
                 if ($path === 'js') {
@@ -364,8 +367,8 @@ class _Dev extends Singleton
 
         $this->elements[] = [
             'class' => 'select',
-            'name' => '_group',
-            'ops' => [
+            'name'  => '_group',
+            'ops'   => [
                 'options' => $options,
             ],
         ];

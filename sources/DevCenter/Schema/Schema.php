@@ -17,27 +17,27 @@ namespace IPS\toolbox\DevCenter;
 use IPS\Application;
 use IPS\Helpers\Table\Custom;
 use IPS\Http\Url;
-use IPS\Member;
+use IPS\Patterns\Singleton;
 
-class _Schema extends \IPS\Patterns\Singleton
+class _Schema extends Singleton
 {
 
-    protected static $instance = \null;
+    protected static $instance = null;
 
-    public function form(array $schema, Application $application){
-
-        $table = new Custom( $schema, Url::internal( "app=core&module=applications&controller=developer&appKey={$application->directory}&tab=SchemaImports" ) );
+    public function form(array $schema, Application $application)
+    {
+        $table = new Custom($schema,
+            Url::internal("app=core&module=applications&controller=developer&appKey={$application->directory}&tab=SchemaImports"));
         $table->langPrefix = 'dtdeveplus_table_';
-        $table->limit      = 150;
-        $table->include = array( 'name' );
+        $table->limit = 150;
+        $table->include = array('name');
 
-        $table->rowButtons = function( $row, $k ) use ( $application )
-        {
+        $table->rowButtons = function ($row, $k) use ($application) {
             return array(
-                'import'	=> array(
-                    'icon'	=> 'download',
-                    'title'	=> 'import',
-                    'link'	=> Url::internal( "app=core&module=applications&controller=developer&appKey={$application->directory}&do=dtdevplusImport&table={$k}" )
+                'import' => array(
+                    'icon'  => 'download',
+                    'title' => 'import',
+                    'link'  => Url::internal("app=core&module=applications&controller=developer&appKey={$application->directory}&do=dtdevplusImport&table={$k}")
                 )
             );
         };

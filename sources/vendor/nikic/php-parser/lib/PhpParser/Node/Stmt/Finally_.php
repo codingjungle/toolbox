@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Node\Stmt;
 
@@ -12,19 +13,22 @@ class Finally_ extends Node\Stmt
     /**
      * Constructs a finally node.
      *
-     * @param Node\Stmt[] $stmts      Statements
-     * @param array       $attributes Additional attributes
+     * @param Node\Stmt[] $stmts Statements
+     * @param array $attributes Additional attributes
      */
-    public function __construct(array $stmts = [], array $attributes = []) {
+    public function __construct(array $stmts = [], array $attributes = [])
+    {
         parent::__construct($attributes);
         $this->stmts = $stmts;
     }
 
-    public function getSubNodeNames() : array {
+    public function getSubNodeNames(): array
+    {
         return ['stmts'];
     }
-    
-    public function getType() : string {
+
+    public function getType(): string
+    {
         return 'Stmt_Finally';
     }
 }

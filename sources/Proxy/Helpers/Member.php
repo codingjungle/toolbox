@@ -12,8 +12,7 @@
 
 namespace IPS\toolbox\Proxy\Helpers;
 
-use IPS\toolbox\Profiler\Debug;
-use Zend\Code\Generator\DocBlock\Tag\ParamTag;
+use IPS\Lang;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;
@@ -23,10 +22,9 @@ use Zend\Code\Generator\PropertyGenerator;
 
 use function defined;
 use function header;
-use IPS\Lang;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER[ 'SERVER_PROTOCOL' ]) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0') . ' 403 Forbidden');
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -37,26 +35,25 @@ class _Member implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
-
-        try{
+        try {
             $propertyDocBlock = new DocBlockGenerator(
-                'Store a reference to the language object', null, [ new ReturnTag('\\'.Lang::class)]
+                'Store a reference to the language object', null, [new ReturnTag('\\' . Lang::class)]
             );
             $body[] = PropertyGenerator::fromArray(
                 [
-                    'name' => '_lang',
-                    'static' => true,
-                    'docblock' => $propertyDocBlock,
+                    'name'       => '_lang',
+                    'static'     => true,
+                    'docblock'   => $propertyDocBlock,
                     'visibility' => 'protected'
                 ]
             );
-        }
-        catch(InvalidArgumentException $e){
+        } catch (InvalidArgumentException $e) {
         }
 
         $methodDocBlock = new DocBlockGenerator(
-            'Return the language object to use for this member - returns default if member has not selected a language', \null, [
-                new ReturnTag('\\'.Lang::class)
+            'Return the language object to use for this member - returns default if member has not selected a language',
+            null, [
+                new ReturnTag('\\' . Lang::class)
             ]
         );
 
@@ -69,7 +66,7 @@ class _Member implements HelpersAbstract
                     ],
                     'body'       => 'return parent::language();',
                     'docblock'   => $methodDocBlock,
-                    'static'     => \false,
+                    'static'     => false,
                 ]
             );
         } catch (InvalidArgumentException $e) {

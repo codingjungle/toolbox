@@ -15,7 +15,45 @@ namespace Slasher;
 
 use Exception;
 use InvalidArgumentException;
+use RecursiveCallbackFilterIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
+
+use SplFileInfo;
+
+use function array_combine;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_values;
+use function count;
+use function explode;
+use function file_get_contents;
+use function function_exists;
+use function get_defined_constants;
+use function get_defined_functions;
+use function implode;
+use function in_array;
+use function is_array;
+use function mb_strpos;
+use function mb_strtolower;
+use function mb_strtoupper;
+use function preg_match_all;
+use function preg_replace;
+use function str_replace;
+
+use function token_get_all;
+
+use const SORT_REGULAR;
 use const T_DOUBLE_COLON;
+use const T_ENCAPSED_AND_WHITESPACE;
+use const T_FUNCTION;
+use const T_NAMESPACE;
+use const T_NS_SEPARATOR;
+use const T_OBJECT_OPERATOR;
+use const T_STRING;
 
 class SlasherClass
 {
@@ -42,6 +80,7 @@ class SlasherClass
     protected $all = false;
 
     protected $path;
+    protected $templateHeaders = [];
 
     /**
      * FileEditor constructor.
@@ -59,7 +98,7 @@ class SlasherClass
      */
     public function addFunction(string $func)
     {
-        static::$addedFunctions[ $func ] = $func;
+        static::$addedFunctions[$func] = $func;
     }
 
     /**
@@ -68,31 +107,31 @@ class SlasherClass
      * @param bool $template
      * @return null|string
      */
-    public function addBackslashes($path, $return=false, $template=false)
+    public function addBackslashes($path, $return = false, $template = false)
     {
         try {
-            $content = \file_get_contents($path);
+            $content = file_get_contents($path);
             $functions = $this->getReplaceableFunctions($content);
             $constants = $this->getDefinedConstants();
-            if( $template === true ){
-                $content = "<?php\n".$content;
+            if ($template === true) {
+                $content = "<?php\n" . $content;
             }
-            $source = \explode("\n", $content);
-            $tokens = \token_get_all($content);
-            $previousToken = \null;
+            $source = explode("\n", $content);
+            $tokens = token_get_all($content);
+            $previousToken = null;
             $uses = [];
 
             foreach ($tokens as $key => $token) {
-                if (!\is_array($token)) {
+                if (!is_array($token)) {
                     $tempToken = $token;
                     $token = [0 => 0, 1 => $tempToken, 2 => 0];
                 }
 
-                if ($token[ 0 ] === \T_STRING || $token[ 0 ] === \T_ENCAPSED_AND_WHITESPACE) {
-                    $line = $token[ 2 ];
+                if ($token[0] === T_STRING || $token[0] === T_ENCAPSED_AND_WHITESPACE) {
+                    $line = $token[2];
 
                     $t = trim($token[1]);
-                    if( $template === \true ) {
+                    if ($template === true) {
                         $t = ltrim($t, '=');
                         $t = rtrim($t, ',');
                         $t = trim($t);
@@ -101,16 +140,15 @@ class SlasherClass
                     $token[1] = $t;
 
                     if ($this->isBackslashable($functions, $token, $previousToken, $constants)) {
-
-                        if ($this->makeUse && isset(static::$functions[ $t ]) && false === \mb_strpos($path,
+                        if ($this->makeUse && isset(static::$functions[$t]) && false === mb_strpos($path,
                                 DIRECTORY_SEPARATOR . 'hooks' . DIRECTORY_SEPARATOR)) {
-                            if (!isset($tokens[ $key - 2 ][ 0 ]) || $tokens[ $key - 2 ][ 0 ] !== \T_FUNCTION) {
-                                $uses[ $t ] = $t;
-                                $source[ $line - 1 ] = \preg_replace("#\\\\" . $t . '#u', $t, $source[ $line - 1 ]);
+                            if (!isset($tokens[$key - 2][0]) || $tokens[$key - 2][0] !== T_FUNCTION) {
+                                $uses[$t] = $t;
+                                $source[$line - 1] = preg_replace("#\\\\" . $t . '#u', $t, $source[$line - 1]);
                             }
                         } else {
-
-                            $source[ $line - 1 ] = \preg_replace("#(?<!\\\\)\b" . $t . '\b#u',"\\" . $t , $source[ $line - 1 ]);
+                            $source[$line - 1] = preg_replace("#(?<!\\\\)\b" . $t . '\b#u', "\\" . $t,
+                                $source[$line - 1]);
                         }
                     }
                 }
@@ -118,11 +156,11 @@ class SlasherClass
                 $previousToken = $token;
             }
 
-            if( $template === true){
-                unset( $source[0] );
+            if ($template === true) {
+                unset($source[0]);
             }
 
-            $source = \implode("\n", $source);
+            $source = implode("\n", $source);
 
             if ($this->makeUse) {
                 try {
@@ -131,29 +169,26 @@ class SlasherClass
                         $add[] = 'use function ' . $use . ';';
                     }
 
-                    if (\count($add)) {
-                        $toUse = PHP_EOL . \implode(PHP_EOL, $add);
-                        if (false === \mb_strpos($path, DIRECTORY_SEPARATOR . 'hooks' . DIRECTORY_SEPARATOR)) {
-                            $source = \preg_replace('/namespace(.+?)([^\n]+)/', 'namespace $2' . $toUse, $source, 1);
+                    if (count($add)) {
+                        $toUse = PHP_EOL . implode(PHP_EOL, $add);
+                        if (false === mb_strpos($path, DIRECTORY_SEPARATOR . 'hooks' . DIRECTORY_SEPARATOR)) {
+                            $source = preg_replace('/namespace(.+?)([^\n]+)/', 'namespace $2' . $toUse, $source, 1);
                         }
                     }
                 } catch (Exception $e) {
                 }
-
             }
 
             $source = $this->applyFinalFixes($source);
 
-            if( !$return ) {
+            if (!$return) {
                 file_put_contents($path, $source);
-            }
-            else{
+            } else {
                 return $source;
             }
         } catch (Exception $e) {
         }
     }
-
 
     /**
      * @param $content
@@ -176,44 +211,44 @@ class SlasherClass
         if (!empty(static::$backslashable)) {
             return static::$backslashable;
         }
-        static::$functions = \array_map('strtolower', \get_defined_functions()[ 'internal' ]);
-        static::$functions = \array_combine(\array_values(static::$functions), static::$functions);
-        ksort(static::$functions, \SORT_REGULAR);
+        static::$functions = array_map('strtolower', get_defined_functions()['internal']);
+        static::$functions = array_combine(array_values(static::$functions), static::$functions);
+        ksort(static::$functions, SORT_REGULAR);
         static::$backslashable = [];
 
         if ($all === false) {
             foreach (static::$functions as $name => $value) {
-                if (\true === static::startsWith($value, 'is_')) {
-                    static::$backslashable[ $name ] = $value;
+                if (true === static::startsWith($value, 'is_')) {
+                    static::$backslashable[$name] = $value;
                 }
             }
 
-            static::$backslashable[ 'array_slice' ] = 'array_slice';
-            static::$backslashable[ 'assert' ] = 'assert';
-            static::$backslashable[ 'chr' ] = 'chr';
-            static::$backslashable[ 'doubleval' ] = 'doubleval';
-            static::$backslashable[ 'floatval' ] = 'floatval';
-            static::$backslashable[ 'func_get_args' ] = 'func_get_args';
-            static::$backslashable[ 'func_num_args' ] = 'func_num_args';
-            static::$backslashable[ 'get_called_class' ] = 'get_called_class';
-            static::$backslashable[ 'get_class' ] = 'get_class';
-            static::$backslashable[ 'gettype' ] = 'gettype';
-            static::$backslashable[ 'intval' ] = 'intval';
-            static::$backslashable[ 'ord' ] = 'ord';
-            static::$backslashable[ 'strval' ] = 'strval';
-            static::$backslashable[ 'count' ] = 'count';
-            static::$backslashable[ 'in_array' ] = 'in_array';
-            static::$backslashable[ 'strlen' ] = 'strlen';
-            static::$backslashable[ 'defined' ] = 'defined';
-            static::$backslashable[ 'call_user_func' ] = 'call_user_func';
-            static::$backslashable[ 'call_user_func_array' ] = 'call_user_func_array';
+            static::$backslashable['array_slice'] = 'array_slice';
+            static::$backslashable['assert'] = 'assert';
+            static::$backslashable['chr'] = 'chr';
+            static::$backslashable['doubleval'] = 'doubleval';
+            static::$backslashable['floatval'] = 'floatval';
+            static::$backslashable['func_get_args'] = 'func_get_args';
+            static::$backslashable['func_num_args'] = 'func_num_args';
+            static::$backslashable['get_called_class'] = 'get_called_class';
+            static::$backslashable['get_class'] = 'get_class';
+            static::$backslashable['gettype'] = 'gettype';
+            static::$backslashable['intval'] = 'intval';
+            static::$backslashable['ord'] = 'ord';
+            static::$backslashable['strval'] = 'strval';
+            static::$backslashable['count'] = 'count';
+            static::$backslashable['in_array'] = 'in_array';
+            static::$backslashable['strlen'] = 'strlen';
+            static::$backslashable['defined'] = 'defined';
+            static::$backslashable['call_user_func'] = 'call_user_func';
+            static::$backslashable['call_user_func_array'] = 'call_user_func_array';
         } else {
             foreach (static::$functions as $name => $value) {
-                static::$backslashable[ $name ] = $value;
+                static::$backslashable[$name] = $value;
             }
         }
 
-        static::$backslashable = \array_merge(static::$backslashable, static::$addedFunctions);
+        static::$backslashable = array_merge(static::$backslashable, static::$addedFunctions);
         return static::$backslashable;
     }
 
@@ -241,19 +276,18 @@ class SlasherClass
      */
     protected function removeUseFunctionsFromBackslashing($content, array $functions): array
     {
-        \preg_match_all('#use(.*?)function([^;]+)#', $content, $matches);
+        preg_match_all('#use(.*?)function([^;]+)#', $content, $matches);
         $funcs = [];
-        if (isset($matches[ 2 ])) {
+        if (isset($matches[2])) {
             /* @var array $m */
             $m = $matches[2];
             foreach ($m as $func) {
                 $func = trim($func);
-                $funcs[ $func ] = $func;
-                if (!empty($functions[ $func ]) && \function_exists($func)) {
-                        unset($functions[ $func ]);
-                    }
+                $funcs[$func] = $func;
+                if (!empty($functions[$func]) && function_exists($func)) {
+                    unset($functions[$func]);
                 }
-
+            }
         }
 
         return $functions;
@@ -265,24 +299,11 @@ class SlasherClass
     protected function getDefinedConstants(): array
     {
         if (empty(self::$constants)) {
-            self::$constants = \array_keys(\get_defined_constants(false));
-            $c = \array_values(self::$constants);
-            self::$constants = \array_combine($c, $c);
+            self::$constants = array_keys(get_defined_constants(false));
+            $c = array_values(self::$constants);
+            self::$constants = array_combine($c, $c);
         }
         return self::$constants;
-    }
-    protected $templateHeaders = [];
-    protected function templatesHeaders(): array
-    {
-        if( empty( $this->templateHeaders ) === true ){
-            $c = $this->getDefinedConstants();
-            foreach( $c as $k => $v ){
-                 $this->templateHeaders['raw'][$v] = $v;
-                 $this->templateHeaders['l_raw'][\mb_strtolower($v)] = \mb_strtolower($v);
-            }
-        }
-        return $this->templateHeaders;
-
     }
 
     /**
@@ -295,7 +316,7 @@ class SlasherClass
      */
     protected function isBackslashable(array &$functions, array &$token, array &$previousToken, array &$constants): bool
     {
-        if( $previousToken[0] === \T_DOUBLE_COLON || $previousToken[0] === \T_OBJECT_OPERATOR || $previousToken[0] === \T_NS_SEPARATOR ){
+        if ($previousToken[0] === T_DOUBLE_COLON || $previousToken[0] === T_OBJECT_OPERATOR || $previousToken[0] === T_NS_SEPARATOR) {
             return false;
         }
 
@@ -312,7 +333,7 @@ class SlasherClass
      */
     protected function isFunction(array &$functions, array &$token, array &$previousToken): bool
     {
-        return !empty($functions[ $token[ 1 ] ]) && $previousToken[ 0 ] !== \T_NAMESPACE && $previousToken[ 0 ] !== \T_OBJECT_OPERATOR;
+        return !empty($functions[$token[1]]) && $previousToken[0] !== T_NAMESPACE && $previousToken[0] !== T_OBJECT_OPERATOR;
     }
 
     /**
@@ -329,7 +350,7 @@ class SlasherClass
 //        $t = rtrim( $t,',');
 //        $t = trim( $t );
 
-        return !empty($constants[ \mb_strtoupper($token[1]) ]) && $previousToken[ 0 ] !== \T_NAMESPACE;
+        return !empty($constants[mb_strtoupper($token[1])]) && $previousToken[0] !== T_NAMESPACE;
     }
 
     /**
@@ -339,23 +360,35 @@ class SlasherClass
      */
     protected function applyFinalFixes($source): string
     {
-        $source = \str_replace(['function \\', 'const \\', "::\\", "$\\"], ['function ', 'const ', '::', '$'], $source);
+        $source = str_replace(['function \\', 'const \\', "::\\", "$\\"], ['function ', 'const ', '::', '$'], $source);
         return (string)$source;
+    }
+
+    protected function templatesHeaders(): array
+    {
+        if (empty($this->templateHeaders) === true) {
+            $c = $this->getDefinedConstants();
+            foreach ($c as $k => $v) {
+                $this->templateHeaders['raw'][$v] = $v;
+                $this->templateHeaders['l_raw'][mb_strtolower($v)] = mb_strtolower($v);
+            }
+        }
+        return $this->templateHeaders;
     }
 }
 
 class Slasher
 {
     protected static $errorMessages = [
-        'noFile' => 'The file or app directoy, %s, can\'t be found.',
-        'noArgs' => 'No args were passed!',
-        'type' => 'Type needs to be set, choices are type=app or type=file',
-        'app' => 'App needs to be set, app=myapp',
-        'app2' => 'The app, %s, doesn\'t appear to exits.',
-        'appRun' => 'Beginning to run Slasher on %s',
+        'noFile'     => 'The file or app directoy, %s, can\'t be found.',
+        'noArgs'     => 'No args were passed!',
+        'type'       => 'Type needs to be set, choices are type=app or type=file',
+        'app'        => 'App needs to be set, app=myapp',
+        'app2'       => 'The app, %s, doesn\'t appear to exits.',
+        'appRun'     => 'Beginning to run Slasher on %s',
         'processing' => 'Processing file: %s',
-        'done' => 'Processing done on: %s',
-        'appDone' => 'Slasher done on %s',
+        'done'       => 'Processing done on: %s',
+        'appDone'    => 'Slasher done on %s',
     ];
 
     /**
@@ -380,7 +413,7 @@ class Slasher
     /**
      * slasher constructor.
      * @param array $args
-     * @param bool  $suppressMessages
+     * @param bool $suppressMessages
      * @throws Exception
      */
     public function __construct(array $args, bool $suppressMessages = null)
@@ -391,22 +424,22 @@ class Slasher
         $file = null;
         $skip = [];
         $key = null;
-        unset($args[ 0 ]);
+        unset($args[0]);
 
-        if (!\count($args)) {
+        if (!count($args)) {
             $this->message('noArgs');
         }
 
         foreach ($args as $k => $val) {
             if ($val === '-all') {
                 $all = true;
-                unset($args[ $k ]);
+                unset($args[$k]);
                 continue;
             }
 
             if ($val === '-use') {
                 $makeUse = true;
-                unset($args[ $k ]);
+                unset($args[$k]);
                 continue;
             }
 
@@ -414,7 +447,7 @@ class Slasher
                 list($key, $skip) = explode('=', $val);
                 $this->key = $key;
                 $skip = explode(',', $skip);
-                unset($args[ $k ]);
+                unset($args[$k]);
                 continue;
             }
             $file = $val;
@@ -433,7 +466,7 @@ class Slasher
 
             if (!is_dir($path)) {
                 if (!file_exists($path)) {
-                    throw new InvalidArgumentException;
+                    throw new InvalidArgumentException();
                 }
                 $this->type = 'file';
                 $this->file = $path;
@@ -451,7 +484,7 @@ class Slasher
     protected function message($type, $exit = true, $sprint = null)
     {
         if ($this->suppressMessages === false) {
-            $msg = static::$errorMessages[ $type ];
+            $msg = static::$errorMessages[$type];
             if ($sprint) {
                 $msg = sprintf($msg, $sprint);
             }
@@ -470,8 +503,10 @@ class Slasher
     {
         if ($this->type === 'app') {
             $this->parseDirectory();
-        } else if ($this->type === 'file') {
-            $this->parseFile();
+        } else {
+            if ($this->type === 'file') {
+                $this->parseFile();
+            }
         }
     }
 
@@ -488,8 +523,8 @@ class Slasher
         };
 
         if (!empty($this->skip)) {
-            $filter = function (\SplFileInfo $file) {
-                if (\in_array($file->getFilename(), $this->skip, true)) {
+            $filter = function (SplFileInfo $file) {
+                if (in_array($file->getFilename(), $this->skip, true)) {
                     return false;
                 }
 
@@ -497,15 +532,15 @@ class Slasher
             };
         }
 
-        $dirIterator = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveCallbackFilterIterator($dirIterator, $filter),
-            \RecursiveIteratorIterator::SELF_FIRST);
-        $iterator = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+        $dirIterator = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+        $iterator = new RecursiveIteratorIterator(new RecursiveCallbackFilterIterator($dirIterator, $filter),
+            RecursiveIteratorIterator::SELF_FIRST);
+        $iterator = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
 
         foreach ($iterator as $file) {
             try {
-                if (isset($file[ 0 ])) {
-                    $file = $file[ 0 ];
+                if (isset($file[0])) {
+                    $file = $file[0];
                     $this->message('processing', false, $file);
                     $this->slasher->addBackslashes($file);
                     $this->message('done', $file);
@@ -513,7 +548,6 @@ class Slasher
                     echo $file;
                     exit;
                 }
-
             } catch (Exception $e) {
                 echo $e->getMessage();
                 exit;

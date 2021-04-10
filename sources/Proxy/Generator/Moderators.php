@@ -10,25 +10,25 @@
 
 namespace IPS\toolbox\Proxy\Generator;
 
-use function _;
-
+use Exception;
 use IPS\Application;
 use IPS\core\extensions\core\ModeratorPermissions\ModeratorPermissions;
 use IPS\Data\Store;
+
 use function array_keys;
 use function array_merge;
 use function defined;
 use function header;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( isset( $_SERVER[ 'SERVER_PROTOCOL' ] ) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
  * Moderators Class
  *
- * @mixin \IPS\toolbox\Proxy\Generator\Moderators
+ * @mixin Moderators
  */
 class _Moderators extends GeneratorAbstract
 {
@@ -38,22 +38,21 @@ class _Moderators extends GeneratorAbstract
      * @note  This needs to be declared in any child class.
      * @var static
      */
-    protected static $instance = \null;
+    protected static $instance = null;
 
     /**
      * creates the jsonMeta for the json file and writes the provider to disk.
      */
     public function create()
     {
-
         $file = 'modsProvider.php';
         $jsonMeta = [];
 
-        if ( isset( Store::i()->dt_json ) ) {
+        if (isset(Store::i()->dt_json)) {
             $jsonMeta = Store::i()->dt_json;
         }
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signature' => [
                 "IPS\\Member::modPermission",
             ],
@@ -61,7 +60,7 @@ class _Moderators extends GeneratorAbstract
             'language'  => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'   => 'mods',
             'source' => [
                 'contributor' => 'return_array',
@@ -95,55 +94,55 @@ class _Moderators extends GeneratorAbstract
             'delete_item_message' => [],
         ];
 
-        foreach ( Application::allExtensions( 'core', 'ModeratorPermissions', \false ) as $k => $ext ) {
-            if ( $ext instanceof ModeratorPermissions ) {
+        foreach (Application::allExtensions('core', 'ModeratorPermissions', false) as $k => $ext) {
+            if ($ext instanceof ModeratorPermissions) {
                 /**
                  * @var \IPS\Content\ModeratorPermissions $ext
                  */
-                $class = \null;
+                $class = null;
 
-                foreach ( $ext->actions as $s ) {
+                foreach ($ext->actions as $s) {
                     $class = $ext::$class;
-                    $toggles[ $s ][] = "can_{$s}_{$class::$title}";
+                    $toggles[$s][] = "can_{$s}_{$class::$title}";
                 }
 
-                if ( isset( $class::$commentClass ) ) {
-                    foreach ( $ext->commentActions as $s ) {
+                if (isset($class::$commentClass)) {
+                    foreach ($ext->commentActions as $s) {
                         $commentClass = $class::$commentClass;
-                        $toggles[ $s ][] = "can_{$s}_{$commentClass::$title}";
+                        $toggles[$s][] = "can_{$s}_{$commentClass::$title}";
                     }
                 }
 
-                if ( isset( $class::$reviewClass ) ) {
-                    foreach ( $ext->reviewActions as $s ) {
+                if (isset($class::$reviewClass)) {
+                    foreach ($ext->reviewActions as $s) {
                         $reviewClass = $class::$reviewClass;
-                        $toggles[ $s ][] = "can_{$s}_{$reviewClass::$title}";
+                        $toggles[$s][] = "can_{$s}_{$reviewClass::$title}";
                     }
                 }
             }
         }
 
-        $apps = Application::appsWithExtension( 'core', 'ModeratorPermissions' );
-        $perms = [ [] ];
+        $apps = Application::appsWithExtension('core', 'ModeratorPermissions');
+        $perms = [[]];
 
         /**
          * @var Application $app
          */
-        foreach ( $apps as $app ) {
-            $extensions = $app->extensions( 'core', 'ModeratorPermissions', \true );
+        foreach ($apps as $app) {
+            $extensions = $app->extensions('core', 'ModeratorPermissions', true);
 
             /* @var ModeratorPermissions $extension */
-            foreach ( $extensions as $extension ) {
+            foreach ($extensions as $extension) {
                 try {
-                    $perms[] = array_keys( $extension->getPermissions( $toggles ) );
-                } catch ( \Exception $e ) {
+                    $perms[] = array_keys($extension->getPermissions($toggles));
+                } catch (Exception $e) {
                 }
             }
         }
 
-        $perms = array_merge( ...$perms );
+        $perms = array_merge(...$perms);
 
-        $this->writeClass( 'Mods', 'modsProvider', $perms );
+        $this->writeClass('Mods', 'modsProvider', $perms);
     }
 }
 

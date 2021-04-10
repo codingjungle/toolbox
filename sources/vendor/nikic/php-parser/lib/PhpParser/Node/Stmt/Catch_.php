@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Node\Stmt;
 
@@ -17,13 +18,16 @@ class Catch_ extends Node\Stmt
     /**
      * Constructs a catch node.
      *
-     * @param Node\Name[]   $types      Types of exceptions to catch
-     * @param Expr\Variable $var        Variable for exception
-     * @param Node\Stmt[]   $stmts      Statements
-     * @param array         $attributes Additional attributes
+     * @param Node\Name[] $types Types of exceptions to catch
+     * @param Expr\Variable $var Variable for exception
+     * @param Node\Stmt[] $stmts Statements
+     * @param array $attributes Additional attributes
      */
     public function __construct(
-        array $types, Expr\Variable $var, array $stmts = [], array $attributes = []
+        array $types,
+        Expr\Variable $var,
+        array $stmts = [],
+        array $attributes = []
     ) {
         parent::__construct($attributes);
         $this->types = $types;
@@ -31,11 +35,13 @@ class Catch_ extends Node\Stmt
         $this->stmts = $stmts;
     }
 
-    public function getSubNodeNames() : array {
+    public function getSubNodeNames(): array
+    {
         return ['types', 'var', 'stmts'];
     }
-    
-    public function getType() : string {
+
+    public function getType(): string
+    {
         return 'Stmt_Catch';
     }
 }

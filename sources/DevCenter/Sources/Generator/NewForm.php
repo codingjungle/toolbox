@@ -91,128 +91,137 @@ class _NewForm extends GeneratorAbstract
     {
         $config = [
             'name'   => 'classMap',
-            'value'  => new PropertyValueGenerator( static::$classMap, PropertyValueGenerator::TYPE_ARRAY, PropertyValueGenerator::OUTPUT_MULTIPLE_LINE ),
+            'value'  => new PropertyValueGenerator(static::$classMap, PropertyValueGenerator::TYPE_ARRAY,
+                PropertyValueGenerator::OUTPUT_MULTIPLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'array' ],
+                    ['name' => 'var', 'description' => 'array'],
                 ],
             ],
-            'static' => \true,
+            'static' => true,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'form',
-            'value'  => new PropertyValueGenerator( null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'Form' ],
+                    ['name' => 'var', 'description' => 'Form'],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'id',
-            'value'  => new PropertyValueGenerator( 'defaul', PropertyValueGenerator::TYPE_STRING, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator('defaul', PropertyValueGenerator::TYPE_STRING,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'string' ],
+                    ['name' => 'var', 'description' => 'string'],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'elementStore',
-            'value'  => new PropertyValueGenerator( [], PropertyValueGenerator::TYPE_ARRAY_SHORT, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY_SHORT,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'string' ],
+                    ['name' => 'var', 'description' => 'string'],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'object',
-            'value'  => new PropertyValueGenerator( null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'object' ],
+                    ['name' => 'var', 'description' => 'object'],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'bitOptions',
-            'value'  => new PropertyValueGenerator( [], PropertyValueGenerator::TYPE_ARRAY_SHORT, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY_SHORT,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'array' ],
+                    ['name' => 'var', 'description' => 'array'],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'formPrefix',
-            'value'  => new PropertyValueGenerator( null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'string' ],
+                    ['name' => 'var', 'description' => 'string'],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'lang',
-            'value'  => new PropertyValueGenerator( null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => Lang::class ],
+                    ['name' => 'var', 'description' => Lang::class],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $config = [
             'name'   => 'header',
-            'value'  => new PropertyValueGenerator( null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
-                    [ 'name' => 'var', 'description' => 'string' ],
+                    ['name' => 'var', 'description' => 'string'],
                 ],
             ],
-            'static' => \false,
+            'static' => false,
         ];
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function constructor()
     {
-        $methodDocBlock = new DocBlockGenerator( '_Forms constructor', \null, [
-            new ParamTag( 'form', 'Form|null', '' ),
+        $methodDocBlock = new DocBlockGenerator('_Forms constructor', null, [
+            new ParamTag('form', 'Form|null', ''),
             //new ReturnTag(['dataType' => 'array']),
-        ] );
+        ]);
 
         $body = <<<'eof'
 $this->lang = Member::loggedIn()->language();
@@ -223,16 +232,16 @@ else if ( $form instanceof \IPS\Helpers\Form ) {
     $this->form = $form;
 }
 eof;
-        $this->generator->addUse( Member::class );
-        $this->generator->addUse( Form::class );
-        $this->methods[] = MethodGenerator::fromArray( [
+        $this->generator->addUse(Member::class);
+        $this->generator->addUse(Form::class);
+        $this->methods[] = MethodGenerator::fromArray([
             'name'       => '__construct',
             'parameters' => [
-                new ParameterGenerator( 'form', 'Form', 'null' ),
+                new ParameterGenerator('form', 'Form', 'null'),
             ],
             'body'       => $body,
             'docblock'   => $methodDocBlock,
-            'static'     => \false,
-        ] );
+            'static'     => false,
+        ]);
     }
 }

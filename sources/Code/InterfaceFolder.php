@@ -12,14 +12,13 @@
 
 namespace IPS\toolbox\Code;
 
+use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 use function defined;
 use function header;
 use function str_replace;
-
-use const JSON_PRETTY_PRINT;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -39,16 +38,17 @@ class _InterfaceFolder extends ParserAbstract
         $warning = [];
         /** @var SplFileInfo $file */
         foreach ($this->files as $file) {
-            if( $file->isFile() ){
-                $warning[] = ['path' => [
-                    'url' => $this->buildPath($file->getPathname(), 0),
-                    'name' => str_replace(
-                        $this->app->getApplicationPath() . '/',
-                        '',
-                        $file->getPathname()
-                    )
-                ],
-                    ];
+            if ($file->isFile()) {
+                $warning[] = [
+                    'path' => [
+                        'url'  => $this->buildPath($file->getPathname(), 0),
+                        'name' => str_replace(
+                            $this->app->getApplicationPath() . '/',
+                            '',
+                            $file->getPathname()
+                        )
+                    ],
+                ];
             }
         }
         return $warning;
@@ -57,13 +57,13 @@ class _InterfaceFolder extends ParserAbstract
     /**
      * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function getFiles()
     {
         $files = new Finder();
-        $files->in($this->appPath . 'interface/');
-        if ($this->skip !== \null) {
+        $files->in($this->appPath . 'interface/')->notName('index.html');
+        if ($this->skip !== null) {
             foreach ($this->skip as $name) {
                 $files->notName($name);
             }

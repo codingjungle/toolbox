@@ -13,12 +13,13 @@
 namespace IPS\toolbox\extensions\toolbox\Headerdoc;
 
 use IPS\toolbox\DevCenter\Headerdoc\HeaderdocAbstract;
+
 use function defined;
 use function header;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( isset( $_SERVER[ 'SERVER_PROTOCOL' ] ) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -33,7 +34,7 @@ class _header extends HeaderdocAbstract
      **/
     public function enabled()
     {
-        return \true;
+        return true;
     }
 
     /**
@@ -41,27 +42,27 @@ class _header extends HeaderdocAbstract
      **/
     public function indexEnabled()
     {
-        return \true;
+        return true;
     }
 
     /**
      * files to skip during building of the tar
      **/
-    public function filesSkip( &$skip )
+    public function filesSkip(&$skip)
     {
     }
 
     /**
      * directories to skip during building of the tar
      **/
-    public function dirSkip( &$skip )
+    public function dirSkip(&$skip)
     {
     }
 
     /**
      * an array of files/folders to exclude in the headerdoc
      **/
-    public function exclude( &$skip )
+    public function exclude(&$skip)
     {
     }
 }

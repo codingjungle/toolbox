@@ -35,13 +35,13 @@ class ReturnTag implements TagInterface, PhpDocTypedTagInterface
     }
 
     /**
-     * @param  string $tagDocBlockLine
+     * @param string $tagDocBlockLine
      * @return void
      */
     public function initialize($tagDocBlockLine)
     {
         $matches = [];
-        if (! preg_match('#((?:[\w|\\\]+(?:\[\])*\|?)+)(?:\s+(.*))?#s', $tagDocBlockLine, $matches)) {
+        if (!preg_match('#((?:[\w|\\\]+(?:\[\])*\|?)+)(?:\s+(.*))?#s', $tagDocBlockLine, $matches)) {
             return;
         }
 

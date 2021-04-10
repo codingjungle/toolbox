@@ -53,7 +53,38 @@ class MethodGenerator extends AbstractMemberGenerator
     private $returnsReference = false;
 
     /**
-     * @param  MethodReflection $reflectionMethod
+     * @param string $name
+     * @param array $parameters
+     * @param int $flags
+     * @param string $body
+     * @param DocBlockGenerator|string $docBlock
+     */
+    public function __construct(
+        $name = null,
+        array $parameters = [],
+        $flags = self::FLAG_PUBLIC,
+        $body = null,
+        $docBlock = null
+    ) {
+        if ($name) {
+            $this->setName($name);
+        }
+        if ($parameters) {
+            $this->setParameters($parameters);
+        }
+        if ($flags !== self::FLAG_PUBLIC) {
+            $this->setFlags($flags);
+        }
+        if ($body) {
+            $this->setBody($body);
+        }
+        if ($docBlock) {
+            $this->setDocBlock($docBlock);
+        }
+    }
+
+    /**
+     * @param MethodReflection $reflectionMethod
      * @return MethodGenerator
      */
     public static function fromReflection(MethodReflection $reflectionMethod)
@@ -80,7 +111,7 @@ class MethodGenerator extends AbstractMemberGenerator
      */
     public static function copyMethodSignature(MethodReflection $reflectionMethod): MethodGenerator
     {
-        $method         = new static();
+        $method = new static();
         $declaringClass = $reflectionMethod->getDeclaringClass();
 
         $method->setReturnType(self::extractReturnTypeFromMethodReflection($reflectionMethod));
@@ -104,6 +135,88 @@ class MethodGenerator extends AbstractMemberGenerator
         }
 
         return $method;
+    }
+
+    /**
+     * @param MethodReflection $methodReflection
+     *
+     * @return null|string
+     */
+    private static function extractReturnTypeFromMethodReflection(MethodReflection $methodReflection)
+    {
+        $returnType = method_exists($methodReflection, 'getReturnType')
+            ? $methodReflection->getReturnType()
+            : null;
+
+        if (!$returnType) {
+            return null;
+        }
+
+        if (!method_exists($returnType, 'getName')) {
+            return self::expandLiteralType((string)$returnType, $methodReflection);
+        }
+
+        return ($returnType->allowsNull() ? '?' : '')
+            . self::expandLiteralType($returnType->getName(), $methodReflection);
+    }
+
+    /**
+     * @param string $literalReturnType
+     * @param ReflectionMethod $methodReflection
+     *
+     * @return string
+     */
+    private static function expandLiteralType($literalReturnType, ReflectionMethod $methodReflection)
+    {
+        if ('self' === strtolower($literalReturnType)) {
+            return $methodReflection->getDeclaringClass()->getName();
+        }
+
+        if ('parent' === strtolower($literalReturnType)) {
+            return $methodReflection->getDeclaringClass()->getParentClass()->getName();
+        }
+
+        return $literalReturnType;
+    }
+
+    /**
+     * @param bool $returnsReference
+     *
+     * @return MethodGenerator
+     */
+    public function setReturnsReference($returnsReference)
+    {
+        $this->returnsReference = (bool)$returnsReference;
+
+        return $this;
+    }
+
+    /**
+     * @param ParameterGenerator|array|string $parameter
+     * @return MethodGenerator
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setParameter($parameter)
+    {
+        if (is_string($parameter)) {
+            $parameter = new ParameterGenerator($parameter);
+        }
+
+        if (is_array($parameter)) {
+            $parameter = ParameterGenerator::fromArray($parameter);
+        }
+
+        if (!$parameter instanceof ParameterGenerator) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s is expecting either a string, array or an instance of %s\ParameterGenerator',
+                __METHOD__,
+                __NAMESPACE__
+            ));
+        }
+
+        $this->parameters[$parameter->getName()] = $parameter;
+
+        return $this;
     }
 
     /**
@@ -148,13 +261,13 @@ class MethodGenerator extends AbstractMemberGenerator
      * @configkey static         bool
      * @configkey visibility     string
      *
-     * @throws Exception\InvalidArgumentException
-     * @param  array $array
+     * @param array $array
      * @return MethodGenerator
+     * @throws Exception\InvalidArgumentException
      */
     public static function fromArray(array $array)
     {
-        if (! isset($array['name'])) {
+        if (!isset($array['name'])) {
             throw new Exception\InvalidArgumentException(
                 'Method generator requires that a name is provided for this object'
             );
@@ -202,87 +315,15 @@ class MethodGenerator extends AbstractMemberGenerator
     }
 
     /**
-     * @param  string $name
-     * @param  array $parameters
-     * @param  int $flags
-     * @param  string $body
-     * @param  DocBlockGenerator|string $docBlock
+     * @return string
      */
-    public function __construct(
-        $name = null,
-        array $parameters = [],
-        $flags = self::FLAG_PUBLIC,
-        $body = null,
-        $docBlock = null
-    ) {
-        if ($name) {
-            $this->setName($name);
-        }
-        if ($parameters) {
-            $this->setParameters($parameters);
-        }
-        if ($flags !== self::FLAG_PUBLIC) {
-            $this->setFlags($flags);
-        }
-        if ($body) {
-            $this->setBody($body);
-        }
-        if ($docBlock) {
-            $this->setDocBlock($docBlock);
-        }
-    }
-
-    /**
-     * @param  array $parameters
-     * @return MethodGenerator
-     */
-    public function setParameters(array $parameters)
+    public function getBody()
     {
-        foreach ($parameters as $parameter) {
-            $this->setParameter($parameter);
-        }
-
-        return $this;
+        return $this->body;
     }
 
     /**
-     * @param  ParameterGenerator|array|string $parameter
-     * @throws Exception\InvalidArgumentException
-     * @return MethodGenerator
-     */
-    public function setParameter($parameter)
-    {
-        if (is_string($parameter)) {
-            $parameter = new ParameterGenerator($parameter);
-        }
-
-        if (is_array($parameter)) {
-            $parameter = ParameterGenerator::fromArray($parameter);
-        }
-
-        if (! $parameter instanceof ParameterGenerator) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s is expecting either a string, array or an instance of %s\ParameterGenerator',
-                __METHOD__,
-                __NAMESPACE__
-            ));
-        }
-
-        $this->parameters[$parameter->getName()] = $parameter;
-
-        return $this;
-    }
-
-    /**
-     * @return ParameterGenerator[]
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * @param  string $body
+     * @param string $body
      * @return MethodGenerator
      */
     public function setBody($body)
@@ -292,11 +333,11 @@ class MethodGenerator extends AbstractMemberGenerator
     }
 
     /**
-     * @return string
+     * @return TypeGenerator|null
      */
-    public function getBody()
+    public function getReturnType()
     {
-        return $this->body;
+        return $this->returnType;
     }
 
     /**
@@ -313,24 +354,9 @@ class MethodGenerator extends AbstractMemberGenerator
         return $this;
     }
 
-    /**
-     * @return TypeGenerator|null
-     */
-    public function getReturnType()
+    public function __toString()
     {
-        return $this->returnType;
-    }
-
-    /**
-     * @param bool $returnsReference
-     *
-     * @return MethodGenerator
-     */
-    public function setReturnsReference($returnsReference)
-    {
-        $this->returnsReference = (bool) $returnsReference;
-
-        return $this;
+        return $this->generate();
     }
 
     /**
@@ -362,7 +388,7 @@ class MethodGenerator extends AbstractMemberGenerator
             . $this->getName() . '(';
 
         $parameters = $this->getParameters();
-        if (! empty($parameters)) {
+        if (!empty($parameters)) {
             foreach ($parameters as $parameter) {
                 $parameterOutput[] = $parameter->generate();
             }
@@ -396,50 +422,24 @@ class MethodGenerator extends AbstractMemberGenerator
         return $output;
     }
 
-    public function __toString()
+    /**
+     * @return ParameterGenerator[]
+     */
+    public function getParameters()
     {
-        return $this->generate();
+        return $this->parameters;
     }
 
     /**
-     * @param MethodReflection $methodReflection
-     *
-     * @return null|string
+     * @param array $parameters
+     * @return MethodGenerator
      */
-    private static function extractReturnTypeFromMethodReflection(MethodReflection $methodReflection)
+    public function setParameters(array $parameters)
     {
-        $returnType = method_exists($methodReflection, 'getReturnType')
-            ? $methodReflection->getReturnType()
-            : null;
-
-        if (! $returnType) {
-            return null;
+        foreach ($parameters as $parameter) {
+            $this->setParameter($parameter);
         }
 
-        if (! method_exists($returnType, 'getName')) {
-            return self::expandLiteralType((string) $returnType, $methodReflection);
-        }
-
-        return ($returnType->allowsNull() ? '?' : '')
-            . self::expandLiteralType($returnType->getName(), $methodReflection);
-    }
-
-    /**
-     * @param string           $literalReturnType
-     * @param ReflectionMethod $methodReflection
-     *
-     * @return string
-     */
-    private static function expandLiteralType($literalReturnType, ReflectionMethod $methodReflection)
-    {
-        if ('self' === strtolower($literalReturnType)) {
-            return $methodReflection->getDeclaringClass()->getName();
-        }
-
-        if ('parent' === strtolower($literalReturnType)) {
-            return $methodReflection->getDeclaringClass()->getParentClass()->getName();
-        }
-
-        return $literalReturnType;
+        return $this;
     }
 }

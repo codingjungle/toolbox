@@ -20,7 +20,7 @@ class ReflectionType extends BaseReflectionType
     /**
      * If type allows null or not
      *
-     * @var boolean
+     * @var bool
      */
     private $allowsNull;
 
@@ -41,33 +41,9 @@ class ReflectionType extends BaseReflectionType
      */
     public function __construct($type, $allowsNull, $isBuiltin)
     {
-        $this->type       = $type;
+        $this->type = $type;
         $this->allowsNull = $allowsNull;
-        $this->isBuiltin  = $isBuiltin;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function allowsNull()
-    {
-        return $this->allowsNull;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isBuiltin()
-    {
-        return $this->isBuiltin;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function __toString()
-    {
-        return $this->type;
+        $this->isBuiltin = $isBuiltin;
     }
 
     /**
@@ -79,7 +55,7 @@ class ReflectionType extends BaseReflectionType
      *
      * @return string
      */
-    public static function convertToDisplayType(\ReflectionType $type)
+    public static function convertToDisplayType(BaseReflectionType $type)
     {
         static $typeMap = [
             'int'  => 'integer',
@@ -97,5 +73,29 @@ class ReflectionType extends BaseReflectionType
         }
 
         return $displayType;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __toString()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function allowsNull()
+    {
+        return $this->allowsNull;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isBuiltin()
+    {
+        return $this->isBuiltin;
     }
 }

@@ -13,17 +13,19 @@ namespace IPS\toolbox\Proxy\Generator;
 
 use IPS\Application;
 use IPS\Data\Store;
+
+use function defined;
 use function header;
 
-if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
  * Applications Class
  *
- * @mixin \IPS\toolbox\Proxy\Generator\Applications
+ * @mixin Applications
  */
 class _Applications extends GeneratorAbstract
 {
@@ -40,10 +42,10 @@ class _Applications extends GeneratorAbstract
     public function create()
     {
         $jsonMeta = [];
-        if ( isset( Store::i()->dt_json ) ) {
+        if (isset(Store::i()->dt_json)) {
             $jsonMeta = Store::i()->dt_json;
         }
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signature' => [
                 "IPS\\Application::load",
                 "IPS\\Application::appIsEnabled",
@@ -62,7 +64,7 @@ class _Applications extends GeneratorAbstract
             'provider'  => 'appName',
             'language'  => 'php',
         ];
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'   => 'appName',
             'source' => [
                 'contributor' => 'return_array',
@@ -76,11 +78,11 @@ class _Applications extends GeneratorAbstract
         /**
          * @var Application $app
          */
-        foreach ( Application::roots() as $app ) {
+        foreach (Application::roots() as $app) {
             $apps[] = $app->directory;
         }
 
-        $this->writeClass( 'Applications', 'AppNameProvider', $apps );
+        $this->writeClass('Applications', 'AppNameProvider', $apps);
     }
 }
 

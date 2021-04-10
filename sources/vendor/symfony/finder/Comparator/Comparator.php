@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Finder\Comparator;
 
+use InvalidArgumentException;
+
+use function in_array;
+
 /**
  * Comparator.
  *
@@ -56,7 +60,7 @@ class Comparator
      *
      * @param string $operator A valid operator
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setOperator($operator)
     {
@@ -64,8 +68,8 @@ class Comparator
             $operator = '==';
         }
 
-        if (!\in_array($operator, ['>', '<', '>=', '<=', '==', '!='])) {
-            throw new \InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
+        if (!in_array($operator, ['>', '<', '>=', '<=', '==', '!='])) {
+            throw new InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
         }
 
         $this->operator = $operator;

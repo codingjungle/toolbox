@@ -12,20 +12,24 @@
 namespace IPS\toolbox;
 
 use IPS\Application;
+use IPS\Dispatcher;
 use IPS\Http\Url;
+use IPS\IPS;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
 
-use const IPS\ROOT_PATH;
-
 use function array_merge;
+use function count;
+use function defined;
 use function is_array;
 use function ob_end_clean;
 use function ob_get_clean;
 use function ob_start;
 use function preg_replace_callback;
 use function str_replace;
+
+use const IPS\ROOT_PATH;
 
 
 /**
@@ -44,16 +48,16 @@ class _Application extends Application
     /**
      * @var string
      */
-    protected static $baseDir = \IPS\ROOT_PATH . '/applications/toolbox/sources/vendor/';
+    protected static $baseDir = ROOT_PATH . '/applications/toolbox/sources/vendor/';
 
-    protected static $loaded = \false;
+    protected static $loaded = false;
 
     public static function loadAutoLoader(): void
     {
-        if (static::$loaded === \false) {
-            static::$loaded = \true;
+        if (static::$loaded === false) {
+            static::$loaded = true;
             require static::$baseDir . '/autoload.php';
-            \IPS\IPS::$PSR0Namespaces['Generator'] = ROOT_PATH . '/applications/toolbox/sources/Generator/';
+            IPS::$PSR0Namespaces['Generator'] = ROOT_PATH . '/applications/toolbox/sources/Generator/';
         }
     }
 
@@ -148,7 +152,7 @@ class _Application extends Application
 
         $content = '<div id="toolboxAdminer">';
         ob_start();
-        include(\IPS\ROOT_PATH . '/applications/toolbox/sources/Profiler/Adminer.php');
+        include(ROOT_PATH . '/applications/toolbox/sources/Profiler/Adminer.php');
         $content .= ob_get_clean();
         ob_end_clean();
         $content .= "</div>";
@@ -173,7 +177,7 @@ class _Application extends Application
     {
         $apps = array();
         foreach (static::applications() as $application) {
-            if (\count($application->extensions('toolbox', 'SpecialHooks'))) {
+            if (count($application->extensions('toolbox', 'SpecialHooks'))) {
                 $apps[$application->directory] = $application;
             }
         }
@@ -182,57 +186,50 @@ class _Application extends Application
 
     public static function getThemeId()
     {
-        $location = \IPS\Dispatcher::hasInstance() ? \IPS\Dispatcher::i()->controllerLocation : null;
-        if (isset(\IPS\Request::i()->admin) && \IPS\Request::i()->admin === 1) {
+        $location = Dispatcher::hasInstance() ? Dispatcher::i()->controllerLocation : null;
+        if (isset(Request::i()->admin) && Request::i()->admin === 1) {
             $location = 'admin';
         }
-        if ($location === 'admin' && \defined('DT_THEME_ID_ADMIN') && DT_THEME_ID_ADMIN !== 0) {
+        if ($location === 'admin' && defined('DT_THEME_ID_ADMIN') && DT_THEME_ID_ADMIN !== 0) {
             return DT_THEME_ID_ADMIN;
         }
 
         return DT_THEME_ID;
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function get__icon()
+    public static function getSidebar()
     {
-        return 'wrench';
-    }
-
-    public static function getSidebar(){
-        $app = Application::load( Request::i()->appKey );
+        $app = Application::load(Request::i()->appKey);
         $createTable = Url::internal('app=core&module=applications&controller=developer')->setQueryString([
             'appKey' => $app->directory,
-            'do' => 'addTable'
-                                                                                                                                    ]);
-        $schema	= json_decode( file_get_contents( $app->getApplicationPath() . "/data/schema.json" ), TRUE );
+            'do'     => 'addTable'
+        ]);
+        $schema = json_decode(file_get_contents($app->getApplicationPath() . "/data/schema.json"), true);
         $html = '<div class="ipsBox ipsPadding:half">';
-        $html .= '<h4>Tables<a href="'.$createTable.'" class="ipsButton ipsButton_primary ipsButton_veryVerySmall ipsPos_right" title="Add Table" data-ipsDialog><i class="fa fa-plus"></i></a></h4>';
+        $html .= '<h4>Tables<a href="' . $createTable . '" class="ipsButton ipsButton_primary ipsButton_veryVerySmall ipsPos_right" title="Add Table" data-ipsDialog><i class="fa fa-plus"></i></a></h4>';
         $html .= '<ul class="ipsList_reset">';
-        foreach($schema as $key => $val){
+        foreach ($schema as $key => $val) {
             $active = ' style="width:150px;display:block;" ';
-            if( \IPS\Request::i()->_name === $key){
+            if (Request::i()->_name === $key) {
                 $active = ' style="width:150px;display:block;text-decoration:underline;font-weight:bolder;"';
             }
             $url = Url::internal('app=core&module=applications&controller=developer')
-                ->setQueryString([
-                                     'appKey' => $app->directory,
-                                     'do' => 'editSchema',
-                                     '_name' => $key,
-                                     'existing' => 1,
-                                     'tab' => 'columns'
-                                 ]);
-            $html2 = '<ul class="ipsMenu ipsHide" id="toolbox_schema_fields_'.$key.'_menu">';
-            foreach( $val['columns'] as $kk => $vv ){
+                      ->setQueryString([
+                          'appKey'   => $app->directory,
+                          'do'       => 'editSchema',
+                          '_name'    => $key,
+                          'existing' => 1,
+                          'tab'      => 'columns'
+                      ]);
+            $html2 = '<ul class="ipsMenu ipsHide" id="toolbox_schema_fields_' . $key . '_menu">';
+            foreach ($val['columns'] as $kk => $vv) {
                 $url2 = Url::internal('app=core&module=applications&controller=developer&appKey=chrono&do=editSchemaColumn&_name=chrono_timecards&column=timecard_id')
-                    ->setQueryString([
-                        'appKey' => $app->directory,
-                        'do' => 'editSchemaColumn',
-                        '_name' => $key,
-                        'column' => $kk
-                                     ]);
+                           ->setQueryString([
+                               'appKey' => $app->directory,
+                               'do'     => 'editSchemaColumn',
+                               '_name'  => $key,
+                               'column' => $kk
+                           ]);
                 $html2 .= <<<EOF
 <li class="ipsMenu_item">
 <a href="{$url2}" data-ipsDialog data-ipsDialog-desctructOnClose="true" data-ipsDialog-title="{$kk}">{$kk}({$vv['type']})</a>
@@ -240,12 +237,13 @@ class _Application extends Application
 EOF;
             }
             $html2 .= '</ul>';
-            $addColumn = Url::internal('app=core&module=applications&controller=developer&appKey=chrono&do=editSchemaColumn&_name=chrono_timesheets')->setQueryString([
-                'appKey' => $app->directory,
-                'do' => 'editSchemaColumn',
-                '_name' => $key
-                                                                                                                                                                      ]);
-            $html .=<<<EOF
+            $addColumn = Url::internal('app=core&module=applications&controller=developer&appKey=chrono&do=editSchemaColumn&_name=chrono_timesheets')
+                            ->setQueryString([
+                                'appKey' => $app->directory,
+                                'do'     => 'editSchemaColumn',
+                                '_name'  => $key
+                            ]);
+            $html .= <<<EOF
 <li class="ipsClearfix ipsMargin_bottom:half"> 
 <a href="{$url}"{$active} class="ipsPos_left ipsType_break">
 {$key}
@@ -255,11 +253,18 @@ EOF;
 {$html2} 
 </li>
 EOF;
-
         }
 
         $html .= '</ul></div>';
 
         return $html;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function get__icon()
+    {
+        return 'wrench';
     }
 }

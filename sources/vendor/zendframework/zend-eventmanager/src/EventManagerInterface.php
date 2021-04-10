@@ -27,9 +27,9 @@ interface EventManagerInterface extends SharedEventsCapableInterface
      * It will create the Event instance for you and then trigger all listeners
      * related to the event.
      *
-     * @param  string $eventName
-     * @param  null|object|string $target
-     * @param  array|object $argv
+     * @param string $eventName
+     * @param null|object|string $target
+     * @param array|object $argv
      * @return ResponseCollection
      */
     public function trigger($eventName, $target = null, $argv = []);
@@ -50,10 +50,10 @@ interface EventManagerInterface extends SharedEventsCapableInterface
      * The result of each listener is passed to $callback; if $callback returns
      * a boolean true value, the manager must short-circuit listener execution.
      *
-     * @param  callable $callback
-     * @param  string $eventName
-     * @param  null|object|string $target
-     * @param  array|object $argv
+     * @param callable $callback
+     * @param string $eventName
+     * @param null|object|string $target
+     * @param array|object $argv
      * @return ResponseCollection
      */
     public function triggerUntil(callable $callback, $eventName, $target = null, $argv = []);
@@ -64,7 +64,7 @@ interface EventManagerInterface extends SharedEventsCapableInterface
      * Provided an EventInterface instance, this method will trigger listeners
      * based on the event name, raising an exception if the event name is missing.
      *
-     * @param  EventInterface $event
+     * @param EventInterface $event
      * @return ResponseCollection
      */
     public function triggerEvent(EventInterface $event);
@@ -78,8 +78,8 @@ interface EventManagerInterface extends SharedEventsCapableInterface
      * The result of each listener is passed to $callback; if $callback returns
      * a boolean true value, the manager must short-circuit listener execution.
      *
-     * @param  callable $callback
-     * @param  EventInterface $event
+     * @param callable $callback
+     * @param EventInterface $event
      * @return ResponseCollection
      */
     public function triggerEventUntil(callable $callback, EventInterface $event);
@@ -98,9 +98,9 @@ interface EventManagerInterface extends SharedEventsCapableInterface
      * be triggered for every event *that has registered listeners at the time
      * it is attached*. As such, register wildcard events last whenever possible!
      *
-     * @param  string $eventName Event to which to listen.
-     * @param  callable $listener
-     * @param  int $priority Priority at which to register listener.
+     * @param string $eventName Event to which to listen.
+     * @param callable $listener
+     * @param int $priority Priority at which to register listener.
      * @return callable
      */
     public function attach($eventName, callable $listener, $priority = 1);
@@ -121,7 +121,7 @@ interface EventManagerInterface extends SharedEventsCapableInterface
     /**
      * Clear all listeners for a given event
      *
-     * @param  string $eventName
+     * @param string $eventName
      * @return void
      */
     public function clearListeners($eventName);
@@ -132,7 +132,7 @@ interface EventManagerInterface extends SharedEventsCapableInterface
      * When `trigger()` needs to create an event instance, it should clone the
      * prototype provided to this method.
      *
-     * @param  EventInterface $prototype
+     * @param EventInterface $prototype
      * @return void
      */
     public function setEventPrototype(EventInterface $prototype);
@@ -147,7 +147,7 @@ interface EventManagerInterface extends SharedEventsCapableInterface
     /**
      * Set the identifiers (overrides any currently set identifiers)
      *
-     * @param  string[] $identifiers
+     * @param string[] $identifiers
      * @return void
      */
     public function setIdentifiers(array $identifiers);
@@ -155,7 +155,7 @@ interface EventManagerInterface extends SharedEventsCapableInterface
     /**
      * Add identifier(s) (appends to any currently set identifiers)
      *
-     * @param  string[] $identifiers
+     * @param string[] $identifiers
      * @return void
      */
     public function addIdentifiers(array $identifiers);

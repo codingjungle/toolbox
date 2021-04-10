@@ -20,12 +20,12 @@ use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-use function _p;
 use function abs;
 use function array_diff;
 use function count;
 use function defined;
 use function explode;
+use function file_exists;
 use function header;
 use function in_array;
 use function is_array;
@@ -62,24 +62,24 @@ class _Langs extends ParserAbstract
         'mailsub__'
     ];
     public $toIgnore = [
-        'app_' => 1,
-        '__app_' => 1,
-        'module__' => 1,
-        'menu__' => 1,
+        'app_'              => 1,
+        '__app_'            => 1,
+        'module__'          => 1,
+        'menu__'            => 1,
         'frontnavigation__' => 1,
-        '__indefart' => 1,
-        '__defart' => 1,
-        'r__' => 1,
-        'modeperms__' => 1,
-        'acplogs__' => 1,
-        'task__' => 1,
-        'modlog__' => 1,
-        '__api' => 1,
-        'filestorage__' => 1,
-        'block_' => 1,
-        'widget_' => 1,
+        '__indefart'        => 1,
+        '__defart'          => 1,
+        'r__'               => 1,
+        'modeperms__'       => 1,
+        'acplogs__'         => 1,
+        'task__'            => 1,
+        'modlog__'          => 1,
+        '__api'             => 1,
+        'filestorage__'     => 1,
+        'block_'            => 1,
+        'widget_'           => 1,
         'mobilenavigation_' => 1,
-        'mailsub__' => 1
+        'mailsub__'         => 1
     ];
 
     public $suffixes = [
@@ -157,14 +157,14 @@ class _Langs extends ParserAbstract
         $files = new Finder();
         $files->in($this->appPath . 'dev/')->files()->name('*lang.php');
         $lf = $this->appPath . 'dev/lang.php';
-        if (\file_exists($lf)) {
+        if (file_exists($lf)) {
             $lang = null;
             require $lf;
             $this->langs = $lang;
         }
 
         $jlf = $this->appPath . 'dev/jslang.php';
-        if (\file_exists($jlf)) {
+        if (file_exists($jlf)) {
             $lang = null;
             require $jlf;
             $this->jslangs = $lang;
@@ -295,12 +295,12 @@ class _Langs extends ParserAbstract
 
                 preg_match_all('#ROOT_PATH#u', $content, $matches);
 
-                if(mb_strpos($content, 'ROOT_PATH') !== false){
-                        $root[] = [
-                            'path' => ['url' => $path, 'name' => $name],
-                            'key' => '\\IPS\\ROOT_PATH',
-                            'line' => $line
-                        ];
+                if (mb_strpos($content, 'ROOT_PATH') !== false) {
+                    $root[] = [
+                        'path' => ['url' => $path, 'name' => $name],
+                        'key'  => '\\IPS\\ROOT_PATH',
+                        'line' => $line
+                    ];
                 }
 
                 if ($file->getExtension() === 'phtml') {
@@ -320,7 +320,7 @@ class _Langs extends ParserAbstract
                                 )) && !Member::loggedIn()->language()->checkKeyExists($val)) {
                                 $warning[] = [
                                     'path' => ['url' => $path, 'name' => $name],
-                                    'key' => $val,
+                                    'key'  => $val,
                                     'line' => $line
                                 ];
                             }
@@ -345,7 +345,7 @@ class _Langs extends ParserAbstract
                                 )) && !Member::loggedIn()->language()->checkKeyExists($val)) {
                                 $warning[] = [
                                     'path' => ['url' => $path, 'name' => $name],
-                                    'key' => $val,
+                                    'key'  => $val,
                                     'line' => $line
                                 ];
                             }
@@ -368,7 +368,7 @@ class _Langs extends ParserAbstract
                                 )) && !Member::loggedIn()->language()->checkKeyExists($val)) {
                                 $warning[] = [
                                     'path' => ['url' => $path, 'name' => $name],
-                                    'key' => $val,
+                                    'key'  => $val,
                                     'line' => $line
                                 ];
                             }
@@ -398,7 +398,7 @@ class _Langs extends ParserAbstract
                                     ))) {
                                 $warning[] = [
                                     'path' => ['url' => $path, 'name' => $name],
-                                    'key' => $val,
+                                    'key'  => $val,
                                     'line' => $line
                                 ];
                             }
@@ -408,6 +408,6 @@ class _Langs extends ParserAbstract
                 $line++;
             }
         }
-        return ['langs' => $warning,'root' => $root];
+        return ['langs' => $warning, 'root' => $root];
     }
 }

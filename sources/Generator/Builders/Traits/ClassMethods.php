@@ -13,10 +13,12 @@
 
 namespace Generator\Builders\Traits;
 
+use Exception;
 use ReflectionNamedType;
 
 use function array_key_exists;
 use function array_pop;
+use function count;
 use function explode;
 use function implode;
 use function is_array;
@@ -25,6 +27,7 @@ use function mb_strpos;
 use function mb_strtolower;
 use function method_exists;
 use function trim;
+
 use const T_PRIVATE;
 use const T_PROTECTED;
 use const T_PUBLIC;
@@ -41,120 +44,117 @@ trait ClassMethods
 
     public function writeMethods()
     {
-
-        foreach ( $this->methods as $name => $method ) {
-            if ( isset( $this->removeMethods[ $name ] ) ) {
+        foreach ($this->methods as $name => $method) {
+            if (isset($this->removeMethods[$name])) {
                 continue;
             }
-            $this->output( "\n\n" );
-            if ( $method[ 'document' ] && is_array( $method[ 'document' ] ) ) {
-                $this->output( $this->tab . "/**\n" );
+            $this->output("\n\n");
+            if ($method['document'] && is_array($method['document'])) {
+                $this->output($this->tab . "/**\n");
                 $last = false;
                 $returned = false;
 
-                foreach ( $method[ 'document' ] as $item ) {
-                    if ( mb_strpos( $item, '@return' ) === 0 ) {
-                        $this->output( "{$this->tab}*\n" );
+                foreach ($method['document'] as $item) {
+                    if (mb_strpos($item, '@return') === 0) {
+                        $this->output("{$this->tab}*\n");
                         $returned = true;
                     }
-                    $this->output( "{$this->tab}* {$item}\n" );
+                    $this->output("{$this->tab}* {$item}\n");
 
-                    if ( $returned === false && mb_strpos( $item, '@' ) === false ) {
-                        $this->output( "{$this->tab}*\n" );
+                    if ($returned === false && mb_strpos($item, '@') === false) {
+                        $this->output("{$this->tab}*\n");
                     }
                 }
-                $this->output( "{$this->tab}*/\n" );
-
+                $this->output("{$this->tab}*/\n");
             }
 
             $final = null;
             $static = null;
             $abstract = null;
 
-            if ( isset( $method[ 'abstract' ] ) && $method[ 'abstract' ] === true ) {
+            if (isset($method['abstract']) && $method['abstract'] === true) {
                 $abstract = 'abstract ';
             }
-            if ( isset( $method[ 'final' ] ) && $method[ 'final' ] === true ) {
+            if (isset($method['final']) && $method['final'] === true) {
                 $final = 'final ';
             }
 
-            if ( isset( $method[ 'static' ] ) && $method[ 'static' ] === true ) {
+            if (isset($method['static']) && $method['static'] === true) {
                 $static = ' static';
             }
 
-            $visibility = $method[ 'visibility' ];
+            $visibility = $method['visibility'];
 
-            if ( $visibility === T_PUBLIC ) {
+            if ($visibility === T_PUBLIC) {
                 $visibility = 'public';
-            }
-            else if ( $visibility === T_PROTECTED ) {
-                $visibility = 'protected';
-            }
-            else if ( $visibility === T_PRIVATE ) {
-                $visibility = 'private';
-            }
-
-            $this->output( $this->tab . $abstract . $final . $visibility . $static . ' function ' . $name . '(' );
-
-            if ( empty( $method[ 'params' ] ) !== true && is_array( $method[ 'params' ] ) ) {
-                $this->writeParams( $method[ 'params' ] );
+            } else {
+                if ($visibility === T_PROTECTED) {
+                    $visibility = 'protected';
+                } else {
+                    if ($visibility === T_PRIVATE) {
+                        $visibility = 'private';
+                    }
+                }
             }
 
-            $this->output( ')' );
+            $this->output($this->tab . $abstract . $final . $visibility . $static . ' function ' . $name . '(');
 
-            if ( isset( $method[ 'returnType' ] ) && $method[ 'returnType' ] ) {
-                $this->output( ': ' . $method[ 'returnType' ] );
+            if (empty($method['params']) !== true && is_array($method['params'])) {
+                $this->writeParams($method['params']);
             }
 
-            $body = $this->replaceMethods[ $name ] ?? trim( $method[ 'body' ] );
-            if ( $abstract === null ) {
+            $this->output(')');
+
+            if (isset($method['returnType']) && $method['returnType']) {
+                $this->output(': ' . $method['returnType']);
+            }
+
+            $body = $this->replaceMethods[$name] ?? trim($method['body']);
+            if ($abstract === null) {
                 $wrap = false;
-                if ( mb_strpos( $body, '{' ) !== 0 ) {
+                if (mb_strpos($body, '{') !== 0) {
                     $wrap = true;
                 }
 
-                $this->output( "{\n\n{$this->tab}{$this->tab}" );
-                $this->output( '' . $body . '' );
-                $this->output( "\n{$this->tab}}" );
+                $this->output("{\n\n{$this->tab}{$this->tab}");
+                $this->output('' . $body . '');
+                $this->output("\n{$this->tab}}");
+            } else {
+                $this->output(";");
             }
-            else {
-                $this->output( ";" );
-            }
-            if ( isset( $this->afterMethod[ $name ] ) ) {
-                $this->output( "\n" );
+            if (isset($this->afterMethod[$name])) {
+                $this->output("\n");
 
-                foreach ( $this->afterMethod[ $name ] as $after ) {
-                    $this->output( $this->tab . $this->tab2space( $after ) . "\n" );
+                foreach ($this->afterMethod[$name] as $after) {
+                    $this->output($this->tab . $this->tab2space($after) . "\n");
                 }
             }
         }
-
     }
 
-    protected function writeParams( array $params ): void
+    protected function writeParams(array $params): void
     {
-
-        $this->output( ' ' );
+        $this->output(' ');
         $built = [];
 
-        foreach ( $params as $param ) {
-            if ( !isset( $param[ 'name' ] ) ) {
+        foreach ($params as $param) {
+            if (!isset($param['name'])) {
                 continue;
             }
             $p = '';
-            if ( isset( $param[ 'hint' ] ) && $param[ 'hint' ] ) {
-                if ( isset( $param[ 'nullable' ] ) && $param[ 'nullable' ] === true ) {
+            if (isset($param['hint']) && $param['hint']) {
+                if (isset($param['nullable']) && $param['nullable'] === true) {
                     $p .= '?';
                 }
 
-                $hint = $param[ 'hint' ];
-                if ( method_exists( $this, 'addImport' ) ) {
+                $hint = $param['hint'];
+                if (method_exists($this, 'addImport')) {
                     try {
                         if ($hint instanceof ReflectionNamedType) {
                             $hint = $hint->getName();
                         }
                         $hint = $this->addImport($hint);
-                    }catch(\Exception $e){
+                    } catch (Exception $e) {
                         _p($hint);
                     }
                 }
@@ -162,91 +162,90 @@ trait ClassMethods
                 $p .= $hint . ' ';
             }
 
-            if ( isset( $param[ 'reference' ] ) && $param[ 'reference' ] === true ) {
+            if (isset($param['reference']) && $param['reference'] === true) {
                 $p .= '&';
             }
 
-            $p .= '$' . $param[ 'name' ];
+            $p .= '$' . $param['name'];
 
-            if ( array_key_exists( 'value', $param ) ) {
+            if (array_key_exists('value', $param)) {
                 $val = '';
-                if ( $param[ 'value' ] === '[]' || $param[ 'value' ] === 'array()' || is_array( $param[ 'value' ] ) ) {
+                if ($param['value'] === '[]' || $param['value'] === 'array()' || is_array($param['value'])) {
                     $val = '[]';
-                }
-                else if ( mb_strtolower( $param[ 'value' ] ) === 'true' || mb_strtolower( $param[ 'value' ] ) === 'false' ) {
-                    $val = mb_strtolower( $param[ 'value' ] );
-                }
-                else if ( $param[ 'value' ] === false ) {
-                    $val = 'false';
-                }
-                else if ( $param[ 'value' ] === true ) {
-                    $val = 'true';
-                }
-                else if ( $param[ 'value' ] === null || mb_strtolower( $param[ 'value' ] ) === 'null' ) {
-                    $val = 'null';
-                }
-                else if ( $param[ 'value' ] === "''" || $param === '""' ) {
-                    $val = $param[ 'value' ];
-                }
-                else if ( is_string( $param[ 'value' ] ) ) {
-
-                    $val = empty($param[ 'value' ]) ? "''" : $param['value'];
-                }
-                else {
-                    $val = empty($param[ 'value' ]) ? "''" : $param['value'];
+                } else {
+                    if (mb_strtolower($param['value']) === 'true' || mb_strtolower($param['value']) === 'false') {
+                        $val = mb_strtolower($param['value']);
+                    } else {
+                        if ($param['value'] === false) {
+                            $val = 'false';
+                        } else {
+                            if ($param['value'] === true) {
+                                $val = 'true';
+                            } else {
+                                if ($param['value'] === null || mb_strtolower($param['value']) === 'null') {
+                                    $val = 'null';
+                                } else {
+                                    if ($param['value'] === "''" || $param === '""') {
+                                        $val = $param['value'];
+                                    } else {
+                                        if (is_string($param['value'])) {
+                                            $val = empty($param['value']) ? "''" : $param['value'];
+                                        } else {
+                                            $val = empty($param['value']) ? "''" : $param['value'];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 $p .= ' = ' . $val;
             }
             $built[] = $p;
-
         }
-        $this->output( implode( ', ', $built ) );
-        $this->output( ' ' );
+        $this->output(implode(', ', $built));
+        $this->output(' ');
     }
 
     /**
      * @param        $name
      * @param string $body
-     * @param array  $params
-     * @param array  $extra
+     * @param array $params
+     * @param array $extra
      *
      * @return $this
      */
-    public function addMethod( $name, string $body, array $params = [], array $extra = [] )
+    public function addMethod($name, string $body, array $params = [], array $extra = [])
     {
-
-        $this->methods[ trim( $name ) ] = [
+        $this->methods[trim($name)] = [
             'name'       => $name,
-            'abstract'   => $extra[ 'abstract' ] ?? false,
-            'static'     => $extra[ 'static' ] ?? false,
-            'visibility' => $extra[ 'visibility' ] ?? 'public',
-            'final'      => $extra[ 'final' ] ?? false,
-            'document'   => $extra[ 'document' ] ?? null,
+            'abstract'   => $extra['abstract'] ?? false,
+            'static'     => $extra['static'] ?? false,
+            'visibility' => $extra['visibility'] ?? 'public',
+            'final'      => $extra['final'] ?? false,
+            'document'   => $extra['document'] ?? null,
             'params'     => $params,
-            'returnType' => $extra[ 'returnType' ] ?? '',
+            'returnType' => $extra['returnType'] ?? '',
             'body'       => $body,
         ];
     }
 
     public function getMethods()
     {
-
         return $this->methods;
     }
 
-    public function getMethod( $name )
+    public function getMethod($name)
     {
-
-        return $this->methods[ $name ] ?? null;
+        return $this->methods[$name] ?? null;
     }
 
-    public function addMixin( $class )
+    public function addMixin($class)
     {
-
-        $og = explode( '\\', $class );
-        if ( $this->doImports === true && \count( $og ) >= 2 ) {
-            $this->addImport( $class );
-            $class = array_pop( $og );
+        $og = explode('\\', $class);
+        if ($this->doImports === true && count($og) >= 2) {
+            $this->addImport($class);
+            $class = array_pop($og);
         }
         $this->classComment[] = '@mixin ' . $class;
     }

@@ -25,8 +25,8 @@ trait Replace
      *
      * @return string
      */
-    protected function _replace( $find, $replace, $subject ): string
+    protected function _replace($find, $replace, $subject): string
     {
-        return str_replace( $find, $replace, $subject );
+        return str_replace($find, $replace, $subject);
     }
 }

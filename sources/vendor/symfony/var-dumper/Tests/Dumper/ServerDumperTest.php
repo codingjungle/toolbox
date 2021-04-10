@@ -79,13 +79,13 @@ class ServerDumperTest extends TestCase
 ]
 %d
 DUMP
-        , $dumped);
+            , $dumped);
     }
 
     private function getServerProcess(): Process
     {
-        $process = new PhpProcess(file_get_contents(__DIR__.'/../Fixtures/dump_server.php'), null, [
-            'COMPONENT_ROOT' => __DIR__.'/../../',
+        $process = new PhpProcess(file_get_contents(__DIR__ . '/../Fixtures/dump_server.php'), null, [
+            'COMPONENT_ROOT'    => __DIR__ . '/../../',
             'VAR_DUMPER_SERVER' => self::VAR_DUMPER_SERVER,
         ]);
         $process->inheritEnvironmentVariables(true);

@@ -12,11 +12,7 @@
 
 namespace IPS\toolbox\extensions\toolbox\ProxyHelpers;
 
-use IPS\Application;
-use IPS\toolbox\DevCenter\Dev;
-use IPS\toolbox\DevCenter\Extensions\ContentRouter;
-use IPS\toolbox\DevCenter\Extensions\CreateMenu;
-use IPS\toolbox\DevCenter\Extensions\FileStorage;
+use Exception;
 use IPS\toolbox\DevCenter\Helpers\HelperCompilerAbstract;
 use IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract;
 
@@ -27,7 +23,7 @@ use function mb_strtolower;
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER[ 'SERVER_PROTOCOL' ]) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0') . ' 403 Forbidden');
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -52,7 +48,7 @@ class _devplus
      *
      * @param array $classDoc
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function request(&$classDoc)
     {
@@ -74,25 +70,25 @@ class _devplus
      */
     public function map(&$helpers)
     {
-        $helpers[ Dev\Compiler\CompilerAbstract::class ][] = HelperCompilerAbstract::class;
+        $helpers[Dev\Compiler\CompilerAbstract::class][] = HelperCompilerAbstract::class;
     }
 
     protected function loop(array $elements, &$classDoc)
     {
-        $prefix = \null;
-        if (isset($elements[ 'prefix' ])) {
-            $prefix = $elements[ 'prefix' ];
+        $prefix = null;
+        if (isset($elements['prefix'])) {
+            $prefix = $elements['prefix'];
         }
 
         foreach ($elements as $el) {
-            if (isset($el[ 'name' ]) && $el[ 'name' ] !== 'namespace') {
-                if (isset($el[ 'class' ]) && 'stack' === mb_strtolower($el[ 'class' ])) {
+            if (isset($el['name']) && $el['name'] !== 'namespace') {
+                if (isset($el['class']) && 'stack' === mb_strtolower($el['class'])) {
                     $key = 'array';
                 } else {
                     $key = 'string';
                 }
 
-                $classDoc[ $el[ 'name' ] ] = ['pt' => 'p', 'prop' => "{$prefix}{$el['name']}", 'type' => $key];
+                $classDoc[$el['name']] = ['pt' => 'p', 'prop' => "{$prefix}{$el['name']}", 'type' => $key];
             }
         }
     }

@@ -12,6 +12,7 @@ namespace Go\ParserReflection;
 
 use Go\ParserReflection\Instrument\PathResolver;
 use Go\ParserReflection\ValueResolver\NodeExpressionResolver;
+use InvalidArgumentException;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
@@ -79,14 +80,14 @@ class ReflectionFileNamespace
     /**
      * File namespace constructor
      *
-     * @param string          $fileName      Name of the file
-     * @param string          $namespaceName Name of the namespace
+     * @param string $fileName Name of the file
+     * @param string $namespaceName Name of the namespace
      * @param Namespace_|null $namespaceNode Optional AST-node for this namespace block
      */
     public function __construct($fileName, $namespaceName, Namespace_ $namespaceNode = null)
     {
         if (!is_string($fileName)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     '$fileName must be a string, but a %s was passed',
                     gettype($fileName)
@@ -98,7 +99,7 @@ class ReflectionFileNamespace
             $namespaceNode = ReflectionEngine::parseFileNamespace($fileName, $namespaceName);
         }
         $this->namespaceNode = $namespaceNode;
-        $this->fileName      = $fileName;
+        $this->fileName = $fileName;
     }
 
     /**
@@ -118,6 +119,20 @@ class ReflectionFileNamespace
     }
 
     /**
+     * Checks if the given class is present in this filenamespace
+     *
+     * @param string $className
+     *
+     * @return bool
+     */
+    public function hasClass($className)
+    {
+        $classes = $this->getClasses();
+
+        return isset($classes[$className]);
+    }
+
+    /**
      * Gets list of classes in the namespace
      *
      * @return ReflectionClass[]|array
@@ -129,6 +144,41 @@ class ReflectionFileNamespace
         }
 
         return $this->fileClasses;
+    }
+
+    /**
+     * Searches for classes in the given AST
+     *
+     * @return array|ReflectionClass[]
+     */
+    private function findClasses()
+    {
+        $classes = array();
+        $namespaceName = $this->getName();
+        // classes can be only top-level nodes in the namespace, so we can scan them directly
+        foreach ($this->namespaceNode->stmts as $namespaceLevelNode) {
+            if ($namespaceLevelNode instanceof ClassLike) {
+                $classShortName = $namespaceLevelNode->name->toString();
+                $className = $namespaceName ? $namespaceName . '\\' . $classShortName : $classShortName;
+
+                $namespaceLevelNode->setAttribute('fileName', $this->fileName);
+                $classes[$className] = new ReflectionClass($className, $namespaceLevelNode);
+            }
+        }
+
+        return $classes;
+    }
+
+    /**
+     * Gets namespace name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        $nameNode = $this->namespaceNode->name;
+
+        return $nameNode ? $nameNode->toString() : '';
     }
 
     /**
@@ -145,6 +195,20 @@ class ReflectionFileNamespace
         }
 
         return false;
+    }
+
+    /**
+     * Checks if the given constant is present in this filenamespace
+     *
+     * @param string $constantName
+     *
+     * @return bool
+     */
+    public function hasConstant($constantName)
+    {
+        $constants = $this->getConstants();
+
+        return isset($constants[$constantName]);
     }
 
     /**
@@ -172,224 +236,6 @@ class ReflectionFileNamespace
     }
 
     /**
-     * Gets doc comments from a class.
-     *
-     * @return string|false The doc comment if it exists, otherwise "false"
-     */
-    public function getDocComment()
-    {
-        $docComment = false;
-        $comments   = $this->namespaceNode->getAttribute('comments');
-
-        if ($comments) {
-            $docComment = (string)$comments[0];
-        }
-
-        return $docComment;
-    }
-
-    /**
-     * Gets starting line number
-     *
-     * @return integer
-     */
-    public function getEndLine()
-    {
-        return $this->namespaceNode->getAttribute('endLine');
-    }
-
-    /**
-     * Returns the name of file
-     *
-     * @return string
-     */
-    public function getFileName()
-    {
-        return $this->fileName;
-    }
-
-    /**
-     * Returns the concrete function from the file namespace or false if there is no function
-     *
-     * @param string $functionName
-     *
-     * @return bool|ReflectionFunction
-     */
-    public function getFunction($functionName)
-    {
-        if ($this->hasFunction($functionName)) {
-            return $this->fileFunctions[$functionName];
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets list of functions in the namespace
-     *
-     * @return ReflectionFunction[]|array
-     */
-    public function getFunctions()
-    {
-        if (!isset($this->fileFunctions)) {
-            $this->fileFunctions = $this->findFunctions();
-        }
-
-        return $this->fileFunctions;
-    }
-
-    /**
-     * Gets namespace name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        $nameNode = $this->namespaceNode->name;
-
-        return $nameNode ? $nameNode->toString() : '';
-    }
-
-    /**
-     * Returns a list of namespace aliases
-     *
-     * @return array
-     */
-    public function getNamespaceAliases()
-    {
-        if (!isset($this->fileNamespaceAliases)) {
-            $this->fileNamespaceAliases = $this->findNamespaceAliases();
-        }
-
-        return $this->fileNamespaceAliases;
-    }
-
-    /**
-     * Returns an AST-node for namespace
-     *
-     * @return Namespace_
-     */
-    public function getNode()
-    {
-        return $this->namespaceNode;
-    }
-
-    /**
-     * Helper method to access last token position for namespace
-     *
-     * This method is useful because namespace can be declared with braces or without them
-     */
-    public function getLastTokenPosition()
-    {
-        $endNamespaceTokenPosition = $this->namespaceNode->getAttribute('endTokenPos');
-
-        /** @var Node $lastNamespaceNode */
-        $lastNamespaceNode         = end($this->namespaceNode->stmts);
-        $endStatementTokenPosition = $lastNamespaceNode->getAttribute('endTokenPos');
-
-        return max($endNamespaceTokenPosition, $endStatementTokenPosition);
-    }
-
-    /**
-     * Gets starting line number
-     *
-     * @return integer
-     */
-    public function getStartLine()
-    {
-        return $this->namespaceNode->getAttribute('startLine');
-    }
-
-    /**
-     * Checks if the given class is present in this filenamespace
-     *
-     * @param string $className
-     *
-     * @return bool
-     */
-    public function hasClass($className)
-    {
-        $classes = $this->getClasses();
-
-        return isset($classes[$className]);
-    }
-
-    /**
-     * Checks if the given constant is present in this filenamespace
-     *
-     * @param string $constantName
-     *
-     * @return bool
-     */
-    public function hasConstant($constantName)
-    {
-        $constants = $this->getConstants();
-
-        return isset($constants[$constantName]);
-    }
-
-    /**
-     * Checks if the given function is present in this filenamespace
-     *
-     * @param string $functionName
-     *
-     * @return bool
-     */
-    public function hasFunction($functionName)
-    {
-        $functions = $this->getFunctions();
-
-        return isset($functions[$functionName]);
-    }
-
-    /**
-     * Searches for classes in the given AST
-     *
-     * @return array|ReflectionClass[]
-     */
-    private function findClasses()
-    {
-        $classes       = array();
-        $namespaceName = $this->getName();
-        // classes can be only top-level nodes in the namespace, so we can scan them directly
-        foreach ($this->namespaceNode->stmts as $namespaceLevelNode) {
-            if ($namespaceLevelNode instanceof ClassLike) {
-                $classShortName = $namespaceLevelNode->name->toString();
-                $className = $namespaceName ? $namespaceName .'\\' . $classShortName : $classShortName;
-
-                $namespaceLevelNode->setAttribute('fileName', $this->fileName);
-                $classes[$className] = new ReflectionClass($className, $namespaceLevelNode);
-            }
-        }
-
-        return $classes;
-    }
-
-    /**
-     * Searches for functions in the given AST
-     *
-     * @return array
-     */
-    private function findFunctions()
-    {
-        $functions     = array();
-        $namespaceName = $this->getName();
-
-        // functions can be only top-level nodes in the namespace, so we can scan them directly
-        foreach ($this->namespaceNode->stmts as $namespaceLevelNode) {
-            if ($namespaceLevelNode instanceof Function_) {
-                $funcShortName = $namespaceLevelNode->name->toString();
-                $functionName  = $namespaceName ? $namespaceName .'\\' . $funcShortName : $funcShortName;
-
-                $namespaceLevelNode->setAttribute('fileName', $this->fileName);
-                $functions[$funcShortName] = new ReflectionFunction($functionName, $namespaceLevelNode);
-            }
-        }
-
-        return $functions;
-    }
-
-    /**
      * Searches for constants in the given AST
      *
      * @param bool $withDefined Include constants defined via "define(...)" in results.
@@ -398,7 +244,7 @@ class ReflectionFileNamespace
      */
     private function findConstants($withDefined = false)
     {
-        $constants        = array();
+        $constants = array();
         $expressionSolver = new NodeExpressionResolver($this);
 
         // constants can be only top-level nodes in the namespace, so we can scan them directly
@@ -440,6 +286,125 @@ class ReflectionFileNamespace
     }
 
     /**
+     * Gets doc comments from a class.
+     *
+     * @return string|false The doc comment if it exists, otherwise "false"
+     */
+    public function getDocComment()
+    {
+        $docComment = false;
+        $comments = $this->namespaceNode->getAttribute('comments');
+
+        if ($comments) {
+            $docComment = (string)$comments[0];
+        }
+
+        return $docComment;
+    }
+
+    /**
+     * Gets starting line number
+     *
+     * @return int
+     */
+    public function getEndLine()
+    {
+        return $this->namespaceNode->getAttribute('endLine');
+    }
+
+    /**
+     * Returns the name of file
+     *
+     * @return string
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * Returns the concrete function from the file namespace or false if there is no function
+     *
+     * @param string $functionName
+     *
+     * @return bool|ReflectionFunction
+     */
+    public function getFunction($functionName)
+    {
+        if ($this->hasFunction($functionName)) {
+            return $this->fileFunctions[$functionName];
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the given function is present in this filenamespace
+     *
+     * @param string $functionName
+     *
+     * @return bool
+     */
+    public function hasFunction($functionName)
+    {
+        $functions = $this->getFunctions();
+
+        return isset($functions[$functionName]);
+    }
+
+    /**
+     * Gets list of functions in the namespace
+     *
+     * @return ReflectionFunction[]|array
+     */
+    public function getFunctions()
+    {
+        if (!isset($this->fileFunctions)) {
+            $this->fileFunctions = $this->findFunctions();
+        }
+
+        return $this->fileFunctions;
+    }
+
+    /**
+     * Searches for functions in the given AST
+     *
+     * @return array
+     */
+    private function findFunctions()
+    {
+        $functions = array();
+        $namespaceName = $this->getName();
+
+        // functions can be only top-level nodes in the namespace, so we can scan them directly
+        foreach ($this->namespaceNode->stmts as $namespaceLevelNode) {
+            if ($namespaceLevelNode instanceof Function_) {
+                $funcShortName = $namespaceLevelNode->name->toString();
+                $functionName = $namespaceName ? $namespaceName . '\\' . $funcShortName : $funcShortName;
+
+                $namespaceLevelNode->setAttribute('fileName', $this->fileName);
+                $functions[$funcShortName] = new ReflectionFunction($functionName, $namespaceLevelNode);
+            }
+        }
+
+        return $functions;
+    }
+
+    /**
+     * Returns a list of namespace aliases
+     *
+     * @return array
+     */
+    public function getNamespaceAliases()
+    {
+        if (!isset($this->fileNamespaceAliases)) {
+            $this->fileNamespaceAliases = $this->findNamespaceAliases();
+        }
+
+        return $this->fileNamespaceAliases;
+    }
+
+    /**
      * Searchse for namespace aliases for the current block
      *
      * @return array
@@ -461,5 +426,41 @@ class ReflectionFileNamespace
         }
 
         return $namespaceAliases;
+    }
+
+    /**
+     * Returns an AST-node for namespace
+     *
+     * @return Namespace_
+     */
+    public function getNode()
+    {
+        return $this->namespaceNode;
+    }
+
+    /**
+     * Helper method to access last token position for namespace
+     *
+     * This method is useful because namespace can be declared with braces or without them
+     */
+    public function getLastTokenPosition()
+    {
+        $endNamespaceTokenPosition = $this->namespaceNode->getAttribute('endTokenPos');
+
+        /** @var Node $lastNamespaceNode */
+        $lastNamespaceNode = end($this->namespaceNode->stmts);
+        $endStatementTokenPosition = $lastNamespaceNode->getAttribute('endTokenPos');
+
+        return max($endNamespaceTokenPosition, $endStatementTokenPosition);
+    }
+
+    /**
+     * Gets starting line number
+     *
+     * @return int
+     */
+    public function getStartLine()
+    {
+        return $this->namespaceNode->getAttribute('startLine');
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Redis;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
@@ -24,7 +25,7 @@ class RedisCasterTest extends TestCase
 
     public function testNotConnected()
     {
-        $redis = new \Redis();
+        $redis = new Redis();
 
         $xCast = <<<'EODUMP'
 Redis {
@@ -37,7 +38,7 @@ EODUMP;
 
     public function testConnected()
     {
-        $redis = new \Redis();
+        $redis = new Redis();
         if (!@$redis->connect('127.0.0.1')) {
             $e = error_get_last();
             self::markTestSkipped($e['message']);

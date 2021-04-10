@@ -13,7 +13,9 @@
 namespace IPS\toolbox\DevCenter\Extensions;
 
 
-class _ExtensionException extends \Exception
+use Exception;
+
+class _ExtensionException extends Exception
 {
 
 }

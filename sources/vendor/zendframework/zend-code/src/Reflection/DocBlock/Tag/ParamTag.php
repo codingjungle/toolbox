@@ -42,13 +42,13 @@ class ParamTag implements TagInterface, PhpDocTypedTagInterface
     /**
      * Initializer
      *
-     * @param  string $tagDocBlockLine
+     * @param string $tagDocBlockLine
      */
     public function initialize($tagDocBlockLine)
     {
         $matches = [];
 
-        if (! preg_match('#((?:[\w|\\\]+(?:\[\])*\|?)+)(?:\s+(\$\S+))?(?:\s+(.*))?#s', $tagDocBlockLine, $matches)) {
+        if (!preg_match('#((?:[\w|\\\]+(?:\[\])*\|?)+)(?:\s+(\$\S+))?(?:\s+(.*))?#s', $tagDocBlockLine, $matches)) {
             return;
         }
 

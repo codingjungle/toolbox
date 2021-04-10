@@ -12,6 +12,7 @@ namespace Go\ParserReflection;
 
 
 use Go\ParserReflection\Instrument\PathResolver;
+use InvalidArgumentException;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Namespace_;
 
@@ -51,15 +52,15 @@ class ReflectionFile
     public function __construct($fileName, $topLevelNodes = null)
     {
         if (!is_string($fileName)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     '$fileName must be a string, but a %s was passed',
                     gettype($fileName)
                 )
             );
         }
-        $fileName            = PathResolver::realpath($fileName);
-        $this->fileName      = $fileName;
+        $fileName = PathResolver::realpath($fileName);
+        $this->fileName = $fileName;
         $this->topLevelNodes = $topLevelNodes ?: ReflectionEngine::parseFile($fileName);
     }
 
@@ -80,40 +81,6 @@ class ReflectionFile
     }
 
     /**
-     * Gets the list of namespaces in the file
-     *
-     * @return array|ReflectionFileNamespace[]
-     */
-    public function getFileNamespaces()
-    {
-        if (!isset($this->fileNamespaces)) {
-            $this->fileNamespaces = $this->findFileNamespaces();
-        }
-
-        return $this->fileNamespaces;
-    }
-
-    /**
-     * Returns the name of current reflected file
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->fileName;
-    }
-
-    /**
-     * Returns an AST-nodes for file
-     *
-     * @return Node[]
-     */
-    public function getNodes()
-    {
-        return $this->topLevelNodes;
-    }
-
-    /**
      * Returns the presence of namespace in the file
      *
      * @param string $namespaceName Namespace to check
@@ -128,24 +95,17 @@ class ReflectionFile
     }
 
     /**
-     * Checks if the current file is in strict mode
+     * Gets the list of namespaces in the file
      *
-     * @return bool
+     * @return array|ReflectionFileNamespace[]
      */
-    public function isStrictMode()
+    public function getFileNamespaces()
     {
-        // declare statement for the strict_types can be only top-level node
-        $topLevelNode = reset($this->topLevelNodes);
-        if (!$topLevelNode instanceof Node\Stmt\Declare_) {
-            return false;
+        if (!isset($this->fileNamespaces)) {
+            $this->fileNamespaces = $this->findFileNamespaces();
         }
 
-        $declareStatement = reset($topLevelNode->declares);
-        $isStrictTypeKey  = $declareStatement->key->toString() === 'strict_types';
-        $isScalarValue    = $declareStatement->value instanceof Node\Scalar\LNumber;
-        $isStrictMode     = $isStrictTypeKey && $isScalarValue && $declareStatement->value->value === 1;
-
-        return $isStrictMode;
+        return $this->fileNamespaces;
     }
 
     /**
@@ -171,5 +131,46 @@ class ReflectionFile
         }
 
         return $namespaces;
+    }
+
+    /**
+     * Returns the name of current reflected file
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * Returns an AST-nodes for file
+     *
+     * @return Node[]
+     */
+    public function getNodes()
+    {
+        return $this->topLevelNodes;
+    }
+
+    /**
+     * Checks if the current file is in strict mode
+     *
+     * @return bool
+     */
+    public function isStrictMode()
+    {
+        // declare statement for the strict_types can be only top-level node
+        $topLevelNode = reset($this->topLevelNodes);
+        if (!$topLevelNode instanceof Node\Stmt\Declare_) {
+            return false;
+        }
+
+        $declareStatement = reset($topLevelNode->declares);
+        $isStrictTypeKey = $declareStatement->key->toString() === 'strict_types';
+        $isScalarValue = $declareStatement->value instanceof Node\Scalar\LNumber;
+        $isStrictMode = $isStrictTypeKey && $isScalarValue && $declareStatement->value->value === 1;
+
+        return $isStrictMode;
     }
 }

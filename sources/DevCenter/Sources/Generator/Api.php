@@ -25,8 +25,8 @@ class _Api extends GeneratorAbstract
     protected function bodyGenerator()
     {
         $this->brief = 'API';
-        $this->namespace = 'IPS\\'.$this->app.'\\api';
-        switch( $this->apiType ){
+        $this->namespace = 'IPS\\' . $this->app . '\\api';
+        switch ($this->apiType) {
             case 's':
                 $this->extends = Controller::class;
                 break;

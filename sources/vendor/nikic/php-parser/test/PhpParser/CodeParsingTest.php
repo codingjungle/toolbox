@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser;
 
+use Exception;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt;
 
@@ -10,7 +12,8 @@ class CodeParsingTest extends CodeTestAbstract
     /**
      * @dataProvider provideTestParse
      */
-    public function testParse($name, $code, $expected, $modeLine) {
+    public function testParse($name, $code, $expected, $modeLine)
+    {
         if (null !== $modeLine) {
             $modes = array_fill_keys(explode(',', $modeLine), true);
         } else {
@@ -36,13 +39,19 @@ class CodeParsingTest extends CodeTestAbstract
         $this->checkAttributes($stmts7);
     }
 
-    public function createParsers(array $modes) {
-        $lexer = new Lexer\Emulative(['usedAttributes' => [
-            'startLine', 'endLine',
-            'startFilePos', 'endFilePos',
-            'startTokenPos', 'endTokenPos',
-            'comments'
-        ]]);
+    public function createParsers(array $modes)
+    {
+        $lexer = new Lexer\Emulative([
+            'usedAttributes' => [
+                'startLine',
+                'endLine',
+                'startFilePos',
+                'endFilePos',
+                'startTokenPos',
+                'endTokenPos',
+                'comments'
+            ]
+        ]);
 
         return [
             new Parser\Php5($lexer),
@@ -51,10 +60,11 @@ class CodeParsingTest extends CodeTestAbstract
     }
 
     // Must be public for updateTests.php
-    public function getParseOutput(Parser $parser, $code, array $modes) {
+    public function getParseOutput(Parser $parser, $code, array $modes)
+    {
         $dumpPositions = isset($modes['positions']);
 
-        $errors = new ErrorHandler\Collecting;
+        $errors = new ErrorHandler\Collecting();
         $stmts = $parser->parse($code, $errors);
 
         $output = '';
@@ -70,11 +80,8 @@ class CodeParsingTest extends CodeTestAbstract
         return [$stmts, canonicalize($output)];
     }
 
-    public function provideTestParse() {
-        return $this->getTests(__DIR__ . '/../code/parser', 'test');
-    }
-
-    private function formatErrorMessage(Error $e, $code) {
+    private function formatErrorMessage(Error $e, $code)
+    {
         if ($e->hasColumnInfo()) {
             return $e->getMessageWithColumnInfo($code);
         }
@@ -82,14 +89,16 @@ class CodeParsingTest extends CodeTestAbstract
         return $e->getMessage();
     }
 
-    private function checkAttributes($stmts) {
+    private function checkAttributes($stmts)
+    {
         if ($stmts === null) {
             return;
         }
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new class extends NodeVisitorAbstract {
-            public function enterNode(Node $node) {
+            public function enterNode(Node $node)
+            {
                 $startLine = $node->getStartLine();
                 $endLine = $node->getEndLine();
                 $startFilePos = $node->getStartFilePos();
@@ -100,7 +109,7 @@ class CodeParsingTest extends CodeTestAbstract
                     $startFilePos < 0 || $endFilePos < 0 ||
                     $startTokenPos < 0 || $endTokenPos < 0
                 ) {
-                    throw new \Exception('Missing location information on ' . $node->getType());
+                    throw new Exception('Missing location information on ' . $node->getType());
                 }
 
                 if ($endLine < $startLine ||
@@ -109,11 +118,16 @@ class CodeParsingTest extends CodeTestAbstract
                 ) {
                     // Nops and error can have inverted order, if they are empty
                     if (!$node instanceof Stmt\Nop && !$node instanceof Expr\Error) {
-                        throw new \Exception('End < start on ' . $node->getType());
+                        throw new Exception('End < start on ' . $node->getType());
                     }
                 }
             }
         });
         $traverser->traverse($stmts);
+    }
+
+    public function provideTestParse()
+    {
+        return $this->getTests(__DIR__ . '/../code/parser', 'test');
     }
 }

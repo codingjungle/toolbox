@@ -12,7 +12,10 @@
 
 namespace IPS\toolbox\DevCenter\Sources\Generator;
 
+use Exception;
 use IPS\Patterns\Singleton;
+
+use Zend\Code\Exception\InvalidArgumentException;
 
 use function defined;
 use function header;
@@ -27,8 +30,8 @@ class _Singleton extends GeneratorAbstract
 
     /**
      * @inheritdoc
-     * @throws \Zend\Code\Exception\InvalidArgumentException
-     * @throws \Exception
+     * @throws InvalidArgumentException
+     * @throws Exception
      */
     protected function bodyGenerator()
     {
@@ -41,7 +44,7 @@ class _Singleton extends GeneratorAbstract
                 '@note This needs to be declared in any child class',
                 '@var static',
             ],
-            'static' => true,
+            'static'   => true,
         ];
 
         $this->generator->addProperty('instance', null, $extra);

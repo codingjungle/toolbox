@@ -9,20 +9,22 @@
 
 namespace Zend\Stdlib;
 
+use Traversable;
+
 interface MessageInterface
 {
     /**
      * Set metadata
      *
-     * @param  string|int|array|\Traversable $spec
-     * @param  mixed $value
+     * @param string|int|array|Traversable $spec
+     * @param mixed $value
      */
     public function setMetadata($spec, $value = null);
 
     /**
      * Get metadata
      *
-     * @param  null|string|int $key
+     * @param null|string|int $key
      * @return mixed
      */
     public function getMetadata($key = null);
@@ -30,7 +32,7 @@ interface MessageInterface
     /**
      * Set content
      *
-     * @param  mixed $content
+     * @param mixed $content
      * @return mixed
      */
     public function setContent($content);

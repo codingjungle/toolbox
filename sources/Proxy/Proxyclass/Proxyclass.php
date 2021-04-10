@@ -15,10 +15,11 @@ namespace IPS\toolbox\Proxy;
 use Exception;
 use InvalidArgumentException;
 use IPS\Data\Store;
+use IPS\Output\_System;
 use IPS\Patterns\Singleton;
 use IPS\Settings;
+use IPS\Theme;
 use IPS\toolbox\Application;
-use IPS\toolbox\DevCenter\Sources\SourcesFormAbstract;
 use IPS\toolbox\Generator\DTFileGenerator;
 use IPS\toolbox\Proxy\Generator\Applications;
 use IPS\toolbox\Proxy\Generator\Db as GeneratorDb;
@@ -60,19 +61,17 @@ use function iterator_to_array;
 use function json_decode;
 use function json_encode;
 use function md5;
-use function method_exists;
 use function mkdir;
 use function mt_rand;
 use function preg_match;
 use function preg_replace_callback;
+use function str_replace;
 use function time;
+use function token_get_all;
 
 use const DIRECTORY_SEPARATOR;
 use const JSON_PRETTY_PRINT;
 use const PHP_EOL;
-
-use function str_replace;
-use function token_get_all;
 use const T_ABSTRACT;
 use const T_CLASS;
 use const T_FINAL;
@@ -94,7 +93,9 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 class _Proxyclass extends Singleton
 {
 
-    use Read, Write, Replace;
+    use Read;
+    use Replace;
+    use Write;
 
     /**
      * @inheritdoc
@@ -236,7 +237,7 @@ class _Proxyclass extends Singleton
                 Store::i()->dtproxy_templates = $this->templates;
             }
 
-            if (isset( $data['current']) && $data['current']) {
+            if (isset($data['current']) && $data['current']) {
                 $offset = $data['current'] + $i;
             } else {
                 $offset = $i;
@@ -306,7 +307,7 @@ class _Proxyclass extends Singleton
         $finder = new SplFileInfo($file);
         $content = $this->_getFileByFullPath($file);
         $templates = [];
-        if(isset(Store::i()->dtproxy_templates)) {
+        if (isset(Store::i()->dtproxy_templates)) {
             $templates = Store::i()->dtproxy_templates;
         }
         if ($finder->getExtension() === 'phtml') {
@@ -390,11 +391,11 @@ class _Proxyclass extends Singleton
     {
         $jsonMeta = [];
 
-        if ( isset( Store::i()->dt_json ) ) {
+        if (isset(Store::i()->dt_json)) {
             $jsonMeta = Store::i()->dt_json;
         }
         /* @var \IPS\Application $app */
-        foreach (Application::appsWithExtension('toolbox', 'Providers',false) as $app) {
+        foreach (Application::appsWithExtension('toolbox', 'Providers', false) as $app) {
             /* @var Providers $extension */
             foreach ($app->extensions('toolbox', 'Providers') as $extension) {
                 $extension->meta($jsonMeta);
@@ -404,9 +405,62 @@ class _Proxyclass extends Singleton
 
         if (empty($jsonMeta) === false) {
             $content = json_encode($jsonMeta, JSON_PRETTY_PRINT);
-            $this->_writeFile('.ide-toolbox.metadata.json', $content,  $this->save);
+            $this->_writeFile('.ide-toolbox.metadata.json', $content, $this->save);
             unset(Store::i()->dt_json);
         }
+    }
+
+    public function buildCss()
+    {
+        $ds = DIRECTORY_SEPARATOR;
+        $save = $this->save . $ds . 'css' . $ds;
+        if (is_dir($save)) {
+            $this->emptyDirectory($save);
+        }
+        if (!mkdir($save) && !is_dir($save)) {
+            chmod($save, 0777);
+        }
+        $finder = new Finder();
+
+        $finder->in(\IPS\ROOT_PATH);
+        $filter = function (SplFileInfo $file) {
+            if (!in_array($file->getExtension(), ['css'])) {
+                return false;
+            }
+
+            return true;
+        };
+
+        /** @var \Symfony\Component\Finder\SplFileInfo $css */
+        foreach ($finder->filter($filter)->files() as $css) {
+            $functionName = 'css_' . mt_rand();
+            $contents = str_replace('\\', '\\\\', $css->getContents());
+            /* If we have something like `{expression="\IPS\SOME_CONSTANT"}` we cannot double escape it, however we do need to escape font icons and similar. */
+            $contents = preg_replace_callback("/{expression=\"(.+?)\"}/ms", function ($matches) {
+                return '{expression="' . str_replace('\\\\', '\\', $matches[1]) . '"}';
+            }, $contents);
+            Theme::makeProcessFunction($contents, $functionName);
+            $functionName = "IPS\Theme\\{$functionName}";
+            if (!is_dir($save . $css->getRelativePath() . $ds)) {
+                mkdir($save . $css->getRelativePath() . $ds, 0777, true);
+                chmod($save . $css->getRelativePath() . $ds, 0777);
+            }
+            //_p( $css->getRelativePath(), $css->getBasename(),$functionName());
+            file_put_contents($save . $css->getRelativePath() . $ds . $css->getBasename(), $functionName());
+        }
+    }
+
+    /**
+     * empties a directroy, use with caution!
+     *
+     * @param $dir
+     *
+     * @throws IOException
+     */
+    public function emptyDirectory($dir)
+    {
+        $fs = new Filesystem();
+        $fs->remove($dir);
     }
 
     /**
@@ -493,7 +547,7 @@ class _Proxyclass extends Singleton
     {
         $ds = DIRECTORY_SEPARATOR;
         $root = \IPS\ROOT_PATH;
-        $save =  $this->save . $ds;
+        $save = $this->save . $ds;
         $finder = new Finder();
         try {
             if ($dir === null) {
@@ -559,19 +613,6 @@ class _Proxyclass extends Singleton
         } catch (Exception $e) {
             return 0;
         }
-    }
-
-    /**
-     * empties a directroy, use with caution!
-     *
-     * @param $dir
-     *
-     * @throws IOException
-     */
-    public function emptyDirectory($dir)
-    {
-        $fs = new Filesystem();
-        $fs->remove($dir);
     }
 
     /**
@@ -650,12 +691,6 @@ class _Proxyclass extends Singleton
         ];
     }
 
-    public function excludeClasses(){
-        return [
-          \IPS\Output\_System::class => 1
-        ];
-    }
-
     /**
      * prints to console
      *
@@ -692,6 +727,13 @@ class _Proxyclass extends Singleton
         if ($old === $done) {
             $this->console(PHP_EOL . 'File Processing Done!');
         }
+    }
+
+    public function excludeClasses()
+    {
+        return [
+            _System::class => 1
+        ];
     }
 
     /**
@@ -767,7 +809,6 @@ class _Proxyclass extends Singleton
         }
     }
 
-
     /**
      * returns the class and namespace
      *
@@ -812,52 +853,13 @@ class _Proxyclass extends Singleton
 
                 return [
                     'namespace' => $namespace,
-                    'class' => $class,
-                    'abstract' => $abstract,
-                    'final' => $final,
+                    'class'     => $class,
+                    'abstract'  => $abstract,
+                    'final'     => $final,
                 ];
             }
         }
 
         return null;
-    }
-
-    public function buildCss(){
-        $ds = DIRECTORY_SEPARATOR;
-        $save =  $this->save . $ds . 'css' . $ds;
-        if (is_dir($save)) {
-            $this->emptyDirectory($save);
-        }
-        if (!mkdir($save) && !is_dir($save)) {
-            chmod($save, 0777);
-        }
-        $finder = new Finder();
-
-        $finder->in(\IPS\ROOT_PATH );
-        $filter = function (SplFileInfo $file) {
-            if (!in_array($file->getExtension(), ['css'])) {
-                return false;
-            }
-
-            return true;
-        };
-
-        /** @var \Symfony\Component\Finder\SplFileInfo $css */
-        foreach( $finder->filter($filter)->files() as $css ){
-            $functionName = 'css_' . mt_rand();
-            $contents = str_replace( '\\', '\\\\', $css->getContents() );
-            /* If we have something like `{expression="\IPS\SOME_CONSTANT"}` we cannot double escape it, however we do need to escape font icons and similar. */
-            $contents = preg_replace_callback( "/{expression=\"(.+?)\"}/ms", function( $matches ) {
-                return '{expression="' . str_replace( '\\\\', '\\', $matches[1] ) . '"}';
-            }, $contents );
-            \IPS\Theme::makeProcessFunction( $contents, $functionName );
-            $functionName = "IPS\Theme\\{$functionName}";
-            if (!is_dir($save.$css->getRelativePath(). $ds)) {
-                mkdir($save.$css->getRelativePath(). $ds,0777, true);
-                chmod($save.$css->getRelativePath() . $ds, 0777);
-            }
-            //_p( $css->getRelativePath(), $css->getBasename(),$functionName());
-            \file_put_contents( $save.$css->getRelativePath().$ds.$css->getBasename(), $functionName());
-        }
     }
 }

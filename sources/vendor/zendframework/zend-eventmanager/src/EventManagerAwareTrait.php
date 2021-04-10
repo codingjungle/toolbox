@@ -29,13 +29,28 @@ trait EventManagerAwareTrait
     protected $events;
 
     /**
+     * Retrieve the event manager
+     *
+     * Lazy-loads an EventManager instance if none registered.
+     *
+     * @return EventManagerInterface
+     */
+    public function getEventManager()
+    {
+        if (!$this->events instanceof EventManagerInterface) {
+            $this->setEventManager(new EventManager());
+        }
+        return $this->events;
+    }
+
+    /**
      * Set the event manager instance used by this context.
      *
      * For convenience, this method will also set the class name / LSB name as
      * identifiers, in addition to any string or array of strings set to the
      * $this->eventIdentifier property.
      *
-     * @param  EventManagerInterface $events
+     * @param EventManagerInterface $events
      */
     public function setEventManager(EventManagerInterface $events)
     {
@@ -45,7 +60,7 @@ trait EventManagerAwareTrait
                 || (is_array($this->eventIdentifier))
                 || ($this->eventIdentifier instanceof Traversable)
             ) {
-                $identifiers = array_unique(array_merge($identifiers, (array) $this->eventIdentifier));
+                $identifiers = array_unique(array_merge($identifiers, (array)$this->eventIdentifier));
             } elseif (is_object($this->eventIdentifier)) {
                 $identifiers[] = $this->eventIdentifier;
             }
@@ -56,20 +71,5 @@ trait EventManagerAwareTrait
         if (method_exists($this, 'attachDefaultListeners')) {
             $this->attachDefaultListeners();
         }
-    }
-
-    /**
-     * Retrieve the event manager
-     *
-     * Lazy-loads an EventManager instance if none registered.
-     *
-     * @return EventManagerInterface
-     */
-    public function getEventManager()
-    {
-        if (! $this->events instanceof EventManagerInterface) {
-            $this->setEventManager(new EventManager());
-        }
-        return $this->events;
     }
 }

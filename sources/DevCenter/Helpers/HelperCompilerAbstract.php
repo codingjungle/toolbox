@@ -11,14 +11,13 @@
 
 namespace IPS\toolbox\DevCenter\Helpers;
 
-use IPS\toolbox\DevCenter\Dev;
 use IPS\toolbox\Proxy\Helpers\HelpersAbstract;
 
+use function defined;
 use function header;
-use function mb_strtolower;
 
-if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 

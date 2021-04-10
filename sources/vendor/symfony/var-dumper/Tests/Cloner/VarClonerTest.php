@@ -14,6 +14,8 @@ namespace Symfony\Component\VarDumper\Tests\Cloner;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
+use const PHP_VERSION_ID;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -320,7 +322,7 @@ EOTXT;
             $this->markTestSkipped('xdebug is active');
         }
 
-        $data = (array) json_decode('{"1":{}}');
+        $data = (array)json_decode('{"1":{}}');
 
         $cloner = new VarCloner();
         $clone = $cloner->cloneVar($data);
@@ -376,13 +378,14 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
 EOTXT;
         ob_start();
         var_dump($clone);
-        $this->assertStringMatchesFormat(\PHP_VERSION_ID >= 70200 ? str_replace('"1"', '1', $expected) : $expected, ob_get_clean());
+        $this->assertStringMatchesFormat(PHP_VERSION_ID >= 70200 ? str_replace('"1"', '1', $expected) : $expected,
+            ob_get_clean());
     }
 
     public function testCaster()
     {
         $cloner = new VarCloner([
-            '*' => function ($obj, $array) {
+            '*'       => function ($obj, $array) {
                 return ['foo' => 123];
             },
             __CLASS__ => function ($obj, $array) {

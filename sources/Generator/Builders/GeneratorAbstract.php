@@ -47,31 +47,26 @@ abstract class GeneratorAbstract
     public $path;
 
     public $isHook = false;
-
+    public $hookClass;
+    public $hookNamespace;
     /**
      * the file document
      *
      * @var array
      */
     protected $docComment;
-
     /**
      * class name space
      *
      * @var string
      */
     protected $nameSpace;
-
     /**
      * inlucde the IPS system check header
      *
      * @var bool
      */
     protected $headerCatch = false;
-
-    public $hookClass;
-
-    public $hookNamespace;
     /**
      * class comment
      *

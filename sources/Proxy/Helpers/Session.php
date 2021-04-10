@@ -12,20 +12,17 @@
 
 namespace IPS\toolbox\Proxy\Helpers;
 
-use IPS\toolbox\Profiler\Debug;
-use Zend\Code\Generator\DocBlock\Tag\ParamTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
-use Zend\Code\Generator\ParameterGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 
 use function defined;
 use function header;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER[ 'SERVER_PROTOCOL' ]) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0') . ' 403 Forbidden');
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -36,25 +33,23 @@ class _Session implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
-
-        try{
+        try {
             $propertyDocBlock = new DocBlockGenerator(
-                'Singleton Instances', null, [ new ReturnTag('static')]
+                'Singleton Instances', null, [new ReturnTag('static')]
             );
             $body[] = PropertyGenerator::fromArray(
                 [
-                    'name' => 'instance',
-                    'static' => true,
-                    'docblock' => $propertyDocBlock,
+                    'name'       => 'instance',
+                    'static'     => true,
+                    'docblock'   => $propertyDocBlock,
                     'visibility' => 'protected'
                 ]
             );
-        }
-        catch(InvalidArgumentException $e){
+        } catch (InvalidArgumentException $e) {
         }
 
         $methodDocBlock = new DocBlockGenerator(
-            'Get instance', \null, [
+            'Get instance', null, [
                 new ReturnTag('static')
             ]
         );
@@ -66,7 +61,7 @@ class _Session implements HelpersAbstract
                     'parameters' => [],
                     'body'       => 'return parent::i();',
                     'docblock'   => $methodDocBlock,
-                    'static'     => \true,
+                    'static'     => true,
                 ]
             );
         } catch (InvalidArgumentException $e) {

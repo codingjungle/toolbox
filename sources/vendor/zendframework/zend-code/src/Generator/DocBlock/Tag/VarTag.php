@@ -17,9 +17,9 @@ class VarTag extends AbstractTypeableTag implements TagInterface
     private $variableName;
 
     /**
-     * @param string|null     $variableName
+     * @param string|null $variableName
      * @param string|string[] $types
-     * @param string|null     $description
+     * @param string|null $description
      */
     public function __construct(?string $variableName = null, $types = [], ?string $description = null)
     {
@@ -33,36 +33,36 @@ class VarTag extends AbstractTypeableTag implements TagInterface
     /**
      * {@inheritDoc}
      */
-    public function getName() : string
+    public function getName(): string
     {
         return 'var';
     }
 
+    public function getVariableName(): ?string
+    {
+        return $this->variableName;
+    }
+
     /**
      * @internal this code is only public for compatibility with the
-     *           @see \Zend\Code\Generator\DocBlock\TagManager, which
+     * @see \Zend\Code\Generator\DocBlock\TagManager, which
      *           uses setters
      */
-    public function setVariableName(?string $variableName) : void
+    public function setVariableName(?string $variableName): void
     {
         if (null !== $variableName) {
             $this->variableName = ltrim($variableName, '$');
         }
     }
 
-    public function getVariableName() : ?string
-    {
-        return $this->variableName;
-    }
-
     /**
      * {@inheritDoc}
      */
-    public function generate() : string
+    public function generate(): string
     {
         return '@var'
-            . ((! empty($this->types)) ? ' ' . $this->getTypesAsString() : '')
+            . ((!empty($this->types)) ? ' ' . $this->getTypesAsString() : '')
             . (null !== $this->variableName ? ' $' . $this->variableName : '')
-            . ((! empty($this->description)) ? ' ' . $this->description : '');
+            . ((!empty($this->description)) ? ' ' . $this->description : '');
     }
 }

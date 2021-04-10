@@ -8,8 +8,8 @@ use Symfony\Component\VarDumper\VarDumper;
 
 $componentRoot = $_SERVER['COMPONENT_ROOT'];
 
-if (!is_file($file = $componentRoot.'/vendor/autoload.php')) {
-    $file = $componentRoot.'/../../../../vendor/autoload.php';
+if (!is_file($file = $componentRoot . '/vendor/autoload.php')) {
+    $file = $componentRoot . '/../../../../vendor/autoload.php';
 }
 
 require $file;
@@ -32,7 +32,7 @@ $server->start();
 echo "READY\n";
 
 $server->listen(function (Data $data, array $context, $clientId) {
-    dump((string) $data, $context, $clientId);
+    dump((string)$data, $context, $clientId);
 
     exit(0);
 });

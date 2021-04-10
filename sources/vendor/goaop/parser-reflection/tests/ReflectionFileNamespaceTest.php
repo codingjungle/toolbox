@@ -1,30 +1,26 @@
 <?php
+
 namespace Go\ParserReflection;
 
+use DateTime;
 use Go\ParserReflection\Stub\TestNamespaceClassFoo;
 
-class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
+use PHPUnit_Framework_TestCase;
+
+use const Go\ParserReflection\Stub\END_MARKER;
+use const Go\ParserReflection\Stub\FILE_NAME;
+use const Go\ParserReflection\Stub\NAMESPACE_NAME;
+use const Go\ParserReflection\Stub\START_MARKER;
+
+class ReflectionFileNamespaceTest extends PHPUnit_Framework_TestCase
 {
-    const STUB_FILE = '/Stub/FileWithNamespaces.php';
-    const STUB_GLOBAL_FILE = '/Stub/FileWithGlobalNamespace.php';
+    public const STUB_FILE = '/Stub/FileWithNamespaces.php';
+    public const STUB_GLOBAL_FILE = '/Stub/FileWithGlobalNamespace.php';
 
     /**
      * @var ReflectionFileNamespace
      */
     protected $parsedRefFileNamespace;
-
-    protected function setUp()
-    {
-        $fileName = stream_resolve_include_path(__DIR__ . self::STUB_FILE);
-        $fileNode = ReflectionEngine::parseFile($fileName);
-
-        $reflectionFile = new ReflectionFile($fileName, $fileNode);
-
-        $parsedFileNamespace          = $reflectionFile->getFileNamespace('Go\ParserReflection\Stub');
-        $this->parsedRefFileNamespace = $parsedFileNamespace;
-
-        include_once $fileName;
-    }
 
     /**
      * @expectedException        InvalidArgumentException
@@ -41,7 +37,7 @@ class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
      */
     public function testBadFilenameTypeObject()
     {
-        new ReflectionFileNamespace(new \DateTime(), 'BogusNamespace');
+        new ReflectionFileNamespace(new DateTime(), 'BogusNamespace');
     }
 
     public function testGetClass()
@@ -67,7 +63,7 @@ class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
 
         $constValue = $this->parsedRefFileNamespace->getConstant('NAMESPACE_NAME');
         $this->assertNotFalse($constValue);
-        $this->assertEquals(\Go\ParserReflection\Stub\NAMESPACE_NAME, $constValue);
+        $this->assertEquals(NAMESPACE_NAME, $constValue);
     }
 
     public function testGetConstantsCacheIndependence()
@@ -97,13 +93,13 @@ class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             array(
                 // Scalar types are handled.
-                'INT_CONST' => 5,
-                'STRING_CONST' => 'text',
-                'BOOLEAN_CONST' => true,
+                'INT_CONST'        => 5,
+                'STRING_CONST'     => 'text',
+                'BOOLEAN_CONST'    => true,
 
                 // Expressions are handled partially.
                 'EXPRESSION_CONST' => false,
-                'FUNCTION_CONST' => null,
+                'FUNCTION_CONST'   => null,
             ),
             $reflectionFileNamespace->getConstants(true)
         );
@@ -118,13 +114,13 @@ class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
     public function testGetEndLine()
     {
         $endLine = $this->parsedRefFileNamespace->getEndLine();
-        $this->assertEquals(\Go\ParserReflection\Stub\END_MARKER + 1, $endLine);
+        $this->assertEquals(END_MARKER + 1, $endLine);
     }
 
     public function testGetFileName()
     {
         $fileName = $this->parsedRefFileNamespace->getFileName();
-        $this->assertEquals(\Go\ParserReflection\Stub\FILE_NAME, $fileName);
+        $this->assertEquals(FILE_NAME, $fileName);
     }
 
     public function testGetFunction()
@@ -146,7 +142,7 @@ class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $namespaceName = $this->parsedRefFileNamespace->getName();
-        $this->assertEquals(\Go\ParserReflection\Stub\NAMESPACE_NAME, $namespaceName);
+        $this->assertEquals(NAMESPACE_NAME, $namespaceName);
     }
 
     public function testGetNameOfGlobalNamespace()
@@ -174,7 +170,7 @@ class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
     public function testGetStartLine()
     {
         $startLine = $this->parsedRefFileNamespace->getStartLine();
-        $this->assertEquals(\Go\ParserReflection\Stub\START_MARKER - 2, $startLine);
+        $this->assertEquals(START_MARKER - 2, $startLine);
     }
 
     public function testHasClass()
@@ -202,5 +198,18 @@ class ReflectionFileNamespaceTest extends \PHPUnit_Framework_TestCase
 
         $hasFunction = $this->parsedRefFileNamespace->hasFunction('testFunctionBar');
         $this->assertTrue($hasFunction);
+    }
+
+    protected function setUp()
+    {
+        $fileName = stream_resolve_include_path(__DIR__ . self::STUB_FILE);
+        $fileNode = ReflectionEngine::parseFile($fileName);
+
+        $reflectionFile = new ReflectionFile($fileName, $fileNode);
+
+        $parsedFileNamespace = $reflectionFile->getFileNamespace('Go\ParserReflection\Stub');
+        $this->parsedRefFileNamespace = $parsedFileNamespace;
+
+        include_once $fileName;
     }
 }

@@ -31,11 +31,11 @@ class ResponseCollection extends SplStack
     /**
      * Mark the collection as stopped (or its opposite)
      *
-     * @param  bool $flag
+     * @param bool $flag
      */
     public function setStopped($flag)
     {
-        $this->stopped = (bool) $flag;
+        $this->stopped = (bool)$flag;
     }
 
     /**
@@ -67,7 +67,7 @@ class ResponseCollection extends SplStack
     /**
      * Check if any of the responses match the given value.
      *
-     * @param  mixed $value The value to look for among responses
+     * @param mixed $value The value to look for among responses
      * @return bool
      */
     public function contains($value)

@@ -75,7 +75,7 @@ class _Database
      * @var array
      */
     protected $schema = [
-        'name' => null,
+        'name'    => null,
         'columns' => [],
         'indexes' => [],
     ];
@@ -173,18 +173,18 @@ class _Database
         $binary = false
     ): array {
         return [
-            'name' => $this->tablePrefix . $name,
-            'type' => $type,
-            'default' => $default,
-            'comment' => $comment,
-            'length' => $type === 'TEXT' ? null : $length,
-            'unsigned' => $unsigned,
-            'decimals' => $decimals,
-            'values' => $values,
-            'allow_null' => $allow_null,
-            'zerofill' => $zerofill,
+            'name'           => $this->tablePrefix . $name,
+            'type'           => $type,
+            'default'        => $default,
+            'comment'        => $comment,
+            'length'         => $type === 'TEXT' ? null : $length,
+            'unsigned'       => $unsigned,
+            'decimals'       => $decimals,
+            'values'         => $values,
+            'allow_null'     => $allow_null,
+            'zerofill'       => $zerofill,
             'auto_increment' => $auto_increment,
-            'binary' => $binary,
+            'binary'         => $binary,
         ];
     }
 
@@ -645,7 +645,8 @@ class _Database
 
     protected function solvedCommentId(): array
     {
-        return $this->buildDefinition('solved_comment_id', 'Solved Comment ID', 'BIGINT', null, true, null, true, false);
+        return $this->buildDefinition('solved_comment_id', 'Solved Comment ID', 'BIGINT', null, true, null, true,
+            false);
     }
 
     /**

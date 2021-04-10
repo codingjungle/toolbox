@@ -1,8 +1,8 @@
 <?php
+
 namespace Go\ParserReflection;
 
 use Go\ParserReflection\Stub\ClassWithProperties;
-use PhpParser\Lexer;
 
 class ReflectionPropertyTest extends AbstractTestCase
 {
@@ -25,21 +25,20 @@ class ReflectionPropertyTest extends AbstractTestCase
      *
      * @dataProvider caseProvider
      *
-     * @param ReflectionClass     $parsedClass Parsed class
+     * @param ReflectionClass $parsedClass Parsed class
      * @param \ReflectionProperty $refProperty Property to analyze
-     * @param string              $getterName  Name of the reflection method to test
+     * @param string $getterName Name of the reflection method to test
      */
     public function testReflectionMethodParity(
         ReflectionClass $parsedClass,
         \ReflectionProperty $refProperty,
         $getterName
-    )
-    {
-        $propertyName   = $refProperty->getName();
-        $className      = $parsedClass->getName();
+    ) {
+        $propertyName = $refProperty->getName();
+        $className = $parsedClass->getName();
         $parsedProperty = $parsedClass->getProperty($propertyName);
-        $expectedValue  = $refProperty->$getterName();
-        $actualValue    = $parsedProperty->$getterName();
+        $expectedValue = $refProperty->$getterName();
+        $actualValue = $parsedProperty->$getterName();
         $this->assertSame(
             $expectedValue,
             $actualValue,
@@ -57,7 +56,7 @@ class ReflectionPropertyTest extends AbstractTestCase
         $allNameGetters = $this->getGettersToCheck();
 
         $testCases = [];
-        $files     = $this->getFilesToAnalyze();
+        $files = $this->getFilesToAnalyze();
         foreach ($files as $fileList) {
             foreach ($fileList as $fileName) {
                 $fileName = stream_resolve_include_path($fileName);
@@ -86,6 +85,28 @@ class ReflectionPropertyTest extends AbstractTestCase
         return $testCases;
     }
 
+    /**
+     * Returns list of ReflectionMethod getters that be checked directly without additional arguments
+     *
+     * @return array
+     */
+    protected function getGettersToCheck()
+    {
+        $allNameGetters = [
+            'isDefault',
+            'getName',
+            'getModifiers',
+            'getDocComment',
+            'isPrivate',
+            'isProtected',
+            'isPublic',
+            'isStatic',
+            '__toString'
+        ];
+
+        return $allNameGetters;
+    }
+
     public function testSetAccessibleMethod()
     {
         $parsedProperty = $this->parsedRefClass->getProperty('protectedStaticProperty');
@@ -101,7 +122,7 @@ class ReflectionPropertyTest extends AbstractTestCase
         $parsedProperty->setAccessible(true);
 
         $className = $this->parsedRefClass->getName();
-        $obj       = new $className;
+        $obj = new $className();
 
         $value = $parsedProperty->getValue($obj);
         $this->assertSame('a', $value);
@@ -114,31 +135,16 @@ class ReflectionPropertyTest extends AbstractTestCase
     public function testCompatibilityWithOriginalConstructor()
     {
         $parsedRefProperty = new ReflectionProperty($this->parsedRefClass->getName(), 'publicStaticProperty');
-        $originalValue     = $parsedRefProperty->getValue();
+        $originalValue = $parsedRefProperty->getValue();
 
         $this->assertSame(M_PI, $originalValue);
     }
 
     public function testDebugInfoMethod()
     {
-        $parsedRefProperty   = $this->parsedRefClass->getProperty('publicStaticProperty');
+        $parsedRefProperty = $this->parsedRefClass->getProperty('publicStaticProperty');
         $originalRefProperty = new \ReflectionProperty($this->parsedRefClass->getName(), 'publicStaticProperty');
-        $expectedValue     = (array) $originalRefProperty;
+        $expectedValue = (array)$originalRefProperty;
         $this->assertSame($expectedValue, $parsedRefProperty->___debugInfo());
-    }
-
-    /**
-     * Returns list of ReflectionMethod getters that be checked directly without additional arguments
-     *
-     * @return array
-     */
-    protected function getGettersToCheck()
-    {
-        $allNameGetters = [
-            'isDefault', 'getName', 'getModifiers', 'getDocComment',
-            'isPrivate', 'isProtected', 'isPublic', 'isStatic', '__toString'
-        ];
-
-        return $allNameGetters;
     }
 }

@@ -32,12 +32,13 @@ use IPS\toolbox\Content\Member as Dtmember;
 use IPS\toolbox\Content\Post;
 use IPS\toolbox\Content\Topic;
 use IPS\toolbox\Form;
+
 use function defined;
 use function header;
 use function time;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -50,30 +51,30 @@ class _generator extends Controller
      * @brief    Has been CSRF-protected
      */
     public static $csrfProtected = true;
+
     /**
      * @inheritdoc
      * @throws Exception
      */
     protected function manage()
     {
-
         $groups = [];
 
-        /* @var \IPS\Member\Group $group */
-        foreach ( Group::groups() as $key => $group ) {
-            $groups[ $key ] = $group->get_formattedName();
+        /* @var Group $group */
+        foreach (Group::groups() as $key => $group) {
+            $groups[$key] = $group->get_formattedName();
         }
 
-        $url = $this->url->setQueryString( [ 'do' => 'delete', 'oldDo' => Request::i()->do ] );
+        $url = $this->url->setQueryString(['do' => 'delete', 'oldDo' => Request::i()->do]);
 
-        Output::i()->sidebar[ 'actions' ][ 'delete' ] = [
+        Output::i()->sidebar['actions']['delete'] = [
             'icon'  => 'delete',
             'title' => 'Delete Content Generated Data',
             'link'  => $url,
 
         ];
-        $form = Form::create()->formPrefix( 'dtcontent_' );
-        $form->add( 'type', 'select' )->options( [
+        $form = Form::create()->formPrefix('dtcontent_');
+        $form->add('type', 'select')->options([
             'options' => [
                 'none'   => 'Select Type',
                 'member' => 'Member',
@@ -82,7 +83,7 @@ class _generator extends Controller
                 'post'   => 'Post',
                 'club'   => 'Club',
             ],
-        ] )->toggles( [
+        ])->toggles([
             'member' => [
                 'passwords',
                 'group',
@@ -94,44 +95,44 @@ class _generator extends Controller
                 'rangeStart',
                 'rangeEnd',
             ],
-        ] )->validation( static function ( $data )
-        {
-
-            if ( $data === 'none' ) {
-                throw new InvalidArgumentException( 'dtcontent_gen_none' );
+        ])->validation(static function ($data) {
+            if ($data === 'none') {
+                throw new InvalidArgumentException('dtcontent_gen_none');
             }
-        } );
-        $form->add( 'limit', 'number' )->empty( 50 )->options( [ 'min' => 1 ] );
-        $form->add( 'rangeStart', 'date' )->empty( Settings::i()->getFromConfGlobal( 'board_start' ) );
-        $form->add( 'rangeEnd', 'date' )->empty( time() );
-        $form->add( 'passwords', 'yn' );
-        $form->add( 'club', 'yn' )->options( [ 'disabled' => !Settings::i()->clubs ] );
-        $form->add( 'group', 'select' )->empty( Settings::i()->getFromConfGlobal( 'member_group' ) )->options( [ 'options' => $groups ] );
+        });
+        $form->add('limit', 'number')->empty(50)->options(['min' => 1]);
+        $form->add('rangeStart', 'date')->empty(Settings::i()->getFromConfGlobal('board_start'));
+        $form->add('rangeEnd', 'date')->empty(time());
+        $form->add('passwords', 'yn');
+        $form->add('club', 'yn')->options(['disabled' => !Settings::i()->clubs]);
+        $form->add('group', 'select')
+             ->empty(Settings::i()->getFromConfGlobal('member_group'))
+             ->options(['options' => $groups]);
 
-        if ( $values = $form->values() ) {
+        if ($values = $form->values()) {
             $url = $this->url;
             $query = [
-                'type'  => $values[ 'type' ],
-                'limit' => $values[ 'limit' ],
+                'type'  => $values['type'],
+                'limit' => $values['limit'],
             ];
 
-            if ( $values[ 'type' ] === 'members' ) {
-                $query[ 'password' ] = $values[ 'passwords' ];
-                $query[ 'group' ] = $values[ 'group' ];
-                $query[ 'club' ] = $values[ 'club' ];
+            if ($values['type'] === 'members') {
+                $query['password'] = $values['passwords'];
+                $query['group'] = $values['group'];
+                $query['club'] = $values['club'];
             }
 
-            if ( $values[ 'type' ] === 'topic' ) {
+            if ($values['type'] === 'topic') {
                 /* @var DateTime $start */
-                $start = $values[ 'rangeStart' ];
+                $start = $values['rangeStart'];
                 /* @var DateTime $end */
-                $end = $values[ 'rangeEnd' ];
-                $query[ 'start' ] = $start->getTimestamp();
-                $query[ 'end' ] = $end->getTimestamp();
+                $end = $values['rangeEnd'];
+                $query['start'] = $start->getTimestamp();
+                $query['end'] = $end->getTimestamp();
             }
 
-            $query[ 'do' ] = 'queue';
-            Output::i()->redirect( $url->setQueryString( $query )->csrf() );
+            $query['do'] = 'queue';
+            Output::i()->redirect($url->setQueryString($query)->csrf());
         }
 
         Output::i()->title = 'Generate Dummy Data';
@@ -143,67 +144,61 @@ class _generator extends Controller
      */
     protected function delete()
     {
-
         Output::i()->title = 'Delete Content';
 
-        $url = $this->url->setQueryString( [ 'do' => 'delete', 'oldDo' => Request::i()->oldDo ] )->csrf();
-        Output::i()->output = new MultipleRedirect( $url, static function ( $data )
-        {
-
+        $url = $this->url->setQueryString(['do' => 'delete', 'oldDo' => Request::i()->oldDo])->csrf();
+        Output::i()->output = new MultipleRedirect($url, static function ($data) {
             $offset = 0;
-            if ( isset( $data[ 'offset' ] ) ) {
-                $offset = $data[ 'offset' ];
+            if (isset($data['offset'])) {
+                $offset = $data['offset'];
             }
 
-            if ( !isset( $data[ 'total' ] ) ) {
+            if (!isset($data['total'])) {
                 try {
-                    $total = Db::i()->select( 'COUNT(*)', 'toolbox_generator' )->first();
-                } catch ( Exception $e ) {
+                    $total = Db::i()->select('COUNT(*)', 'toolbox_generator')->first();
+                } catch (Exception $e) {
                     $total = 0;
                 }
-            }
-            else {
-                $total = $data[ 'total' ];
+            } else {
+                $total = $data['total'];
             }
 
             $limit = 100;
 
             $count = Db::i()->select('COUNT(*)', 'toolbox_generator')->first();
-            if ( !$count ) {
-                return \null;
+            if (!$count) {
+                return null;
             }
 
-            $sql = Db::i()->select( '*', 'toolbox_generator', [], 'generator_id ASC', $limit );
+            $sql = Db::i()->select('*', 'toolbox_generator', [], 'generator_id ASC', $limit);
 
-            $contents = new ActiveRecordIterator( $sql, Generator::class );
+            $contents = new ActiveRecordIterator($sql, Generator::class);
 
-            /* @var \IPS\toolbox\Content\Generator $content */
-            foreach ( $contents as $content ) {
+            /* @var Generator $content */
+            foreach ($contents as $content) {
                 $content->process();
                 $offset++;
             }
 
-            $progress = ( $offset / $total ) * 100;
+            $progress = ($offset / $total) * 100;
 
-            $language = Member::loggedIn()->language()->addToStack( 'dtcontent_progress', \false, [
+            $language = Member::loggedIn()->language()->addToStack('dtcontent_progress', false, [
                 'sprintf' => [
                     $offset,
                     $total,
                 ],
-            ] );
+            ]);
 
             return [
-                [ 'total' => $total, 'offset' => $offset ],
+                ['total' => $total, 'offset' => $offset],
                 $language,
                 $progress,
             ];
-        }, function ()
-        {
-
+        }, function () {
             /* And redirect back to the overview screen */
-            $url = Url::internal( 'app=toolbox&module=content&controller=generator' );
-            Output::i()->redirect( $url->csrf(), 'dtcontent_generation_delete_done' );
-        } );
+            $url = Url::internal('app=toolbox&module=content&controller=generator');
+            Output::i()->redirect($url->csrf(), 'dtcontent_generation_delete_done');
+        });
     }
 
     /**
@@ -211,118 +206,117 @@ class _generator extends Controller
      */
     protected function queue()
     {
-
         Output::i()->title = 'Generator';
         $type = Request::i()->type ?: 'forums';
         $limit = Request::i()->limit ?: 10;
-        $password = Request::i()->password ?: \null;
-        $group = Request::i()->group ?: \null;
-        $club = Request::i()->club ?: \null;
+        $password = Request::i()->password ?: null;
+        $group = Request::i()->group ?: null;
+        $club = Request::i()->club ?: null;
 
-        $url = $this->url->setQueryString( [
+        $url = $this->url->setQueryString([
             'do'       => 'queue',
             'type'     => $type,
             'limit'    => $limit,
             'password' => $password,
             'group'    => $group,
             'club'     => $club,
-        ] );
+        ]);
 
-        Output::i()->output = new MultipleRedirect( $url->csrf(), function ( $data )
-        {
-
+        Output::i()->output = new MultipleRedirect($url->csrf(), function ($data) {
             $offset = 0;
             $type = Request::i()->type ?: 'forums';
             $limit = Request::i()->limit ?: 10;
-            $password = Request::i()->password ?: \null;
-            $group = Request::i()->group ?: \null;
-            $club = Request::i()->club ?: \null;
-            $start = Request::i()->start ?: \null;
-            $end = Request::i()->end ?: \null;
+            $password = Request::i()->password ?: null;
+            $group = Request::i()->group ?: null;
+            $club = Request::i()->club ?: null;
+            $start = Request::i()->start ?: null;
+            $end = Request::i()->end ?: null;
 
-            if ( isset( $data[ 'start' ] ) ) {
-                $start = $data[ 'start' ];
-            }
-            else if ( $start === \null ) {
-                $start = Settings::i()->getFromConfGlobal( 'board_start' );
-            }
-
-            if ( isset( $data[ 'end' ] ) ) {
-                $end = $data[ 'end' ];
-            }
-            else if ( $end === \null ) {
-                $end = time();
+            if (isset($data['start'])) {
+                $start = $data['start'];
+            } else {
+                if ($start === null) {
+                    $start = Settings::i()->getFromConfGlobal('board_start');
+                }
             }
 
-            if ( isset( $data[ 'offset' ] ) ) {
-                $offset = $data[ 'offset' ];
+            if (isset($data['end'])) {
+                $end = $data['end'];
+            } else {
+                if ($end === null) {
+                    $end = time();
+                }
             }
 
-            if ( isset( $data[ 'limit' ] ) ) {
-                $limit = $data[ 'limit' ];
+            if (isset($data['offset'])) {
+                $offset = $data['offset'];
             }
 
-            if ( isset( $data[ 'type' ] ) ) {
-                $type = $data[ 'type' ];
+            if (isset($data['limit'])) {
+                $limit = $data['limit'];
             }
 
-            if ( isset( $data[ 'password' ] ) ) {
-                $password = $data[ 'password' ];
+            if (isset($data['type'])) {
+                $type = $data['type'];
             }
 
-            if ( isset( $data[ 'group' ] ) ) {
-                $group = $data[ 'group' ];
+            if (isset($data['password'])) {
+                $password = $data['password'];
             }
 
-            if ( isset( $data[ 'club' ] ) ) {
-                $club = $data[ 'club' ];
+            if (isset($data['group'])) {
+                $group = $data['group'];
+            }
+
+            if (isset($data['club'])) {
+                $club = $data['club'];
             }
 
             $max = 1;
 
-            if ( $limit < $max ) {
+            if ($limit < $max) {
                 $max = $limit;
             }
 
-            if ( $offset >= $limit ) {
-                return \null;
+            if ($offset >= $limit) {
+                return null;
             }
 
-            for ( $i = 0; $i < $max; $i++ ) {
-                switch ( $type ) {
+            for ($i = 0; $i < $max; $i++) {
+                switch ($type) {
                     case 'member':
-                        $member = new Dtmember;
+                        $member = new Dtmember();
                         $member->start = $start;
                         $member->end = $end;
-                        $member->build( $password, $group );
+                        $member->build($password, $group);
                         break;
                     case 'forum':
-                        ( new Forum )->build();
+                        (new Forum())->build();
                         break;
                     case 'topic':
-                        $topic = new Topic;
+                        $topic = new Topic();
                         $topic->start = $start;
                         $topic->end = $end;
                         $topic->build();
                         break;
                     case 'post':
-                        ( new Post )->build();
+                        (new Post())->build();
                         break;
                     case 'club':
-                        ( new Club )->build();
+                        (new Club())->build();
                         break;
                 }
                 $offset++;
             }
 
-            $progress = ( $offset / $limit ) * 100;
+            $progress = ($offset / $limit) * 100;
 
-            $language = Member::loggedIn()->language()->addToStack( 'dtcontent_progress', \false, [
+            $language = Member::loggedIn()->language()->addToStack('dtcontent_progress', false, [
                 'sprintf' => [
                     $offset,
                     $limit,
                 ],
-            ] );
+            ]);
 
             return [
                 [
@@ -338,13 +332,13 @@ class _generator extends Controller
                 $language,
                 $progress,
             ];
-        }, function ()
-        {
-
-            $url = Url::internal( 'app=toolbox&module=content&controller=generator' );
-            $lang = Member::loggedIn()->language()->addToStack( 'dtcontent_completed', \false, [ 'sprintf' => [ mb_ucfirst( Request::i()->type ) ] ] );
-            Member::loggedIn()->language()->parseOutputForDisplay( $lang );
-            Output::i()->redirect( $url->csrf(), $lang );
-        } );
+        }, function () {
+            $url = Url::internal('app=toolbox&module=content&controller=generator');
+            $lang = Member::loggedIn()
+                          ->language()
+                          ->addToStack('dtcontent_completed', false, ['sprintf' => [mb_ucfirst(Request::i()->type)]]);
+            Member::loggedIn()->language()->parseOutputForDisplay($lang);
+            Output::i()->redirect($url->csrf(), $lang);
+        });
     }
 }

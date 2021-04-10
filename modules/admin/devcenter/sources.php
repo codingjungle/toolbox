@@ -5,23 +5,11 @@ namespace IPS\toolbox\modules\admin\devcenter;
 use IPS\Application;
 use IPS\Dispatcher;
 use IPS\Dispatcher\Controller;
-use IPS\Http\Url;
-use IPS\Output;
 use IPS\Request;
 use IPS\toolbox\DevCenter\Sources;
-use IPS\toolbox\Proxy\Generator\Cache;
 
 use function defined;
 use function header;
-use function mb_strtoupper;
-
-use function array_shift;
-use function explode;
-use function implode;
-use function ltrim;
-use function preg_grep;
-use function preg_quote;
-use function str_replace;
 
 
 /* To prevent PHP errors (extending class does not exist) revealing path */

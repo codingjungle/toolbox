@@ -12,7 +12,12 @@
 namespace IPS\toolbox\extensions\core\FileStorage;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
-if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
+
+use UnderflowException;
+
+use function defined;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
@@ -40,11 +45,11 @@ class _FileStorage
      * @param int $storageConfiguration New storage configuration ID
      * @param int|NULL $oldConfiguration Old storage configuration ID
      * @return    void|int                            An offset integer to use on the next cycle, or nothing
-     * @throws    \UnderflowException                    When file record doesn't exist. Indicating there are no more files to move
+     * @throws    UnderflowException                    When file record doesn't exist. Indicating there are no more files to move
      */
     public function move($offset, $storageConfiguration, $oldConfiguration = null)
     {
-        throw new \UnderflowException;
+        throw new UnderflowException();
     }
 
     /**

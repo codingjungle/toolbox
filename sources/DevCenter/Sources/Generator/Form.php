@@ -12,6 +12,11 @@
 
 namespace IPS\toolbox\DevCenter\Sources\Generator;
 
+use IPS\Helpers\Form\FormAbstract;
+use IPS\Helpers\Form\Matrix;
+use IPS\Helpers\Form\Text;
+use IPS\Log;
+use IPS\Member;
 use Zend\Code\Generator\DocBlock\Tag\ParamTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
@@ -19,15 +24,12 @@ use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\ParameterGenerator;
 use Zend\Code\Generator\PropertyValueGenerator;
 
-use function header;
-
 
 class _Form extends GeneratorAbstract
 {
 
     public function bodyGenerator()
     {
-
         $this->brief = 'Class';
         $this->instance();
         $this->classMap();
@@ -46,49 +48,48 @@ class _Form extends GeneratorAbstract
         $this->build();
         $this->extra();
 
-        $this->generator->addUse( \IPS\Log::class );
-        $this->generator->addUse( \IPS\Helpers\Form\Text::class );
-        $this->generator->addUse( \IPS\Helpers\Form\Matrix::class );
-        $this->generator->addUse( \IPS\Helpers\Form\FormAbstract::class );
-        $this->generator->addUse( \IPS\Member::class );
-        $this->generator->addUse( \IPS\Helpers\Form::class );
-        $this->generator->addImportFunction( 'defined' );
-        $this->generator->addImportFunction( 'header' );
-        $this->generator->addImportFunction( 'in_array' );
-        $this->generator->addImportFunction( 'is_object' );
-        $this->generator->addImportFunction( 'class_exists' );
-        $this->generator->addImportFunction( 'in_array' );
-        $this->generator->addImportFunction( 'property_exists' );
+        $this->generator->addUse(Log::class);
+        $this->generator->addUse(Text::class);
+        $this->generator->addUse(Matrix::class);
+        $this->generator->addUse(FormAbstract::class);
+        $this->generator->addUse(Member::class);
+        $this->generator->addUse(\IPS\Helpers\Form::class);
+        $this->generator->addImportFunction('defined');
+        $this->generator->addImportFunction('header');
+        $this->generator->addImportFunction('in_array');
+        $this->generator->addImportFunction('is_object');
+        $this->generator->addImportFunction('class_exists');
+        $this->generator->addImportFunction('in_array');
+        $this->generator->addImportFunction('property_exists');
     }
 
     protected function instance()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'var', 'description' => 'Form' ],
+                ['name' => 'var', 'description' => 'Form'],
             ],
         ];
 
         $config = [
             'name'   => 'nodeTitle',
-            'value'  => new PropertyValueGenerator( [], PropertyValueGenerator::TYPE_ARRAY, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \true,
+            'static' => true,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
 
         $doc = [
             '@var Form',
         ];
-        $this->generator->addProperty( 'node' );
+        $this->generator->addProperty('node');
     }
 
     protected function classMap()
     {
-
         $classMap = [
             'address'      => 'Address',
             'addy'         => 'Address',
@@ -145,238 +146,238 @@ class _Form extends GeneratorAbstract
 
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'the class map for form elements' ],
-                [ 'name' => 'var', 'description' => 'array' ],
+                ['name' => 'brief', 'description' => 'the class map for form elements'],
+                ['name' => 'var', 'description' => 'array'],
             ],
         ];
 
         $config = [
             'name'   => 'classMap',
-            'value'  => new PropertyValueGenerator( $classMap, PropertyValueGenerator::TYPE_ARRAY, PropertyValueGenerator::OUTPUT_MULTIPLE_LINE ),
+            'value'  => new PropertyValueGenerator($classMap, PropertyValueGenerator::TYPE_ARRAY,
+                PropertyValueGenerator::OUTPUT_MULTIPLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \true,
+            'static' => true,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function form()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'for use in run once the object is instantiated' ],
-                [ 'name' => 'var', 'description' => 'Form' ],
+                ['name' => 'brief', 'description' => 'for use in run once the object is instantiated'],
+                ['name' => 'var', 'description' => 'Form'],
             ],
         ];
 
         $config = [
             'name'   => 'form',
-            'value'  => new PropertyValueGenerator( '', PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator('', PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function elements()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'form helpers store' ],
-                [ 'name' => 'var', 'description' => 'array' ],
+                ['name' => 'brief', 'description' => 'form helpers store'],
+                ['name' => 'var', 'description' => 'array'],
             ],
         ];
 
         $config = [
             'name'   => 'elements',
-            'value'  => new PropertyValueGenerator( [], PropertyValueGenerator::TYPE_ARRAY, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function object()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'the form record object' ],
-                [ 'name' => 'var', 'description' => 'null' ],
+                ['name' => 'brief', 'description' => 'the form record object'],
+                ['name' => 'var', 'description' => 'null'],
             ],
         ];
 
         $config = [
             'name'   => 'obj',
-            'value'  => new PropertyValueGenerator( \null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function prefix()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'the language prefix' ],
-                [ 'name' => 'var', 'description' => 'null' ],
+                ['name' => 'brief', 'description' => 'the language prefix'],
+                ['name' => 'var', 'description' => 'null'],
             ],
         ];
 
         $config = [
             'name'   => 'langPrefix',
-            'value'  => new PropertyValueGenerator( \null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function suffix()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'add header template' ],
-                [ 'name' => 'var', 'description' => 'bool' ],
+                ['name' => 'brief', 'description' => 'add header template'],
+                ['name' => 'var', 'description' => 'bool'],
             ],
         ];
 
         $config = [
             'name'   => 'suffix',
-            'value'  => new PropertyValueGenerator( \false, PropertyValueGenerator::TYPE_BOOL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(false, PropertyValueGenerator::TYPE_BOOL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function header()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'header store' ],
-                [ 'name' => 'var', 'description' => 'null' ],
+                ['name' => 'brief', 'description' => 'header store'],
+                ['name' => 'var', 'description' => 'null'],
             ],
         ];
 
         $config = [
             'name'   => 'header',
-            'value'  => new PropertyValueGenerator( \null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function tab()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'brief', 'description' => 'tab store' ],
-                [ 'name' => 'var', 'description' => 'null' ],
+                ['name' => 'brief', 'description' => 'tab store'],
+                ['name' => 'var', 'description' => 'null'],
             ],
         ];
 
         $config = [
             'name'   => 'tab',
-            'value'  => new PropertyValueGenerator( \null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function bitOptions()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'var', 'description' => 'array' ],
+                ['name' => 'var', 'description' => 'array'],
             ],
         ];
 
         $config = [
             'name'   => 'bitOptions',
-            'value'  => new PropertyValueGenerator( [], PropertyValueGenerator::TYPE_ARRAY, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function props()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'var', 'description' => 'array' ],
+                ['name' => 'var', 'description' => 'array'],
             ],
         ];
 
         $config = [
             'name'   => 'props',
-            'value'  => new PropertyValueGenerator( [], PropertyValueGenerator::TYPE_ARRAY, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function lang()
     {
-
         $doc = [
             'tags' => [
-                [ 'name' => 'var', 'description' => '\IPS\Lang' ],
+                ['name' => 'var', 'description' => '\IPS\Lang'],
             ],
         ];
 
         $config = [
             'name'   => 'lang',
-            'value'  => new PropertyValueGenerator( \null, PropertyValueGenerator::TYPE_NULL, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
             'vis'    => 'protected',
             'doc'    => $doc,
-            'static' => \false,
+            'static' => false,
         ];
 
-        $this->addProperty( $config );
+        $this->addProperty($config);
     }
 
     protected function constructor()
     {
-
-        $methodDocBlock = new DocBlockGenerator( '_Forms constructor', \null, [
-            new ParamTag( 'elements', 'array', 'array of form elements' ),
-            new ParamTag( 'prefix', 'string|null', 'language prefix for the form elements' ),
-            new ParamTag( 'config', 'array', 'extra settings for the form' ),
+        $methodDocBlock = new DocBlockGenerator('_Forms constructor', null, [
+            new ParamTag('elements', 'array', 'array of form elements'),
+            new ParamTag('prefix', 'string|null', 'language prefix for the form elements'),
+            new ParamTag('config', 'array', 'extra settings for the form'),
             //new ReturnTag(['dataType' => 'array']),
-        ] );
+        ]);
 
         $body = <<<'eof'
 $this->elements = $elements;
@@ -402,30 +403,29 @@ if ( isset( $config[ 'formClass' ] ) ) {
     $this->form->class = $config[ 'formClass' ];
 }
 eof;
-        $this->generator->addUse( \IPS\Member::class );
-        $this->generator->addUse( \IPS\Helpers\Form::class );
-        $this->methods[] = MethodGenerator::fromArray( [
+        $this->generator->addUse(Member::class);
+        $this->generator->addUse(\IPS\Helpers\Form::class);
+        $this->methods[] = MethodGenerator::fromArray([
             'name'       => '__construct',
             'parameters' => [
-                new ParameterGenerator( 'elements', 'array' ),
-                new ParameterGenerator( 'prefix', 'string' ),
-                new ParameterGenerator( 'config', 'array' ),
+                new ParameterGenerator('elements', 'array'),
+                new ParameterGenerator('prefix', 'string'),
+                new ParameterGenerator('config', 'array'),
             ],
             'body'       => $body,
             'docblock'   => $methodDocBlock,
-            'static'     => \false,
-        ] );
+            'static'     => false,
+        ]);
     }
 
     protected function buildForm()
     {
-
-        $methodDocBlock = new DocBlockGenerator( '', \null, [
-            new ParamTag( 'elements', 'array', 'array of form elements' ),
-            new ParamTag( 'prefix', 'string|null', 'language prefix for the form elements' ),
-            new ParamTag( 'config', 'array', 'extra settings for the form' ),
-            new ReturnTag( [ 'dataType' => 'Form' ] ),
-        ] );
+        $methodDocBlock = new DocBlockGenerator('', null, [
+            new ParamTag('elements', 'array', 'array of form elements'),
+            new ParamTag('prefix', 'string|null', 'language prefix for the form elements'),
+            new ParamTag('config', 'array', 'extra settings for the form'),
+            new ReturnTag(['dataType' => 'Form']),
+        ]);
 
         $body = <<<'eof'
 /**
@@ -435,27 +435,26 @@ $class = new static($elements, $prefix, $config);
 return $class->build();
 eof;
 
-        $this->generator->addUse( \IPS\Member::class );
-        $this->generator->addUse( \IPS\Helpers\Form::class );
-        $this->methods[] = MethodGenerator::fromArray( [
+        $this->generator->addUse(Member::class);
+        $this->generator->addUse(\IPS\Helpers\Form::class);
+        $this->methods[] = MethodGenerator::fromArray([
             'name'       => 'buildForm',
             'parameters' => [
-                new ParameterGenerator( 'elements', 'array' ),
-                new ParameterGenerator( 'prefix', 'string', \null ),
-                new ParameterGenerator( 'config', 'array', [] ),
+                new ParameterGenerator('elements', 'array'),
+                new ParameterGenerator('prefix', 'string', null),
+                new ParameterGenerator('config', 'array', []),
             ],
             'body'       => $body,
             'docblock'   => $methodDocBlock,
-            'static'     => \true,
-        ] );
+            'static'     => true,
+        ]);
     }
 
     protected function build()
     {
-
-        $methodDocBlock = new DocBlockGenerator( '', \null, [
-            new ReturnTag( [ 'dataType' => 'Form' ] ),
-        ] );
+        $methodDocBlock = new DocBlockGenerator('', null, [
+            new ReturnTag(['dataType' => 'Form']),
+        ]);
 
         $body = <<<'eof'
 $typesWName = [
@@ -748,20 +747,19 @@ foreach ( $this->elements as $key => $el ) {
 return $this->form;
 eof;
 
-        $this->methods[] = MethodGenerator::fromArray( [
+        $this->methods[] = MethodGenerator::fromArray([
             'name'     => 'build',
             'body'     => $body,
             'docblock' => $methodDocBlock,
-            'static'   => \false,
-        ] );
+            'static'   => false,
+        ]);
     }
 
     protected function extra()
     {
-
-        $methodDocBlock = new DocBlockGenerator( '', \null, [
-            new ParamTag( 'el', 'array' ),
-        ] );
+        $methodDocBlock = new DocBlockGenerator('', null, [
+            new ParamTag('el', 'array'),
+        ]);
 
         $body = <<<'eof'
 $suffix = $this->suffix ? '_tab' : '';
@@ -792,14 +790,14 @@ if (isset($el[ 'sidebar' ])) {
 }
 eof;
 
-        $this->methods[] = MethodGenerator::fromArray( [
+        $this->methods[] = MethodGenerator::fromArray([
             'name'       => 'extra',
             'parameters' => [
-                new ParameterGenerator( 'el', 'array' ),
+                new ParameterGenerator('el', 'array'),
             ],
             'body'       => $body,
             'docblock'   => $methodDocBlock,
-            'static'     => \false,
-        ] );
+            'static'     => false,
+        ]);
     }
 }

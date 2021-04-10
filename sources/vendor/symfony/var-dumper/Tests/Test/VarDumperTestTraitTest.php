@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Test;
 
+use ArrayObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
@@ -41,6 +42,6 @@ EODUMP;
 
     public function testAllowsNonScalarExpectation()
     {
-        $this->assertDumpEquals(new \ArrayObject(['bim' => 'bam']), new \ArrayObject(['bim' => 'bam']));
+        $this->assertDumpEquals(new ArrayObject(['bim' => 'bam']), new ArrayObject(['bim' => 'bam']));
     }
 }

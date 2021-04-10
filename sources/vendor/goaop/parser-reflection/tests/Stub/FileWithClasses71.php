@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Parser Reflection API
  *
@@ -17,31 +18,42 @@ use Go\ParserReflection\{ReflectionMethod, ReflectionProperty as P};
 
 class ClassWithNullableScalarTypeHints
 {
-    public function acceptsInteger(?int $value) {}
-    public function acceptsString(?string $value) {}
-    public function acceptsFloat(?float $value) {}
-    public function acceptsBool(?bool $value) {}
-    public function acceptsVariadicInteger(?int ...$values) {}
-    public function acceptsDefaultString(?string $class = ReflectionMethod::class, ?string $name = P::class) {}
+    public function acceptsInteger(?int $value) { }
+
+    public function acceptsString(?string $value) { }
+
+    public function acceptsFloat(?float $value) { }
+
+    public function acceptsBool(?bool $value) { }
+
+    public function acceptsVariadicInteger(?int ...$values) { }
+
+    public function acceptsDefaultString(?string $class = ReflectionMethod::class, ?string $name = P::class) { }
 }
 
 class ClassWithNullableReturnTypeHints
 {
-    public function returnsInteger() : ?int {}
-    public function returnsString() : ?string {}
-    public function returnsFloat() : ?float {}
-    public function returnsBool() : ?bool {}
-    public function returnsObject() : ?ReflectionMethod {}
-    public function returnsNamedObject() : ?P {}
+    public function returnsInteger(): ?int { }
+
+    public function returnsString(): ?string { }
+
+    public function returnsFloat(): ?float { }
+
+    public function returnsBool(): ?bool { }
+
+    public function returnsObject(): ?ReflectionMethod { }
+
+    public function returnsNamedObject(): ?P { }
 }
 
 class ClassWithPhp71Features
 {
-    const PUBLIC_CONST_A = 1;
+    public const PUBLIC_CONST_A = 1;
     public const PUBLIC_CONST_B = 2;
     protected const PROTECTED_CONST = 3;
     private const PRIVATE_CONST = 4;
 
-    public function returnsVoid() : void {}
-    public function acceptsIterable(iterable $iterable) : iterable {}
+    public function returnsVoid(): void { }
+
+    public function acceptsIterable(iterable $iterable): iterable { }
 }

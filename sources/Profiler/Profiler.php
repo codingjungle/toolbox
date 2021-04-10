@@ -37,6 +37,7 @@ use OutOfRangeException;
 use ReflectionClass;
 use RuntimeException;
 use UnexpectedValueException;
+
 use function base64_encode;
 use function count;
 use function defined;
@@ -52,6 +53,7 @@ use function json_encode;
 use function mb_substr;
 use function microtime;
 use function round;
+
 use const IPS\CACHE_PAGE_TIMEOUT;
 use const IPS\CACHING_LOG;
 use const IPS\NO_WRITES;
@@ -60,8 +62,8 @@ use const PHP_VERSION;
 
 Application::loadAutoLoader();
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -83,25 +85,24 @@ class _Profiler extends Singleton
      */
     public function run()
     {
-
-        if ( CACHE_PAGE_TIMEOUT !== 0 && !Member::loggedIn()->member_id ) {
+        if (CACHE_PAGE_TIMEOUT !== 0 && !Member::loggedIn()->member_id) {
             return '';
         }
-        if ( !Request::i()->isAjax() ) {
+        if (!Request::i()->isAjax()) {
             $framework = null;
 
-            if ( Settings::i()->dtprofiler_enabled_execution ) {
-                $framework = round( microtime( true ) - $_SERVER[ 'REQUEST_TIME_FLOAT' ], 4 ) * 1000;
+            if (Settings::i()->dtprofiler_enabled_execution) {
+                $framework = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;
             }
             //
             $logs = Logs::i()->build();
             $database = Database::i()->build();
             $templates = Templates::i()->build();
-            $extra = implode( ' ', $this->extra() );
+            $extra = implode(' ', $this->extra());
             $info = $this->info();
             $environment = $this->environment();
             $debug = null;
-            if ( Settings::i()->dtprofiler_enable_debug ) {
+            if (Settings::i()->dtprofiler_enable_debug) {
                 $debug = Debug::build();
             }
             $files = null;
@@ -110,20 +111,20 @@ class _Profiler extends Singleton
             $time = null;
             $executions = Time::build();
 
-            if ( Settings::i()->dtprofiler_enabled_files ) {
+            if (Settings::i()->dtprofiler_enabled_files) {
                 $files = Files::i()->build();
             }
 
-            if ( CACHING_LOG ) {
+            if (CACHING_LOG) {
                 $cache = Caching::i()->build();
             }
 
-            if ( Settings::i()->dtprofiler_enabled_memory ) {
+            if (Settings::i()->dtprofiler_enabled_memory) {
                 $memory = Memory::build();
             }
 
-            if ( Settings::i()->dtprofiler_enabled_execution ) {
-                $total = round( microtime( true ) - $_SERVER[ 'REQUEST_TIME_FLOAT' ], 4 ) * 1000;
+            if (Settings::i()->dtprofiler_enabled_execution) {
+                $total = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;
                 $profileTime = $total - $framework;
                 $time = [
                     'total'     => $total,
@@ -132,8 +133,10 @@ class _Profiler extends Singleton
                 ];
             }
 
-            return Theme::i()->getTemplate( 'bar', 'toolbox', 'front' )->bar( $time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions );
-
+            return Theme::i()
+                        ->getTemplate('bar', 'toolbox', 'front')
+                        ->bar($time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment,
+                            $debug, $executions);
         }
 
         return null;
@@ -146,7 +149,6 @@ class _Profiler extends Singleton
      */
     protected function extra(): array
     {
-
         return [];
     }
 
@@ -158,28 +160,27 @@ class _Profiler extends Singleton
      */
     protected function info(): array
     {
-
-        $data = base64_encode( (string)Request::i()->url() );
-        $url = Url::internal( 'app=toolbox&module=bt&controller=bt', 'front' )->setQueryString( [
+        $data = base64_encode((string)Request::i()->url());
+        $url = Url::internal('app=toolbox&module=bt&controller=bt', 'front')->setQueryString([
             'do'   => 'clearCaches',
             'data' => $data,
-        ] );
+        ]);
         $info = [];
-        $info[ 'server' ] = [
-            '<a>IPS ' . Application::load( 'core' )->version . '</a>',
-            '<a href="' . (string)$url->setQueryString( [ 'do' => 'phpinfo' ] ) . '" data-ipsDialog data-ipsDialog-title="phpinfo()">PHP: ' . PHP_VERSION . '</a>',
+        $info['server'] = [
+            '<a>IPS ' . Application::load('core')->version . '</a>',
+            '<a href="' . (string)$url->setQueryString(['do' => 'phpinfo']) . '" data-ipsDialog data-ipsDialog-title="phpinfo()">PHP: ' . PHP_VERSION . '</a>',
             '<a>MySQL: ' . Db::i()->server_info . '</a>',
 
         ];
-        $info['adminer'] = '<a href="'.(string)Url::internal('app=toolbox&module=bt&controller=bt&do=adminer').'" data-ipsdialog data-ipsdialog-title="Adminer">Adminer</a>';
+        $info['adminer'] = '<a href="' . (string)Url::internal('app=toolbox&module=bt&controller=bt&do=adminer') . '" data-ipsdialog data-ipsdialog-title="Adminer">Adminer</a>';
         $slowestLink = Database::$slowestLink;
         $slowestTime = Database::$slowest;
-        $info[ 'other' ] = [
+        $info['other'] = [
             'Controller'    => $this->getLocation(),
             'Slowest Query' => "<a href='{$slowestLink}' data-ipsdialog>{$slowestTime}ms</a>",
         ];
 
-        $info[ 'cache' ] = (string)$url;
+        $info['cache'] = (string)$url;
         //        $info[ 'apps' ][ 'enable' ] = Url::internal('app=toolbox&module=bt&controller=bt', 'front')->setQueryString(['do' => 'thirdParty', 'data' => $data, 'enable' => 1]);
 //        $info[ 'apps' ][ 'disable' ] = Url::internal( 'app=toolbox&module=bt&controller=bt', 'front' )->setQueryString( [
 //            'do'     => 'thirdParty',
@@ -228,22 +229,23 @@ class _Profiler extends Singleton
 //        }
 
         $app = Request::i()->app;
-        $info[ 'git_url' ] = Url::internal( 'app=toolbox&module=bt&controller=bt', 'front' )->setQueryString( [
+        $info['git_url'] = Url::internal('app=toolbox&module=bt&controller=bt', 'front')->setQueryString([
             'do' => 'gitInfo',
             'id' => $app,
-        ] );
+        ]);
 
         $sources = [];
-        foreach( $this->apps(false) as $app ){
+        foreach ($this->apps(false) as $app) {
             $title = $app->_title;
-            \IPS\Member::loggedIn()->language()->parseOutputForDisplay( $title );
+            Member::loggedIn()->language()->parseOutputForDisplay($title);
 
             $sources[] = [
-                'url' => Url::internal('app=toolbox&module=generator&controller=sources')->setQueryString(['appKey'=>$app->directory]),
+                'url'  => Url::internal('app=toolbox&module=generator&controller=sources')
+                             ->setQueryString(['appKey' => $app->directory]),
                 'name' => $title
             ];
         }
-       // $info['sources'] = $sources;
+        // $info['sources'] = $sources;
         return $info;
     }
 
@@ -253,49 +255,47 @@ class _Profiler extends Singleton
      */
     protected function getLocation()
     {
-
         $location = [];
-        if ( isset( Request::i()->app ) ) {
+        if (isset(Request::i()->app)) {
             $location[] = Request::i()->app;
         }
 
-        if ( isset( Request::i()->module ) ) {
+        if (isset(Request::i()->module)) {
             $location[] = 'modules';
-            if ( Dispatcher::hasInstance() ) {
-                if ( Dispatcher::i() instanceof Dispatcher\Front ) {
+            if (Dispatcher::hasInstance()) {
+                if (Dispatcher::i() instanceof Dispatcher\Front) {
                     $location[] = 'front';
-                }
-                else {
+                } else {
                     $location[] = 'admin';
                 }
             }
             $location[] = Request::i()->module;
         }
 
-        if ( isset( Request::i()->controller ) ) {
+        if (isset(Request::i()->controller)) {
             $location[] = '_' . Request::i()->controller;
         }
 
         $do = Request::i()->do ?? 'manage';
 
-        $class = 'IPS\\' . implode( '\\', $location );
+        $class = 'IPS\\' . implode('\\', $location);
         $location = $class . '::' . $do;
         $link = null;
         $url = null;
         $line = null;
         try {
-            $reflection = new ReflectionClass( $class );
-            $method = $reflection->getMethod( $do );
+            $reflection = new ReflectionClass($class);
+            $method = $reflection->getMethod($do);
             $line = $method->getStartLine();
             $declaredClass = $method->getDeclaringClass();
             $url = $declaredClass->getFileName();
-            $link = ( new Editor )->replace( $url );
+            $link = (new Editor())->replace($url);
             $location .= ':' . $line;
-        } catch ( Exception $e ) {
+        } catch (Exception $e) {
         }
 
-        if ( $link ) {
-            $url = ( new Editor )->replace( $url, $line );
+        if ($link) {
+            $url = (new Editor())->replace($url, $line);
 
             return '<a href="' . $url . '">' . $location . '</a>';
         }
@@ -308,25 +308,23 @@ class _Profiler extends Singleton
      *
      * @return array
      */
-    public function apps( $skip = true ): array
+    public function apps($skip = true): array
     {
-
-        if ( NO_WRITES ) {
+        if (NO_WRITES) {
             return [];
         }
 
         $dtApps = [];
-        if ( $skip === true ) {
+        if ($skip === true) {
             $dtApps = [
                 'toolbox',
             ];
         }
         $apps = [];
 
-        foreach ( Application::applications() as $app ) {
-
-            if ( !in_array( $app->directory, IPS::$ipsApps, true ) ) {
-                if ( in_array( $app->directory, $dtApps, true ) ) {
+        foreach (Application::applications() as $app) {
+            if (!in_array($app->directory, IPS::$ipsApps, true)) {
+                if (in_array($app->directory, $dtApps, true)) {
                     continue;
                 }
 
@@ -338,84 +336,78 @@ class _Profiler extends Singleton
     }
 
     /**
-     * @return array
-     */
-    public function plugins(): array
-    {
-
-        if ( NO_WRITES ) {
-            return [];
-        }
-
-        $plugins = [];
-
-        foreach ( Plugin::plugins() as $plugin ) {
-            if ( $plugin->enabled ) {
-                $plugins[] = $plugin;
-            }
-        }
-
-        return $plugins;
-    }
-
-    /**
      * @return string|null
      * @throws UnexpectedValueException
      */
     protected function environment(): ?string
     {
-
-        if ( !Settings::i()->dtprofiler_enabled_enivro ) {
+        if (!Settings::i()->dtprofiler_enabled_enivro) {
             return null;
         }
 
         $data = [];
 
-        if ( !empty( $_GET ) ) {
-            foreach ( $_GET as $key => $val ) {
-                if ( is_object( $val ) ) {
+        if (!empty($_GET)) {
+            foreach ($_GET as $key => $val) {
+                if (is_object($val)) {
                     continue;
                 }
-                if ( !is_array( $val ) ) {
-                    $val = json_decode( $val, true ) ?? $val;
+                if (!is_array($val)) {
+                    $val = json_decode($val, true) ?? $val;
                 }
 
-                $data[ $key ] = [ 'name' => Theme::i()->getTemplate( 'dtpsearch', 'toolbox', 'front' )->keyvalue( '$_GET : ' . $key, $val ) ];
+                $data[$key] = [
+                    'name' => Theme::i()
+                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
+                                   ->keyvalue('$_GET : ' . $key, $val)
+                ];
             }
         }
 
-        if ( !empty( $_POST ) ) {
-            foreach ( $_POST as $key => $val ) {
-                if ( is_object( $val ) ) {
+        if (!empty($_POST)) {
+            foreach ($_POST as $key => $val) {
+                if (is_object($val)) {
                     continue;
                 }
-                if ( !is_array( $val ) ) {
-                    $val = json_decode( $val, true ) ?? $val;
+                if (!is_array($val)) {
+                    $val = json_decode($val, true) ?? $val;
                 }
 
-                $data[ $key ] = [ 'name' => Theme::i()->getTemplate( 'dtpsearch', 'toolbox', 'front' )->keyvalue( '$_POST : ' . $key, $val ) ];
+                $data[$key] = [
+                    'name' => Theme::i()
+                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
+                                   ->keyvalue('$_POST : ' . $key, $val)
+                ];
             }
         }
 
-        if ( !empty( Request::i()->returnData() ) ) {
+        if (!empty(Request::i()->returnData())) {
             $request = Request::i()->returnData();
-            foreach ( $request as $key => $val ) {
-                if ( is_object( $val ) ) {
+            foreach ($request as $key => $val) {
+                if (is_object($val)) {
                     continue;
                 }
-                if ( !is_array( $val ) ) {
-                    $val = json_decode( $val, true ) ?? $val;
+                if (!is_array($val)) {
+                    $val = json_decode($val, true) ?? $val;
                 }
-                $data[ $key ] = [ 'name' => Theme::i()->getTemplate( 'dtpsearch', 'toolbox', 'front' )->keyvalue( '$_REQUEST : ' . $key, $val ) ];
+                $data[$key] = [
+                    'name' => Theme::i()
+                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
+                                   ->keyvalue('$_REQUEST : ' . $key, $val)
+                ];
             }
         }
 
-        if ( !empty( $_COOKIE ) ) {
-            foreach ( $_COOKIE as $key => $val ) {
-                if ( !is_array( $val ) ) {
-                    $val = json_decode( $val, true ) ?? $val;
+        if (!empty($_COOKIE)) {
+            foreach ($_COOKIE as $key => $val) {
+                if (!is_array($val)) {
+                    $val = json_decode($val, true) ?? $val;
                 }
-                $data[ $key ] = [ 'name' => Theme::i()->getTemplate( 'dtpsearch', 'toolbox', 'front' )->keyvalue( '$_COOKIE : ' . $key, $val ) ];
+                $data[$key] = [
+                    'name' => Theme::i()
+                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
+                                   ->keyvalue('$_COOKIE : ' . $key, $val)
+                ];
             }
         }
 
@@ -431,25 +423,51 @@ class _Profiler extends Singleton
         //            }
         //        }
 
-        if ( !empty( $_SERVER ) ) {
-            foreach ( $_SERVER as $key => $val ) {
-                if ( is_object( $val ) ) {
+        if (!empty($_SERVER)) {
+            foreach ($_SERVER as $key => $val) {
+                if (is_object($val)) {
                     continue;
                 }
-                if ( !is_array( $val ) ) {
-                    $val = json_decode( $val, true ) ?? $val;
+                if (!is_array($val)) {
+                    $val = json_decode($val, true) ?? $val;
                 }
-                $data[ $key ] = [ 'name' => Theme::i()->getTemplate( 'dtpsearch', 'toolbox', 'front' )->keyvalue( '$_SERVER : ' . $key, $val ) ];
+                $data[$key] = [
+                    'name' => Theme::i()
+                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
+                                   ->keyvalue('$_SERVER : ' . $key, $val)
+                ];
             }
         }
 
         $return = null;
-        if ( is_array( $data ) && count( $data ) ) {
-            $return = Theme::i()->getTemplate( 'dtpsearch', 'toolbox', 'front' )->button( 'Environment', 'environment', 'Environment Variables.', $data, json_encode( $data ), count( $data ), 'random', true, false );
-
+        if (is_array($data) && count($data)) {
+            $return = Theme::i()
+                           ->getTemplate('dtpsearch', 'toolbox', 'front')
+                           ->button('Environment', 'environment', 'Environment Variables.', $data, json_encode($data),
+                               count($data), 'random', true, false);
         }
 
         return $return;
+    }
+
+    /**
+     * @return array
+     */
+    public function plugins(): array
+    {
+        if (NO_WRITES) {
+            return [];
+        }
+
+        $plugins = [];
+
+        foreach (Plugin::plugins() as $plugin) {
+            if ($plugin->enabled) {
+                $plugins[] = $plugin;
+            }
+        }
+
+        return $plugins;
     }
 
     /**
@@ -458,18 +476,17 @@ class _Profiler extends Singleton
      * @throws InvalidArgumentException
      * @throws OutOfRangeException
      */
-    public function getLastCommitId( &$info ): void
+    public function getLastCommitId(&$info): void
     {
-
-        if ( Settings::i()->dtprofiler_git_data ) {
+        if (Settings::i()->dtprofiler_git_data) {
             $app = Request::i()->id;
             $path = ROOT_PATH . '/applications/' . $app . '/.git/';
             //            print_r($path);exit;
-            if ( is_dir( $path ) && function_exists( 'exec' ) ) {
-                $app = Application::load( $app );
+            if (is_dir($path) && function_exists('exec')) {
+                $app = Application::load($app);
                 $name = $app->_title;
-                Member::loggedIn()->language()->parseOutputForDisplay( $name );
-                $git = new Git( $path );
+                Member::loggedIn()->language()->parseOutputForDisplay($name);
+                $git = new Git($path);
                 $id = null;
                 $branch = null;
                 $msg = [];
@@ -479,9 +496,8 @@ class _Profiler extends Singleton
                 $branch = $git->getCurrentBranchName();
                 $aBranches = $git->getBranches();
                 $branches = [];
-                if ( !empty( $aBranches ) ) {
-                    foreach ( $aBranches as $val ) {
-
+                if (!empty($aBranches)) {
+                    foreach ($aBranches as $val) {
                         $branches[] = [
                             'name' => $val,
                         ];
@@ -491,9 +507,9 @@ class _Profiler extends Singleton
                 $info = [
                     'version'  => $app->version,
                     'app'      => $name,
-                    'id'       => mb_substr( $id, 0, 6 ),
+                    'id'       => mb_substr($id, 0, 6),
                     'fid'      => $id,
-                    'msg'      => implode( '<br>', $msg ),
+                    'msg'      => implode('<br>', $msg),
                     'branch'   => $branch,
                     'branches' => $branches,
                 ];
@@ -506,19 +522,18 @@ class _Profiler extends Singleton
      *
      * @throws InvalidArgumentException
      */
-    public function hasChanges( &$info ): void
+    public function hasChanges(&$info): void
     {
-
-        if ( function_exists( 'exec' ) ) {
+        if (function_exists('exec')) {
             /* @var Application $app */
-            foreach ( Application::enabledApplications() as $app ) {
+            foreach (Application::enabledApplications() as $app) {
                 $path = ROOT_PATH . '/applications/' . $app->directory . '/.git/';
-                if ( is_dir( $path ) ) {
+                if (is_dir($path)) {
                     $name = $app->_title;
-                    Member::loggedIn()->language()->parseOutputForDisplay( $name );
-                    $git = new Git( $path );
-                    if ( $git->hasChanges() ) {
-                        $info[ 'changes' ][] = [
+                    Member::loggedIn()->language()->parseOutputForDisplay($name);
+                    $git = new Git($path);
+                    if ($git->hasChanges()) {
+                        $info['changes'][] = [
                             'name'      => $name,
                             'directory' => $app->directory,
                         ];

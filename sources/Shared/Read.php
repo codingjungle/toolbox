@@ -38,21 +38,21 @@ trait Read
      *
      * @return bool|string
      */
-    protected function _getFile( $file )
+    protected function _getFile($file)
     {
-        if ( is_file( $this->blanks . $file . $this->ext ) ) {
-            return file_get_contents( $this->blanks . '/' . $file . $this->ext );
+        if (is_file($this->blanks . $file . $this->ext)) {
+            return file_get_contents($this->blanks . '/' . $file . $this->ext);
         }
 
-        return \null;
+        return null;
     }
 
-    protected function _getFileByFullPath( $path )
+    protected function _getFileByFullPath($path)
     {
-        if ( is_file( $path ) ) {
-            return file_get_contents( $path );
+        if (is_file($path)) {
+            return file_get_contents($path);
         }
 
-        return \null;
+        return null;
     }
 }

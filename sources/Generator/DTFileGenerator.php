@@ -13,50 +13,55 @@
 namespace IPS\toolbox\Generator;
 
 use Exception;
-use IPS\Application;
+use IPS\toolbox\Application;
 use IPS\toolbox\Proxy\Proxyclass;
 use Symfony\Component\Filesystem\Filesystem;
+use Zend\Code\Generator\Exception\RuntimeException;
 use Zend\Code\Generator\FileGenerator;
+
 use function defined;
 use function header;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+use function pathinfo;
+
+use const IPS\IPS_FOLDER_PERMISSION;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
-\IPS\toolbox\Application::loadAutoLoader();
+Application::loadAutoLoader();
 
 class _DTFileGenerator extends FileGenerator
 {
 
-    public $isProxy = \false;
+    public $isProxy = false;
 
     /**
      * @return FileGenerator
-     * @throws \Zend\Code\Generator\Exception\RuntimeException
+     * @throws RuntimeException
      */
     public function write($isPhp = true): FileGenerator
     {
-
-        if ( $this->filename !== '' ) {
-            $path = \pathinfo( $this->filename );
+        if ($this->filename !== '') {
+            $path = pathinfo($this->filename);
             try {
-                $dir = $path[ 'dirname' ];
+                $dir = $path['dirname'];
                 $fs = new Filesystem();
 
-                if ( !$fs->exists( $dir ) ) {
-                    $fs->mkdir( $dir, \IPS\IPS_FOLDER_PERMISSION );
-                    $fs->chmod( $dir, \IPS\IPS_FOLDER_PERMISSION );
+                if (!$fs->exists($dir)) {
+                    $fs->mkdir($dir, IPS_FOLDER_PERMISSION);
+                    $fs->chmod($dir, IPS_FOLDER_PERMISSION);
                 }
-            } catch ( Exception $e ) {
+            } catch (Exception $e) {
             }
         }
 
         $parent = parent::write();
 
-        if ( $this->isProxy === \false ) {
-            Proxyclass::i()->buildAndMake( $this->filename );
+        if ($this->isProxy === false) {
+            Proxyclass::i()->buildAndMake($this->filename);
         }
 
         return $parent;

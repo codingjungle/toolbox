@@ -1,10 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Node;
 
-class NameTest extends \PHPUnit\Framework\TestCase
+use InvalidArgumentException;
+use OutOfBoundsException;
+use PHPUnit\Framework\TestCase;
+use stdClass;
+
+class NameTest extends TestCase
 {
-    public function testConstruct() {
+    public function testConstruct()
+    {
         $name = new Name(['foo', 'bar']);
         $this->assertSame(['foo', 'bar'], $name->parts);
 
@@ -15,7 +22,8 @@ class NameTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['foo', 'bar'], $name->parts);
     }
 
-    public function testGet() {
+    public function testGet()
+    {
         $name = new Name('foo');
         $this->assertSame('foo', $name->getFirst());
         $this->assertSame('foo', $name->getLast());
@@ -25,15 +33,17 @@ class NameTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('bar', $name->getLast());
     }
 
-    public function testToString() {
+    public function testToString()
+    {
         $name = new Name('Foo\Bar');
 
-        $this->assertSame('Foo\Bar', (string) $name);
+        $this->assertSame('Foo\Bar', (string)$name);
         $this->assertSame('Foo\Bar', $name->toString());
         $this->assertSame('foo\bar', $name->toLowerString());
     }
 
-    public function testSlice() {
+    public function testSlice()
+    {
         $name = new Name('foo\bar\baz');
         $this->assertEquals(new Name('foo\bar\baz'), $name->slice(0));
         $this->assertEquals(new Name('bar\baz'), $name->slice(1));
@@ -49,31 +59,36 @@ class NameTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($name->slice(-2, -2));
     }
 
-    public function testSliceOffsetTooLarge() {
-        $this->expectException(\OutOfBoundsException::class);
+    public function testSliceOffsetTooLarge()
+    {
+        $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessage('Offset 4 is out of bounds');
         (new Name('foo\bar\baz'))->slice(4);
     }
 
-    public function testSliceOffsetTooSmall() {
-        $this->expectException(\OutOfBoundsException::class);
+    public function testSliceOffsetTooSmall()
+    {
+        $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessage('Offset -4 is out of bounds');
         (new Name('foo\bar\baz'))->slice(-4);
     }
 
-    public function testSliceLengthTooLarge() {
-        $this->expectException(\OutOfBoundsException::class);
+    public function testSliceLengthTooLarge()
+    {
+        $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessage('Length 4 is out of bounds');
         (new Name('foo\bar\baz'))->slice(0, 4);
     }
 
-    public function testSliceLengthTooSmall() {
-        $this->expectException(\OutOfBoundsException::class);
+    public function testSliceLengthTooSmall()
+    {
+        $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessage('Length -4 is out of bounds');
         (new Name('foo\bar\baz'))->slice(0, -4);
     }
 
-    public function testConcat() {
+    public function testConcat()
+    {
         $this->assertEquals(new Name('foo\bar\baz'), Name::concat('foo', 'bar\baz'));
         $this->assertEquals(
             new Name\FullyQualified('foo\bar'),
@@ -91,7 +106,8 @@ class NameTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(Name::concat(null, null));
     }
 
-    public function testNameTypes() {
+    public function testNameTypes()
+    {
         $name = new Name('foo');
         $this->assertTrue($name->isUnqualified());
         $this->assertFalse($name->isQualified());
@@ -121,31 +137,36 @@ class NameTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('namespace\foo', $name->toCodeString());
     }
 
-    public function testInvalidArg() {
-        $this->expectException(\InvalidArgumentException::class);
+    public function testInvalidArg()
+    {
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected string, array of parts or Name instance');
-        Name::concat('foo', new \stdClass);
+        Name::concat('foo', new stdClass());
     }
 
-    public function testInvalidEmptyString() {
-        $this->expectException(\InvalidArgumentException::class);
+    public function testInvalidEmptyString()
+    {
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Name cannot be empty');
         new Name('');
     }
 
-    public function testInvalidEmptyArray() {
-        $this->expectException(\InvalidArgumentException::class);
+    public function testInvalidEmptyArray()
+    {
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Name cannot be empty');
         new Name([]);
     }
 
     /** @dataProvider provideTestIsSpecialClassName */
-    public function testIsSpecialClassName($name, $expected) {
+    public function testIsSpecialClassName($name, $expected)
+    {
         $name = new Name($name);
         $this->assertSame($expected, $name->isSpecialClassName());
     }
 
-    public function provideTestIsSpecialClassName() {
+    public function provideTestIsSpecialClassName()
+    {
         return [
             ['self', true],
             ['PARENT', true],

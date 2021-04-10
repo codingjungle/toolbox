@@ -13,6 +13,10 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
+use UnexpectedValueException;
+
+use const DIRECTORY_SEPARATOR;
+
 class RecursiveDirectoryIteratorTest extends IteratorTestCase
 {
     /**
@@ -22,7 +26,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
     {
         try {
             $i = new RecursiveDirectoryIterator('ftp://speedtest.tele2.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             $this->markTestSkipped('Unsupported stream "ftp".');
         }
 
@@ -38,13 +42,13 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
     {
         try {
             $i = new RecursiveDirectoryIterator('ftp://speedtest.tele2.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             $this->markTestSkipped('Unsupported stream "ftp".');
         }
 
         $contains = [
-            'ftp://speedtest.tele2.net'.\DIRECTORY_SEPARATOR.'1000GB.zip',
-            'ftp://speedtest.tele2.net'.\DIRECTORY_SEPARATOR.'100GB.zip',
+            'ftp://speedtest.tele2.net' . DIRECTORY_SEPARATOR . '1000GB.zip',
+            'ftp://speedtest.tele2.net' . DIRECTORY_SEPARATOR . '100GB.zip',
         ];
         $actual = [];
 

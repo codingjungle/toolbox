@@ -13,6 +13,7 @@
 namespace IPS\toolbox;
 
 use Exception;
+use InvalidArgumentException;
 use IPS\Application;
 use IPS\Application\BuilderIterator;
 use IPS\Data\Store;
@@ -32,6 +33,8 @@ use function is_dir;
 use function mkdir;
 use function sprintf;
 
+use const IPS\IPS_FOLDER_PERMISSION;
+
 
 \IPS\toolbox\Application::loadAutoLoader();
 
@@ -48,7 +51,7 @@ class _Build extends Singleton
     public function export()
     {
         if (!Application::appIsEnabled('toolbox') || !\IPS\IN_DEV) {
-            throw new \InvalidArgumentException('toolbox not installed');
+            throw new InvalidArgumentException('toolbox not installed');
         }
 
         $app = Request::i()->appKey;
@@ -118,10 +121,10 @@ class _Build extends Singleton
                     $application->build();
                     $application->save();
                     if (!is_dir($path)) {
-                        if (!mkdir($path, \IPS\IPS_FOLDER_PERMISSION, true) && !is_dir($path)) {
+                        if (!mkdir($path, IPS_FOLDER_PERMISSION, true) && !is_dir($path)) {
                             throw new RuntimeException(sprintf('Directory "%s" was not created', $path));
                         }
-                        chmod($path, \IPS\IPS_FOLDER_PERMISSION);
+                        chmod($path, IPS_FOLDER_PERMISSION);
                     }
                     $pharPath = $path . $application->directory . ' - ' . $application->version . '.tar';
                     $download = new PharData($pharPath, 0, $application->directory . '.tar', Phar::TAR);

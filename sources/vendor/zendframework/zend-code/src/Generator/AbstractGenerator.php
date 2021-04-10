@@ -23,7 +23,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     /**
      * Line feed to use in place of EOL
      */
-    const LINE_FEED = "\n";
+    public const LINE_FEED = "\n";
 
     /**
      * @var bool
@@ -41,7 +41,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     protected $sourceContent;
 
     /**
-     * @param  array $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -51,67 +51,13 @@ abstract class AbstractGenerator implements GeneratorInterface
     }
 
     /**
-     * @param  bool $isSourceDirty
+     * @param array|Traversable $options
      * @return AbstractGenerator
-     */
-    public function setSourceDirty($isSourceDirty = true)
-    {
-        $this->isSourceDirty = (bool) $isSourceDirty;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSourceDirty()
-    {
-        return $this->isSourceDirty;
-    }
-
-    /**
-     * @param  string $indentation
-     * @return AbstractGenerator
-     */
-    public function setIndentation($indentation)
-    {
-        $this->indentation = (string) $indentation;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIndentation()
-    {
-        return $this->indentation;
-    }
-
-    /**
-     * @param  string $sourceContent
-     * @return AbstractGenerator
-     */
-    public function setSourceContent($sourceContent)
-    {
-        $this->sourceContent = (string) $sourceContent;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSourceContent()
-    {
-        return $this->sourceContent;
-    }
-
-    /**
-     * @param  array|Traversable $options
      * @throws Exception\InvalidArgumentException
-     * @return AbstractGenerator
      */
     public function setOptions($options)
     {
-        if (! is_array($options) && ! $options instanceof Traversable) {
+        if (!is_array($options) && !$options instanceof Traversable) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable object; received "%s"',
                 __METHOD__,
@@ -126,6 +72,60 @@ abstract class AbstractGenerator implements GeneratorInterface
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @param bool $isSourceDirty
+     * @return AbstractGenerator
+     */
+    public function setSourceDirty($isSourceDirty = true)
+    {
+        $this->isSourceDirty = (bool)$isSourceDirty;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSourceDirty()
+    {
+        return $this->isSourceDirty;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndentation()
+    {
+        return $this->indentation;
+    }
+
+    /**
+     * @param string $indentation
+     * @return AbstractGenerator
+     */
+    public function setIndentation($indentation)
+    {
+        $this->indentation = (string)$indentation;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSourceContent()
+    {
+        return $this->sourceContent;
+    }
+
+    /**
+     * @param string $sourceContent
+     * @return AbstractGenerator
+     */
+    public function setSourceContent($sourceContent)
+    {
+        $this->sourceContent = (string)$sourceContent;
         return $this;
     }
 }

@@ -18,11 +18,11 @@ use Generator\Builders\ClassGenerator;
 class StandardTokenizer extends ClassGenerator
 {
 
-    use Shared, ClassTrait;
+    use ClassTrait;
+    use Shared;
 
     protected function writeBody()
     {
-
         $this->rebuildMethods();
         parent::writeBody();
     }

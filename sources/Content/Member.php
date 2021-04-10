@@ -12,11 +12,13 @@
 
 namespace IPS\toolbox\Content;
 
+use Exception;
 use IPS\Db;
 use IPS\Lang;
 use IPS\Member;
 use IPS\Settings;
 use UnderflowException;
+
 use function count;
 use function defined;
 use function header;
@@ -26,8 +28,8 @@ use function random_int;
 use function sha1;
 use function time;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -40,7 +42,7 @@ class _Member extends Generator
     /**
      * @var bool
      */
-    protected static $thereAreNoClubs = \false;
+    protected static $thereAreNoClubs = false;
     public $start;
     public $end;
     /**
@@ -81,7 +83,7 @@ class _Member extends Generator
     /**
      * _Member constructor.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
@@ -96,69 +98,68 @@ class _Member extends Generator
     /**
      * selects the members first name
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function first()
     {
-        $rand = random_int( 0, count( Data::$firstNames ) - 1 );
-        $this->first = Data::$firstNames[ $rand ];
+        $rand = random_int(0, count(Data::$firstNames) - 1);
+        $this->first = Data::$firstNames[$rand];
     }
 
     /**
      * selects the members lastname
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function last()
     {
-        $rand = random_int( 0, count( Data::$lastNames ) - 1 );
-        $this->last = Data::$lastNames[ $rand ];
+        $rand = random_int(0, count(Data::$lastNames) - 1);
+        $this->last = Data::$lastNames[$rand];
     }
 
     /**
      * selects the members username
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function username()
     {
-        $rand = random_int( 0, count( Data::$userNames ) );
+        $rand = random_int(0, count(Data::$userNames));
         $dividedBy = 3;
         $num = $rand / $dividedBy;
-        if ( is_int( $num ) ) {
-            $placeHolder = [ '.', '-', '_', ' ' ];
-            $p = random_int( 0, 3 );
-            $placeHolder = $placeHolder[ $p ];
+        if (is_int($num)) {
+            $placeHolder = ['.', '-', '_', ' '];
+            $p = random_int(0, 3);
+            $placeHolder = $placeHolder[$p];
             $this->user = $this->first . $placeHolder . $this->last;
-        }
-        else {
-            $rand = random_int( 0, count( Data::$userNames ) - 1 );
-            $this->user = Data::$userNames[ $rand ];
+        } else {
+            $rand = random_int(0, count(Data::$userNames) - 1);
+            $this->user = Data::$userNames[$rand];
         }
     }
 
     /**
      * selects the members email
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function email()
     {
-        $rand = random_int( 0, count( Data::$domains ) - 1 );
-        $domain = Data::$domains[ $rand ];
+        $rand = random_int(0, count(Data::$domains) - 1);
+        $domain = Data::$domains[$rand];
         $this->email = $this->user . '@' . $domain;
     }
 
     /**
-     * @return \IPS\Member
+     * @return Member
      */
     public static function get()
     {
         try {
-            $db = Db::i()->select( '*', 'core_members', [], 'RAND()' )->first();
-            return Member::constructFromData( $db );
-        } catch ( UnderflowException $e ) {
-            return Member::load( 0 );
+            $db = Db::i()->select('*', 'core_members', [], 'RAND()')->first();
+            return Member::constructFromData($db);
+        } catch (UnderflowException $e) {
+            return Member::load(0);
         }
     }
 
@@ -170,22 +171,20 @@ class _Member extends Generator
      * @param null $club
      *
      * @throws Db\Exception
-     * @throws \Exception
+     * @throws Exception
      */
-    public function build( $password = \null, $group = \null, $club = \null )
+    public function build($password = null, $group = null, $club = null)
     {
-        $existing = Member::load( $this->user, 'name' );
+        $existing = Member::load($this->user, 'name');
 
-        if ( !$existing->member_id ) {
-
-            if ( !$group || !is_int( $group ) ) {
-                $group = Settings::i()->getFromConfGlobal( 'member_group' );
+        if (!$existing->member_id) {
+            if (!$group || !is_int($group)) {
+                $group = Settings::i()->getFromConfGlobal('member_group');
             }
 
-            if ( $password ) {
-                $this->pass = sha1( random_int( 1, 8800000083 ) );
-            }
-            else {
+            if ($password) {
+                $this->pass = sha1(random_int(1, 8800000083));
+            } else {
                 $this->pass = $this->user;
             }
 
@@ -194,16 +193,16 @@ class _Member extends Generator
 
             try {
                 $where = [];
-                if ( $start !== \null ) {
-                    $where = [ 'joined >= ?', $start ];
+                if ($start !== null) {
+                    $where = ['joined >= ?', $start];
                 }
-                $sql = Db::i()->select( '*', 'core_members', $where, 'joined DESC' )->first();
-                $start = $sql[ 'joined' ] + 60;
-            } catch ( UnderflowException $e ) {
+                $sql = Db::i()->select('*', 'core_members', $where, 'joined DESC')->first();
+                $start = $sql['joined'] + 60;
+            } catch (UnderflowException $e) {
             }
 
-            $time = $this->getTime( $start, $end );
-            $member = new Member;
+            $time = $this->getTime($start, $end);
+            $member = new Member();
             $member->name = $this->user;
             $member->member_group_id = $group;
             $member->email = $this->email;
@@ -211,41 +210,41 @@ class _Member extends Generator
             $member->language = Lang::defaultLanguage();
             $member->skin = 0;
 
-            $member->setLocalPassword( $this->pass );
-            $member->members_bitoptions[ 'coppa_user' ] = \false;
+            $member->setLocalPassword($this->pass);
+            $member->members_bitoptions['coppa_user'] = false;
             $member->save();
 
             /* Add member to club? */
-            if ( $club ) {
-                if ( static::$thereAreNoClubs === \false && !count( static::$availableClubIds ) ) {
-                    static::$availableClubIds = iterator_to_array( Db::i()->select( 'id', 'core_clubs' ) );
+            if ($club) {
+                if (static::$thereAreNoClubs === false && !count(static::$availableClubIds)) {
+                    static::$availableClubIds = iterator_to_array(Db::i()->select('id', 'core_clubs'));
 
-                    if ( !count( static::$availableClubIds ) ) {
-                        static::$thereAreNoClubs = \true;
+                    if (!count(static::$availableClubIds)) {
+                        static::$thereAreNoClubs = true;
                     }
                 }
 
-                if ( static::$thereAreNoClubs === \false ) {
-                    $joinedAClub = \false;
+                if (static::$thereAreNoClubs === false) {
+                    $joinedAClub = false;
 
-                    foreach ( static::$availableClubIds as $clubId ) {
-                        $areWeJoining = random_int( 0, 1 ); /* 50% chance of joinging the club */
+                    foreach (static::$availableClubIds as $clubId) {
+                        $areWeJoining = random_int(0, 1); /* 50% chance of joinging the club */
 
-                        if ( $areWeJoining === 1 ) {
-                            Db::i()->insert( 'core_clubs_memberships', [
+                        if ($areWeJoining === 1) {
+                            Db::i()->insert('core_clubs_memberships', [
                                 'club_id'    => $clubId,
                                 'member_id'  => $member->member_id,
                                 'joined'     => time(),
                                 'status'     => 'member',
-                                'added_by'   => \null,
-                                'invited_by' => \null,
-                            ] );
+                                'added_by'   => null,
+                                'invited_by' => null,
+                            ]);
 
-                            $joinedAClub = \true;
+                            $joinedAClub = true;
                         }
                     }
 
-                    if ( $joinedAClub ) {
+                    if ($joinedAClub) {
                         $member->rebuildPermissionArray();
                     }
                 }
@@ -253,13 +252,12 @@ class _Member extends Generator
 
             $this->gid = $member->member_id;
             $this->save();
-        }
-        else {
+        } else {
             $this->first();
             $this->last();
             $this->username();
             $this->email();
-            $this->build( $password, $group );
+            $this->build($password, $group);
         }
     }
 

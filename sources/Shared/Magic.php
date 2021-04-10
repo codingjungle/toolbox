@@ -23,53 +23,53 @@ trait Magic
     /**
      * Magic Method: Get
      *
-     * @param    mixed $key Key
+     * @param mixed $key Key
      *
      * @return   string|array
      */
-    public function __get( $key )
+    public function __get($key)
     {
-        if ( !isset( $this->data[ $key ] ) ) {
-            return \null;
+        if (!isset($this->data[$key])) {
+            return null;
         }
 
-        return $this->data[ $key ];
+        return $this->data[$key];
     }
 
     /**
      * Magic Method: Set
      *
-     * @param    mixed $key   Key
-     * @param    mixed $value Value
+     * @param mixed $key Key
+     * @param mixed $value Value
      *
      * @return    void
      */
-    public function __set( $key, $value )
+    public function __set($key, $value)
     {
-        $this->data[ $key ] = $value;
+        $this->data[$key] = $value;
     }
 
     /**
      * Magic Method: Isset
      *
-     * @param    mixed $key Key
+     * @param mixed $key Key
      *
      * @return    bool
      */
-    public function __isset( $key )
+    public function __isset($key)
     {
-        return isset( $this->data[ $key ] );
+        return isset($this->data[$key]);
     }
 
     /**
      * Magic Method: Unset
      *
-     * @param    mixed $key Key
+     * @param mixed $key Key
      *
      * @return    void
      */
-    public function __unset( $key )
+    public function __unset($key)
     {
-        unset( $this->data[ $key ] );
+        unset($this->data[$key]);
     }
 }

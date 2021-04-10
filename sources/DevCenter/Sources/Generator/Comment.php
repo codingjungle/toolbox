@@ -45,12 +45,12 @@ class _Comment extends Item
         ];
 
         $columnMap = [
-            'item' => 'item_id',
-            'author' => 'author',
+            'item'        => 'item_id',
+            'author'      => 'author',
             'author_name' => 'author_name',
-            'content' => 'content',
-            'date' => 'start_date',
-            'ip_address' => 'ip_address',
+            'content'     => 'content',
+            'date'        => 'start_date',
+            'ip_address'  => 'ip_address',
         ];
 
         if (mb_strtolower($this->type) === 'comment') {
@@ -89,7 +89,7 @@ class _Comment extends Item
      */
     protected function contentItemClass()
     {
-        if ($this->content_item_class !== \null) {
+        if ($this->content_item_class !== null) {
             $this->content_item_class = mb_ucfirst($this->content_item_class);
             $itemClass = '\\IPS\\' . $this->app . '\\' . $this->content_item_class;
             $this->generator->addImport($itemClass);
@@ -105,8 +105,8 @@ class _Comment extends Item
                 $itemClass,
                 [
                     'visibility' => T_PUBLIC,
-                    'static' => true,
-                    'document' => $doc,
+                    'static'     => true,
+                    'document'   => $doc,
                 ]
             );
         }

@@ -33,14 +33,14 @@ class _Template extends CompilerAbstract
         $arguments = $this->arguments ?: [];
 
         /* @var array $arguments */
-        if ( !empty( $arguments ) ) {
-            foreach ( $arguments as $argument ) {
+        if (!empty($arguments)) {
+            foreach ($arguments as $argument) {
                 $params[] = "\${$argument}";
             }
         }
 
-        $params = count( $params ) ? implode( ',', $params ) : \null;
+        $params = count($params) ? implode(',', $params) : null;
 
-        return $this->_replace( '{params}', $params, $this->_getFile( 'template' ) );
+        return $this->_replace('{params}', $params, $this->_getFile('template'));
     }
 }

@@ -15,6 +15,8 @@ use InvalidArgumentException;
 use IPS\Db;
 use IPS\Patterns\ActiveRecordIterator;
 
+use UnderflowException;
+
 use function array_key_exists;
 use function defined;
 use function header;
@@ -77,7 +79,7 @@ trait ActiveRecord
         if ($count === true) {
             try {
                 return (int)$sql->first();
-            } catch (\UnderflowException $e) {
+            } catch (UnderflowException $e) {
                 return 0;
             }
         }

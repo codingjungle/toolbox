@@ -14,12 +14,14 @@ namespace IPS\toolbox\Proxy\Helpers;
 
 use IPS\Application;
 
+use IPS\toolbox\Proxy\extensions\toolbox\Proxy\ProxyHelpers\ProxyHelpers;
+
 use function defined;
 use function header;
 use function method_exists;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header((isset($_SERVER[ 'SERVER_PROTOCOL' ]) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0') . ' 403 Forbidden');
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -69,8 +71,8 @@ class _Request implements HelpersAbstract
 
         /* @var Application $app */
         foreach (Application::appsWithExtension('toolbox', 'ProxyHelpers') as $app) {
-            $extensions = $app->extensions('toolbox', 'ProxyHelpers', \true);
-            /* @var \IPS\toolbox\Proxy\extensions\toolbox\Proxy\ProxyHelpers\ProxyHelpers $extension */
+            $extensions = $app->extensions('toolbox', 'ProxyHelpers', true);
+            /* @var ProxyHelpers $extension */
             foreach ($extensions as $extension) {
                 if (method_exists($extension, 'request')) {
                     $extension->request($classDoc);

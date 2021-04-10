@@ -11,11 +11,18 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-class MockSplFileInfo extends \SplFileInfo
+use RuntimeException;
+
+use SplFileInfo;
+
+use function is_array;
+use function is_string;
+
+class MockSplFileInfo extends SplFileInfo
 {
-    const TYPE_DIRECTORY = 1;
-    const TYPE_FILE = 2;
-    const TYPE_UNKNOWN = 3;
+    public const TYPE_DIRECTORY = 1;
+    public const TYPE_FILE = 2;
+    public const TYPE_UNKNOWN = 3;
 
     private $contents = null;
     private $mode = null;
@@ -25,15 +32,15 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function __construct($param)
     {
-        if (\is_string($param)) {
+        if (is_string($param)) {
             parent::__construct($param);
-        } elseif (\is_array($param)) {
+        } elseif (is_array($param)) {
             $defaults = [
-                'name' => 'file.txt',
-                'contents' => null,
-                'mode' => null,
-                'type' => null,
-                'relativePath' => null,
+                'name'             => 'file.txt',
+                'contents'         => null,
+                'mode'             => null,
+                'type'             => null,
+                'relativePath'     => null,
                 'relativePathname' => null,
             ];
             $defaults = array_merge($defaults, $param);
@@ -44,17 +51,33 @@ class MockSplFileInfo extends \SplFileInfo
             $this->setRelativePath($defaults['relativePath']);
             $this->setRelativePathname($defaults['relativePathname']);
         } else {
-            throw new \RuntimeException(sprintf('Incorrect parameter "%s"', $param));
+            throw new RuntimeException(sprintf('Incorrect parameter "%s"', $param));
         }
     }
 
-    public function isFile()
+    public function setMode($mode)
     {
-        if (null === $this->type) {
-            return false !== strpos($this->getFilename(), 'file');
-        }
+        $this->mode = $mode;
+    }
 
-        return self::TYPE_FILE === $this->type;
+    public function setType($type)
+    {
+        if (is_string($type)) {
+            switch ($type) {
+                case 'directory':
+                case 'd':
+                    $this->type = self::TYPE_DIRECTORY;
+                    break;
+                case 'file':
+                case 'f':
+                    $this->type = self::TYPE_FILE;
+                    break;
+                default:
+                    $this->type = self::TYPE_UNKNOWN;
+            }
+        } else {
+            $this->type = $type;
+        }
     }
 
     public function isDir()
@@ -64,6 +87,15 @@ class MockSplFileInfo extends \SplFileInfo
         }
 
         return self::TYPE_DIRECTORY === $this->type;
+    }
+
+    public function isFile()
+    {
+        if (null === $this->type) {
+            return false !== strpos($this->getFilename(), 'file');
+        }
+
+        return self::TYPE_FILE === $this->type;
     }
 
     public function isReadable()
@@ -85,29 +117,9 @@ class MockSplFileInfo extends \SplFileInfo
         $this->contents = $contents;
     }
 
-    public function setMode($mode)
+    public function getRelativePath()
     {
-        $this->mode = $mode;
-    }
-
-    public function setType($type)
-    {
-        if (\is_string($type)) {
-            switch ($type) {
-                case 'directory':
-                case 'd':
-                    $this->type = self::TYPE_DIRECTORY;
-                    break;
-                case 'file':
-                case 'f':
-                    $this->type = self::TYPE_FILE;
-                    break;
-                default:
-                    $this->type = self::TYPE_UNKNOWN;
-            }
-        } else {
-            $this->type = $type;
-        }
+        return $this->relativePath;
     }
 
     public function setRelativePath($relativePath)
@@ -115,18 +127,13 @@ class MockSplFileInfo extends \SplFileInfo
         $this->relativePath = $relativePath;
     }
 
-    public function setRelativePathname($relativePathname)
-    {
-        $this->relativePathname = $relativePathname;
-    }
-
-    public function getRelativePath()
-    {
-        return $this->relativePath;
-    }
-
     public function getRelativePathname()
     {
         return $this->relativePathname;
+    }
+
+    public function setRelativePathname($relativePathname)
+    {
+        $this->relativePathname = $relativePathname;
     }
 }

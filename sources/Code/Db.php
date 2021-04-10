@@ -12,6 +12,8 @@
 
 namespace IPS\toolbox\Code;
 
+use InvalidArgumentException;
+use IPS\IPS;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -38,7 +40,7 @@ class _Db extends ParserAbstract
      */
     public function check(): array
     {
-        $ipsApps = \IPS\IPS::$ipsApps;
+        $ipsApps = IPS::$ipsApps;
         $warning = [];
         /** @var SplFileInfo $file */
         foreach ($this->files as $file) {
@@ -52,17 +54,17 @@ class _Db extends ParserAbstract
                         $tt = mb_substr($table, 0, mb_strlen($app));
                         if ($tt === $app) {
                             $warning[] = [
-                                'path' => [
-                                    'url' => $this->buildPath($file->getPathname(), 0),
+                                'path'  => [
+                                    'url'  => $this->buildPath($file->getPathname(), 0),
                                     'name' => str_replace(
                                         $this->app->getApplicationPath() . '/',
                                         '',
                                         $file->getPathname()
                                     )
                                 ],
-                                'app' => $app,
+                                'app'   => $app,
                                 'table' => $table,
-                                'pre' => trim(json_encode($definition, JSON_PRETTY_PRINT))
+                                'pre'   => trim(json_encode($definition, JSON_PRETTY_PRINT))
                             ];
                         }
                     }
@@ -75,13 +77,13 @@ class _Db extends ParserAbstract
     /**
      * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function getFiles()
     {
         $files = new Finder();
         $files->in($this->appPath . 'setup/')->name('queries.json');
-        if ($this->skip !== \null) {
+        if ($this->skip !== null) {
             foreach ($this->skip as $name) {
                 $files->notName($name);
             }

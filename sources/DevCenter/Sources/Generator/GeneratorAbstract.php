@@ -25,6 +25,9 @@ use IPS\toolbox\Shared\ModuleBuilder;
 use IPS\toolbox\Shared\SchemaBuilder;
 use IPS\toolbox\Shared\Write;
 
+use RuntimeException;
+
+use function array_merge;
 use function array_shift;
 use function count;
 use function defined;
@@ -42,7 +45,6 @@ use function mb_ucfirst;
 use function str_replace;
 use function trim;
 
-use function array_merge;
 use const T_PROTECTED;
 use const T_PUBLIC;
 
@@ -77,7 +79,11 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 abstract class _GeneratorAbstract
 {
 
-    use LanguageBuilder, SchemaBuilder, ModuleBuilder, Write, Magic;
+    use LanguageBuilder;
+    use Magic;
+    use ModuleBuilder;
+    use SchemaBuilder;
+    use Write;
 
     /**
      * activerecord descendants
@@ -100,7 +106,7 @@ abstract class _GeneratorAbstract
     public $error = false;
 
     /**
-     * @var \IPS\Application
+     * @var Application
      */
     protected $application;
 
@@ -243,7 +249,7 @@ abstract class _GeneratorAbstract
             $body = $this->extends ? 'parent::__construct();' : '';
             $config = [
                 'visibility' => T_PUBLIC,
-                'document' => [
+                'document'   => [
                     $this->_classname . ' constructor',
                 ],
             ];
@@ -312,7 +318,7 @@ abstract class _GeneratorAbstract
             $this->generator->save();
             if ($this->scaffolding_create && in_array($this->type, static::$arDescendent, false)) {
                 $this->_createRelation($file, $dir, $this->database);
-                if (\is_array($this->scaffolding_type) && in_array('db', $this->scaffolding_type, false)) {
+                if (is_array($this->scaffolding_type) && in_array('db', $this->scaffolding_type, false)) {
                     try {
                         $this->db->add('bitwise');
                         $this->db->createTable()->_buildSchemaFile($this->database, $this->application);
@@ -321,7 +327,7 @@ abstract class _GeneratorAbstract
                     }
                 }
 
-                if (\is_array($this->scaffolding_type) && in_array('modules', $this->scaffolding_type, false)) {
+                if (is_array($this->scaffolding_type) && in_array('modules', $this->scaffolding_type, false)) {
                     try {
                         $this->_buildModule(
                             $this->application,
@@ -336,7 +342,7 @@ abstract class _GeneratorAbstract
                     }
                 }
             }
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->error = 1;
             Debug::log($e);
         }
@@ -358,8 +364,8 @@ abstract class _GeneratorAbstract
             [],
             [
                 'visibility' => T_PROTECTED,
-                'document' => $document,
-                'static' => true,
+                'document'   => $document,
+                'static'     => true,
             ]
         );
 
@@ -376,8 +382,8 @@ abstract class _GeneratorAbstract
                 $this->prefix,
                 [
                     'visibility' => T_PUBLIC,
-                    'document' => $document,
-                    'static' => true,
+                    'document'   => $document,
+                    'static'     => true,
                 ]
             );
         }
@@ -393,8 +399,8 @@ abstract class _GeneratorAbstract
             $this->database,
             [
                 'visibility' => T_PUBLIC,
-                'document' => $document,
-                'static' => true,
+                'document'   => $document,
+                'static'     => true,
             ]
         );
 
@@ -417,9 +423,9 @@ EOF;
             $value,
             [
                 'visibility' => T_PUBLIC,
-                'document' => $document,
-                'static' => true,
-                'type' => 'array',
+                'document'   => $document,
+                'static'     => true,
+                'type'       => 'array',
             ]
         );
     }
@@ -479,8 +485,8 @@ EOF;
             'seoTitle',
             [
                 'visibility' => T_PUBLIC,
-                'document' => $doc,
-                'static' => true,
+                'document'   => $doc,
+                'static'     => true,
             ]
         );
     }
@@ -499,7 +505,7 @@ EOF;
             null,
             [
                 'visibility' => T_PROTECTED,
-                'document' => $doc,
+                'document'   => $doc,
             ]
         );
     }
@@ -523,8 +529,8 @@ EOF;
             $value,
             [
                 'visibility' => T_PUBLIC,
-                'document' => $doc,
-                'static' => true,
+                'document'   => $doc,
+                'static'     => true,
             ]
         );
     }
@@ -546,8 +552,8 @@ EOF;
             $base . '&id=',
             [
                 'visibility' => T_PUBLIC,
-                'static' => true,
-                'document' => $doc,
+                'static'     => true,
+                'document'   => $doc,
             ]
         );
     }

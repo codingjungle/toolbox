@@ -33,6 +33,7 @@ use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 use Zend\Code\Generator\PropertyValueGenerator;
+
 use function array_replace_recursive;
 use function count;
 use function defined;
@@ -45,15 +46,17 @@ use function is_file;
 use function json_decode;
 use function mb_strtolower;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+use const IPS\IPS_FOLDER_PERMISSION;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
  * ModuleBuilder Trait
  *
- * @mixin \IPS\toolbox\Shared\LanguageBuilder
+ * @mixin LanguageBuilder
  */
 trait ModuleBuilder
 {
@@ -65,87 +68,86 @@ trait ModuleBuilder
      * @param             $namespace
      * @param             $type
      */
-    protected function _buildModule( Application $application, $classname, $namespace, $type, $useImports = \false )
+    protected function _buildModule(Application $application, $classname, $namespace, $type, $useImports = false)
     {
-        $type = mb_strtolower( $type );
-        if ( !in_array( $type, [ 'node', 'item' ] ) ) {
+        $type = mb_strtolower($type);
+        if (!in_array($type, ['node', 'item'])) {
             return;
         }
 
-        $classLower = mb_strtolower( $classname );
+        $classLower = mb_strtolower($classname);
 
         try {
-            $lang = Member::loggedIn()->language()->get( '__app_' . $application->directory );
-        } catch ( UnderflowException $e ) {
+            $lang = Member::loggedIn()->language()->get('__app_' . $application->directory);
+        } catch (UnderflowException $e) {
             $lang = $application->directory;
         }
 
-        $this->_addToLangs( 'menutab__' . $application->directory, $lang, $application );
+        $this->_addToLangs('menutab__' . $application->directory, $lang, $application);
         $methods = [];
         $this->classGenerator = new DTClassGenerator();
-        $this->classGenerator->setName( '_' . $classLower );
-        if ( $type === 'node' ) {
+        $this->classGenerator->setName('_' . $classLower);
+        if ($type === 'node') {
             try {
                 $doc = [
                     'tags' => [
-                        [ 'name' => 'brief', 'description' => 'Node Class' ],
-                        [ 'name' => 'var', 'description' => '\\' . $namespace . '\\' . $classname ],
+                        ['name' => 'brief', 'description' => 'Node Class'],
+                        ['name' => 'var', 'description' => '\\' . $namespace . '\\' . $classname],
                     ],
                 ];
 
                 $config = [
                     'name'   => 'nodeClass',
-                    'value'  => new PropertyValueGenerator( '\\' . $namespace . '\\' . $classname . '::class', PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+                    'value'  => new PropertyValueGenerator('\\' . $namespace . '\\' . $classname . '::class',
+                        PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE),
                     'vis'    => 'protected',
                     'doc'    => $doc,
-                    'static' => \false,
+                    'static' => false,
                 ];
 
-                $this->addModuleProperty( $config );
-
-            } catch ( \Exception $e ) {
+                $this->addModuleProperty($config);
+            } catch (Exception $e) {
             }
             $extends = Controller::class;
             $location = 'admin';
-
-        }
-        else {
+        } else {
             try {
                 $doc = [
                     'tags' => [
-                        [ 'name' => 'brief', 'description' => 'ContentModel Class' ],
-                        [ 'name' => 'var', 'description' => '\\' . $namespace . '\\' . $classname ],
+                        ['name' => 'brief', 'description' => 'ContentModel Class'],
+                        ['name' => 'var', 'description' => '\\' . $namespace . '\\' . $classname],
                     ],
                 ];
 
                 $config = [
                     'name'   => 'contentModel',
-                    'value'  => new PropertyValueGenerator( '\\' . $namespace . '\\' . $classname . '::class', PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE ),
+                    'value'  => new PropertyValueGenerator('\\' . $namespace . '\\' . $classname . '::class',
+                        PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE),
                     'vis'    => 'protected',
                     'doc'    => $doc,
-                    'static' => \true,
+                    'static' => true,
                 ];
-                $this->addModuleProperty( $config );
-            } catch ( \Exception $e ) {
+                $this->addModuleProperty($config);
+            } catch (Exception $e) {
             }
             $extends = \IPS\Content\Controller::class;
             $location = 'front';
         }
 
-        $this->classGenerator->setExtendedClass( $extends );
-        if ( $useImports ) {
-            $this->classGenerator->addUse( $extends );
+        $this->classGenerator->setExtendedClass($extends);
+        if ($useImports) {
+            $this->classGenerator->addUse($extends);
         }
 
         $ns = 'IPS\\' . $application->directory . '\\modules\\' . $location . '\\' . $classLower;
-        $this->classGenerator->setNamespaceName( $ns );
-        $modules = $this->_getModules( $application );
+        $this->classGenerator->setNamespaceName($ns);
+        $modules = $this->_getModules($application);
         $key = $classLower;
 
         try {
-            $module = Module::get( $application->directory, $key, $location );
-        } catch ( OutOfRangeException $e ) {
-            $module = new Module;
+            $module = Module::get($application->directory, $key, $location);
+        } catch (OutOfRangeException $e) {
+            $module = new Module();
             $module->application = $application->directory;
             $module->area = $location;
         }
@@ -154,104 +156,107 @@ trait ModuleBuilder
         $module->protected = 0;
         $module->default_controller = '';
         $module->save();
-        $modules[ $location ][ $module->key ] = [
+        $modules[$location][$module->key] = [
             'default_controller' => $module->default_controller,
             'protected'          => $module->protected,
         ];
 
-        $this->_addToLangs( 'menu__' . $application->directory . '_' . $module->key, $module->key, $application );
-        $this->_writeModules( $modules, $application );
+        $this->_addToLangs('menu__' . $application->directory . '_' . $module->key, $module->key, $application);
+        $this->_writeModules($modules, $application);
         $targetDir = \IPS\ROOT_PATH . "/applications/{$application->directory}/modules/{$location}/{$module->key}/";
         $fs = new Filesystem();
 
         try {
-            if ( !$fs->exists( $targetDir ) ) {
-                $fs->mkdir( $targetDir, \IPS\IPS_FOLDER_PERMISSION );
-                $fs->chmod( $targetDir, \IPS\IPS_FOLDER_PERMISSION );
+            if (!$fs->exists($targetDir)) {
+                $fs->mkdir($targetDir, IPS_FOLDER_PERMISSION);
+                $fs->chmod($targetDir, IPS_FOLDER_PERMISSION);
             }
-        } catch ( Exception $e ) {
+        } catch (Exception $e) {
         }
 
-        $restriction = \null;
+        $restriction = null;
 
-        if ( $location === 'admin' ) {
+        if ($location === 'admin') {
             /* Create a restriction? */
             $restrictions = [];
-            if ( is_file( \IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json" ) ) {
+            if (is_file(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json")) {
                 $file = \IPS\ROOT_PATH . '/applications/' . $application->directory . '/data/acprestrictions.json';
                 $restrictions = [];
-                if ( file_exists( $file ) ) {
-                    $restrictions = json_decode( file_get_contents( $file ), \true );
+                if (file_exists($file)) {
+                    $restrictions = json_decode(file_get_contents($file), true);
                 }
             }
-            $restrictions[ $module->key ][ $classname ][ "{$classLower}_manage" ] = "{$classLower}_manage";
+            $restrictions[$module->key][$classname]["{$classLower}_manage"] = "{$classLower}_manage";
 
             try {
-                Application::writeJson( \IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json", $restrictions );
-            } catch ( RuntimeException $e ) {
+                Application::writeJson(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json",
+                    $restrictions);
+            } catch (RuntimeException $e) {
             }
             $restriction = "{$classLower}_manage";
 
             try {
-                $methodDocBlock = new DocBlockGenerator( 'Get the database column which stores the club ID', \null, [ new ReturnTag( [ 'dataType' => 'string' ] ) ] );
-                $restrict = $restriction ? '\IPS\Dispatcher::i()->checkAcpPermission( \'' . $restriction . '\' );' : \null;
-                $methods[] = MethodGenerator::fromArray( [
+                $methodDocBlock = new DocBlockGenerator('Get the database column which stores the club ID', null,
+                    [new ReturnTag(['dataType' => 'string'])]);
+                $restrict = $restriction ? '\IPS\Dispatcher::i()->checkAcpPermission( \'' . $restriction . '\' );' : null;
+                $methods[] = MethodGenerator::fromArray([
                     'name'     => 'execute',
                     'body'     => "{$restrict}\n\nparent::execute();",
                     'docblock' => $methodDocBlock,
-                    'static'   => \false,
-                ] );
-            } catch ( \Exception $e ) {
+                    'static'   => false,
+                ]);
+            } catch (Exception $e) {
             }
         }
 
         //        try {
 
-        if ( !empty( $methods ) ) {
-            $this->classGenerator->addMethods( $methods );
+        if (!empty($methods)) {
+            $this->classGenerator->addMethods($methods);
         }
         try {
-            $package = Member::loggedIn()->language()->get( "__app_{$application->directory}" );
-        } catch ( UnderflowException $e ) {
+            $package = Member::loggedIn()->language()->get("__app_{$application->directory}");
+        } catch (UnderflowException $e) {
             $package = $application->directory;
         }
-        $headerBlock = DocBlockGenerator::fromArray( [
+        $headerBlock = DocBlockGenerator::fromArray([
             'tags' => [
-                [ 'name' => 'brief', 'description' => $classLower . ' Controller' ],
-                [ 'name' => 'copyright', 'description' => '-storm_copyright-' ],
-                [ 'name' => 'package', 'description' => 'IPS Social Suite' ],
-                [ 'name' => 'subpackage', 'description' => $package ],
-                [ 'name' => 'since', 'description' => '-storm_since_version-' ],
-                [ 'name' => 'version', 'description' => '-storm_version-' ],
+                ['name' => 'brief', 'description' => $classLower . ' Controller'],
+                ['name' => 'copyright', 'description' => '-storm_copyright-'],
+                ['name' => 'package', 'description' => 'IPS Social Suite'],
+                ['name' => 'subpackage', 'description' => $package],
+                ['name' => 'since', 'description' => '-storm_since_version-'],
+                ['name' => 'version', 'description' => '-storm_version-'],
             ],
-        ] );
+        ]);
 
         $mixin = '\\' . $ns . '\\' . $classLower;
-        $docBlock = DocBlockGenerator::fromArray( [
+        $docBlock = DocBlockGenerator::fromArray([
             'shortDescription' => $classLower . ' Class',
-            'longDescription'  => \null,
-            'tags'             => [ [ 'name' => 'mixin', 'description' => $mixin ] ],
-        ] );
-        $this->classGenerator->setDocBlock( $docBlock );
-        $content = new DTFileGenerator;
-        $content->setDocBlock( $headerBlock );
-        $content->setClass( $this->classGenerator );
-        $content->setFilename( $targetDir . $classLower . '.php' );
+            'longDescription'  => null,
+            'tags'             => [['name' => 'mixin', 'description' => $mixin]],
+        ]);
+        $this->classGenerator->setDocBlock($docBlock);
+        $content = new DTFileGenerator();
+        $content->setDocBlock($headerBlock);
+        $content->setClass($this->classGenerator);
+        $content->setFilename($targetDir . $classLower . '.php');
         $content->write();
         //        }
         //        catch( \Exception $e){}
 
-        $this->_addToLangs( 'menu__' . $application->directory . '_' . $module->key . '_' . $module->key, $module->key, $application );
+        $this->_addToLangs('menu__' . $application->directory . '_' . $module->key . '_' . $module->key, $module->key,
+            $application);
 
-        if ( $location === 'admin' ) {
+        if ($location === 'admin') {
             /* Add to the menu */
             $file = \IPS\ROOT_PATH . '/applications/' . $application->directory . '/data/acpmenu.json';
             $menu = [];
-            if ( file_exists( $file ) ) {
-                $menu = json_decode( file_get_contents( $file ), \true );
+            if (file_exists($file)) {
+                $menu = json_decode(file_get_contents($file), true);
             }
 
-            $menu[ $module->key ][ $classLower ] = [
+            $menu[$module->key][$classLower] = [
                 'tab'         => $application->directory,
                 'controller'  => $classLower,
                 'do'          => '',
@@ -259,29 +264,30 @@ trait ModuleBuilder
             ];
 
             try {
-                Application::writeJson( \IPS\ROOT_PATH . "/applications/{$application->directory}/data/acpmenu.json", $menu );
-            } catch ( RuntimeException $e ) {
+                Application::writeJson(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/acpmenu.json",
+                    $menu);
+            } catch (RuntimeException $e) {
             }
         }
     }
 
-    protected function addModuleProperty( array $config = [] )
+    protected function addModuleProperty(array $config = [])
     {
         try {
-            if ( !isset( $config[ 'name' ] ) ) {
-                throw new InvalidArgumentException( 'array missing name or name value is null' );
+            if (!isset($config['name'])) {
+                throw new InvalidArgumentException('array missing name or name value is null');
             }
-            $config[ 'defaultvalue' ] = $config[ 'value' ] ?? \null;
-            if ( !empty( $config[ 'doc' ] ) ) {
-                $config[ 'docblock' ] = DocBlockGenerator::fromArray( $config[ 'doc' ] );
-                unset( $config[ 'doc' ] );
+            $config['defaultvalue'] = $config['value'] ?? null;
+            if (!empty($config['doc'])) {
+                $config['docblock'] = DocBlockGenerator::fromArray($config['doc']);
+                unset($config['doc']);
             }
-            $config[ 'visibility' ] = $config[ 'vis' ] ?? \false;
-            $config[ 'static' ] = $config[ 'static' ] ?? \false;
-            $prop = PropertyGenerator::fromArray( $config );
-            $this->classGenerator->addPropertyFromGenerator( $prop );
-        } catch ( \Exception $e ) {
-            Debug::add( 'addProperty', $e );
+            $config['visibility'] = $config['vis'] ?? false;
+            $config['static'] = $config['static'] ?? false;
+            $prop = PropertyGenerator::fromArray($config);
+            $this->classGenerator->addPropertyFromGenerator($prop);
+        } catch (Exception $e) {
+            Debug::add('addProperty', $e);
         }
     }
 
@@ -292,51 +298,52 @@ trait ModuleBuilder
      *
      * @return array
      */
-    protected function _getModules( Application $application ): array
+    protected function _getModules(Application $application): array
     {
         $file = \IPS\ROOT_PATH . "/applications/{$application->directory}/data/modules.json";
         $json = [];
-        if ( file_exists( $file ) ) {
-            $json = json_decode( file_get_contents( $file ), \true );
+        if (file_exists($file)) {
+            $json = json_decode(file_get_contents($file), true);
         }
 
         $modules = [];
         $extra = [];
         $db = [];
 
-        foreach ( Db::i()->select( '*', 'core_modules', [
-            'sys_module_application=?',
-            $application->directory,
-        ] ) as $row ) {
+        foreach (
+            Db::i()->select('*', 'core_modules', [
+                'sys_module_application=?',
+                $application->directory,
+            ]) as $row
+        ) {
             $db[] = $row;
-            $extra[ $row[ 'sys_module_area' ] ][ $row[ 'sys_module_key' ] ] = [
-                'default'            => $row[ 'sys_module_default' ],
-                'id'                 => $row[ 'sys_module_id' ],
-                'default_controller' => $row[ 'sys_module_default_controller' ],
-                'protected'          => $row[ 'sys_module_protected' ],
+            $extra[$row['sys_module_area']][$row['sys_module_key']] = [
+                'default'            => $row['sys_module_default'],
+                'id'                 => $row['sys_module_id'],
+                'default_controller' => $row['sys_module_default_controller'],
+                'protected'          => $row['sys_module_protected'],
             ];
         }
 
-        if ( is_array( $json ) && count( $json ) ) {
+        if (is_array($json) && count($json)) {
             $modules = $json;
-        }
-        else {
-            foreach ( $db as $row ) {
-                $modules[ $row[ 'sys_module_area' ] ][ $row[ 'sys_module_key' ] ] = [
-                    'default_controller' => $row[ 'sys_module_default_controller' ],
-                    'protected'          => $row[ 'sys_module_protected' ],
+        } else {
+            foreach ($db as $row) {
+                $modules[$row['sys_module_area']][$row['sys_module_key']] = [
+                    'default_controller' => $row['sys_module_default_controller'],
+                    'protected'          => $row['sys_module_protected'],
                 ];
             }
         }
 
         try {
-            if ( !is_file( $file ) ) {
-                Application::writeJson( $file, $modules );
+            if (!is_file($file)) {
+                Application::writeJson($file, $modules);
             }
 
             /* We get the ID and default flag from the local DB to prevent devs syncing defaults */
-            return array_replace_recursive( $modules, $extra );
-        } catch ( Exception $e ) {
+            return array_replace_recursive($modules, $extra);
+        } catch (Exception $e) {
             return $modules;
         }
     }
@@ -344,26 +351,26 @@ trait ModuleBuilder
     /**
      * writes the modules to the apps json file.
      *
-     * @param array       $json
+     * @param array $json
      * @param Application $application
      */
-    protected function _writeModules( array $json, Application $application )
+    protected function _writeModules(array $json, Application $application)
     {
-        foreach ( $json as $location => $module ) {
+        foreach ($json as $location => $module) {
             /* @var array $module */
-            foreach ( $module as $name => $data ) {
+            foreach ($module as $name => $data) {
                 /* @var array $data */
-                foreach ( $data as $k => $v ) {
-                    if ( !in_array( $k, [ 'protected', 'default_controller' ] ) ) {
-                        unset( $json[ $location ][ $name ][ $k ] );
+                foreach ($data as $k => $v) {
+                    if (!in_array($k, ['protected', 'default_controller'])) {
+                        unset($json[$location][$name][$k]);
                     }
                 }
             }
         }
 
         try {
-            Application::writeJson( \IPS\ROOT_PATH . "/applications/{$application->directory}/data/modules.json", $json );
-        } catch ( RuntimeException $e ) {
+            Application::writeJson(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/modules.json", $json);
+        } catch (RuntimeException $e) {
         }
     }
 }

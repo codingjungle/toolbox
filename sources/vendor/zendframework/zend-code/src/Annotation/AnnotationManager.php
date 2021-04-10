@@ -9,6 +9,7 @@
 
 namespace Zend\Code\Annotation;
 
+use stdClass;
 use Zend\Code\Annotation\Parser\ParserInterface;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventManager;
@@ -29,7 +30,7 @@ use function is_object;
  */
 class AnnotationManager implements EventManagerAwareInterface
 {
-    const EVENT_CREATE_ANNOTATION = 'createAnnotation';
+    public const EVENT_CREATE_ANNOTATION = 'createAnnotation';
 
     /**
      * @var EventManagerInterface
@@ -37,18 +38,15 @@ class AnnotationManager implements EventManagerAwareInterface
     protected $events;
 
     /**
-     * Set the event manager instance
+     * Attach a parser to listen to the createAnnotation event
      *
-     * @param  EventManagerInterface $events
+     * @param ParserInterface $parser
      * @return AnnotationManager
      */
-    public function setEventManager(EventManagerInterface $events)
+    public function attach(ParserInterface $parser)
     {
-        $events->setIdentifiers([
-            __CLASS__,
-            get_class($this),
-        ]);
-        $this->events = $events;
+        $this->getEventManager()
+             ->attach(self::EVENT_CREATE_ANNOTATION, [$parser, 'onCreateAnnotation']);
 
         return $this;
     }
@@ -70,15 +68,18 @@ class AnnotationManager implements EventManagerAwareInterface
     }
 
     /**
-     * Attach a parser to listen to the createAnnotation event
+     * Set the event manager instance
      *
-     * @param  ParserInterface $parser
+     * @param EventManagerInterface $events
      * @return AnnotationManager
      */
-    public function attach(ParserInterface $parser)
+    public function setEventManager(EventManagerInterface $events)
     {
-        $this->getEventManager()
-             ->attach(self::EVENT_CREATE_ANNOTATION, [$parser, 'onCreateAnnotation']);
+        $events->setIdentifiers([
+            __CLASS__,
+            get_class($this),
+        ]);
+        $this->events = $events;
 
         return $this;
     }
@@ -86,8 +87,8 @@ class AnnotationManager implements EventManagerAwareInterface
     /**
      * Create Annotation
      *
-     * @param  string[] $annotationData
-     * @return false|\stdClass
+     * @param string[] $annotationData
+     * @return false|stdClass
      */
     public function createAnnotation(array $annotationData)
     {

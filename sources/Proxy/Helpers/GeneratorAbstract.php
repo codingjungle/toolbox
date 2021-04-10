@@ -14,8 +14,6 @@ namespace IPS\toolbox\Proxy\Helpers;
 
 use IPS\dtdevplus\Sources;
 
-use function mb_strtolower;
-
 
 class _GeneratorAbstract implements HelpersAbstract
 {

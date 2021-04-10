@@ -20,7 +20,7 @@ abstract class _SourcesFormAbstract
      *
      * @param array $interfaces
      */
-    public function formNodeInterfaces( &$interfaces )
+    public function formNodeInterfaces(&$interfaces)
     {
         //example
         //$interfaces[] = \IPS\myapp\MyInterface::class
@@ -31,7 +31,7 @@ abstract class _SourcesFormAbstract
      *
      * @param array $interfaces
      */
-    public function formItemsInterface( &$interfaces )
+    public function formItemsInterface(&$interfaces)
     {
         //example
         //$interfaces[] = \IPS\myapp\MyInterface::class
@@ -42,7 +42,7 @@ abstract class _SourcesFormAbstract
      *
      * @param array $interfaces
      */
-    public function formCommentInterfaces( &$interfaces )
+    public function formCommentInterfaces(&$interfaces)
     {
         //example
         //$interfaces[] = \IPS\myapp\MyInterface::class
@@ -53,7 +53,7 @@ abstract class _SourcesFormAbstract
      *
      * @param array $traits
      */
-    public function formNodeTraits( &$traits )
+    public function formNodeTraits(&$traits)
     {
         //example
         //$traits[] = \IPS\myapp\MyTraits::class
@@ -64,7 +64,7 @@ abstract class _SourcesFormAbstract
      *
      * @param array $traits
      */
-    public function formItemsTraits( &$traits )
+    public function formItemsTraits(&$traits)
     {
         //example
         //$traits[] = \IPS\myapp\MyTraits::class
@@ -76,7 +76,7 @@ abstract class _SourcesFormAbstract
      *
      * @param $classTypes
      */
-    public function formClassTypes( &$classTypes )
+    public function formClassTypes(&$classTypes)
     {
         //example
         //$classTypes['key'] = 'value';
@@ -85,7 +85,7 @@ abstract class _SourcesFormAbstract
     /**
      * add toggles to new class types
      */
-    public function formClassTypeToggles( $toggles )
+    public function formClassTypeToggles($toggles)
     {
         //the forms use dtbase/sources/Forms/Forms.php, it is a wrapper class for IPS\Helper\Forms, so it has
         //a different syntax, it uses arrays, and adds a prefix to form names, so all you have to do here is
@@ -119,9 +119,8 @@ abstract class _SourcesFormAbstract
      *
      * @param $elements
      */
-    public function formElements( &$elements )
+    public function formElements(&$elements)
     {
-
     }
 
     /**
@@ -129,7 +128,7 @@ abstract class _SourcesFormAbstract
      *
      * @param $values
      */
-    public function formProcess( &$values )
+    public function formProcess(&$values)
     {
     }
 }

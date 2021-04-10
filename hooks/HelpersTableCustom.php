@@ -1,9 +1,11 @@
 //<?php namespace toolbox_IPS_Helpers_Table_Custom_ac16e012da1288a7da21c27bc8228cc63;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
-if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
-{
-	exit;
+
+use function defined;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    exit;
 }
 
 class toolbox_hook_HelpersTableCustom extends _HOOK_CLASS_
@@ -11,7 +13,7 @@ class toolbox_hook_HelpersTableCustom extends _HOOK_CLASS_
 
     public function __toString()
     {
-        if( $this->langPrefix === 'database_column_'){
+        if ($this->langPrefix === 'database_column_') {
 //            $this->rootButtons['addMulti'] = array(
 //                    'icon'	=> 'plus',
 //                    'title'	=> 'database_columns_add',

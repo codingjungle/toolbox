@@ -52,7 +52,7 @@ class _Store implements HelpersAbstract
         $classDoc[] = ['pt' => 'p', 'prop' => 'dt_cascade_proxy', 'type' => 'array'];
         /* @var Application $app */
         foreach (Application::appsWithExtension('toolbox', 'ProxyHelpers') as $app) {
-            $extensions = $app->extensions('toolbox', 'ProxyHelpers', \true);
+            $extensions = $app->extensions('toolbox', 'ProxyHelpers', true);
             foreach ($extensions as $extension) {
                 if (method_exists($extension, 'store')) {
                     $extension->store($classDoc);

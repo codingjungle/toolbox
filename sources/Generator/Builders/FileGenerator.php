@@ -28,22 +28,19 @@ class FileGenerator extends GeneratorAbstract
 
     protected $body = [];
 
-    public function addBody( $body )
+    public function addBody($body)
     {
-
         $this->body[] = $body;
-    }
-
-    protected function writeSourceType()
-    {
-
     }
 
     protected function writeBody()
     {
+        $body = implode("\n", $this->body);
+        $this->output($body);
+    }
 
-        $body = implode( "\n", $this->body );
-        $this->output( $body );
+    protected function writeSourceType()
+    {
     }
 
 }

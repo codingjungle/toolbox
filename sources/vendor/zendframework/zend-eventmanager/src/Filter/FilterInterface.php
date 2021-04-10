@@ -19,8 +19,8 @@ interface FilterInterface
     /**
      * Execute the filter chain
      *
-     * @param  string|object $context
-     * @param  array $params
+     * @param string|object $context
+     * @param array $params
      * @return mixed
      */
     public function run($context, array $params = []);
@@ -28,14 +28,14 @@ interface FilterInterface
     /**
      * Attach an intercepting filter
      *
-     * @param  callable $callback
+     * @param callable $callback
      */
     public function attach(callable $callback);
 
     /**
      * Detach an intercepting filter
      *
-     * @param  callable $filter
+     * @param callable $filter
      * @return bool
      */
     public function detach(callable $filter);

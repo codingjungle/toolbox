@@ -1,10 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Internal;
 
-class DifferTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class DifferTest extends TestCase
 {
-    private function formatDiffString(array $diff) {
+    /** @dataProvider provideTestDiff */
+    public function testDiff($oldStr, $newStr, $expectedDiffStr)
+    {
+        $differ = new Differ(function ($a, $b) { return $a === $b; });
+        $diff = $differ->diff(str_split($oldStr), str_split($newStr));
+        $this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
+    }
+
+    private function formatDiffString(array $diff)
+    {
         $diffStr = '';
         foreach ($diff as $diffElem) {
             switch ($diffElem->type) {
@@ -28,14 +40,8 @@ class DifferTest extends \PHPUnit\Framework\TestCase
         return $diffStr;
     }
 
-    /** @dataProvider provideTestDiff */
-    public function testDiff($oldStr, $newStr, $expectedDiffStr) {
-        $differ = new Differ(function($a, $b) { return $a === $b; });
-        $diff = $differ->diff(str_split($oldStr), str_split($newStr));
-        $this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
-    }
-
-    public function provideTestDiff() {
+    public function provideTestDiff()
+    {
         return [
             ['abc', 'abc', 'abc'],
             ['abc', 'abcdef', 'abc+d+e+f'],
@@ -48,13 +54,15 @@ class DifferTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @dataProvider provideTestDiffWithReplacements */
-    public function testDiffWithReplacements($oldStr, $newStr, $expectedDiffStr) {
-        $differ = new Differ(function($a, $b) { return $a === $b; });
+    public function testDiffWithReplacements($oldStr, $newStr, $expectedDiffStr)
+    {
+        $differ = new Differ(function ($a, $b) { return $a === $b; });
         $diff = $differ->diffWithReplacements(str_split($oldStr), str_split($newStr));
         $this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
     }
 
-    public function provideTestDiffWithReplacements() {
+    public function provideTestDiffWithReplacements()
+    {
         return [
             ['abcde', 'axyze', 'a/bx/cy/dze'],
             ['abcde', 'xbcdy', '/axbcd/ey'],

@@ -13,8 +13,10 @@
 namespace IPS\toolbox\Code;
 
 use Exception;
+use InvalidArgumentException;
 use IPS\Application;
 use IPS\toolbox\Editor;
+use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -77,13 +79,13 @@ abstract class _ParserAbstract
     /**
      * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     final protected function getLocalFiles()
     {
         $files = new Finder();
         $files->in($this->appPath)->name('*.php')->name('*.js')->name('*.phtml');
-        if ($this->skip !== \null) {
+        if ($this->skip !== null) {
             foreach ($this->skip as $name) {
                 $files->notName($name);
             }
@@ -95,7 +97,7 @@ abstract class _ParserAbstract
      * looks for usage in app files
      *
      * @return array
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function check(): array
     {
@@ -116,7 +118,7 @@ abstract class _ParserAbstract
      * stores all the contents from the files for searching thru.
      *
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function getContent(): string
     {

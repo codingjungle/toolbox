@@ -2,15 +2,51 @@
 
 namespace Go\ParserReflection\Stub;
 
-abstract class ExplicitAbstractClass {}
+use Generator;
+
+trait SimpleTrait
+{
+    public function foo() { return __CLASS__; }
+}
+
+trait ConflictedSimpleTrait
+{
+    public function foo() { return 'BAZ'; }
+}
+
+trait TraitWithProperties
+{
+    public static $cs = 'foo';
+    protected static $bs = __TRAIT__;
+    private static $as = 1;
+    public $c = 'baz';
+    protected $b = 'bar';
+    private $a = 'foo';
+}
+
+interface SimpleInterface { }
+
+interface InterfaceWithMethod
+{
+    public function foo();
+}
+
+interface AbstractInterface
+{
+    public function foo();
+
+    public function bar();
+}
+
+abstract class ExplicitAbstractClass { }
 
 abstract class ImplicitAbstractClass
 {
-    private $a = 'foo';
-    protected $b = 'bar';
     public $c = 'baz';
+    protected $b = 'bar';
+    private $a = 'foo';
 
-    abstract function test();
+    public abstract function test();
 }
 
 /**
@@ -19,6 +55,7 @@ abstract class ImplicitAbstractClass
 final class FinalClass
 {
     public $args = [];
+
     public function __construct($a = null, &$b = null)
     {
         $this->args = array_slice(array($a, &$b), 0, func_num_args());
@@ -38,25 +75,18 @@ class BaseClass
  */
 abstract class AbstractClassWithMethods extends BaseClass
 {
-    const TEST = 5;
+    public const TEST = 5;
 
-    public function __construct(){}
-    public function __destruct(){}
-    public function explicitPublicFunc(){}
-    function implicitPublicFunc(){}
-    protected function protectedFunc(){}
-    private function privateFunc(){}
-    static function staticFunc(){}
-    protected static function protectedStaticFunc(){}
-    abstract function abstractFunc();
-    final function finalFunc(){}
+    public function __construct() { }
+
+    public static function staticFunc() { }
 
     /**
      * @return string
      */
     public static function funcWithDocAndBody()
     {
-        static $a =5, $test = '1234';
+        static $a = 5, $test = '1234';
 
         return 'hello';
     }
@@ -71,8 +101,20 @@ abstract class AbstractClassWithMethods extends BaseClass
         return __CLASS__;
     }
 
+    protected static function protectedStaticFunc() { }
+
+    public function __destruct() { }
+
+    public function explicitPublicFunc() { }
+
+    public function implicitPublicFunc() { }
+
+    public abstract function abstractFunc();
+
+    public final function finalFunc() { }
+
     /**
-     * @return \Generator
+     * @return Generator
      */
     public function generatorYieldFunc()
     {
@@ -94,68 +136,27 @@ abstract class AbstractClassWithMethods extends BaseClass
         return 10;
     }
 
-    private function testParam($a, $b = null, $d = self::TEST) {}
+    protected function protectedFunc() { }
+
+    private function privateFunc() { }
+
+    private function testParam($a, $b = null, $d = self::TEST) { }
 }
 
 class ClassWithProperties
 {
-    private $privateProperty = 123;
-    protected $protectedProperty = 'a';
-    public $publicProperty = 42.0;
-
+    public static $publicStaticProperty = M_PI;
+    protected static $protectedStaticProperty = 'foo';
     /**
      * Some message to test docBlock
      *
      * @var int
      */
     private static $privateStaticProperty = 1;
-    protected static $protectedStaticProperty = 'foo';
-    public static $publicStaticProperty = M_PI;
+    public $publicProperty = 42.0;
+    protected $protectedProperty = 'a';
+    private $privateProperty = 123;
 }
-
-abstract class ClassWithMethodsAndProperties
-{
-    public $publicProperty;
-    protected $protectedProperty;
-    private $privateProperty;
-
-    static public $staticPublicProperty;
-    static protected $staticProtectedProperty;
-    static private $staticPrivateProperty;
-
-    public function publicMethod() {}
-    protected function protectedMethod() {}
-    private function privateMethod() {}
-
-    static public function publicStaticMethod() {}
-    static protected function protectedStaticMethod() {}
-    static private function privateStaticMethod() {}
-
-    abstract public function publicAbstractMethod();
-    abstract protected function protectedAbstractMethod();
-
-    final public function publicFinalMethod() {}
-    final protected function protectedFinalMethod() {}
-    final private function privateFinalMethod() {}
-}
-
-interface SimpleInterface {}
-
-interface InterfaceWithMethod {
-    function foo();
-}
-
-trait SimpleTrait
-{
-    function foo() { return __CLASS__; }
-}
-
-trait ConflictedSimpleTrait
-{
-    function foo() { return 'BAZ'; }
-}
-
-class SimpleInheritance extends ExplicitAbstractClass {}
 
 /*
  * Current implementation returns wrong __toString description for the parent methods
@@ -168,12 +169,39 @@ abstract class SimpleAbstractInheritance extends ImplicitAbstractClass
 }
 */
 
-class ClassWithInterface implements SimpleInterface {}
-
-class ClassWithTrait
+abstract class ClassWithMethodsAndProperties
 {
-    use SimpleTrait;
+    public static $staticPublicProperty;
+    protected static $staticProtectedProperty;
+    private static $staticPrivateProperty;
+    public $publicProperty;
+    protected $protectedProperty;
+    private $privateProperty;
+
+    public static function publicStaticMethod() { }
+
+    protected static function protectedStaticMethod() { }
+
+    private static function privateStaticMethod() { }
+
+    public function publicMethod() { }
+
+    abstract public function publicAbstractMethod();
+
+    final public function publicFinalMethod() { }
+
+    protected function protectedMethod() { }
+
+    abstract protected function protectedAbstractMethod();
+
+    final protected function protectedFinalMethod() { }
+
+    private function privateMethod() { }
+
+    final private function privateFinalMethod() { }
 }
+
+class SimpleInheritance extends ExplicitAbstractClass { }
 
 /*
  * Current implementation doesn't support trait adaptation,
@@ -205,62 +233,52 @@ class ClassWithTraitAndInterface implements InterfaceWithMethod
 }
 */
 
+class ClassWithInterface implements SimpleInterface { }
+
+class ClassWithTrait
+{
+    use SimpleTrait;
+}
+
 class NoCloneable
 {
-    private function __clone() {}
+    private function __clone() { }
 }
 
 class NoInstantiable
 {
-    private function __construct() {}
-}
-
-interface AbstractInterface
-{
-    public function foo();
-    public function bar();
+    private function __construct() { }
 }
 
 class ClassWithScalarConstants
 {
-    const A = 10, A1 = 11;
-    const B = 42.0;
-    const C = 'foo';
-    const D = false;
-    const E = null;
-}
-
-class ClassWithMagicConstants
-{
-    const A = __DIR__;
-    const B = __FILE__;
-    const C = __NAMESPACE__;
-    const D = __CLASS__;
-    const E = __LINE__;
-
-    public static $a    = self::A;
-    protected static $b = self::B;
-    private static $c   = self::C;
+    public const A1 = 11;
+    public const B = 42.0;
+    public const C = 'foo';
+    public const D = false;
+    public const E = null;
 }
 
 const NS_CONST = 'test';
 
-class ClassWithConstantsAndInheritance extends ClassWithMagicConstants
+class ClassWithMagicConstants
 {
-    const A = 'overridden';
-    const H = M_PI;
-    const J = NS_CONST;
+    public const A = __DIR__;
+    public const B = __FILE__;
+    public const C = __NAMESPACE__;
+    public const D = __CLASS__;
+    public const E = __LINE__;
 
-    public static $h = self::H;
+    public static $a = self::A;
+    protected static $b = self::B;
+    private static $c = self::C;
 }
 
-trait TraitWithProperties
+class ClassWithConstantsAndInheritance extends ClassWithMagicConstants
 {
-    private $a = 'foo';
-    protected $b = 'bar';
-    public $c = 'baz';
+    public const A = 'overridden';
+    public const H = M_PI;
+    public const J = NS_CONST;
 
-    private static $as = 1;
-    protected static $bs = __TRAIT__;
-    public static $cs = 'foo';
+    public static $h = self::H;
 }

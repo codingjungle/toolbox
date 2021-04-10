@@ -58,29 +58,6 @@ class TraitUsageGenerator extends AbstractGenerator implements TraitUsageInterfa
     }
 
     /**
-     * @inheritDoc
-     */
-    public function addUse($use, $useAlias = null)
-    {
-        $this->removeUse($use);
-
-        if (! empty($useAlias)) {
-            $use .= ' as ' . $useAlias;
-        }
-
-        $this->uses[$use] = $use;
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getUses()
-    {
-        return array_values($this->uses);
-    }
-
-    /**
      * @param string $use
      * @return bool
      */
@@ -94,6 +71,19 @@ class TraitUsageGenerator extends AbstractGenerator implements TraitUsageInterfa
         }
 
         return false;
+    }    /**
+     * @inheritDoc
+     */
+    public function addUse($use, $useAlias = null)
+    {
+        $this->removeUse($use);
+
+        if (!empty($useAlias)) {
+            $use .= ' as ' . $useAlias;
+        }
+
+        $this->uses[$use] = $use;
+        return $this;
     }
 
     /**
@@ -150,22 +140,6 @@ class TraitUsageGenerator extends AbstractGenerator implements TraitUsageInterfa
      * @param string $use
      * @return TraitUsageGenerator
      */
-    public function removeUse($use)
-    {
-        foreach ($this->uses as $key => $value) {
-            $parts = explode(' ', $value);
-            if ($parts[0] === $use) {
-                unset($this->uses[$value]);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string $use
-     * @return TraitUsageGenerator
-     */
     public function removeUseAlias($use)
     {
         foreach ($this->uses as $key => $value) {
@@ -176,228 +150,6 @@ class TraitUsageGenerator extends AbstractGenerator implements TraitUsageInterfa
         }
 
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addTrait($trait)
-    {
-        $traitName = $trait;
-        if (is_array($trait)) {
-            if (! array_key_exists('traitName', $trait)) {
-                throw new Exception\InvalidArgumentException('Missing required value for traitName');
-            }
-            $traitName = $trait['traitName'];
-
-            if (array_key_exists('aliases', $trait)) {
-                foreach ($trait['aliases'] as $alias) {
-                    $this->addAlias($alias);
-                }
-            }
-
-            if (array_key_exists('insteadof', $trait)) {
-                foreach ($trait['insteadof'] as $insteadof) {
-                    $this->addTraitOverride($insteadof);
-                }
-            }
-        }
-
-        if (! $this->hasTrait($traitName)) {
-            $this->traits[] = $traitName;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addTraits(array $traits)
-    {
-        foreach ($traits as $trait) {
-            $this->addTrait($trait);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasTrait($traitName)
-    {
-        return in_array($traitName, $this->traits);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTraits()
-    {
-        return $this->traits;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function removeTrait($traitName)
-    {
-        $key = array_search($traitName, $this->traits);
-        if (false !== $key) {
-            unset($this->traits[$key]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addTraitAlias($method, $alias, $visibility = null)
-    {
-        $traitAndMethod = $method;
-        if (is_array($method)) {
-            if (! array_key_exists('traitName', $method)) {
-                throw new Exception\InvalidArgumentException('Missing required argument "traitName" for $method');
-            }
-
-            if (! array_key_exists('method', $method)) {
-                throw new Exception\InvalidArgumentException('Missing required argument "method" for $method');
-            }
-
-            $traitAndMethod = $method['traitName'] . '::' . $method['method'];
-        }
-
-        // Validations
-        if (false === strpos($traitAndMethod, '::')) {
-            throw new Exception\InvalidArgumentException(
-                'Invalid Format: $method must be in the format of trait::method'
-            );
-        }
-        if (! is_string($alias)) {
-            throw new Exception\InvalidArgumentException('Invalid Alias: $alias must be a string or array.');
-        }
-        if ($this->classGenerator->hasMethod($alias)) {
-            throw new Exception\InvalidArgumentException('Invalid Alias: Method name already exists on this class.');
-        }
-        if (null !== $visibility
-            && $visibility !== ReflectionMethod::IS_PUBLIC
-            && $visibility !== ReflectionMethod::IS_PRIVATE
-            && $visibility !== ReflectionMethod::IS_PROTECTED
-        ) {
-            throw new Exception\InvalidArgumentException(
-                'Invalid Type: $visibility must of ReflectionMethod::IS_PUBLIC,'
-                . ' ReflectionMethod::IS_PRIVATE or ReflectionMethod::IS_PROTECTED'
-            );
-        }
-
-        list($trait, $method) = explode('::', $traitAndMethod);
-        if (! $this->hasTrait($trait)) {
-            throw new Exception\InvalidArgumentException('Invalid trait: Trait does not exists on this class');
-        }
-
-        $this->traitAliases[$traitAndMethod] = [
-            'alias'      => $alias,
-            'visibility' => $visibility,
-        ];
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTraitAliases()
-    {
-        return $this->traitAliases;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addTraitOverride($method, $traitsToReplace)
-    {
-        if (false === is_array($traitsToReplace)) {
-            $traitsToReplace = [$traitsToReplace];
-        }
-
-        $traitAndMethod = $method;
-        if (is_array($method)) {
-            if (! array_key_exists('traitName', $method)) {
-                throw new Exception\InvalidArgumentException('Missing required argument "traitName" for $method');
-            }
-
-            if (! array_key_exists('method', $method)) {
-                throw new Exception\InvalidArgumentException('Missing required argument "method" for $method');
-            }
-
-            $traitAndMethod = (string) $method['traitName'] . '::' . (string) $method['method'];
-        }
-
-        // Validations
-        if (false === strpos($traitAndMethod, '::')) {
-            throw new Exception\InvalidArgumentException(
-                'Invalid Format: $method must be in the format of trait::method'
-            );
-        }
-
-        list($trait, $method) = explode('::', $traitAndMethod);
-        if (! $this->hasTrait($trait)) {
-            throw new Exception\InvalidArgumentException('Invalid trait: Trait does not exists on this class');
-        }
-
-        if (! array_key_exists($traitAndMethod, $this->traitOverrides)) {
-            $this->traitOverrides[$traitAndMethod] = [];
-        }
-
-        foreach ($traitsToReplace as $traitToReplace) {
-            if (! is_string($traitToReplace)) {
-                throw new Exception\InvalidArgumentException(
-                    'Invalid Argument: $traitToReplace must be a string or array of strings'
-                );
-            }
-
-            if (! in_array($traitToReplace, $this->traitOverrides[$traitAndMethod])) {
-                $this->traitOverrides[$traitAndMethod][] = $traitToReplace;
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function removeTraitOverride($method, $overridesToRemove = null)
-    {
-        if (! array_key_exists($method, $this->traitOverrides)) {
-            return $this;
-        }
-
-        if (null === $overridesToRemove) {
-            unset($this->traitOverrides[$method]);
-            return $this;
-        }
-
-        $overridesToRemove = ! is_array($overridesToRemove)
-            ? [$overridesToRemove]
-            : $overridesToRemove;
-        foreach ($overridesToRemove as $traitToRemove) {
-            $key = array_search($traitToRemove, $this->traitOverrides[$method]);
-            if (false !== $key) {
-                unset($this->traitOverrides[$method][$key]);
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTraitOverrides()
-    {
-        return $this->traitOverrides;
     }
 
     /**
@@ -415,7 +167,7 @@ class TraitUsageGenerator extends AbstractGenerator implements TraitUsageInterfa
 
         $output .= $indent . 'use ' . implode(', ', $traits);
 
-        $aliases   = $this->getTraitAliases();
+        $aliases = $this->getTraitAliases();
         $overrides = $this->getTraitOverrides();
         if (empty($aliases) && empty($overrides)) {
             $output .= ';' . self::LINE_FEED . self::LINE_FEED;
@@ -464,4 +216,252 @@ class TraitUsageGenerator extends AbstractGenerator implements TraitUsageInterfa
 
         return $output;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTraits()
+    {
+        return $this->traits;
+    }    /**
+     * @param string $use
+     * @return TraitUsageGenerator
+     */
+    public function removeUse($use)
+    {
+        foreach ($this->uses as $key => $value) {
+            $parts = explode(' ', $value);
+            if ($parts[0] === $use) {
+                unset($this->uses[$value]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTraitAliases()
+    {
+        return $this->traitAliases;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTraitOverrides()
+    {
+        return $this->traitOverrides;
+    }    /**
+     * @inheritDoc
+     */
+    public function addTrait($trait)
+    {
+        $traitName = $trait;
+        if (is_array($trait)) {
+            if (!array_key_exists('traitName', $trait)) {
+                throw new Exception\InvalidArgumentException('Missing required value for traitName');
+            }
+            $traitName = $trait['traitName'];
+
+            if (array_key_exists('aliases', $trait)) {
+                foreach ($trait['aliases'] as $alias) {
+                    $this->addAlias($alias);
+                }
+            }
+
+            if (array_key_exists('insteadof', $trait)) {
+                foreach ($trait['insteadof'] as $insteadof) {
+                    $this->addTraitOverride($insteadof);
+                }
+            }
+        }
+
+        if (!$this->hasTrait($traitName)) {
+            $this->traits[] = $traitName;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUses()
+    {
+        return array_values($this->uses);
+    }    /**
+     * @inheritDoc
+     */
+    public function addTraits(array $traits)
+    {
+        foreach ($traits as $trait) {
+            $this->addTrait($trait);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasTrait($traitName)
+    {
+        return in_array($traitName, $this->traits);
+    }
+
+
+
+    /**
+     * @inheritDoc
+     */
+    public function removeTrait($traitName)
+    {
+        $key = array_search($traitName, $this->traits);
+        if (false !== $key) {
+            unset($this->traits[$key]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addTraitAlias($method, $alias, $visibility = null)
+    {
+        $traitAndMethod = $method;
+        if (is_array($method)) {
+            if (!array_key_exists('traitName', $method)) {
+                throw new Exception\InvalidArgumentException('Missing required argument "traitName" for $method');
+            }
+
+            if (!array_key_exists('method', $method)) {
+                throw new Exception\InvalidArgumentException('Missing required argument "method" for $method');
+            }
+
+            $traitAndMethod = $method['traitName'] . '::' . $method['method'];
+        }
+
+        // Validations
+        if (false === strpos($traitAndMethod, '::')) {
+            throw new Exception\InvalidArgumentException(
+                'Invalid Format: $method must be in the format of trait::method'
+            );
+        }
+        if (!is_string($alias)) {
+            throw new Exception\InvalidArgumentException('Invalid Alias: $alias must be a string or array.');
+        }
+        if ($this->classGenerator->hasMethod($alias)) {
+            throw new Exception\InvalidArgumentException('Invalid Alias: Method name already exists on this class.');
+        }
+        if (null !== $visibility
+            && $visibility !== ReflectionMethod::IS_PUBLIC
+            && $visibility !== ReflectionMethod::IS_PRIVATE
+            && $visibility !== ReflectionMethod::IS_PROTECTED
+        ) {
+            throw new Exception\InvalidArgumentException(
+                'Invalid Type: $visibility must of ReflectionMethod::IS_PUBLIC,'
+                . ' ReflectionMethod::IS_PRIVATE or ReflectionMethod::IS_PROTECTED'
+            );
+        }
+
+        list($trait, $method) = explode('::', $traitAndMethod);
+        if (!$this->hasTrait($trait)) {
+            throw new Exception\InvalidArgumentException('Invalid trait: Trait does not exists on this class');
+        }
+
+        $this->traitAliases[$traitAndMethod] = [
+            'alias'      => $alias,
+            'visibility' => $visibility,
+        ];
+
+        return $this;
+    }
+
+
+
+    /**
+     * @inheritDoc
+     */
+    public function addTraitOverride($method, $traitsToReplace)
+    {
+        if (false === is_array($traitsToReplace)) {
+            $traitsToReplace = [$traitsToReplace];
+        }
+
+        $traitAndMethod = $method;
+        if (is_array($method)) {
+            if (!array_key_exists('traitName', $method)) {
+                throw new Exception\InvalidArgumentException('Missing required argument "traitName" for $method');
+            }
+
+            if (!array_key_exists('method', $method)) {
+                throw new Exception\InvalidArgumentException('Missing required argument "method" for $method');
+            }
+
+            $traitAndMethod = (string)$method['traitName'] . '::' . (string)$method['method'];
+        }
+
+        // Validations
+        if (false === strpos($traitAndMethod, '::')) {
+            throw new Exception\InvalidArgumentException(
+                'Invalid Format: $method must be in the format of trait::method'
+            );
+        }
+
+        list($trait, $method) = explode('::', $traitAndMethod);
+        if (!$this->hasTrait($trait)) {
+            throw new Exception\InvalidArgumentException('Invalid trait: Trait does not exists on this class');
+        }
+
+        if (!array_key_exists($traitAndMethod, $this->traitOverrides)) {
+            $this->traitOverrides[$traitAndMethod] = [];
+        }
+
+        foreach ($traitsToReplace as $traitToReplace) {
+            if (!is_string($traitToReplace)) {
+                throw new Exception\InvalidArgumentException(
+                    'Invalid Argument: $traitToReplace must be a string or array of strings'
+                );
+            }
+
+            if (!in_array($traitToReplace, $this->traitOverrides[$traitAndMethod])) {
+                $this->traitOverrides[$traitAndMethod][] = $traitToReplace;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function removeTraitOverride($method, $overridesToRemove = null)
+    {
+        if (!array_key_exists($method, $this->traitOverrides)) {
+            return $this;
+        }
+
+        if (null === $overridesToRemove) {
+            unset($this->traitOverrides[$method]);
+            return $this;
+        }
+
+        $overridesToRemove = !is_array($overridesToRemove)
+            ? [$overridesToRemove]
+            : $overridesToRemove;
+        foreach ($overridesToRemove as $traitToRemove) {
+            $key = array_search($traitToRemove, $this->traitOverrides[$method]);
+            if (false !== $key) {
+                unset($this->traitOverrides[$method][$key]);
+            }
+        }
+        return $this;
+    }
+
+
+
+
 }

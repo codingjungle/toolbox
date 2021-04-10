@@ -16,13 +16,6 @@ namespace Go\ParserReflection\Traits;
 trait InternalPropertiesEmulationTrait
 {
     /**
-     * Magic method that should be defined to provide an info about internal properties
-     *
-     * @return array
-     */
-    abstract public function ___debugInfo();
-
-    /**
      * Magic implementation of properties
      *
      * @param string $propertyName Name of the property to return
@@ -41,4 +34,11 @@ trait InternalPropertiesEmulationTrait
 
         return $internalInfo[$propertyName];
     }
+
+    /**
+     * Magic method that should be defined to provide an info about internal properties
+     *
+     * @return array
+     */
+    abstract public function ___debugInfo();
 }

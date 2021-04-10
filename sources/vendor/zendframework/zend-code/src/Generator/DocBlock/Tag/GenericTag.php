@@ -32,17 +32,25 @@ class GenericTag extends AbstractGenerator implements TagInterface, PrototypeGen
      */
     public function __construct($name = null, $content = null)
     {
-        if (! empty($name)) {
+        if (!empty($name)) {
             $this->setName($name);
         }
 
-        if (! empty($content)) {
+        if (!empty($content)) {
             $this->setContent($content);
         }
     }
 
     /**
-     * @param  string $name
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
      * @return GenericTag
      */
     public function setName($name)
@@ -54,9 +62,9 @@ class GenericTag extends AbstractGenerator implements TagInterface, PrototypeGen
     /**
      * @return string
      */
-    public function getName()
+    public function getContent()
     {
-        return $this->name;
+        return $this->content;
     }
 
     /**
@@ -72,18 +80,10 @@ class GenericTag extends AbstractGenerator implements TagInterface, PrototypeGen
     /**
      * @return string
      */
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    /**
-     * @return string
-     */
     public function generate()
     {
         $output = '@' . $this->name
-            . (! empty($this->content) ? ' ' . $this->content : '');
+            . (!empty($this->content) ? ' ' . $this->content : '');
 
         return $output;
     }

@@ -12,9 +12,10 @@
 
 namespace IPS\toolbox\DevCenter\Extensions;
 
+use Exception;
+
 use function defined;
 use function header;
-
 use function str_replace;
 
 
@@ -27,25 +28,10 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  * Class _FileStorage
  *
  * @package IPS\toolbox\DevCenter\Extensions
- * @mixin \IPS\toolbox\DevCenter\Extensions\ExtensionsAbstract
+ * @mixin ExtensionsAbstract
  */
 class _Headerdoc extends ExtensionsAbstract
 {
-
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public function elements()
-    {
-        $this->form->element('use_default')->toggles(['table', 'field'], true);
-        $this->form->add('enabled', 'yn');
-        $this->form->add('indexEnabled', 'yn');
-        $this->form->add('dirSkip', 'stack');
-        $this->form->add('fileSkip', 'stack');
-        $this->form->add('exclude', 'stack');
-        return $this->elements;
-    }
 
     /**
      * @inheritdoc
@@ -91,5 +77,20 @@ class _Headerdoc extends ExtensionsAbstract
         ];
         unset($this->enabled, $this->indexEnabled, $this->dirSkip, $this->fileSkip, $this->exclude);
         return str_replace($find, $replace, $content);
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function elements()
+    {
+        $this->form->element('use_default')->toggles(['table', 'field'], true);
+        $this->form->add('enabled', 'yn');
+        $this->form->add('indexEnabled', 'yn');
+        $this->form->add('dirSkip', 'stack');
+        $this->form->add('fileSkip', 'stack');
+        $this->form->add('exclude', 'stack');
+        return $this->elements;
     }
 }

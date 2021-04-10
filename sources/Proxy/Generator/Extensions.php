@@ -16,6 +16,7 @@ use IPS\Application;
 use IPS\Data\Store;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+
 use function date;
 use function defined;
 use function header;
@@ -24,15 +25,15 @@ use function str_replace;
 
 \IPS\toolbox\Application::loadAutoLoader();
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( isset( $_SERVER[ 'SERVER_PROTOCOL' ] ) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
  * Extensions Class
  *
- * @mixin \IPS\toolbox\Proxy\Generator\Extensions
+ * @mixin Extensions
  */
 class _Extensions extends GeneratorAbstract
 {
@@ -49,21 +50,19 @@ class _Extensions extends GeneratorAbstract
      */
     public function create()
     {
-
         $name = [];
         $lookup = [];
-        foreach ( Application::roots() AS $key ) {
+        foreach (Application::roots() as $key) {
             $path = \IPS\ROOT_PATH . '/applications/' . $key->directory . '/data/defaults/extensions/';
-            if ( is_dir( $path ) ) {
+            if (is_dir($path)) {
                 try {
-
-                    $files = ( new Finder() )->in( $path )->files()->name( '*.txt' );
+                    $files = (new Finder())->in($path)->files()->name('*.txt');
 
                     /**
                      * @var SplFileInfo $file
                      */
-                    foreach ( $files as $file ) {
-                        $baseName = $file->getBasename( '.txt' );
+                    foreach ($files as $file) {
+                        $baseName = $file->getBasename('.txt');
                         $name[] = $baseName;
                         $find = [
                             '{subpackage}',
@@ -74,31 +73,30 @@ class _Extensions extends GeneratorAbstract
                         ];
                         $replace = [
                             $key->directory,
-                            date( 'd M Y' ),
+                            date('d M Y'),
                             $key->directory,
-                            $file->getBasename( '.txt' ),
+                            $file->getBasename('.txt'),
                             '',
                         ];
 
-                        $content = str_replace( $find, $replace, $file->getContents() );
-                        $file = new FileGenerator;
-                        $file->addBody( $content );
-                        $file->addFileName( $baseName );
-                        $file->addPath( $this->save . '/extensions' );
+                        $content = str_replace($find, $replace, $file->getContents());
+                        $file = new FileGenerator();
+                        $file->addBody($content);
+                        $file->addFileName($baseName);
+                        $file->addPath($this->save . '/extensions');
                         $file->save();
-
                     }
-                } catch ( Exception $e ) {
+                } catch (Exception $e) {
                 }
             }
         }
 
         $jsonMeta = [];
-        if ( isset( Store::i()->dt_json ) ) {
+        if (isset(Store::i()->dt_json)) {
             $jsonMeta = Store::i()->dt_json;
         }
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signature'  => [
                 'IPS\\Application::extensions:1',
                 'IPS\\Application::allExtensions:1',
@@ -116,7 +114,7 @@ class _Extensions extends GeneratorAbstract
             'language'   => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'   => 'ExtensionsNameProvider',
             'source' => [
                 'contributor' => 'return_array',
@@ -126,7 +124,7 @@ class _Extensions extends GeneratorAbstract
 
         Store::i()->dt_json = $jsonMeta;
 
-        $this->writeClass( 'Extensions', 'ExtensionsNameProvider', $name );
+        $this->writeClass('Extensions', 'ExtensionsNameProvider', $name);
     }
 }
 

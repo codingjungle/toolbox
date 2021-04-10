@@ -13,14 +13,18 @@
 namespace IPS\toolbox\DevCenter;
 
 use Exception;
+use InvalidArgumentException;
 use IPS\Application;
 use IPS\Member;
 use IPS\Patterns\Singleton;
 use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\Text;
 use ReflectionMethod;
+use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+
+use UnderflowException;
 
 use function array_pop;
 use function defined;
@@ -42,7 +46,7 @@ use function str_replace;
 use function trim;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -50,7 +54,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  * Class _Headerdoc
  *
  * @package IPS\toolbox\DevCenter
- * @mixin \IPS\toolbox\DevCenter\Headerdoc
+ * @mixin Headerdoc
  */
 class _Headerdoc extends Singleton
 {
@@ -75,9 +79,9 @@ class _Headerdoc extends Singleton
      */
     public function addIndexHtml(Application $app)
     {
-        $continue = \false;
+        $continue = false;
 
-        foreach ($app->extensions('toolbox', 'Headerdoc', \true) as $class) {
+        foreach ($app->extensions('toolbox', 'Headerdoc', true) as $class) {
             if (method_exists($class, 'indexEnabled')) {
                 $continue = $class->indexEnabled();
             }
@@ -94,14 +98,14 @@ class _Headerdoc extends Singleton
         ];
 
         try {
-            $finder = new Finder;
+            $finder = new Finder();
             $dir = \IPS\ROOT_PATH . '/applications/' . $app->directory;
             $filter = function (SplFileInfo $file) use ($exclude) {
-                if (!in_array($file->getExtension(), $exclude, \true)) {
-                    return \true;
+                if (!in_array($file->getExtension(), $exclude, true)) {
+                    return true;
                 }
 
-                return \false;
+                return false;
             };
 
             $finder->in($dir)->filter($filter)->directories();
@@ -123,9 +127,9 @@ class _Headerdoc extends Singleton
      *
      * @param Application $app
      *
-     * @throws \UnderflowException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws UnderflowException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function process(Application $app)
     {
@@ -151,11 +155,11 @@ class _Headerdoc extends Singleton
         $since = $app->version;
 
         /* @var \IPS\toolbox\DevCenter\extensions\toolbox\DevCenter\Headerdoc\Headerdoc $class */
-        foreach ($app->extensions('toolbox', 'Headerdoc', \true) as $class) {
-            if( method_exists($class, 'filesSkip')){
+        foreach ($app->extensions('toolbox', 'Headerdoc', true) as $class) {
+            if (method_exists($class, 'filesSkip')) {
                 $class->filesSkip($files);
             }
-            if( method_exists($class,'dirSkip')){
+            if (method_exists($class, 'dirSkip')) {
                 $class->dirSkip($directory);
             }
             try {
@@ -169,7 +173,7 @@ class _Headerdoc extends Singleton
             }
         }
 
-        $finder = new Finder;
+        $finder = new Finder();
         $dir = \IPS\ROOT_PATH . '/applications/' . $app->directory;
 
 
@@ -201,7 +205,7 @@ class _Headerdoc extends Singleton
      */
     public function can(Application $app): bool
     {
-        $continue = \false;
+        $continue = false;
 
         /* @var \IPS\toolbox\DevCenter\extensions\toolbox\DevCenter\Headerdoc\Headerdoc $class */
         foreach ($app->extensions('toolbox', 'Headerdoc', true) as $class) {
@@ -221,27 +225,27 @@ class _Headerdoc extends Singleton
             preg_match("#^.+?\s(?=namespace)#s", $line, $section);
             $sinced = [];
 
-            if (isset($section[ 0 ])) {
-                preg_match('#@since([^\n]+)?#', $section[ 0 ], $sinced);
+            if (isset($section[0])) {
+                preg_match('#@since([^\n]+)?#', $section[0], $sinced);
             }
 
 
-            if (!isset($sinced[ 1 ])) {
+            if (!isset($sinced[1])) {
                 preg_match("#^.+?\s(?=namespace)#s", $line, $section);
 
-                if (isset($section[ 0 ])) {
-                    preg_match('#@brief([^\n]+)?#', $section[ 0 ], $brief);
+                if (isset($section[0])) {
+                    preg_match('#@brief([^\n]+)?#', $section[0], $brief);
                 } else {
                     $brief = [];
                 }
 
-                if (!isset($brief[ 1 ])) {
+                if (!isset($brief[1])) {
                     $path = pathinfo($filePath);
-                    $type = $path[ 'dirname' ];
+                    $type = $path['dirname'];
                     $type = str_replace('\\', '/', $type);
-                    $file = $path[ 'filename' ];
+                    $file = $path['filename'];
 
-                    if (mb_strpos($filePath, 'extensions') !== \false) {
+                    if (mb_strpos($filePath, 'extensions') !== false) {
                         $type = explode('/', $type);
                         $extension = mb_ucfirst(mb_strtolower(array_pop($type)));
                         $extApp = mb_ucfirst(mb_strtolower(array_pop($type)));
@@ -251,20 +255,20 @@ class _Headerdoc extends Singleton
 
                         preg_match($regex, $line, $matches);
 
-                        if (isset($matches[ 1 ])) {
+                        if (isset($matches[1])) {
                             $brief = (mb_strpos(
-                                    $matches[ 1 ],
+                                    $matches[1],
                                     'Model'
-                                ) !== \false) ? $file . ' Node' : $file . ' Class';
+                                ) !== false) ? $file . ' Node' : $file . ' Class';
                         } else {
                             $brief = $file;
-                            $brief .= isset($matches[ 1 ]) ? ' ' . mb_ucfirst($matches[ 1 ]) : ' Class';
+                            $brief .= isset($matches[1]) ? ' ' . mb_ucfirst($matches[1]) : ' Class';
                         }
                     }
 
                     $brief = trim($brief);
                 } else {
-                    $brief = str_replace(' ', '', trim($brief[ 1 ]));
+                    $brief = str_replace(' ', '', trim($brief[1]));
                 }
 
                 $replacement = file_get_contents(\IPS\ROOT_PATH . '/applications/toolbox/data/defaults/headerDoc.txt');
@@ -281,16 +285,16 @@ class _Headerdoc extends Singleton
 
                 file_put_contents($filePath, $line);
             } else {
-                $write = \false;
+                $write = false;
 
                 $line = preg_replace_callback(
                     "#^.+?\s(?=namespace)#s",
                     function ($m) use (&$write, $since) {
-                        $line = $m[ 0 ];
+                        $line = $m[0];
                         preg_match('#@since([^\n]+)?#', $line, $since);
 
-                        if (isset($since[ 1 ]) && trim($since[ 1 ]) === '-storm_since_version-') {
-                            $write = \true;
+                        if (isset($since[1]) && trim($since[1]) === '-storm_since_version-') {
+                            $write = true;
                             $since = <<<EOF
 @author      {$since[1]}
 EOF;
@@ -299,8 +303,8 @@ EOF;
                         //author
                         preg_match('#@author([^\n]+)?#', $line, $auth);
 
-                        if (isset($auth[ 1 ]) && trim($auth[ 1 ]) !== '-storm_author-') {
-                            $write = \true;
+                        if (isset($auth[1]) && trim($auth[1]) !== '-storm_author-') {
+                            $write = true;
                             $author = <<<EOF
 @author      -storm_author-
 EOF;
@@ -310,8 +314,8 @@ EOF;
                         //version
                         preg_match('#@version([^\n]+)?#', $line, $ver);
 
-                        if (isset($ver[ 1 ]) && trim($ver[ 1 ]) !== '-storm_version-') {
-                            $write = \true;
+                        if (isset($ver[1]) && trim($ver[1]) !== '-storm_version-') {
+                            $write = true;
                             $ver = <<<EOF
 @version     -storm_version-
 EOF;
@@ -321,8 +325,8 @@ EOF;
                         //copyright
                         preg_match('#@copyright([^\n]+)?#', $line, $cp);
 
-                        if (isset($cp[ 1 ]) && trim($cp[ 1 ]) !== '-storm_copyright-') {
-                            $write = \true;
+                        if (isset($cp[1]) && trim($cp[1]) !== '-storm_copyright-') {
+                            $write = true;
                             $cpy = <<<EOF
 @copyright   -storm_copyright-
 EOF;

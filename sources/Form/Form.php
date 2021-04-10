@@ -14,7 +14,6 @@
 namespace IPS\toolbox;
 
 use InvalidArgumentException;
-use IPS\toolbox\Profiler\Debug;
 use IPS\Content\Item;
 use IPS\Helpers\Form\FormAbstract;
 use IPS\Helpers\Form\Matrix;
@@ -24,8 +23,10 @@ use IPS\Login;
 use IPS\Member;
 use IPS\Request;
 use IPS\Session;
-use IPS\toolbox\Form\Element;
 use IPS\Theme;
+use IPS\toolbox\Form\Element;
+
+use UnexpectedValueException;
 
 use function array_merge;
 use function class_exists;
@@ -39,9 +40,6 @@ use function mb_strtolower;
 use function mb_substr;
 use function property_exists;
 use function sha1;
-
-use function header;
-
 
 
 /**
@@ -222,6 +220,18 @@ class _Form
     }
 
     /**
+     * @param array $attributes
+     *
+     * @return self
+     */
+    public function attributes(array $attributes): self
+    {
+        $this->form->attributes = array_merge($this->form->attributes, $attributes);
+
+        return $this;
+    }
+
+    /**
      * @param $action
      *
      * @return self
@@ -237,11 +247,11 @@ class _Form
      * @param $langKey
      *
      * @return self
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function submitLang($langKey): self
     {
-        $this->form->actionButtons[ 0 ] = Theme::i()->getTemplate('forms', 'core', 'global')->button(
+        $this->form->actionButtons[0] = Theme::i()->getTemplate('forms', 'core', 'global')->button(
             $langKey,
             'submit',
             null,
@@ -256,18 +266,6 @@ class _Form
     }
 
     /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes(array $attributes): self
-    {
-        $this->form->attributes = array_merge($this->form->attributes, $attributes);
-
-        return $this;
-    }
-
-    /**
      * @param FormAbstract $helper
      *
      * @return self
@@ -277,20 +275,6 @@ class _Form
         $this->elementStore[] = $helper;
 
         return $this;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return Element
-     */
-    public function element($name): Element
-    {
-        if (isset($this->elementStore[ $name ])) {
-            return $this->elementStore[ $name ];
-        }
-
-        throw new InvalidArgumentException('element ' . $name . ' doesn\'t exist');
     }
 
     public function noSuffix()
@@ -401,13 +385,13 @@ class _Form
                     $parse = false;
                     if ($this->lang->checkKeyExists($name)) {
                         $parse = true;
-                        if (isset($extra[ 'sprintf' ])) {
+                        if (isset($extra['sprintf'])) {
                             $parse = false;
-                            $sprintf = $extra[ 'sprintf' ];
+                            $sprintf = $extra['sprintf'];
                             $name = $this->lang->addToStack($name, false, ['sprintf' => $sprintf]);
                         }
                     }
-                    $css = $extra[ 'css' ] ?? '';
+                    $css = $extra['css'] ?? '';
                     $this->form->addMessage($name, $css, $parse, $id);
                     break;
                 case 'helper':
@@ -417,8 +401,8 @@ class _Form
                         break;
                     }
 
-                    if ($el->custom === false && isset(Element::$helpers[ mb_strtolower($class) ])) {
-                        $class = Element::$helpers[ $class ] ?? $class;
+                    if ($el->custom === false && isset(Element::$helpers[mb_strtolower($class)])) {
+                        $class = Element::$helpers[$class] ?? $class;
                         $class = '\\IPS\\Helpers\\Form\\' . $class;
                     }
 
@@ -444,12 +428,12 @@ class _Form
                             /* @var array $val */
                             foreach ($this->bitOptions as $bit => $val) {
                                 foreach ($val as $k => $v) {
-                                    if (!empty($obj->{$k}[ $prop ])) {
-                                        $default = $obj->{$k}[ $prop ];
+                                    if (!empty($obj->{$k}[$prop])) {
+                                        $default = $obj->{$k}[$prop];
                                         break 2;
                                     }
-                                    if (!empty($obj->{$k}[ $prop2 ])) {
-                                        $default = $obj->{$k}[ $prop2 ];
+                                    if (!empty($obj->{$k}[$prop2])) {
+                                        $default = $obj->{$k}[$prop2];
                                         break 2;
                                     }
                                 }
@@ -462,26 +446,26 @@ class _Form
                     /* @var array $toggles */
                     if (empty($toggles) !== true) {
                         foreach ($toggles as $toggle) {
-                            if (isset($toggle[ 'key' ])) {
-                                switch ($toggle[ 'key' ]) {
+                            if (isset($toggle['key'])) {
+                                switch ($toggle['key']) {
                                     case 'toggles':
                                     case 'natoggles':
-                                        foreach ($toggle[ 'elements' ] as $k => $val) {
+                                        foreach ($toggle['elements'] as $k => $val) {
                                             foreach ($val as $v) {
-                                                $options[ 'toggles' ][ $k ][] = $toggle[ 'key' ] === 'toggles' ? 'js_' . $this->formPrefix . $v : $v;
+                                                $options['toggles'][$k][] = $toggle['key'] === 'toggles' ? 'js_' . $this->formPrefix . $v : $v;
                                             }
                                         }
                                         break;
                                     case 'togglesOn':
                                     case 'natogglesOn':
-                                        foreach ($toggle[ 'elements' ] as $val) {
-                                            $options[ 'togglesOn' ][] = $toggle[ 'key' ] === 'togglesOn' ? 'js_' . $this->formPrefix . $val : $val;
+                                        foreach ($toggle['elements'] as $val) {
+                                            $options['togglesOn'][] = $toggle['key'] === 'togglesOn' ? 'js_' . $this->formPrefix . $val : $val;
                                         }
                                         break;
                                     case 'togglesOff':
                                     case 'natogglesOff':
-                                        foreach ($toggle[ 'elements' ] as $val) {
-                                            $options[ 'togglesOff' ][] = $toggle[ 'key' ] === 'togglesOff' ? 'js_' . $this->formPrefix . $val : $val;
+                                        foreach ($toggle['elements'] as $val) {
+                                            $options['togglesOff'][] = $toggle['key'] === 'togglesOff' ? 'js_' . $this->formPrefix . $val : $val;
                                         }
                                         break;
                                 }
@@ -490,114 +474,114 @@ class _Form
                     }
                     if ($class === '\\IPS\\Helpers\\Form\\Select' && is_array(
                             $options
-                        ) && isset($options[ 'options' ]) && isset($options[ 'parse' ]) && $options[ 'parse' ] === 'lang') {
+                        ) && isset($options['options']) && isset($options['parse']) && $options['parse'] === 'lang') {
                         $langs = [];
-                        foreach ($options[ 'options' ] as $key => $val) {
-                            $langs[ $key ] = $this->formPrefix . $val . '_options';
+                        foreach ($options['options'] as $key => $val) {
+                            $langs[$key] = $this->formPrefix . $val . '_options';
                         }
-                        $options[ 'options' ] = $langs;
+                        $options['options'] = $langs;
                     }
                     $element = new $class($name, $default, $required, $options, $validation, $prefix, $suffix, $id);
                     $element->appearRequried = $el->appearRequired;
-                    if (is_array($el->label) && isset($el->label[ 'key' ])) {
-                        $label = $el->label[ 'key' ];
+                    if (is_array($el->label) && isset($el->label['key'])) {
+                        $label = $el->label['key'];
                         if ($this->lang->checkKeyExists($this->formPrefix . $label)) {
-                            if (isset($el->label[ 'sprintf' ]) && is_array($el->label[ 'sprintf' ])) {
+                            if (isset($el->label['sprintf']) && is_array($el->label['sprintf'])) {
                                 $label = $this->lang->addToStack(
                                     $this->formPrefix . $label,
-                                    ['sprintf' => $el->label[ 'sprintf' ]]
+                                    ['sprintf' => $el->label['sprintf']]
                                 );
                             } else {
                                 $label = $this->lang->addToStack($this->formPrefix . $label);
                             }
                         }
-                        if ($label === $el->label[ 'key' ] && $this->lang->checkKeyExists($label)) {
-                            if (isset($el->label[ 'sprintf' ]) && is_array($el->label[ 'sprintf' ])) {
-                                $label = $this->lang->addToStack($label, ['sprintf' => $el->label[ 'sprintf' ]]);
+                        if ($label === $el->label['key'] && $this->lang->checkKeyExists($label)) {
+                            if (isset($el->label['sprintf']) && is_array($el->label['sprintf'])) {
+                                $label = $this->lang->addToStack($label, ['sprintf' => $el->label['sprintf']]);
                             } else {
                                 $label = $this->lang->addToStack($label);
                             }
                         }
                         $element->label = $label;
                     }
-                    if (is_array($el->description) && isset($el->description[ 'key' ])) {
-                        $desc = $el->description[ 'key' ];
+                    if (is_array($el->description) && isset($el->description['key'])) {
+                        $desc = $el->description['key'];
                         if ($this->lang->checkKeyExists($this->formPrefix . $desc)) {
-                            if (isset($el->description[ 'sprintf' ])) {
+                            if (isset($el->description['sprintf'])) {
                                 $desc = $this->lang->addToStack(
                                     $this->formPrefix . $desc,
                                     false,
-                                    ['sprintf' => $el->description[ 'sprintf' ]]
+                                    ['sprintf' => $el->description['sprintf']]
                                 );
                             } else {
                                 $desc = $this->lang->addToStack($this->formPrefix . $desc);
                             }
                         }
-                        if ($desc === $el->description[ 'key' ] && $this->lang->checkKeyExists($desc)) {
-                            if (isset($el->description[ 'sprintf' ])) {
+                        if ($desc === $el->description['key'] && $this->lang->checkKeyExists($desc)) {
+                            if (isset($el->description['sprintf'])) {
                                 $desc = $this->lang->addToStack(
                                     $desc,
                                     false,
-                                    ['sprintf' => $el->description[ 'sprintf' ]]
+                                    ['sprintf' => $el->description['sprintf']]
                                 );
                             } else {
                                 $desc = $this->lang->addToStack($desc);
                             }
                         }
-                        $this->lang->words[ $name . '_desc' ] = $desc;
+                        $this->lang->words[$name . '_desc'] = $desc;
                     }
                     $this->form->add($element);
                     break;
                 case 'dummy':
                     $desc = '';
                     $warning = '';
-                    if (is_array($el->description) && isset($el->description[ 'key' ])) {
-                        $desc = $el->description[ 'key' ];
+                    if (is_array($el->description) && isset($el->description['key'])) {
+                        $desc = $el->description['key'];
                         if ($this->lang->checkKeyExists($this->formPrefix . $desc)) {
-                            if (isset($el->description[ 'sprintf' ])) {
+                            if (isset($el->description['sprintf'])) {
                                 $desc = $this->lang->addToStack(
                                     $this->formPrefix . $desc,
                                     false,
-                                    ['sprintf' => $el->description[ 'sprintf' ]]
+                                    ['sprintf' => $el->description['sprintf']]
                                 );
                             } else {
                                 $desc = $this->lang->addToStack($this->formPrefix . $desc);
                             }
                         }
-                        if ($desc === $el->description[ 'key' ] && $this->lang->checkKeyExists($desc)) {
-                            if (isset($el->description[ 'sprintf' ])) {
+                        if ($desc === $el->description['key'] && $this->lang->checkKeyExists($desc)) {
+                            if (isset($el->description['sprintf'])) {
                                 $desc = $this->lang->addToStack(
                                     $desc,
                                     false,
-                                    ['sprintf' => $el->description[ 'sprintf' ]]
+                                    ['sprintf' => $el->description['sprintf']]
                                 );
                             } else {
                                 $desc = $this->lang->addToStack($desc);
                             }
                         }
                     }
-                    if (isset($extra[ 'warning' ])) {
-                        if ($this->lang->checkKeyExists($extra[ 'warning' ])) {
-                            $warning = $this->lang->addToStack($extra[ 'warning' ]);
+                    if (isset($extra['warning'])) {
+                        if ($this->lang->checkKeyExists($extra['warning'])) {
+                            $warning = $this->lang->addToStack($extra['warning']);
                         } else {
-                            $warning = $extra[ 'warning' ];
+                            $warning = $extra['warning'];
                         }
                     }
-                    if (is_array($el->label) && isset($el->label[ 'key' ])) {
-                        $label = $el->label[ 'key' ];
+                    if (is_array($el->label) && isset($el->label['key'])) {
+                        $label = $el->label['key'];
                         if ($this->lang->checkKeyExists($this->formPrefix . $label)) {
-                            if (isset($el->label[ 'sprintf' ]) && is_array($el->label[ 'sprintf' ])) {
+                            if (isset($el->label['sprintf']) && is_array($el->label['sprintf'])) {
                                 $label = $this->lang->addToStack(
                                     $this->formPrefix . $label,
-                                    ['sprintf' => $el->label[ 'sprintf' ]]
+                                    ['sprintf' => $el->label['sprintf']]
                                 );
                             } else {
                                 $label = $this->lang->addToStack($this->formPrefix . $label);
                             }
                         }
-                        if ($label === $el->label[ 'key' ] && $this->lang->checkKeyExists($label)) {
-                            if (isset($el->label[ 'sprintf' ]) && is_array($el->label[ 'sprintf' ])) {
-                                $label = $this->lang->addToStack($label, ['sprintf' => $el->label[ 'sprintf' ]]);
+                        if ($label === $el->label['key'] && $this->lang->checkKeyExists($label)) {
+                            if (isset($el->label['sprintf']) && is_array($el->label['sprintf'])) {
+                                $label = $this->lang->addToStack($label, ['sprintf' => $el->label['sprintf']]);
                             } else {
                                 $label = $this->lang->addToStack($label);
                             }
@@ -616,7 +600,7 @@ class _Form
                     $this->form->addMatrix($name, $default);
                     break;
                 case 'hidden':
-                    $this->form->hiddenValues[ $name ] = $default;
+                    $this->form->hiddenValues[$name] = $default;
                     break;
             }
         }
@@ -643,27 +627,27 @@ class _Form
     /**
      * @param string $name
      * @param string $type
-     * @param array  $extra
+     * @param array $extra
      *
      * @return Element
      */
     public function add(string $name, string $type = 'text', string $custom = ''): Element
     {
-        $this->elementStore[ $name ] = new Element($name, $type, $custom);
+        $this->elementStore[$name] = new Element($name, $type, $custom);
 
-        return $this->elementStore[ $name ];
+        return $this->elementStore[$name];
     }
 
     public function addHelpers(FormAbstract $element)
     {
-        $this->elementStore[ $element->name ] = $element;
+        $this->elementStore[$element->name] = $element;
 
         return $this;
     }
 
     public function header($header)
     {
-        $this->elementStore[ $header ] = new Element($header, 'header');
+        $this->elementStore[$header] = new Element($header, 'header');
 
         return $this;
     }
@@ -671,7 +655,7 @@ class _Form
     public function separator()
     {
         $name = 'separator_' . (count($this->elementStore) + 1);
-        $this->elementStore[ $name ] = new Element($name, 'separator');
+        $this->elementStore[$name] = new Element($name, 'separator');
 
         return $this;
     }
@@ -679,7 +663,7 @@ class _Form
     public function message(string $name, $css = '', array $sprintf = [])
     {
         $key = $name . '_message';
-        $this->elementStore[ $key ] = (new Element($name, 'message'))->extra(['css' => $css]);
+        $this->elementStore[$key] = (new Element($name, 'message'))->extra(['css' => $css]);
 
         return $this;
     }
@@ -687,7 +671,7 @@ class _Form
     public function dummy(string $name, $value, ?string $label = null, ?string $desc = null, array $warning = [])
     {
         $key = $name . '_dummy';
-        $this->elementStore[ $key ] = (new Element(
+        $this->elementStore[$key] = (new Element(
             $name, 'dummy'
         ))->value($value);
         if (empty($warning) !== true) {
@@ -701,6 +685,20 @@ class _Form
         }
 
         return $this;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return Element
+     */
+    public function element($name): Element
+    {
+        if (isset($this->elementStore[$name])) {
+            return $this->elementStore[$name];
+        }
+
+        throw new InvalidArgumentException('element ' . $name . ' doesn\'t exist');
     }
 
     public function saveAsSettings($values = null)
@@ -741,7 +739,7 @@ class _Form
                         $object = $this->object;
                         $dbPrefix = $object::$databasePrefix;
                     }
-                    $newValues[ $dbPrefix . $key ] = $value;
+                    $newValues[$dbPrefix . $key] = $value;
                 }
             }
 
@@ -806,7 +804,7 @@ class _Form
     public function tab($name)
     {
         $key = $name . '_tab';
-        $this->elementStore[ $key ] = new Element($name, 'tab');
+        $this->elementStore[$key] = new Element($name, 'tab');
 
         return $this;
     }
@@ -814,7 +812,7 @@ class _Form
     public function html($html)
     {
         $name = sha1($html);
-        $this->elementStore[ $name ] = (new Element($name, 'html'))->value($html);
+        $this->elementStore[$name] = (new Element($name, 'html'))->value($html);
 
         return $this;
     }
@@ -822,7 +820,7 @@ class _Form
     public function matrix(string $name, Matrix $matrix)
     {
         $key = $name . '_matrix';
-        $this->elementStore[ $key ] = (new Element($name, 'matrix'))->value($matrix);
+        $this->elementStore[$key] = (new Element($name, 'matrix'))->value($matrix);
 
         return $this;
     }
@@ -830,7 +828,7 @@ class _Form
     public function hidden(string $name, $value)
     {
         $key = $name . '_hidden';
-        $this->elementStore[ $key ] = (new Element($name, 'hidden'))->value($value);
+        $this->elementStore[$key] = (new Element($name, 'hidden'))->value($value);
 
         return $this;
     }
@@ -838,9 +836,9 @@ class _Form
     public function sideBar($content, $prefix = true)
     {
         $name = sha1($content);
-        $this->elementStore[ $name ] = new Element($content, 'sidebar');
+        $this->elementStore[$name] = new Element($content, 'sidebar');
         if ($prefix === false) {
-            $this->elementStore[ $name ]->skip();
+            $this->elementStore[$name]->skip();
         }
 
         return $this;

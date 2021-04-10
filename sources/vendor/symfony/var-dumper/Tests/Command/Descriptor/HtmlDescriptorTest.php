@@ -41,11 +41,13 @@ class HtmlDescriptorTest extends TestCase
 
         $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
 
-        $this->assertStringMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output');
+        $this->assertStringMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(),
+            'styles & scripts are output');
 
         $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
 
-        $this->assertStringNotMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output only once');
+        $this->assertStringNotMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(),
+            'styles & scripts are output only once');
     }
 
     /**
@@ -60,7 +62,8 @@ class HtmlDescriptorTest extends TestCase
 
         $descriptor->describe($output, new Data([[123]]), $context + ['timestamp' => 1544804268.3668], 1);
 
-        $this->assertStringMatchesFormat(trim($expectedOutput), trim(preg_replace('@<style>.*</style><script>.*</script>@s', '', $output->fetch())));
+        $this->assertStringMatchesFormat(trim($expectedOutput),
+            trim(preg_replace('@<style>.*</style><script>.*</script>@s', '', $output->fetch())));
     }
 
     public function provideContext()
@@ -97,12 +100,12 @@ TXT
         yield 'source full' => [
             [
                 'source' => [
-                    'name' => 'CliDescriptorTest.php',
-                    'project_dir' => 'src/Symfony/',
-                    'line' => 30,
+                    'name'          => 'CliDescriptorTest.php',
+                    'project_dir'   => 'src/Symfony/',
+                    'line'          => 30,
                     'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
-                    'file' => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
-                    'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
+                    'file'          => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
+                    'file_link'     => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
                 ],
             ],
             <<<TXT
@@ -133,7 +136,7 @@ TXT
         yield 'cli' => [
             [
                 'cli' => [
-                    'identifier' => 'd8bece1c',
+                    'identifier'   => 'd8bece1c',
                     'command_line' => 'bin/phpunit',
                 ],
             ],
@@ -163,8 +166,8 @@ TXT
                 'request' => [
                     'identifier' => 'd8bece1c',
                     'controller' => new Data([['FooController.php']]),
-                    'method' => 'GET',
-                    'uri' => 'http://localhost/foo',
+                    'method'     => 'GET',
+                    'uri'        => 'http://localhost/foo',
                 ],
             ],
             <<<TXT

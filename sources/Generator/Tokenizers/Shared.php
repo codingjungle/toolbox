@@ -13,25 +13,26 @@
 
 namespace Generator\Tokenizers;
 
+use Exception;
 use InvalidArgumentException;
-use IPS\Log;
 
-use function count;
-use function file_exists;
-use function file_get_contents;
-use function in_array;
-use function token_get_all;
-
-use const IPS\ROOT_PATH;
+use SplFileInfo;
 
 use function array_pop;
 use function array_shift;
+use function count;
 use function explode;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
 use function implode;
 use function ltrim;
 use function mb_strpos;
 use function str_replace;
+use function token_get_all;
 use function trim;
+
+use const IPS\ROOT_PATH;
 use const T_ABSTRACT;
 use const T_CLASS;
 use const T_COMMENT;
@@ -64,7 +65,7 @@ trait Shared
     protected $compiled = false;
 
     /**
-     * @var \SplFileInfo
+     * @var SplFileInfo
      */
     protected $file;
 
@@ -78,7 +79,7 @@ trait Shared
                 throw new InvalidArgumentException('Path is invalid: ' . $this->path);
             }
         }
-        $this->file = new \SplFileInfo($file);
+        $this->file = new SplFileInfo($file);
         $this->path = $this->file->getPath();
         $this->compile();
     }
@@ -108,9 +109,9 @@ trait Shared
         $firstExtra = true;
         $lastMethod = null;
         for ($i = 0; $i < $count; $i++) {
-            $token = $tokens[ $i ][ 0 ] ?? $tokens[ $i ];
-            $value = $tokens[ $i ][ 1 ] ?? $tokens[ $i ];
-            $start = $tokens[ $i ][ 2 ] ?? $tokens[ $i ];
+            $token = $tokens[$i][0] ?? $tokens[$i];
+            $value = $tokens[$i][1] ?? $tokens[$i];
+            $start = $tokens[$i][2] ?? $tokens[$i];
             if ($beforeClass === false) {
                 if ($value === '{') {
                     $classStart++;
@@ -143,9 +144,9 @@ trait Shared
                             $constVal = null;
                             $first = true;
                             for ($ii = $i; $ii < $count; $ii++) {
-                                $token2 = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                                $value2 = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
-                                $start2 = $tokens[ $ii ][ 2 ] ?? $tokens[ $ii ];
+                                $token2 = $tokens[$ii][0] ?? $tokens[$ii];
+                                $value2 = $tokens[$ii][1] ?? $tokens[$ii];
+                                $start2 = $tokens[$ii][2] ?? $tokens[$ii];
                                 if ($value2 === '=' || $token2 === T_CONST) {
                                     continue;
                                 }
@@ -190,8 +191,8 @@ trait Shared
                             }
                             $require = [];
                             for ($ii = $i; $ii < $count; $ii++) {
-                                $token2 = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                                $value2 = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
+                                $token2 = $tokens[$ii][0] ?? $tokens[$ii];
+                                $value2 = $tokens[$ii][1] ?? $tokens[$ii];
 
                                 if ($token2 === T_REQUIRE || $token2 === T_REQUIRE_ONCE || $token2 === T_INCLUDE || $token2 === T_INCLUDE_ONCE) {
                                     continue;
@@ -226,9 +227,9 @@ trait Shared
                         $beforeNamespace = false;
                         $nameSpace = [];
                         for ($ii = $i; $ii < $count; $ii++) {
-                            $tokenNs = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                            $valueNs = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
-                            $startNs = $tokens[ $ii ][ 2 ] ?? $tokens[ $ii ];
+                            $tokenNs = $tokens[$ii][0] ?? $tokens[$ii];
+                            $valueNs = $tokens[$ii][1] ?? $tokens[$ii];
+                            $startNs = $tokens[$ii][2] ?? $tokens[$ii];
                             if ($tokenNs === T_STRING) {
                                 $nameSpace[] = $valueNs;
                             }
@@ -269,9 +270,9 @@ trait Shared
                             $uses = [];
                             $type = 'use';
                             for ($ii = $i; $ii < $count; $ii++) {
-                                $token2 = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                                $value2 = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
-                                $start2 = $tokens[ $ii ][ 2 ] ?? $tokens[ $ii ];
+                                $token2 = $tokens[$ii][0] ?? $tokens[$ii];
+                                $value2 = $tokens[$ii][1] ?? $tokens[$ii];
+                                $start2 = $tokens[$ii][2] ?? $tokens[$ii];
                                 if ($value2 === ';' || $value2 === ',') {
                                     $this->prepImport($uses, $type, !$beforeClass);
                                     $uses = [];
@@ -300,9 +301,9 @@ trait Shared
                             $propName = ltrim(trim($value), '$');
                             $propValue = null;
                             for ($ii = $i; $ii < $count; $ii++) {
-                                $token2 = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                                $value2 = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
-                                $start2 = $tokens[ $ii ][ 2 ] ?? $tokens[ $ii ];
+                                $token2 = $tokens[$ii][0] ?? $tokens[$ii];
+                                $value2 = $tokens[$ii][1] ?? $tokens[$ii];
+                                $start2 = $tokens[$ii][2] ?? $tokens[$ii];
                                 if ($token2 === T_VARIABLE || $value2 === '=' || $value2 === '"' || $value2 === "'") {
                                     $i++;
                                     continue;
@@ -310,7 +311,7 @@ trait Shared
                                 if ($value2 === ';') {
                                     break;
                                 }
-                                if ($value2 === ')' && ($tokens[ $ii + 1 ] === '{' || $tokens[ $ii + 2 ] === '{')) {
+                                if ($value2 === ')' && ($tokens[$ii + 1] === '{' || $tokens[$ii + 2] === '{')) {
                                     break;
                                 }
 
@@ -361,9 +362,9 @@ trait Shared
                         $implementsList = null;
                         $interfaceClass = [];
                         for ($ii = $i; $ii < $count; $ii++) {
-                            $token2 = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                            $value2 = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
-                            $start2 = $tokens[ $ii ][ 2 ] ?? $tokens[ $ii ];
+                            $token2 = $tokens[$ii][0] ?? $tokens[$ii];
+                            $value2 = $tokens[$ii][1] ?? $tokens[$ii];
+                            $start2 = $tokens[$ii][2] ?? $tokens[$ii];
                             if ($value2 === '{') {
                                 if ($extendsClass !== null) {
                                     if (count($extendsClass) >= 2) {
@@ -442,9 +443,9 @@ trait Shared
                             T_ABSTRACT,
                         ];
                         for ($ii = $i; $ii < $count; $ii++) {
-                            $token2 = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                            $value2 = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
-                            $start2 = $tokens[ $ii ][ 2 ] ?? $tokens[ $ii ];
+                            $token2 = $tokens[$ii][0] ?? $tokens[$ii];
+                            $value2 = $tokens[$ii][1] ?? $tokens[$ii];
+                            $start2 = $tokens[$ii][2] ?? $tokens[$ii];
                             if ((int)$start2) {
                                 $last = $start2;
                             }
@@ -486,16 +487,16 @@ trait Shared
                                     continue;
                                 }
 
-                                if ($value2 === ')' && ($tokens[ $ii + 1 ] === ':' || $tokens[ $ii + 2 ] === ':')) {
+                                if ($value2 === ')' && ($tokens[$ii + 1] === ':' || $tokens[$ii + 2] === ':')) {
                                     $onParams = false;
                                     $onReturn = true;
                                 }
 
-                                if ($value2 === ')' && ($tokens[ $ii + 1 ] === '{' || $tokens[ $ii + 2 ] === '{')) {
+                                if ($value2 === ')' && ($tokens[$ii + 1] === '{' || $tokens[$ii + 2] === '{')) {
                                     $onParams = false;
                                 }
 
-                                if ($value2 === ')' && ($tokens[ $ii + 1 ] === ';' || $tokens[ $ii + 2 ] === ';')) {
+                                if ($value2 === ')' && ($tokens[$ii + 1] === ';' || $tokens[$ii + 2] === ';')) {
                                     $methodEnd = true;
                                     continue;
                                 }
@@ -514,29 +515,29 @@ trait Shared
                                 }
                                 $returnType .= $value2;
                             } elseif ($method !== null && $onReturn === false && $onParams === false) {
-                                if (isset($tokens[ $ii ][ 2 ])) {
-                                    if (isset($body[ $start2 ])) {
-                                        $content = $body[ $start2 ];
-                                        $body[ $start2 ] = [
+                                if (isset($tokens[$ii][2])) {
+                                    if (isset($body[$start2])) {
+                                        $content = $body[$start2];
+                                        $body[$start2] = [
                                             'line'    => $start2,
-                                            'content' => $content[ 'content' ] . $value2,
+                                            'content' => $content['content'] . $value2,
                                         ];
                                     } else {
-                                        $body[ $start2 ] = [
+                                        $body[$start2] = [
                                             'line'    => $start2,
                                             'content' => $value2,
                                         ];
                                     }
                                 } else {
                                     //we assume this value is a special non-token character and gets added the "last line"
-                                    if (isset($body[ $last ])) {
-                                        $content = $body[ $last ];
-                                        $body[ $last ] = [
+                                    if (isset($body[$last])) {
+                                        $content = $body[$last];
+                                        $body[$last] = [
                                             'line'    => $last,
-                                            'content' => $content[ 'content' ] . $value2,
+                                            'content' => $content['content'] . $value2,
                                         ];
                                     } else {
-                                        $body[ $last ] = [
+                                        $body[$last] = [
                                             'line'    => $last,
                                             'content' => $value2,
                                         ];
@@ -565,7 +566,7 @@ trait Shared
                         $lastMethod = trim($method);
                         try {
                             $this->prepMethod($extra);
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                         }
                         break;
                     default:
@@ -601,8 +602,8 @@ trait Shared
     {
         $path = ROOT_PATH . '/' . $this->path;
         if ($this->path !== null && file_exists($path)) {
-            $contents = \file_get_contents($path);
-            \file_put_contents(ROOT_PATH . '/' . $this->backUpName(), $contents);
+            $contents = file_get_contents($path);
+            file_put_contents(ROOT_PATH . '/' . $this->backUpName(), $contents);
         }
     }
 
@@ -626,16 +627,16 @@ trait Shared
         $setNamespace = false;
         $i = 0;
         for ($i = 0; $i < $count; $i++) {
-            $token = $tokens[ $i ][ 0 ] ?? $tokens[ $i ];
-            $value = $tokens[ $i ][ 1 ] ?? $tokens[ $i ];
-            $start = $tokens[ $i ][ 2 ] ?? $tokens[ $i ];
+            $token = $tokens[$i][0] ?? $tokens[$i];
+            $value = $tokens[$i][1] ?? $tokens[$i];
+            $start = $tokens[$i][2] ?? $tokens[$i];
             if ($token === T_NAMESPACE) {
                 $setNamespace = true;
                 $nameSpace = [];
                 for ($ii = $i; $ii < $count; $ii++) {
-                    $tokenNs = $tokens[ $ii ][ 0 ] ?? $tokens[ $ii ];
-                    $valueNs = $tokens[ $ii ][ 1 ] ?? $tokens[ $ii ];
-                    $startNs = $tokens[ $ii ][ 2 ] ?? $tokens[ $ii ];
+                    $tokenNs = $tokens[$ii][0] ?? $tokens[$ii];
+                    $valueNs = $tokens[$ii][1] ?? $tokens[$ii];
+                    $startNs = $tokens[$ii][2] ?? $tokens[$ii];
                     if ($tokenNs === T_STRING) {
                         $nameSpace[] = $valueNs;
                     }

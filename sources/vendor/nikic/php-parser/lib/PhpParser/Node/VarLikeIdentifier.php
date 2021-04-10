@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Node;
 
@@ -11,7 +12,8 @@ namespace PhpParser\Node;
  */
 class VarLikeIdentifier extends Identifier
 {
-    public function getType() : string {
+    public function getType(): string
+    {
         return 'VarLikeIdentifier';
     }
 }

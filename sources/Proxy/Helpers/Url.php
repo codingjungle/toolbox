@@ -24,7 +24,7 @@ use function defined;
 use function header;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -37,13 +37,13 @@ class _Url implements HelpersAbstract
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
         $methodDocBlock = new DocBlockGenerator(
-            '@inheritdoc', \null, [
-            new ParamTag('timeout', null),
-            new ParamTag('httpVersion', null),
-            new ParamTag('followRedirects', null),
-            new ParamTag('skipLocalhostRedirects', null),
-            new ReturnTag(['dataType' => '\\' . Curl::class]),
-        ]
+            '@inheritdoc', null, [
+                new ParamTag('timeout', null),
+                new ParamTag('httpVersion', null),
+                new ParamTag('followRedirects', null),
+                new ParamTag('skipLocalhostRedirects', null),
+                new ReturnTag(['dataType' => '\\' . Curl::class]),
+            ]
         );
 
         try {
@@ -51,14 +51,14 @@ class _Url implements HelpersAbstract
                 [
                     'name'       => 'request',
                     'parameters' => [
-                        new ParameterGenerator('timeout', \null, 'null', 0),
-                        new ParameterGenerator('httpVersion', \null, 'null', 1),
-                        new ParameterGenerator('followRedirects', \null, 'null', 2),
-                        new ParameterGenerator('skipLocalhostRedirects', \null, 'null', 4),
+                        new ParameterGenerator('timeout', null, 'null', 0),
+                        new ParameterGenerator('httpVersion', null, 'null', 1),
+                        new ParameterGenerator('followRedirects', null, 'null', 2),
+                        new ParameterGenerator('skipLocalhostRedirects', null, 'null', 4),
                     ],
                     'body'       => 'return parent::request(... func_get_arguments());',
                     'docblock'   => $methodDocBlock,
-                    'static'     => \false,
+                    'static'     => false,
                 ]
             );
         } catch (InvalidArgumentException $e) {

@@ -7,8 +7,11 @@ use IPS\Output;
 use IPS\Request;
 use IPS\Settings;
 use IPS\Theme;
+use IPS\toolbox\Application;
 
-if ( !defined('\IPS\SUITE_UNIQUE_KEY' ) ) {
+use const IPS\CACHING_LOG;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 
@@ -22,40 +25,41 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
 
     /* End Hook Data */
 
-    function includeCSS()
+    public function includeCSS()
     {
         $css = Output::i()->cssFiles;
 
-        $caching = Theme::i()->css('styles/caching_log.css', 'core', 'front' );
+        $caching = Theme::i()->css('styles/caching_log.css', 'core', 'front');
         $cachingCss = array_pop($caching);
-        if( \IPS\CACHING_LOG && $key = array_search( $cachingCss, $css ) ){
-                unset( Output::i()->cssFiles[$key]);
+        if (CACHING_LOG && $key = array_search($cachingCss, $css)) {
+            unset(Output::i()->cssFiles[$key]);
         }
-        if ( \IPS\QUERY_LOG && !Request::i()->isAjax() ) {
-            Output::i()->cssFiles = array_merge(Output::i()->cssFiles, Theme::i()->css('profiler.css', 'toolbox', 'front' ) );
-            $query = Theme::i()->css('styles/query_log.css', 'core', 'front' );
-            $queryCss = array_pop( $query );
-            if( $key = array_search( $queryCss, $css ) ){
+        if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
+            Output::i()->cssFiles = array_merge(Output::i()->cssFiles,
+                Theme::i()->css('profiler.css', 'toolbox', 'front'));
+            $query = Theme::i()->css('styles/query_log.css', 'core', 'front');
+            $queryCss = array_pop($query);
+            if ($key = array_search($queryCss, $css)) {
                 unset(Output::i()->cssFiles[$key]);
             }
 
-            if ( Settings::i()->dtprofiler_enabled_css ) {
+            if (Settings::i()->dtprofiler_enabled_css) {
                 Store::i()->dtprofiler_css = Output::i()->cssFiles;
             }
         }
         return parent::includeCSS();
     }
 
-    function includeJS()
+    public function includeJS()
     {
-        if ( \IPS\QUERY_LOG && !Request::i()->isAjax() ) {
+        if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
             //Output::i()->jsFiles = array_merge(Output::i()->jsFiles, Output::i()->js('front_profiler.js', 'toolbox', 'front' ) );
-            \IPS\toolbox\Application::addJs(['front_profiler']);
-            \IPS\toolbox\Application::addJs(['global_proxy'], 'global');
-            if ( Settings::i()->dtprofiler_enabled_js ) {
+            Application::addJs(['front_profiler']);
+            Application::addJs(['global_proxy'], 'global');
+            if (Settings::i()->dtprofiler_enabled_js) {
                 Store::i()->dtprofiler_js = Output::i()->jsFiles;
             }
-            if ( Settings::i()->dtprofiler_enabled_jsvars ) {
+            if (Settings::i()->dtprofiler_enabled_jsvars) {
                 Store::i()->dtprofiler_js_vars = Output::i()->jsVars;
             }
         }

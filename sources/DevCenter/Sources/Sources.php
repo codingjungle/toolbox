@@ -109,13 +109,13 @@ class _Sources
     {
         $this->application = $application;
         $base = [
-            'source' => 'app=toolbox&module=devcenter&controller=sources&do=findClass',
-            'minimized' => false,
-            'commaTrigger' => false,
-            'unique' => true,
-            'minAjaxLength' => 3,
+            'source'               => 'app=toolbox&module=devcenter&controller=sources&do=findClass',
+            'minimized'            => false,
+            'commaTrigger'         => false,
+            'unique'               => true,
+            'minAjaxLength'        => 3,
             'disallowedCharacters' => [],
-            'maxItems' => 1,
+            'maxItems'             => 1,
         ];
         $this->findClass = $base;
         $base['source'] = 'app=toolbox&module=devcenter&controller=sources&do=findClassWithApp&appKey=' . $this->application->directory;
@@ -132,29 +132,29 @@ class _Sources
     {
         if (Request::i()->controller === 'sources' || Request::i()->controller === 'devFolder') {
             Output::i()->sidebar['actions']['devcenter'] = [
-                'icon' => null,
+                'icon'  => null,
                 'title' => 'dtdevplus_devcenter',
-                'link' => (string)Url::internal(
+                'link'  => (string)Url::internal(
                     'app=core&module=applications&controller=developer&appKey=' . Request::i()->appKey
                 )->csrf(),
             ];
         }
         Output::i()->sidebar['actions']['sources'] = [
-            'icon' => 'arrow-down',
+            'icon'  => 'arrow-down',
             'title' => 'dtdevplus_sources',
-            'link' => '#adminMenu_button',
-            'id' => 'adminMenu_button',
-            'data' => [
+            'link'  => '#adminMenu_button',
+            'id'    => 'adminMenu_button',
+            'data'  => [
                 'ipsMenu' => 1,
             ],
         ];
 
         Output::i()->sidebar['actions']['dev'] = [
-            'icon' => 'code',
+            'icon'  => 'code',
             'title' => 'dtdevplus_dev',
-            'link' => '#adminMenuDev_button',
-            'id' => 'adminMenuDev_button',
-            'data' => [
+            'link'  => '#adminMenuDev_button',
+            'id'    => 'adminMenuDev_button',
+            'data'  => [
                 'ipsMenu' => 1,
             ],
         ];
@@ -474,7 +474,7 @@ class _Sources
         }
 
         $options = [
-            'placeholder' => 'Namespace',
+            'placeholder'  => 'Namespace',
             'autocomplete' => $this->findNameSpace,
         ];
         $this->form->add('namespace')->options($options)->prefix("IPS\\{$this->application->directory}\\");
@@ -520,7 +520,7 @@ class _Sources
         $options = [
             'autocomplete' => $this->findClass,
         ];
-        $this->form->add('extendsYN','yn')->toggles(['extends']);
+        $this->form->add('extendsYN', 'yn')->toggles(['extends']);
         $this->form->add('extends')->options($options)->validation([$this, 'extendsCheck'])->prefix('IPS\\');
     }
 
@@ -596,11 +596,13 @@ class _Sources
     {
         $interfacesNode = [
             Permissions::class => Permissions::class,
-            Ratings::class => Ratings::class,
+            Ratings::class     => Ratings::class,
         ];
 
         $this->form->tab('interfaces');
-        $this->form->add('ips_implements', 'checkboxset')->label('interface_implements_node')->options(['options' => $interfacesNode]);
+        $this->form->add('ips_implements', 'checkboxset')
+                   ->label('interface_implements_node')
+                   ->options(['options' => $interfacesNode]);
         $this->elInterfaces();
     }
 
@@ -619,7 +621,7 @@ class _Sources
     {
         $traitsNode = [
             ClubContainer::class => ClubContainer::class,
-            Colorize::class => Colorize::class,
+            Colorize::class      => Colorize::class,
         ];
 
         $this->form->tab('traits');
@@ -642,15 +644,18 @@ class _Sources
     protected function elItemTraits()
     {
         $traitsItems = [
-            Reactable::class => Reactable::class,
+            Reactable::class  => Reactable::class,
             Reportable::class => Reportable::class,
-            ItemTopic::class => ItemTopic::class,
-            Solvable::class => Solvable::class,
+            ItemTopic::class  => ItemTopic::class,
+            Solvable::class   => Solvable::class,
             Statistics::class => Statistics::class
         ];
 
         $this->form->tab('traits');
-        $this->form->add('ips_traits', 'checkboxset')->label('ips_traits_item')->value([])->options(['options' => $traitsItems]);
+        $this->form->add('ips_traits', 'checkboxset')
+                   ->label('ips_traits_item')
+                   ->value([])
+                   ->options(['options' => $traitsItems]);
 
         $this->elTraits();
     }
@@ -661,28 +666,31 @@ class _Sources
     protected function elItemInterfaces()
     {
         $interfacesItem = [
-            EditHistory::class => EditHistory::class,
-            Embeddable::class => Embeddable::class,
-            Featurable::class => Featurable::class,
-            Followable::class => Followable::class,
-            FuturePublishing::class => FuturePublishing::class,
-            Hideable::class => Hideable::class,
-            Lockable::class => Lockable::class,
-            MetaData::class => MetaData::class,
+            EditHistory::class              => EditHistory::class,
+            Embeddable::class               => Embeddable::class,
+            Featurable::class               => Featurable::class,
+            Followable::class               => Followable::class,
+            FuturePublishing::class         => FuturePublishing::class,
+            Hideable::class                 => Hideable::class,
+            Lockable::class                 => Lockable::class,
+            MetaData::class                 => MetaData::class,
             \IPS\Content\Permissions::class => \IPS\Content\Permissions::class,
-            Pinnable::class => Pinnable::class,
-            Polls::class => Polls::class,
-            SplObserver::class => SplObserver::class,
-            \IPS\Content\Ratings::class => \IPS\Content\Ratings::class,
-            ReadMarkers::class => ReadMarkers::class,
-            Searchable::class => Searchable::class,
-            Shareable::class => Shareable::class,
-            Tags::class => Tags::class,
-            Views::class => Views::class,
+            Pinnable::class                 => Pinnable::class,
+            Polls::class                    => Polls::class,
+            SplObserver::class              => SplObserver::class,
+            \IPS\Content\Ratings::class     => \IPS\Content\Ratings::class,
+            ReadMarkers::class              => ReadMarkers::class,
+            Searchable::class               => Searchable::class,
+            Shareable::class                => Shareable::class,
+            Tags::class                     => Tags::class,
+            Views::class                    => Views::class,
         ];
 
         $this->form->tab('interfaces');
-        $this->form->add('ips_implements', 'checkboxset')->label('interface_implements_item')->value([])->options(['options' => $interfacesItem]);
+        $this->form->add('ips_implements', 'checkboxset')
+                   ->label('interface_implements_item')
+                   ->value([])
+                   ->options(['options' => $interfacesItem]);
 
         $this->elInterfaces();
     }
@@ -723,10 +731,10 @@ class _Sources
     protected function elCommentInterfaces()
     {
         $interfacesComment = [
-            Hideable::class => Hideable::class,
-            Embeddable::class => Embeddable::class,
-            Searchable::class => Searchable::class,
-            Lockable::class => Lockable::class,
+            Hideable::class    => Hideable::class,
+            Embeddable::class  => Embeddable::class,
+            Searchable::class  => Searchable::class,
+            Lockable::class    => Lockable::class,
             EditHistory::class => EditHistory::class,
         ];
         $this->form->tab('interfaces');

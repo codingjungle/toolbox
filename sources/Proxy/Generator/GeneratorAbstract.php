@@ -13,8 +13,10 @@ namespace IPS\toolbox\Proxy\Generator;
 use Exception;
 use Generator\Builders\ClassGenerator;
 use IPS\Patterns\Singleton;
+use IPS\toolbox\Application;
 use IPS\toolbox\Proxy\Proxyclass;
 
+use function defined;
 use function header;
 use function implode;
 
@@ -22,9 +24,9 @@ use function implode;
 //use Zend\Code\Generator\FileGenerator;
 //use Zend\Code\Generator\MethodGenerator;
 
-\IPS\toolbox\Application::loadAutoLoader();
+Application::loadAutoLoader();
 
-if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
@@ -32,7 +34,7 @@ if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
 /**
  * GeneratorAbstract Class
  *
- * @mixin \IPS\toolbox\Proxy\Generator\GeneratorAbstract
+ * @mixin GeneratorAbstract
  */
 class _GeneratorAbstract extends Singleton
 {

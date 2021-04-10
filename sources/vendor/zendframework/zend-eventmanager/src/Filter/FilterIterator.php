@@ -23,7 +23,7 @@ class FilterIterator extends FastPriorityQueue
     /**
      * Does the queue contain a given value?
      *
-     * @param  mixed $datum
+     * @param mixed $datum
      * @return bool
      */
     public function contains($datum)
@@ -48,7 +48,7 @@ class FilterIterator extends FastPriorityQueue
      */
     public function insert($value, $priority)
     {
-        if (! is_callable($value)) {
+        if (!is_callable($value)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s can only aggregate callables; received %s',
                 __CLASS__,
@@ -64,7 +64,7 @@ class FilterIterator extends FastPriorityQueue
      * This is an expensive operation. It must first iterate through all values,
      * and then re-populate itself. Use only if absolutely necessary.
      *
-     * @param  mixed $datum
+     * @param mixed $datum
      * @return bool
      */
     public function remove($datum)
@@ -73,9 +73,9 @@ class FilterIterator extends FastPriorityQueue
 
         // Iterate and remove any matches
         $removed = false;
-        $items   = [];
+        $items = [];
         $this->rewind();
-        while (! $this->isEmpty()) {
+        while (!$this->isEmpty()) {
             $item = $this->extract();
             if ($item['data'] === $datum) {
                 $removed = true;
@@ -98,9 +98,9 @@ class FilterIterator extends FastPriorityQueue
      *
      * Iterates and calls the next filter in the chain.
      *
-     * @param  mixed $context
-     * @param  array $params
-     * @param  FilterIterator $chain
+     * @param mixed $context
+     * @param array $params
+     * @param FilterIterator $chain
      * @return mixed
      */
     public function next($context = null, array $params = [], $chain = null)

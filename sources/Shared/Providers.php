@@ -7,7 +7,7 @@ use IPS\toolbox\Proxy\Generator\Writer;
 
 interface Providers
 {
-    public function meta( array &$jsonMeta );
+    public function meta(array &$jsonMeta);
 
-    public function writeProvider( Writer $generator );
+    public function writeProvider(Writer $generator);
 }

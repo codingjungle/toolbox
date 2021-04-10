@@ -2,9 +2,11 @@
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
+use function defined;
+
 use const IPS\ROOT_PATH;
 
-if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 

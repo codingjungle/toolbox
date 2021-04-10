@@ -14,6 +14,9 @@ namespace IPS\toolbox\Profiler;
 
 use IPS\Settings;
 use IPS\Theme;
+
+use UnexpectedValueException;
+
 use function count;
 use function defined;
 use function floor;
@@ -24,11 +27,9 @@ use function memory_get_usage;
 use function round;
 use function time;
 
-use function end;
 
-
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -52,30 +53,31 @@ class _Memory
 
     public function __construct()
     {
-
         $this->start = memory_get_usage();
     }
 
     /**
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public static function build()
     {
-
         $list = [];
         /* @var Memory $obj */
-        foreach ( static::$store as $obj ) {
-            $list[ $obj[ 'name' ] ] = [
-                'url'   => $obj[ 'key' ],
-                'name'  => $obj[ 'name' ],
-                'extra' => ' : ' . $obj[ 'log' ],
+        foreach (static::$store as $obj) {
+            $list[$obj['name']] = [
+                'url'   => $obj['key'],
+                'name'  => $obj['name'],
+                'extra' => ' : ' . $obj['log'],
             ];
         }
 
-        $count = count( $list ) ?: \null;
+        $count = count($list) ?: null;
         $total = static::total();
 
-        return Theme::i()->getTemplate( 'dtpsearch', 'toolbox', 'front' )->button( $total, 'memory', 'Memory Total.', $list, json_encode( $list ), $count, 'microchip', \true, \false );
+        return Theme::i()
+                    ->getTemplate('dtpsearch', 'toolbox', 'front')
+                    ->button($total, 'memory', 'Memory Total.', $list, json_encode($list), $count, 'microchip', true,
+                        false);
     }
 
     /**
@@ -83,8 +85,7 @@ class _Memory
      */
     protected static function total(): string
     {
-
-        return static::formatBytes( memory_get_usage() );
+        return static::formatBytes(memory_get_usage());
     }
 
     /**
@@ -93,16 +94,15 @@ class _Memory
      *
      * @return string
      */
-    public static function formatBytes( $size, $precision = 2, $suffix = true ): string
+    public static function formatBytes($size, $precision = 2, $suffix = true): string
     {
-
-        $base = log( $size, 1024 );
-        $suffixes = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
-        $expo = 1024 ** ( $base - floor( $base ) );
-        $mem = round( $expo, $precision );
-        if ( $suffix === true ) {
-            $suffix = (int)floor( $base );
-            $mem .= ' ' . $suffixes[ $suffix ];
+        $base = log($size, 1024);
+        $suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $expo = 1024 ** ($base - floor($base));
+        $mem = round($expo, $precision);
+        if ($suffix === true) {
+            $suffix = (int)floor($base);
+            $mem .= ' ' . $suffixes[$suffix];
         }
 
         return $mem;
@@ -110,25 +110,23 @@ class _Memory
 
     public function endWithNoSuffix()
     {
-
         $end = memory_get_usage();
         $memEnd = $end - $this->start;
 
-        return static::formatBytes( $memEnd );
+        return static::formatBytes($memEnd);
     }
 
-    public function end( $key = \null, $name = \null ): string
+    public function end($key = null, $name = null): string
     {
-
         $end = memory_get_usage();
         $memEnd = $end - $this->start;
-        $mem = static::formatBytes( $memEnd );
+        $mem = static::formatBytes($memEnd);
 
-        if ( $mem === 'NAN B' ) {
+        if ($mem === 'NAN B') {
             $mem = '> 1 B';
         }
 
-        if ( $key !== \null && Settings::i()->dtprofiler_enabled_memory_summary ) {
+        if ($key !== null && Settings::i()->dtprofiler_enabled_memory_summary) {
             static::$store[] = [
                 'name' => $name,
                 'key'  => $key,

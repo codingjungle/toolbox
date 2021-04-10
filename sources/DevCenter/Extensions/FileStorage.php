@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\DevCenter\Extensions;
 
+use Exception;
 use InvalidArgumentException;
 use IPS\Db;
 use IPS\Request;
@@ -30,14 +31,22 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  * Class _FileStorage
  *
  * @package IPS\toolbox\DevCenter\Extensions
- * @mixin \IPS\toolbox\DevCenter\Extensions\ExtensionsAbstract
+ * @mixin ExtensionsAbstract
  */
 class _FileStorage extends ExtensionsAbstract
 {
 
     /**
+     * @inheritdoc
+     */
+    protected function _content()
+    {
+        return $this->_getFile($this->extension);
+    }
+
+    /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function elements()
     {
@@ -64,7 +73,7 @@ class _FileStorage extends ExtensionsAbstract
         $this->form->add('table', 'select')->options(
             [
                 'options' => $tables,
-                'parse' => 'raw',
+                'parse'   => 'raw',
             ]
         )->validation($validate)->appearRequired();
         $fieldValidate = static function ($data) {
@@ -82,13 +91,5 @@ class _FileStorage extends ExtensionsAbstract
 
 
         return $this->elements;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function _content()
-    {
-        return $this->_getFile($this->extension);
     }
 }

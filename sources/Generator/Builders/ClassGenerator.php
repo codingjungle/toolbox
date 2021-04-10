@@ -17,21 +17,18 @@ use Generator\Builders\Traits\ClassMethods;
 use Generator\Builders\Traits\Constants;
 use Generator\Builders\Traits\Imports;
 use Generator\Builders\Traits\Properties;
-use IPS\babble\Profiler\Debug;
 use ReflectionClass;
-use ReflectionNamedType;
-
+use ReflectionParameter;
 use ReflectionType;
-
-use function count;
-use function is_array;
-use function is_numeric;
 
 use function array_pop;
 use function class_exists;
+use function count;
 use function explode;
 use function implode;
 use function in_array;
+use function is_array;
+use function is_numeric;
 use function is_string;
 use function ltrim;
 use function mb_strpos;
@@ -44,6 +41,7 @@ use function time;
 use function token_get_all;
 use function trim;
 use function var_export;
+
 use const T_ARRAY;
 use const T_CONSTANT_ENCAPSED_STRING;
 use const T_LNUMBER;
@@ -60,7 +58,10 @@ use const T_VARIABLE;
 class ClassGenerator extends GeneratorAbstract
 {
 
-    use Properties, Constants, ClassMethods, Imports;
+    use ClassMethods;
+    use Constants;
+    use Imports;
+    use Properties;
 
     /**
      * an array of implements
@@ -127,7 +128,7 @@ class ClassGenerator extends GeneratorAbstract
         if (is_array($value)) {
             $return = var_export($value, true);
 
-            if (\count($value) >= 1) {
+            if (count($value) >= 1) {
                 $string = explode("\n", $return);
                 $return = '';
                 $i = 0;
@@ -185,8 +186,8 @@ class {$rand} {
     public function foo({$params}){}
 }
 EOF;
-        if (!class_exists($rand) && eval($class) === \false) {
-            $continue = \false;
+        if (!class_exists($rand) && eval($class) === false) {
+            $continue = false;
         }
 
         if ($continue) {
@@ -195,7 +196,7 @@ EOF;
             foreach ($methods as $method) {
                 $params = $method->getParameters();
                 $newParams = [];
-                /** @var \ReflectionParameter $param */
+                /** @var ReflectionParameter $param */
                 foreach ($params as $param) {
                     $position = $param->getPosition();
                     $newParams[$position]['name'] = $param->getName();
@@ -321,7 +322,7 @@ EOF;
         } else {
             $og = explode('\\', $class);
         }
-        if (\count($og) >= 2) {
+        if (count($og) >= 2) {
             $class = $this->addImport($class);
         }
         $hash = $this->hash($class);
@@ -331,6 +332,73 @@ EOF;
     public function getClassUses()
     {
         return $this->classUses;
+    }
+
+    /**
+     * @param $extends
+     *
+     * @return $this
+     */
+    public function addExtends($extends, $import = true)
+    {
+        if (is_array($extends)) {
+            $og = $extends;
+            $extends = implode('\\', $extends);
+        } else {
+            $og = explode('\\', $extends);
+        }
+        if ($import === true && $this->doImports === true && count($og) >= 2) {
+            $this->addImport($extends);
+            $extends = array_pop($og);
+        }
+
+        $this->extends = $extends;
+    }
+
+    public function getExtends()
+    {
+        return $this->extends;
+    }
+
+    /**
+     * @param $interface
+     *
+     * @return $this
+     */
+    public function addInterface($interface)
+    {
+        if (is_array($interface)) {
+            $og = $interface;
+            $interface = implode('\\', $interface);
+        } else {
+            $og = explode('\\', $interface);
+        }
+
+        if ($this->doImports === true && count($og) >= 2) {
+            $this->addImport($interface);
+            $interface = array_pop($og);
+        }
+        $hash = $this->hash($interface);
+        $this->interfaces[$hash] = $interface;
+    }
+
+    protected function writeBody()
+    {
+        $tab = $this->tab;
+        //psr-12 updates
+        if (empty($this->classUses) === false) {
+            foreach ($this->classUses as $use) {
+                {
+                    $this->output("\n\n{$tab}use ");
+                    $this->output($use);
+                    $this->output(";\n");
+                }
+            }
+        }
+        $this->writeConst();
+        $this->writeProperties();
+        $this->writeMethods();
+        $this->output("\n}");
     }
 
     public function writeSourceType()
@@ -367,73 +435,6 @@ EOF;
     public function isFinal()
     {
         return $this->final;
-    }
-
-    /**
-     * @param $extends
-     *
-     * @return $this
-     */
-    public function addExtends($extends, $import = true)
-    {
-        if (is_array($extends)) {
-            $og = $extends;
-            $extends = implode('\\', $extends);
-        } else {
-            $og = explode('\\', $extends);
-        }
-        if ($import === true && $this->doImports === true && \count($og) >= 2) {
-            $this->addImport($extends);
-            $extends = array_pop($og);
-        }
-
-        $this->extends = $extends;
-    }
-
-    public function getExtends()
-    {
-        return $this->extends;
-    }
-
-    /**
-     * @param $interface
-     *
-     * @return $this
-     */
-    public function addInterface($interface)
-    {
-        if (is_array($interface)) {
-            $og = $interface;
-            $interface = implode('\\', $interface);
-        } else {
-            $og = explode('\\', $interface);
-        }
-
-        if ($this->doImports === true && \count($og) >= 2) {
-            $this->addImport($interface);
-            $interface = array_pop($og);
-        }
-        $hash = $this->hash($interface);
-        $this->interfaces[$hash] = $interface;
-    }
-
-    protected function writeBody()
-    {
-        $tab = $this->tab;
-        //psr-12 updates
-        if (empty($this->classUses) === false) {
-            foreach ($this->classUses as $use) {
-                {
-                    $this->output("\n\n{$tab}use ");
-                    $this->output($use);
-                    $this->output(";\n");
-                }
-            }
-        }
-        $this->writeConst();
-        $this->writeProperties();
-        $this->writeMethods();
-        $this->output("\n}");
     }
 
     protected function tab2space($line)

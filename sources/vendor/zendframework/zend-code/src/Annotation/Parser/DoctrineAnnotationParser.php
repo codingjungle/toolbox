@@ -11,6 +11,7 @@ namespace Zend\Code\Annotation\Parser;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\DocParser;
+use stdClass;
 use Traversable;
 use Zend\Code\Exception;
 use Zend\EventManager\EventInterface;
@@ -49,20 +50,50 @@ class DoctrineAnnotationParser implements ParserInterface
     {
         // Hack to ensure an attempt to autoload an annotation class is made
         AnnotationRegistry::registerLoader(function ($class) {
-            return (bool) class_exists($class);
+            return (bool)class_exists($class);
         });
     }
 
     /**
-     * Set the DocParser instance
+     * Handle annotation creation
      *
-     * @param  DocParser $docParser
-     * @return DoctrineAnnotationParser
+     * @param EventInterface $e
+     * @return false|stdClass
      */
-    public function setDocParser(DocParser $docParser)
+    public function onCreateAnnotation(EventInterface $e)
     {
-        $this->docParser = $docParser;
-        return $this;
+        $annotationClass = $e->getParam('class', false);
+        if (!$annotationClass) {
+            return false;
+        }
+
+        if (!isset($this->allowedAnnotations[$annotationClass])) {
+            return false;
+        }
+
+        $annotationString = $e->getParam('raw', false);
+        if (!$annotationString) {
+            return false;
+        }
+
+        // Annotation classes provided by the AnnotationScanner are already
+        // resolved to fully-qualified class names. Adding the global namespace
+        // prefix allows the Doctrine annotation parser to locate the annotation
+        // class correctly.
+        $annotationString = preg_replace('/^(@)/', '$1\\', $annotationString);
+
+        $parser = $this->getDocParser();
+        $annotations = $parser->parse($annotationString);
+        if (empty($annotations)) {
+            return false;
+        }
+
+        $annotation = array_shift($annotations);
+        if (!is_object($annotation)) {
+            return false;
+        }
+
+        return $annotation;
     }
 
     /**
@@ -74,7 +105,7 @@ class DoctrineAnnotationParser implements ParserInterface
      */
     public function getDocParser()
     {
-        if (! $this->docParser instanceof DocParser) {
+        if (!$this->docParser instanceof DocParser) {
             $this->setDocParser(new DocParser());
         }
 
@@ -82,51 +113,21 @@ class DoctrineAnnotationParser implements ParserInterface
     }
 
     /**
-     * Handle annotation creation
+     * Set the DocParser instance
      *
-     * @param  EventInterface $e
-     * @return false|\stdClass
+     * @param DocParser $docParser
+     * @return DoctrineAnnotationParser
      */
-    public function onCreateAnnotation(EventInterface $e)
+    public function setDocParser(DocParser $docParser)
     {
-        $annotationClass = $e->getParam('class', false);
-        if (! $annotationClass) {
-            return false;
-        }
-
-        if (! isset($this->allowedAnnotations[$annotationClass])) {
-            return false;
-        }
-
-        $annotationString = $e->getParam('raw', false);
-        if (! $annotationString) {
-            return false;
-        }
-
-        // Annotation classes provided by the AnnotationScanner are already
-        // resolved to fully-qualified class names. Adding the global namespace
-        // prefix allows the Doctrine annotation parser to locate the annotation
-        // class correctly.
-        $annotationString = preg_replace('/^(@)/', '$1\\', $annotationString);
-
-        $parser      = $this->getDocParser();
-        $annotations = $parser->parse($annotationString);
-        if (empty($annotations)) {
-            return false;
-        }
-
-        $annotation = array_shift($annotations);
-        if (! is_object($annotation)) {
-            return false;
-        }
-
-        return $annotation;
+        $this->docParser = $docParser;
+        return $this;
     }
 
     /**
      * Specify an allowed annotation class
      *
-     * @param  string $annotation
+     * @param string $annotation
      * @return DoctrineAnnotationParser
      */
     public function registerAnnotation($annotation)
@@ -138,14 +139,14 @@ class DoctrineAnnotationParser implements ParserInterface
     /**
      * Set many allowed annotations at once
      *
-     * @param  array|Traversable $annotations Array or traversable object of
+     * @param array|Traversable $annotations Array or traversable object of
      *         annotation class names
-     * @throws Exception\InvalidArgumentException
      * @return DoctrineAnnotationParser
+     * @throws Exception\InvalidArgumentException
      */
     public function registerAnnotations($annotations)
     {
-        if (! is_array($annotations) && ! $annotations instanceof Traversable) {
+        if (!is_array($annotations) && !$annotations instanceof Traversable) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects an array or Traversable; received "%s"',
                 __METHOD__,

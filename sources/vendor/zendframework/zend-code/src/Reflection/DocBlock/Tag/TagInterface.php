@@ -14,7 +14,7 @@ use Zend\Code\Generic\Prototype\PrototypeInterface;
 interface TagInterface extends PrototypeInterface
 {
     /**
-     * @param  string $content
+     * @param string $content
      * @return void
      */
     public function initialize($content);

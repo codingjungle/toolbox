@@ -1,14 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser;
 
-class CommentTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class CommentTest extends TestCase
 {
-    public function testGetSet() {
+    public function testGetSet()
+    {
         $comment = new Comment('/* Some comment */', 1, 10, 2);
 
         $this->assertSame('/* Some comment */', $comment->getText());
-        $this->assertSame('/* Some comment */', (string) $comment);
+        $this->assertSame('/* Some comment */', (string)$comment);
         $this->assertSame(1, $comment->getLine());
         $this->assertSame(10, $comment->getFilePos());
         $this->assertSame(2, $comment->getTokenPos());
@@ -17,12 +21,14 @@ class CommentTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideTestReformatting
      */
-    public function testReformatting($commentText, $reformattedText) {
+    public function testReformatting($commentText, $reformattedText)
+    {
         $comment = new Comment($commentText);
         $this->assertSame($reformattedText, $comment->getReformattedText());
     }
 
-    public function provideTestReformatting() {
+    public function provideTestReformatting()
+    {
         return [
             ['// Some text' . "\n", '// Some text'],
             ['/* Some text */', '/* Some text */'],

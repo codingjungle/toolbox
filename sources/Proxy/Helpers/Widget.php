@@ -23,7 +23,7 @@ use function defined;
 use function header;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -37,10 +37,10 @@ class _Widget implements HelpersAbstract
     {
         $methodDocBlock = new DocBlockGenerator(
             '@inheritdoc', null, [
-            new ParamTag('callback', 'array'),
-            new ReturnTag(['dataType' => 'string']),
+                new ParamTag('callback', 'array'),
+                new ReturnTag(['dataType' => 'string']),
 
-        ]
+            ]
         );
 
         try {
@@ -52,7 +52,7 @@ class _Widget implements HelpersAbstract
                     ],
                     'body'       => 'return parent::template(... func_get_arguments());',
                     'docblock'   => $methodDocBlock,
-                    'static'     => \false,
+                    'static'     => false,
                 ]
             );
         } catch (InvalidArgumentException $e) {

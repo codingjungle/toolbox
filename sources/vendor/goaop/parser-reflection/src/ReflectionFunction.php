@@ -10,6 +10,7 @@
 
 namespace Go\ParserReflection;
 
+use Closure;
 use Go\ParserReflection\Traits\InternalPropertiesEmulationTrait;
 use Go\ParserReflection\Traits\ReflectionFunctionLikeTrait;
 use PhpParser\Node\Stmt\Function_;
@@ -20,13 +21,14 @@ use ReflectionFunction as BaseReflectionFunction;
  */
 class ReflectionFunction extends BaseReflectionFunction
 {
-    use ReflectionFunctionLikeTrait, InternalPropertiesEmulationTrait;
+    use InternalPropertiesEmulationTrait;
+    use ReflectionFunctionLikeTrait;
 
     /**
      * Initializes reflection instance for given AST-node
      *
-     * @param string|\Closure $functionName The name of the function to reflect or a closure.
-     * @param Function_|null  $functionNode Function node AST
+     * @param string|Closure $functionName The name of the function to reflect or a closure.
+     * @param Function_|null $functionNode Function node AST
      */
     public function __construct($functionName, Function_ $functionNode)
     {
@@ -61,6 +63,30 @@ class ReflectionFunction extends BaseReflectionFunction
     public function getNode()
     {
         return $this->functionLikeNode;
+    }
+
+    /**
+     * Returns textual representation of function
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $paramFormat = ($this->getNumberOfParameters() > 0) ? "\n\n  - Parameters [%d] {%s\n  }" : '';
+        $reflectionFormat = "%sFunction [ <user> function %s ] {\n  @@ %s %d - %d{$paramFormat}\n}\n";
+
+        return sprintf(
+            $reflectionFormat,
+            $this->getDocComment() ? $this->getDocComment() . "\n" : '',
+            $this->getName(),
+            $this->getFileName(),
+            $this->getStartLine(),
+            $this->getEndLine(),
+            count($this->getParameters()),
+            array_reduce($this->getParameters(), function ($str, ReflectionParameter $param) {
+                return $str . "\n    " . $param;
+            }, '')
+        );
     }
 
     /**
@@ -103,31 +129,6 @@ class ReflectionFunction extends BaseReflectionFunction
     {
         return false;
     }
-
-    /**
-     * Returns textual representation of function
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        $paramFormat      = ($this->getNumberOfParameters() > 0) ? "\n\n  - Parameters [%d] {%s\n  }" : '';
-        $reflectionFormat = "%sFunction [ <user> function %s ] {\n  @@ %s %d - %d{$paramFormat}\n}\n";
-
-        return sprintf(
-            $reflectionFormat,
-            $this->getDocComment() ? $this->getDocComment() . "\n" : '',
-            $this->getName(),
-            $this->getFileName(),
-            $this->getStartLine(),
-            $this->getEndLine(),
-            count($this->getParameters()),
-            array_reduce($this->getParameters(), function ($str, ReflectionParameter $param) {
-                return $str . "\n    " . $param;
-            }, '')
-        );
-    }
-
 
     /**
      * Implementation of internal reflection initialization

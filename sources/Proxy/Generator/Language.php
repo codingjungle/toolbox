@@ -14,17 +14,19 @@ namespace IPS\toolbox\Proxy\Generator;
 use Exception;
 use IPS\Data\Store;
 use IPS\Lang;
+
+use function defined;
 use function header;
 
-if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
  * Language Class
  *
- * @mixin \IPS\toolbox\Proxy\Generator\Language
+ * @mixin Language
  */
 class _Language extends GeneratorAbstract
 {
@@ -43,11 +45,11 @@ class _Language extends GeneratorAbstract
     {
         $jsonMeta = [];
 
-        if ( isset( Store::i()->dt_json ) ) {
+        if (isset(Store::i()->dt_json)) {
             $jsonMeta = Store::i()->dt_json;
         }
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signature' => [
                 'IPS\\Lang::addToStack:0',
                 'IPS\\Lang::checkKeyExists',
@@ -61,7 +63,7 @@ class _Language extends GeneratorAbstract
             'language'  => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'   => 'langs',
             'source' => [
                 'contributor' => 'return_array',
@@ -72,14 +74,14 @@ class _Language extends GeneratorAbstract
         Store::i()->dt_json = $jsonMeta;
         $toWrite = [];
         try {
-            $lang = Lang::load( Lang::defaultLanguage() );
+            $lang = Lang::load(Lang::defaultLanguage());
 
-            foreach ( $lang->words as $key => $val ) {
+            foreach ($lang->words as $key => $val) {
                 $toWrite[] = $key;
             }
 
-            $this->writeClass( 'Langs', 'LanguageProvider', $toWrite );
-        } catch ( Exception $e ) {
+            $this->writeClass('Langs', 'LanguageProvider', $toWrite);
+        } catch (Exception $e) {
         }
     }
 }

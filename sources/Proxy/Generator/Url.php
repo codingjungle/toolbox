@@ -20,6 +20,7 @@ use Symfony\Component\Finder\Finder;
 
 use function array_filter;
 use function array_unshift;
+use function defined;
 use function file_exists;
 use function file_get_contents;
 use function header;
@@ -28,15 +29,17 @@ use function iterator_to_array;
 use function json_decode;
 use function preg_replace;
 
-if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+use const DIRECTORY_SEPARATOR;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
  * Url Class
  *
- * @mixin \IPS\toolbox\Proxy\Generator\Url
+ * @mixin Url
  */
 class _Url extends GeneratorAbstract
 {
@@ -46,29 +49,29 @@ class _Url extends GeneratorAbstract
      * @note  This needs to be declared in any child class.
      * @var static
      */
-    protected static $instance = \null;
+    protected static $instance = null;
 
     /**
      * creates the jsonMeta for the json file and writes the provider to disk.
      */
     public function create()
     {
-        $ds = \DIRECTORY_SEPARATOR;
+        $ds = DIRECTORY_SEPARATOR;
         $root = \IPS\ROOT_PATH;
         $jsonMeta = [];
 
-        if ( isset( Store::i()->dt_json ) ) {
+        if (isset(Store::i()->dt_json)) {
             $jsonMeta = Store::i()->dt_json;
         }
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signature' => [
                 "IPS\\Http\\Url::internal:0",
             ],
             'provider'  => 'url',
             'language'  => 'php',
         ];
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'   => 'url',
             'source' => [
                 'contributor' => 'return_array',
@@ -77,7 +80,7 @@ class _Url extends GeneratorAbstract
         ];
 
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signature' => [
                 "IPS\\Http\\Url::internal:1",
             ],
@@ -86,7 +89,7 @@ class _Url extends GeneratorAbstract
         ];
 
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'           => 'urlBase',
             'lookup_strings' => [
                 'admin',
@@ -94,14 +97,14 @@ class _Url extends GeneratorAbstract
             ],
         ];
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signature' => [
                 "IPS\\Http\\Url::internal:2",
             ],
             'provider'  => 'furl',
             'language'  => 'php',
         ];
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'   => 'furl',
             'source' => [
                 'contributor' => 'return_array',
@@ -114,12 +117,12 @@ class _Url extends GeneratorAbstract
                 "IPS\\Output::error:1",
                 "IPS\\chrono\\Application::error:1"
             ],
-            'provider' => 'error',
-            'language' => 'php',
+            'provider'  => 'error',
+            'language'  => 'php',
         ];
 
         $jsonMeta['providers'][] = [
-            'name' => 'error',
+            'name'   => 'error',
             'source' => [
                 'contributor' => 'return_array',
                 'parameter'   => 'dtProxy\\ErrorCodesProvider::get',
@@ -129,41 +132,40 @@ class _Url extends GeneratorAbstract
         Store::i()->dt_json = $jsonMeta;
 
         $errorCodes = Store::i()->dt_error_codes ?? [];
-        $this->writeClass('Error', 'ErrorCodesProvider', array_filter($errorCodes ));
-unset(Store::i()->dt_error_codes);
+        $this->writeClass('Error', 'ErrorCodesProvider', array_filter($errorCodes));
+        unset(Store::i()->dt_error_codes);
         try {
             $toWrite = [];
-            $sql = Db::i()->select( '*', 'core_modules', \null, 'sys_module_position' )->join( 'core_permission_index', [
+            $sql = Db::i()->select('*', 'core_modules', null, 'sys_module_position')->join('core_permission_index', [
                 'core_permission_index.app=? AND core_permission_index.perm_type=? AND core_permission_index.perm_type_id=core_modules.sys_module_id',
                 'core',
                 'module',
-            ] );
+            ]);
 
-            $modules = iterator_to_array( $sql );
+            $modules = iterator_to_array($sql);
 
-            foreach ( $modules as $module ) {
-                $toWrite[ 'app=' . $module[ 'sys_module_application' ] ] = 'app=' . $module[ 'sys_module_application' ];
-                $base = 'app=' . $module[ 'sys_module_application' ] . '&module=' . $module[ 'sys_module_key' ];
-                $toWrite[ $base ] = $base;
-                $dir = $root . $ds . 'applications' . $ds . $module[ 'sys_module_application' ] . $ds . 'modules' . $ds . $module[ 'sys_module_area' ] . $ds . $module[ 'sys_module_key' ];
+            foreach ($modules as $module) {
+                $toWrite['app=' . $module['sys_module_application']] = 'app=' . $module['sys_module_application'];
+                $base = 'app=' . $module['sys_module_application'] . '&module=' . $module['sys_module_key'];
+                $toWrite[$base] = $base;
+                $dir = $root . $ds . 'applications' . $ds . $module['sys_module_application'] . $ds . 'modules' . $ds . $module['sys_module_area'] . $ds . $module['sys_module_key'];
 
-                if ( is_dir( $dir ) ) {
+                if (is_dir($dir)) {
                     try {
-                        $finder = new Finder;
-                        $finder->in( $dir )->name( '*.php' )->files();
+                        $finder = new Finder();
+                        $finder->in($dir)->name('*.php')->files();
 
-                        foreach ( $finder as $file ) {
-                            $fileName = $file->getBasename( '.php' );
-                            $toWrite[ $base . '&controller=' . $fileName ] = $base . '&controller=' . $fileName;
+                        foreach ($finder as $file) {
+                            $fileName = $file->getBasename('.php');
+                            $toWrite[$base . '&controller=' . $fileName] = $base . '&controller=' . $fileName;
                         }
-                    } catch ( Exception $e ) {
+                    } catch (Exception $e) {
                     }
                 }
             }
 
-            $this->writeClass( 'Http', 'HttpProvider', $toWrite );
-
-        } catch ( Exception $e ) {
+            $this->writeClass('Http', 'HttpProvider', $toWrite);
+        } catch (Exception $e) {
         }
 
         $this->buildFurlConf();
@@ -175,30 +177,29 @@ unset(Store::i()->dt_error_codes);
     public function buildFurlConf()
     {
         $applications = Application::applications();
-        foreach ( $applications as $k => $app ) {
-            if ( $app->default ) {
-                unset( $applications[ $k ] );
-                array_unshift( $applications, $app );
+        foreach ($applications as $k => $app) {
+            if ($app->default) {
+                unset($applications[$k]);
+                array_unshift($applications, $app);
                 break;
             }
         }
 
         $definitions = [];
 
-        foreach ( $applications as $app ) {
+        foreach ($applications as $app) {
             $path = \IPS\ROOT_PATH . "/applications/{$app->directory}/data/furl.json";
-            if ( file_exists( $path ) ) {
-                $data = json_decode( preg_replace( '/\/\*.+?\*\//s', '', file_get_contents( $path ) ), \true );
+            if (file_exists($path)) {
+                $data = json_decode(preg_replace('/\/\*.+?\*\//s', '', file_get_contents($path)), true);
                 /* @var array $pages */
-                $pages = $data[ 'pages' ];
-                foreach ( $pages as $k => $page ) {
-                    $definitions[ $k ] = $k;
+                $pages = $data['pages'];
+                foreach ($pages as $k => $page) {
+                    $definitions[$k] = $k;
                 }
             }
         }
 
-        $this->writeClass( 'Furl', 'FurlProvider', $definitions );
-
+        $this->writeClass('Furl', 'FurlProvider', $definitions);
     }
 }
 

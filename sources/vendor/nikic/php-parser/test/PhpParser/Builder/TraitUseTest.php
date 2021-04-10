@@ -1,21 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Builder;
 
+use LogicException;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
+use PHPUnit\Framework\TestCase;
 
-class TraitUseTest extends \PHPUnit\Framework\TestCase
+class TraitUseTest extends TestCase
 {
-    protected function createTraitUseBuilder(...$traits) {
-        return new TraitUse(...$traits);
-    }
-
-    public function testAnd() {
+    public function testAnd()
+    {
         $node = $this->createTraitUseBuilder('SomeTrait')
-            ->and('AnotherTrait')
-            ->getNode()
-        ;
+                     ->and('AnotherTrait')
+                     ->getNode();
 
         $this->assertEquals(
             new Stmt\TraitUse([
@@ -26,12 +25,17 @@ class TraitUseTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWith() {
+    protected function createTraitUseBuilder(...$traits)
+    {
+        return new TraitUse(...$traits);
+    }
+
+    public function testWith()
+    {
         $node = $this->createTraitUseBuilder('SomeTrait')
-            ->with(new Stmt\TraitUseAdaptation\Alias(null, 'foo', null, 'bar'))
-            ->with((new TraitUseAdaptation(null, 'test'))->as('baz'))
-            ->getNode()
-        ;
+                     ->with(new Stmt\TraitUseAdaptation\Alias(null, 'foo', null, 'bar'))
+                     ->with((new TraitUseAdaptation(null, 'test'))->as('baz'))
+                     ->getNode();
 
         $this->assertEquals(
             new Stmt\TraitUse([new Name('SomeTrait')], [
@@ -42,11 +46,11 @@ class TraitUseTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInvalidAdaptationNode() {
-        $this->expectException(\LogicException::class);
+    public function testInvalidAdaptationNode()
+    {
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Adaptation must have type TraitUseAdaptation');
         $this->createTraitUseBuilder('Test')
-            ->with(new Stmt\Echo_([]))
-        ;
+             ->with(new Stmt\Echo_([]));
     }
 }

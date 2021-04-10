@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Memcached;
+use ReflectionClass;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
@@ -21,11 +23,11 @@ class MemcachedCaster
     private static $optionConstants;
     private static $defaultOptions;
 
-    public static function castMemcached(\Memcached $c, array $a, Stub $stub, $isNested)
+    public static function castMemcached(Memcached $c, array $a, Stub $stub, $isNested)
     {
         $a += [
-            Caster::PREFIX_VIRTUAL.'servers' => $c->getServerList(),
-            Caster::PREFIX_VIRTUAL.'options' => new EnumStub(
+            Caster::PREFIX_VIRTUAL . 'servers' => $c->getServerList(),
+            Caster::PREFIX_VIRTUAL . 'options' => new EnumStub(
                 self::getNonDefaultOptions($c)
             ),
         ];
@@ -33,7 +35,7 @@ class MemcachedCaster
         return $a;
     }
 
-    private static function getNonDefaultOptions(\Memcached $c)
+    private static function getNonDefaultOptions(Memcached $c)
     {
         self::$defaultOptions = self::$defaultOptions ?? self::discoverDefaultOptions();
         self::$optionConstants = self::$optionConstants ?? self::getOptionConstants();
@@ -50,7 +52,7 @@ class MemcachedCaster
 
     private static function discoverDefaultOptions()
     {
-        $defaultMemcached = new \Memcached();
+        $defaultMemcached = new Memcached();
         $defaultMemcached->addServer('127.0.0.1', 11211);
 
         $defaultOptions = [];
@@ -65,7 +67,7 @@ class MemcachedCaster
 
     private static function getOptionConstants()
     {
-        $reflectedMemcached = new \ReflectionClass(\Memcached::class);
+        $reflectedMemcached = new ReflectionClass(Memcached::class);
 
         $optionConstants = [];
         foreach ($reflectedMemcached->getConstants() as $constantKey => $value) {

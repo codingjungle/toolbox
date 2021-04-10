@@ -1,25 +1,20 @@
 <?php
+
 namespace Go\ParserReflection;
 
+use DateTime;
+use PHPUnit_Framework_TestCase;
 use Stub\Issue44\Locator;
 
-class ReflectionFileTest extends \PHPUnit_Framework_TestCase
+class ReflectionFileTest extends PHPUnit_Framework_TestCase
 {
-    const STUB_FILE        = '/Stub/FileWithNamespaces.php';
-    const STUB_GLOBAL_FILE = '/Stub/FileWithGlobalNamespace.php';
+    public const STUB_FILE = '/Stub/FileWithNamespaces.php';
+    public const STUB_GLOBAL_FILE = '/Stub/FileWithGlobalNamespace.php';
 
     /**
      * @var ReflectionFile
      */
     protected $parsedRefFile;
-
-    protected function setUp()
-    {
-        $fileName       = stream_resolve_include_path(__DIR__ . self::STUB_FILE);
-        $reflectionFile = new ReflectionFile($fileName);
-
-        $this->parsedRefFile = $reflectionFile;
-    }
 
     /**
      * @expectedException        InvalidArgumentException
@@ -36,12 +31,12 @@ class ReflectionFileTest extends \PHPUnit_Framework_TestCase
      */
     public function testBadFilenameTypeObject()
     {
-        new ReflectionFile(new \DateTime());
+        new ReflectionFile(new DateTime());
     }
 
     public function testGetName()
     {
-        $fileName     = $this->parsedRefFile->getName();
+        $fileName = $this->parsedRefFile->getName();
         $expectedName = stream_resolve_include_path(__DIR__ . self::STUB_FILE);
         $this->assertEquals($expectedName, $fileName);
     }
@@ -72,7 +67,7 @@ class ReflectionFileTest extends \PHPUnit_Framework_TestCase
 
     public function testGetGlobalFileNamespace()
     {
-        $fileName       = stream_resolve_include_path(__DIR__ . self::STUB_GLOBAL_FILE);
+        $fileName = stream_resolve_include_path(__DIR__ . self::STUB_GLOBAL_FILE);
         $reflectionFile = new ReflectionFile($fileName);
 
         $reflectionFileNamespace = $reflectionFile->getFileNamespace('');
@@ -89,7 +84,7 @@ class ReflectionFileTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsStrictType($fileName, $shouldBeStrict)
     {
-        $fileName       = stream_resolve_include_path(__DIR__ . $fileName);
+        $fileName = stream_resolve_include_path(__DIR__ . $fileName);
         $reflectionFile = new ReflectionFile($fileName);
 
         $this->assertSame($shouldBeStrict, $reflectionFile->isStrictMode());
@@ -120,5 +115,13 @@ class ReflectionFileTest extends \PHPUnit_Framework_TestCase
 
         $interfaceNames = $class->getInterfaceNames();
         $this->assertEquals([], $interfaceNames);
+    }
+
+    protected function setUp()
+    {
+        $fileName = stream_resolve_include_path(__DIR__ . self::STUB_FILE);
+        $reflectionFile = new ReflectionFile($fileName);
+
+        $this->parsedRefFile = $reflectionFile;
     }
 }

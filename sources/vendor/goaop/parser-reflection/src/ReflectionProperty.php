@@ -16,6 +16,7 @@ use Go\ParserReflection\ValueResolver\NodeExpressionResolver;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\PropertyProperty;
+use Reflection;
 use ReflectionProperty as BaseReflectionProperty;
 
 /**
@@ -23,7 +24,8 @@ use ReflectionProperty as BaseReflectionProperty;
  */
 class ReflectionProperty extends BaseReflectionProperty
 {
-    use InitializationTrait, InternalPropertiesEmulationTrait;
+    use InitializationTrait;
+    use InternalPropertiesEmulationTrait;
 
     /**
      * Type of property node
@@ -66,10 +68,39 @@ class ReflectionProperty extends BaseReflectionProperty
         }
 
         $this->propertyTypeNode = $propertyType;
-        $this->propertyNode     = $propertyNode;
+        $this->propertyNode = $propertyNode;
 
         // Let's unset original read-only properties to have a control over them via __get
         unset($this->name, $this->class);
+    }
+
+    /**
+     * Parses properties from the concrete class node
+     *
+     * @param ClassLike $classLikeNode Class-like node
+     * @param string $fullClassName FQN of the class
+     *
+     * @return array|ReflectionProperty[]
+     */
+    public static function collectFromClassNode(ClassLike $classLikeNode, $fullClassName)
+    {
+        $properties = [];
+
+        foreach ($classLikeNode->stmts as $classLevelNode) {
+            if ($classLevelNode instanceof Property) {
+                foreach ($classLevelNode->props as $classPropertyNode) {
+                    $propertyName = $classPropertyNode->name->toString();
+                    $properties[$propertyName] = new static(
+                        $fullClassName,
+                        $propertyName,
+                        $classLevelNode,
+                        $classPropertyNode
+                    );
+                }
+            }
+        }
+
+        return $properties;
     }
 
     /**
@@ -113,7 +144,7 @@ class ReflectionProperty extends BaseReflectionProperty
         return sprintf(
             "Property [%s %s $%s ]\n",
             $this->isStatic() ? '' : ($this->isDefault() ? ' <default>' : ' <dynamic>'),
-            join(' ', \Reflection::getModifierNames($this->getModifiers())),
+            join(' ', Reflection::getModifierNames($this->getModifiers())),
             $this->getName()
         );
     }
@@ -121,19 +152,19 @@ class ReflectionProperty extends BaseReflectionProperty
     /**
      * {@inheritDoc}
      */
-    public function getDeclaringClass()
+    public function isStatic()
     {
-        return new ReflectionClass($this->className);
+        return $this->propertyTypeNode->isStatic();
     }
 
     /**
      * @inheritDoc
      */
-    public function getDocComment()
+    public function isDefault()
     {
-        $docBlock = $this->propertyTypeNode->getDocComment();
+        // TRUE if the property was declared at compile-time
 
-        return $docBlock ? $docBlock->getText() : false;
+        return true;
     }
 
     /**
@@ -156,6 +187,30 @@ class ReflectionProperty extends BaseReflectionProperty
         }
 
         return $modifiers;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isPublic()
+    {
+        return $this->propertyTypeNode->isPublic();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isProtected()
+    {
+        return $this->propertyTypeNode->isProtected();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isPrivate()
+    {
+        return $this->propertyTypeNode->isPrivate();
     }
 
     /**
@@ -187,45 +242,21 @@ class ReflectionProperty extends BaseReflectionProperty
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getDeclaringClass()
+    {
+        return new ReflectionClass($this->className);
+    }
+
+    /**
      * @inheritDoc
      */
-    public function isDefault()
+    public function getDocComment()
     {
-        // TRUE if the property was declared at compile-time
+        $docBlock = $this->propertyTypeNode->getDocComment();
 
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isPrivate()
-    {
-        return $this->propertyTypeNode->isPrivate();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isProtected()
-    {
-        return $this->propertyTypeNode->isProtected();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isPublic()
-    {
-        return $this->propertyTypeNode->isPublic();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isStatic()
-    {
-        return $this->propertyTypeNode->isStatic();
+        return $docBlock ? $docBlock->getText() : false;
     }
 
     /**
@@ -246,35 +277,6 @@ class ReflectionProperty extends BaseReflectionProperty
         $this->initializeInternalReflection();
 
         parent::setValue($object, $value);
-    }
-
-    /**
-     * Parses properties from the concrete class node
-     *
-     * @param ClassLike $classLikeNode Class-like node
-     * @param string    $fullClassName FQN of the class
-     *
-     * @return array|ReflectionProperty[]
-     */
-    public static function collectFromClassNode(ClassLike $classLikeNode, $fullClassName)
-    {
-        $properties = [];
-
-        foreach ($classLikeNode->stmts as $classLevelNode) {
-            if ($classLevelNode instanceof Property) {
-                foreach ($classLevelNode->props as $classPropertyNode) {
-                    $propertyName = $classPropertyNode->name->toString();
-                    $properties[$propertyName] = new static(
-                        $fullClassName,
-                        $propertyName,
-                        $classLevelNode,
-                        $classPropertyNode
-                    );
-                }
-            }
-        }
-
-        return $properties;
     }
 
     /**

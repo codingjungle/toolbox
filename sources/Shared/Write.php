@@ -21,6 +21,9 @@ use IPS\toolbox\Proxy\Proxyclass;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 
+use const IPS\IPS_FILE_PERMISSION;
+use const IPS\IPS_FOLDER_PERMISSION;
+
 trait Write
 {
     /**
@@ -28,20 +31,20 @@ trait Write
      *
      * @var bool
      */
-    protected $proxy = \false;
+    protected $proxy = false;
 
-    protected function _createDir( $dir )
+    protected function _createDir($dir)
     {
         try {
-            $fs = new FileSystem;
-            if ( !$fs->exists( $dir ) ) {
-                $fs->mkdir( $dir, \IPS\IPS_FOLDER_PERMISSION );
-                $fs->chmod( $dir, \IPS\IPS_FOLDER_PERMISSION );
+            $fs = new FileSystem();
+            if (!$fs->exists($dir)) {
+                $fs->mkdir($dir, IPS_FOLDER_PERMISSION);
+                $fs->chmod($dir, IPS_FOLDER_PERMISSION);
             }
-        } catch ( RuntimeException $e ) {
-            Debug::add( 'Directory Creation Failure', $e );
-        } catch ( Exception $e ) {
-            Debug::add( 'Write Failure', $e );
+        } catch (RuntimeException $e) {
+            Debug::add('Directory Creation Failure', $e);
+        } catch (Exception $e) {
+            Debug::add('Write Failure', $e);
         }
     }
 
@@ -50,30 +53,30 @@ trait Write
      * @param string $content
      * @param string $dir
      */
-    protected function _writeFile( string $file, string $content, string $dir, $append = \true )
+    protected function _writeFile(string $file, string $content, string $dir, $append = true)
     {
         try {
             $fs = new Filesystem();
 
-            if ( !$fs->exists( $dir ) ) {
-                $fs->mkdir( $dir, \IPS\IPS_FOLDER_PERMISSION );
-                $fs->chmod( $dir, \IPS\IPS_FOLDER_PERMISSION );
+            if (!$fs->exists($dir)) {
+                $fs->mkdir($dir, IPS_FOLDER_PERMISSION);
+                $fs->chmod($dir, IPS_FOLDER_PERMISSION);
             }
 
-            if ( $append === \false ) {
-                $fs->remove( $dir . '/' . $file );
+            if ($append === false) {
+                $fs->remove($dir . '/' . $file);
             }
 
-            $fs->appendToFile( $dir . '/' . $file, $content );
-            $fs->chmod( $dir . '/' . $file, \IPS\IPS_FILE_PERMISSION );
+            $fs->appendToFile($dir . '/' . $file, $content);
+            $fs->chmod($dir . '/' . $file, IPS_FILE_PERMISSION);
 
-            if ( $this->proxy && Application::appIsEnabled( 'dtproxy' ) ) {
-                Proxyclass::i()->buildAndMake( $dir . '/' . $file );
+            if ($this->proxy && Application::appIsEnabled('dtproxy')) {
+                Proxyclass::i()->buildAndMake($dir . '/' . $file);
             }
-        } catch ( RuntimeException $e ) {
-            Debug::add( 'Directory Creation Failure', $e );
-        } catch ( Exception $e ) {
-            Debug::add( 'Write Failure', $e );
+        } catch (RuntimeException $e) {
+            Debug::add('Directory Creation Failure', $e);
+        } catch (Exception $e) {
+            Debug::add('Write Failure', $e);
         }
     }
 }

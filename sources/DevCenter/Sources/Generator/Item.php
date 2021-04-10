@@ -29,18 +29,17 @@ use SplObserver;
 use SplSubject;
 
 use function defined;
+use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function header;
 use function in_array;
 use function is_array;
-
-use const IPS\ROOT_PATH;
-
-use function file_exists;
 use function json_decode;
 use function json_encode;
 use function mb_strtolower;
+
+use const IPS\ROOT_PATH;
 use const JSON_PRETTY_PRINT;
 
 
@@ -51,6 +50,26 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Item extends GeneratorAbstract
 {
+
+    protected function addFurl($value, $url)
+    {
+        $furlFile = ROOT_PATH . '/applications/' . $this->application->directory . '/data/furl.json';
+        if (file_exists($furlFile)) {
+            $furls = json_decode(file_get_contents($furlFile), true);
+        } else {
+            $furls = [
+                'topLevel' => $this->app,
+                'pages'    => [],
+            ];
+        }
+
+        $furls['pages'][$value] = [
+            'friendly' => $this->classname_lower . '/' . mb_strtolower($this->item_node_class) . '/{#project}-{?}',
+            'real'     => $url,
+        ];
+
+        file_put_contents($furlFile, json_encode($furls, JSON_PRETTY_PRINT));
+    }
 
     /**
      * @inheritdoc
@@ -70,9 +89,9 @@ class _Item extends GeneratorAbstract
         ];
 
         $columnMap = [
-            'author' => 'author',
-            'title' => 'title',
-            'date' => 'start_date',
+            'author'     => 'author',
+            'title'      => 'title',
+            'date'       => 'start_date',
             'ip_address' => 'ip_address',
         ];
 
@@ -133,7 +152,7 @@ class _Item extends GeneratorAbstract
             'application',
             $this->app . '_' . $this->classname_lower . $extra,
             [
-                'static' => true,
+                'static'   => true,
                 'document' => $doc,
             ]
         );
@@ -147,7 +166,7 @@ class _Item extends GeneratorAbstract
      */
     protected function itemNodeClass(&$dbColumns, &$columnMap): void
     {
-        if ($this->item_node_class !== \null) {
+        if ($this->item_node_class !== null) {
             $this->item_node_class = mb_ucfirst($this->item_node_class);
             $itemNodeClass = 'IPS\\' . $this->app . '\\' . $this->item_node_class;
             $this->generator->addImport($itemNodeClass);
@@ -161,7 +180,7 @@ class _Item extends GeneratorAbstract
             ];
 
             $extra = [
-                'static' => true,
+                'static'   => true,
                 'document' => $doc,
             ];
             $this->generator->addProperty('containerNodeClass', $itemNodeClass, $extra);
@@ -176,7 +195,7 @@ class _Item extends GeneratorAbstract
      */
     protected function commentClass(&$dbColumns, &$columnMap): void
     {
-        if ($this->comment_class !== \null) {
+        if ($this->comment_class !== null) {
             $dbColumns[] = 'num_comments';
             $dbColumns[] = 'last_comment';
             $dbColumns[] = 'last_comment_by';
@@ -197,7 +216,7 @@ class _Item extends GeneratorAbstract
             ];
 
             $extra = [
-                'static' => true,
+                'static'   => true,
                 'document' => $doc,
             ];
             $this->generator->addProperty('commentClass', $commentClass, $extra);
@@ -212,7 +231,7 @@ class _Item extends GeneratorAbstract
      */
     protected function reviewClass(&$dbColumns, &$columnMap): void
     {
-        if ($this->review_class !== \null) {
+        if ($this->review_class !== null) {
             $dbColumns[] = 'num_reviews';
             $dbColumns[] = 'last_review';
             $dbColumns[] = 'last_review_by';
@@ -243,7 +262,7 @@ class _Item extends GeneratorAbstract
             ];
 
             $extra = [
-                'static' => true,
+                'static'   => true,
                 'document' => $doc,
             ];
             $this->generator->addProperty('reviewClass', $reviewClass, $extra);
@@ -255,7 +274,7 @@ class _Item extends GeneratorAbstract
             ];
 
             $extra = [
-                'static' => true,
+                'static'   => true,
                 'document' => $doc,
             ];
             $this->generator->addProperty('reviewsPerPage', 25, $extra);
@@ -272,7 +291,7 @@ class _Item extends GeneratorAbstract
     {
         if (is_array($this->implements)) {
             //edit history
-            if (in_array(EditHistory::class, $this->implements, \false)) {
+            if (in_array(EditHistory::class, $this->implements, false)) {
                 $dbColumns[] = 'edit_time';
                 $dbColumns[] = 'edit_show';
                 $dbColumns[] = 'edit_member_name';
@@ -286,25 +305,25 @@ class _Item extends GeneratorAbstract
             }
 
             //featurable
-            if (in_array(Featurable::class, $this->implements, \false)) {
+            if (in_array(Featurable::class, $this->implements, false)) {
                 $dbColumns[] = 'featured';
                 $columnMap['featured'] = 'featured';
             }
 
             //Pinnable
-            if (in_array(Pinnable::class, $this->implements, \false)) {
+            if (in_array(Pinnable::class, $this->implements, false)) {
                 $dbColumns[] = 'pinned';
                 $columnMap['pinned'] = 'pinned';
             }
 
             //Lockable
-            if (in_array(Lockable::class, $this->implements, \false)) {
+            if (in_array(Lockable::class, $this->implements, false)) {
                 $dbColumns[] = 'locked';
                 $columnMap['locked'] = 'locked';
             }
 
             //Hideable
-            if (in_array(Hideable::class, $this->implements, \false)) {
+            if (in_array(Hideable::class, $this->implements, false)) {
                 $dbColumns[] = 'approved';
                 $dbColumns[] = 'approved_by';
                 $dbColumns[] = 'approved_date';
@@ -314,35 +333,35 @@ class _Item extends GeneratorAbstract
             }
 
             //Views
-            if (in_array(Views::class, $this->implements, \false)) {
+            if (in_array(Views::class, $this->implements, false)) {
                 $dbColumns[] = 'views';
                 $columnMap['views'] = 'views';
             }
 
             //ReadMarkers
-            if (in_array(ReadMarkers::class, $this->implements, \false)) {
+            if (in_array(ReadMarkers::class, $this->implements, false)) {
                 $dbColumns[] = 'updated_date';
                 $columnMap['updated'] = 'updated_date';
 
-                if ($this->comment_class !== \null) {
+                if ($this->comment_class !== null) {
                     $dbColumns[] = 'last_comment';
                     $columnMap['last_comment'] = 'last_comment';
                 }
             }
 
             //Polls
-            if (in_array(Polls::class, $this->implements, \false)) {
+            if (in_array(Polls::class, $this->implements, false)) {
                 $dbColumns[] = 'poll';
                 $columnMap['poll'] = 'poll';
             }
 
             $find[] = '{polls}';
-            $replace['polls'] = \null;
+            $replace['polls'] = null;
             //SplObserver - aka Polls well more polls or something like that
-            if (in_array(Polls::class, $this->implements, \false) && in_array(
+            if (in_array(Polls::class, $this->implements, false) && in_array(
                     SplObserver::class,
                     $this->implements,
-                    \false
+                    false
                 )) {
                 $poll = SplSubject::class;
                 $this->generator->addUse($poll);
@@ -357,7 +376,7 @@ class _Item extends GeneratorAbstract
             }
 
             //Ratings
-            if (in_array(Ratings::class, $this->implements, \false)) {
+            if (in_array(Ratings::class, $this->implements, false)) {
                 $dbColumns[] = 'rating_average';
                 $dbColumns[] = 'rating_total';
                 $dbColumns[] = 'rating_hits';
@@ -368,7 +387,7 @@ class _Item extends GeneratorAbstract
         }
 
         if (is_array($this->traits)) {
-            if (in_array(Reactable::class, $this->traits, \false)) {
+            if (in_array(Reactable::class, $this->traits, false)) {
                 $doc = [
                     'Reaction Type',
                     '@return string',
@@ -376,15 +395,15 @@ class _Item extends GeneratorAbstract
                 $body = 'return \'' . $this->app . '_' . $this->classname_lower . '\';';
                 $params = [];
                 $extra = [
-                    'static' => true,
+                    'static'   => true,
                     'document' => $doc,
                 ];
                 $this->generator->addMethod('reactionType', $body, $params, $extra);
             }
 
-            if (in_array(Reportable::class, $this->traits, \false)) {
+            if (in_array(Reportable::class, $this->traits, false)) {
                 $extra = [
-                    'static' => true,
+                    'static'   => true,
                     'document' => [
                         '@brief Icon',
                         '@var string',
@@ -393,13 +412,13 @@ class _Item extends GeneratorAbstract
                 $this->generator->addProperty('icon', 'cubes', $extra);
             }
 
-            if( in_array( Solvable::class, $this->traits,false) ){
+            if (in_array(Solvable::class, $this->traits, false)) {
                 $dbColumns[] = 'solved_comment_id';
                 $columnMap['solved_comment_id'] = 'solved_comment_id';
                 /**
                  * Container has solvable enabled
                  *
-                 * @return	string
+                 * @return    string
                  */
                 $doc = [
                     'Container has solvable enabled',
@@ -408,7 +427,7 @@ class _Item extends GeneratorAbstract
                 $body = '';
                 $params = [];
                 $extra = [
-                    'static' => false,
+                    'static'   => false,
                     'document' => $doc,
                 ];
                 $this->generator->addMethod('containerAllowsSolvable', $body, $params, $extra);
@@ -421,7 +440,7 @@ class _Item extends GeneratorAbstract
                 $body = '';
                 $params = [];
                 $extra = [
-                    'static' => false,
+                    'static'   => false,
                     'document' => $doc,
                 ];
                 $this->generator->addMethod('containerAllowsMemberSolvable', $body, $params, $extra);
@@ -433,7 +452,7 @@ class _Item extends GeneratorAbstract
                 $body = '';
                 $params = [];
                 $extra = [
-                    'static' => true,
+                    'static'   => true,
                     'document' => $doc,
                 ];
                 $this->generator->addMethod('anyContainerAllowsSolvable', $body, $params, $extra);
@@ -449,32 +468,12 @@ class _Item extends GeneratorAbstract
     protected function columnMap(array $columnMap): void
     {
         $extra = [
-            'static' => true,
+            'static'   => true,
             'document' => [
                 '@brief Database Column Map',
                 '@var array',
             ],
         ];
         $this->generator->addProperty('databaseColumnMap', $columnMap, $extra);
-    }
-
-    protected function addFurl($value, $url)
-    {
-        $furlFile = ROOT_PATH . '/applications/' . $this->application->directory . '/data/furl.json';
-        if (file_exists($furlFile)) {
-            $furls = json_decode(file_get_contents($furlFile), true);
-        } else {
-            $furls = [
-                'topLevel' => $this->app,
-                'pages' => [],
-            ];
-        }
-
-        $furls['pages'][$value] = [
-            'friendly' => $this->classname_lower . '/' . mb_strtolower($this->item_node_class) . '/{#project}-{?}',
-            'real' => $url,
-        ];
-
-        file_put_contents($furlFile, json_encode($furls, JSON_PRETTY_PRINT));
     }
 }

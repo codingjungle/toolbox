@@ -12,6 +12,8 @@
 
 namespace IPS\toolbox\modules\admin\code;
 
+use Exception;
+use InvalidArgumentException;
 use IPS\Application;
 use IPS\Data\Store;
 use IPS\Dispatcher\Admin;
@@ -19,6 +21,7 @@ use IPS\Dispatcher\Controller;
 use IPS\Helpers\Form;
 use IPS\Helpers\MultipleRedirect;
 use IPS\Http\Url;
+use IPS\IPS;
 use IPS\Member;
 use IPS\Output;
 use IPS\Request;
@@ -29,13 +32,15 @@ use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\Settings;
 
-use IPS\toolbox\extensions\core\FileStorage\_FileStorage;
+use OutOfRangeException;
+use RuntimeException;
+use UnexpectedValueException;
 
 use function array_merge;
-use function count;
 use function defined;
 use function header;
 use function in_array;
+use function is_array;
 use function ksort;
 use function round;
 
@@ -54,7 +59,7 @@ class _analyzer extends Controller
 
     /**
      * @inheritdoc
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function execute()
     {
@@ -79,7 +84,7 @@ class _analyzer extends Controller
         (new Langs('chrono'))->verify();
         //(new Db('chrono'))->check();
         foreach (Application::applications() as $key => $val) {
-            if (!defined('DTCODE_NO_SKIP') && in_array($val->directory, \IPS\IPS::$ipsApps, true)) {
+            if (!defined('DTCODE_NO_SKIP') && in_array($val->directory, IPS::$ipsApps, true)) {
                 continue;
             }
             $apps[$val->directory] = Member::loggedIn()->language()->addToStack("__app_{$val->directory}");
@@ -89,8 +94,8 @@ class _analyzer extends Controller
 
         $apps = new Form\Select(
             'dtcode_app', null, true, [
-                            'options' => $apps,
-                        ]
+                'options' => $apps,
+            ]
         );
 
         $form->add($apps);
@@ -99,7 +104,7 @@ class _analyzer extends Controller
             Output::i()->redirect(
                 $this->url->setQueryString(
                     [
-                        'do' => 'queue',
+                        'do'          => 'queue',
                         'application' => $values['dtcode_app'],
                     ]
                 )->csrf()
@@ -111,7 +116,7 @@ class _analyzer extends Controller
 
     /**
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function queue()
     {
@@ -119,7 +124,7 @@ class _analyzer extends Controller
 
             $this->url->setQueryString(
                 [
-                    'do' => 'queue',
+                    'do'          => 'queue',
                     'application' => Request::i()->application,
                 ]
             )->csrf(), function ($data) {
@@ -127,7 +132,7 @@ class _analyzer extends Controller
             $percent = round(100 / $total);
             $app = Request::i()->application;
             $complete = 0;
-            if (\is_array($data) && isset($data['complete'])) {
+            if (is_array($data) && isset($data['complete'])) {
                 $app = (string)$data['app'];
                 $complete = (int)$data['complete'];
             }
@@ -172,7 +177,6 @@ class _analyzer extends Controller
                     $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
                     $complete = 7;
                     break;
-
             }
 
             Store::i()->dtcode_warnings = $warnings;
@@ -206,9 +210,9 @@ class _analyzer extends Controller
     }
 
     /**
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
-     * @throws \UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws OutOfRangeException
+     * @throws UnexpectedValueException
      */
     protected function results()
     {
@@ -235,19 +239,19 @@ class _analyzer extends Controller
             foreach ($warnings as $key => $val) {
                 switch ($key) {
                     case 'langs_check':
-                            $output .= Theme::i()->getTemplate('code')->results(
-                                $val['langs']??[],
-                                'dtcode_langs_php',
-                                [],
-                                true
-                            );
+                        $output .= Theme::i()->getTemplate('code')->results(
+                            $val['langs'] ?? [],
+                            'dtcode_langs_php',
+                            [],
+                            true
+                        );
 
-                            $output .= Theme::i()->getTemplate('code')->results(
-                                $val['jslangs']??[],
-                                'dtcode_jslangs_php',
-                                [],
-                                true
-                            );
+                        $output .= Theme::i()->getTemplate('code')->results(
+                            $val['jslangs'] ?? [],
+                            'dtcode_jslangs_php',
+                            [],
+                            true
+                        );
                         break;
                     case 'langs_verify':
                         $output .= Theme::i()->getTemplate('code')->results(

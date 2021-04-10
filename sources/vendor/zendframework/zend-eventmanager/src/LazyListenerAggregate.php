@@ -60,16 +60,16 @@ class LazyListenerAggregate implements ListenerAggregateInterface
      * constructor in order to create a new instance; in the latter case, the
      * $container and $env will be passed at instantiation as well.
      *
-     * @var array $listeners LazyEventListener instances or array definitions
-     *     to pass to the LazyEventListener constructor.
+     * @throws Exception\InvalidArgumentException for invalid listener items.
      * @var ContainerInterface $container
      * @var array $env
-     * @throws Exception\InvalidArgumentException for invalid listener items.
+     * @var array $listeners LazyEventListener instances or array definitions
+     *     to pass to the LazyEventListener constructor.
      */
     public function __construct(array $listeners, ContainerInterface $container, array $env = [])
     {
         $this->container = $container;
-        $this->env       = $env;
+        $this->env = $env;
 
         // This would raise an exception for invalid structs
         foreach ($listeners as $listener) {
@@ -77,7 +77,7 @@ class LazyListenerAggregate implements ListenerAggregateInterface
                 $listener = new LazyEventListener($listener, $container, $env);
             }
 
-            if (! $listener instanceof LazyEventListener) {
+            if (!$listener instanceof LazyEventListener) {
                 throw new Exception\InvalidArgumentException(sprintf(
                     'All listeners must be LazyEventListener instances or definitions; received %s',
                     (is_object($listener) ? get_class($listener) : gettype($listener))

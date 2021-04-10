@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace PhpParser\Builder;
 
@@ -25,7 +26,8 @@ class Property implements PhpParser\Builder
      *
      * @param string $name Name of the property
      */
-    public function __construct(string $name) {
+    public function __construct(string $name)
+    {
         $this->name = $name;
     }
 
@@ -34,7 +36,8 @@ class Property implements PhpParser\Builder
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function makePublic() {
+    public function makePublic()
+    {
         $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_PUBLIC);
 
         return $this;
@@ -45,7 +48,8 @@ class Property implements PhpParser\Builder
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function makeProtected() {
+    public function makeProtected()
+    {
         $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_PROTECTED);
 
         return $this;
@@ -56,7 +60,8 @@ class Property implements PhpParser\Builder
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function makePrivate() {
+    public function makePrivate()
+    {
         $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_PRIVATE);
 
         return $this;
@@ -67,7 +72,8 @@ class Property implements PhpParser\Builder
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function makeStatic() {
+    public function makeStatic()
+    {
         $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_STATIC);
 
         return $this;
@@ -80,7 +86,8 @@ class Property implements PhpParser\Builder
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function setDefault($value) {
+    public function setDefault($value)
+    {
         $this->default = BuilderHelpers::normalizeValue($value);
 
         return $this;
@@ -93,7 +100,8 @@ class Property implements PhpParser\Builder
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function setDocComment($docComment) {
+    public function setDocComment($docComment)
+    {
         $this->attributes = [
             'comments' => [BuilderHelpers::normalizeDocComment($docComment)]
         ];
@@ -108,7 +116,8 @@ class Property implements PhpParser\Builder
      *
      * @return $this
      */
-    public function setType($type) {
+    public function setType($type)
+    {
         $this->type = BuilderHelpers::normalizeType($type);
 
         return $this;
@@ -119,7 +128,8 @@ class Property implements PhpParser\Builder
      *
      * @return Stmt\Property The built property node
      */
-    public function getNode() : PhpParser\Node {
+    public function getNode(): PhpParser\Node
+    {
         return new Stmt\Property(
             $this->flags !== 0 ? $this->flags : Stmt\Class_::MODIFIER_PUBLIC,
             [

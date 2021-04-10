@@ -27,7 +27,10 @@ use Generator\Builders\Traits\Properties;
 class TraitGenerator extends GeneratorAbstract
 {
 
-    use Properties, Constants, ClassMethods, Imports;
+    use ClassMethods;
+    use Constants;
+    use Imports;
+    use Properties;
 
     /**
      * class type, final/abstract
@@ -36,22 +39,18 @@ class TraitGenerator extends GeneratorAbstract
      */
     protected $type;
 
-    public function writeSourceType()
-    {
-
-        $this->output( "\ntrait {$this->className}" );
-        $this->output( "\n{" );
-
-    }
-
     protected function writeBody()
     {
-
         $this->writeConst();
         $this->writeProperties();
         $this->writeMethods();
-        $this->output( "\n}" );
+        $this->output("\n}");
+    }
 
+    public function writeSourceType()
+    {
+        $this->output("\ntrait {$this->className}");
+        $this->output("\n{");
     }
 
 }

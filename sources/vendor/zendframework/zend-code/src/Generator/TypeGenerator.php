@@ -22,21 +22,6 @@ use function substr;
 final class TypeGenerator implements GeneratorInterface
 {
     /**
-     * @var bool
-     */
-    private $isInternalPhpType;
-
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var bool
-     */
-    private $nullable;
-
-    /**
      * @var string[]
      *
      * @link http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration
@@ -52,12 +37,27 @@ final class TypeGenerator implements GeneratorInterface
         'iterable',
         'object'
     ];
-
     /**
      * @var string a regex pattern to match valid class names or types
      */
     private static $validIdentifierMatcher = '/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*'
-        . '(\\\\[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)*$/';
+    . '(\\\\[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)*$/';
+    /**
+     * @var bool
+     */
+    private $isInternalPhpType;
+    /**
+     * @var string
+     */
+    private $type;
+    /**
+     * @var bool
+     */
+    private $nullable;
+
+    private function __construct()
+    {
+    }
 
     /**
      * @param string $type
@@ -71,7 +71,7 @@ final class TypeGenerator implements GeneratorInterface
         list($nullable, $trimmedNullable) = self::trimNullable($type);
         list($wasTrimmed, $trimmedType) = self::trimType($trimmedNullable);
 
-        if (! preg_match(self::$validIdentifierMatcher, $trimmedType)) {
+        if (!preg_match(self::$validIdentifierMatcher, $trimmedType)) {
             throw new InvalidArgumentException(sprintf(
                 'Provided type "%s" is invalid: must conform "%s"',
                 $type,
@@ -94,37 +94,11 @@ final class TypeGenerator implements GeneratorInterface
 
         $instance = new self();
 
-        $instance->type              = $trimmedType;
-        $instance->nullable          = $nullable;
+        $instance->type = $trimmedType;
+        $instance->nullable = $nullable;
         $instance->isInternalPhpType = $isInternalPhpType;
 
         return $instance;
-    }
-
-    private function __construct()
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function generate()
-    {
-        $nullable = $this->nullable ? '?' : '';
-
-        if ($this->isInternalPhpType) {
-            return $nullable . strtolower($this->type);
-        }
-
-        return $nullable . '\\' . $this->type;
-    }
-
-    /**
-     * @return string the cleaned type string
-     */
-    public function __toString()
-    {
-        return ltrim($this->generate(), '?\\');
     }
 
     /**
@@ -165,5 +139,27 @@ final class TypeGenerator implements GeneratorInterface
     private static function isInternalPhpType($type)
     {
         return in_array(strtolower($type), self::$internalPhpTypes, true);
+    }
+
+    /**
+     * @return string the cleaned type string
+     */
+    public function __toString()
+    {
+        return ltrim($this->generate(), '?\\');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generate()
+    {
+        $nullable = $this->nullable ? '?' : '';
+
+        if ($this->isInternalPhpType) {
+            return $nullable . strtolower($this->type);
+        }
+
+        return $nullable . '\\' . $this->type;
     }
 }

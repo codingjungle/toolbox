@@ -19,6 +19,15 @@
 
 namespace Doctrine\Common\Annotations;
 
+use function array_key_exists;
+use function array_merge;
+use function class_exists;
+use function str_replace;
+
+use function strpos;
+
+use const DIRECTORY_SEPARATOR;
+
 final class AnnotationRegistry
 {
     /**
@@ -31,27 +40,27 @@ final class AnnotationRegistry
      *
      * @var string[][]|string[]|null[]
      */
-    static private $autoloadNamespaces = [];
+    private static $autoloadNamespaces = [];
 
     /**
      * A map of autoloader callables.
      *
      * @var callable[]
      */
-    static private $loaders = [];
+    private static $loaders = [];
 
     /**
      * An array of classes which cannot be found
      *
      * @var null[] indexed by class name
      */
-    static private $failedToAutoload = [];
+    private static $failedToAutoload = [];
 
-    public static function reset() : void
+    public static function reset(): void
     {
         self::$autoloadNamespaces = [];
-        self::$loaders            = [];
-        self::$failedToAutoload   = [];
+        self::$loaders = [];
+        self::$failedToAutoload = [];
     }
 
     /**
@@ -61,7 +70,7 @@ final class AnnotationRegistry
      *             autoloading should be deferred to the globally registered autoloader by then. For now,
      *             use @example AnnotationRegistry::registerLoader('class_exists')
      */
-    public static function registerFile(string $file) : void
+    public static function registerFile(string $file): void
     {
         require_once $file;
     }
@@ -71,14 +80,14 @@ final class AnnotationRegistry
      *
      * Loading of this namespaces will be done with a PSR-0 namespace loading algorithm.
      *
-     * @param string            $namespace
+     * @param string $namespace
      * @param string|array|null $dirs
      *
      * @deprecated this method is deprecated and will be removed in doctrine/annotations 2.0
      *             autoloading should be deferred to the globally registered autoloader by then. For now,
      *             use @example AnnotationRegistry::registerLoader('class_exists')
      */
-    public static function registerAutoloadNamespace(string $namespace, $dirs = null) : void
+    public static function registerAutoloadNamespace(string $namespace, $dirs = null): void
     {
         self::$autoloadNamespaces[$namespace] = $dirs;
     }
@@ -94,9 +103,21 @@ final class AnnotationRegistry
      *             autoloading should be deferred to the globally registered autoloader by then. For now,
      *             use @example AnnotationRegistry::registerLoader('class_exists')
      */
-    public static function registerAutoloadNamespaces(array $namespaces) : void
+    public static function registerAutoloadNamespaces(array $namespaces): void
     {
-        self::$autoloadNamespaces = \array_merge(self::$autoloadNamespaces, $namespaces);
+        self::$autoloadNamespaces = array_merge(self::$autoloadNamespaces, $namespaces);
+    }
+
+    /**
+     * Registers an autoloading callable for annotations, if it is not already registered
+     *
+     * @deprecated this method is deprecated and will be removed in doctrine/annotations 2.0
+     */
+    public static function registerUniqueLoader(callable $callable): void
+    {
+        if (!in_array($callable, self::$loaders, true)) {
+            self::registerLoader($callable);
+        }
     }
 
     /**
@@ -109,41 +130,29 @@ final class AnnotationRegistry
      *             autoloading should be deferred to the globally registered autoloader by then. For now,
      *             use @example AnnotationRegistry::registerLoader('class_exists')
      */
-    public static function registerLoader(callable $callable) : void
+    public static function registerLoader(callable $callable): void
     {
         // Reset our static cache now that we have a new loader to work with
-        self::$failedToAutoload   = [];
-        self::$loaders[]          = $callable;
-    }
-
-    /**
-     * Registers an autoloading callable for annotations, if it is not already registered
-     *
-     * @deprecated this method is deprecated and will be removed in doctrine/annotations 2.0
-     */
-    public static function registerUniqueLoader(callable $callable) : void
-    {
-        if ( ! in_array($callable, self::$loaders, true) ) {
-            self::registerLoader($callable);
-        }
+        self::$failedToAutoload = [];
+        self::$loaders[] = $callable;
     }
 
     /**
      * Autoloads an annotation class silently.
      */
-    public static function loadAnnotationClass(string $class) : bool
+    public static function loadAnnotationClass(string $class): bool
     {
-        if (\class_exists($class, false)) {
+        if (class_exists($class, false)) {
             return true;
         }
 
-        if (\array_key_exists($class, self::$failedToAutoload)) {
+        if (array_key_exists($class, self::$failedToAutoload)) {
             return false;
         }
 
-        foreach (self::$autoloadNamespaces AS $namespace => $dirs) {
-            if (\strpos($class, $namespace) === 0) {
-                $file = \str_replace('\\', \DIRECTORY_SEPARATOR, $class) . '.php';
+        foreach (self::$autoloadNamespaces as $namespace => $dirs) {
+            if (strpos($class, $namespace) === 0) {
+                $file = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 
                 if ($dirs === null) {
                     if ($path = stream_resolve_include_path($file)) {
@@ -151,9 +160,9 @@ final class AnnotationRegistry
                         return true;
                     }
                 } else {
-                    foreach((array) $dirs AS $dir) {
-                        if (is_file($dir . \DIRECTORY_SEPARATOR . $file)) {
-                            require $dir . \DIRECTORY_SEPARATOR . $file;
+                    foreach ((array)$dirs as $dir) {
+                        if (is_file($dir . DIRECTORY_SEPARATOR . $file)) {
+                            require $dir . DIRECTORY_SEPARATOR . $file;
                             return true;
                         }
                     }
@@ -161,7 +170,7 @@ final class AnnotationRegistry
             }
         }
 
-        foreach (self::$loaders AS $loader) {
+        foreach (self::$loaders as $loader) {
             if ($loader($class) === true) {
                 return true;
             }

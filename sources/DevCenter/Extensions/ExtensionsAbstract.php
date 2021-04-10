@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\DevCenter\Extensions;
 
+use Exception;
 use IPS\Application;
 use IPS\Db;
 use IPS\Http\Url;
@@ -23,19 +24,18 @@ use IPS\toolbox\Shared\Read;
 use IPS\toolbox\Shared\Replace;
 use IPS\toolbox\Shared\Write;
 
+use function array_pop;
+use function array_values;
 use function count;
 use function date;
 use function defined;
-use function header;
-use function is_array;
-use function str_replace;
-
-use function array_pop;
-use function array_values;
 use function explode;
 use function file_exists;
+use function header;
+use function is_array;
 use function mb_strlen;
 use function mb_substr;
+use function str_replace;
 use function uniqid;
 
 
@@ -48,7 +48,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  * Class _ExtensionsAbstract
  *
  * @package IPS\toolbox\DevCenter\Extensions
- * @mixin \IPS\toolbox\DevCenter\Extensions\ExtensionsAbstract
+ * @mixin ExtensionsAbstract
  */
 abstract class _ExtensionsAbstract
 {
@@ -125,7 +125,7 @@ abstract class _ExtensionsAbstract
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      * @throws ExtensionException
      */
     public function form()
@@ -155,7 +155,7 @@ abstract class _ExtensionsAbstract
      * @param array $values
      *
      * @throws ExtensionException
-     * @throws \Exception
+     * @throws Exception
      */
     protected function _process(array $values)
     {
@@ -195,8 +195,8 @@ abstract class _ExtensionsAbstract
 
         $this->content = $this->_replace($find, $replace, $content);
         $this->_writeFile($file, $this->content, $dir);
-        \IPS\Application::writeJson( \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/data/extensions.json', $this->application->buildExtensionsJson() );
-  
+        Application::writeJson(\IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/data/extensions.json',
+            $this->application->buildExtensionsJson());
     }
 
     /**

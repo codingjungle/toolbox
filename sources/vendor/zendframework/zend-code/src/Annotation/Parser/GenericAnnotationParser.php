@@ -60,13 +60,13 @@ class GenericAnnotationParser implements ParserInterface
      * present, calls {@link AnnotationInterface::initialize()} with the
      * content.
      *
-     * @param  EventInterface $e
+     * @param EventInterface $e
      * @return false|AnnotationInterface
      */
     public function onCreateAnnotation(EventInterface $e)
     {
         $class = $e->getParam('class', false);
-        if (! $class || ! $this->hasAnnotation($class)) {
+        if (!$class || !$this->hasAnnotation($class)) {
             return false;
         }
 
@@ -77,7 +77,7 @@ class GenericAnnotationParser implements ParserInterface
             $class = $this->resolveAlias($class);
         }
 
-        $index      = array_search($class, $this->annotationNames);
+        $index = array_search($class, $this->annotationNames);
         $annotation = $this->annotations[$index];
 
         $newAnnotation = clone $annotation;
@@ -89,9 +89,26 @@ class GenericAnnotationParser implements ParserInterface
     }
 
     /**
+     * Checks if the manager has annotations for a class
+     *
+     * @param string $class
+     * @return bool
+     */
+    public function hasAnnotation($class)
+    {
+        if (in_array($class, $this->annotationNames)) {
+            return true;
+        }
+
+        if ($this->hasAlias($class)) {
+            return true;
+        }
+
+        return false;
+    }    /**
      * Register annotations
      *
-     * @param  string|AnnotationInterface $annotation String class name of an
+     * @param string|AnnotationInterface $annotation String class name of an
      *         AnnotationInterface implementation, or actual instance
      * @return void
      * @throws Exception\InvalidArgumentException
@@ -100,11 +117,11 @@ class GenericAnnotationParser implements ParserInterface
     {
         $class = false;
         if (is_string($annotation) && class_exists($annotation)) {
-            $class      = $annotation;
+            $class = $annotation;
             $annotation = new $annotation();
         }
 
-        if (! $annotation instanceof AnnotationInterface) {
+        if (!$annotation instanceof AnnotationInterface) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects an instance of %s\AnnotationInterface; received "%s"',
                 __METHOD__,
@@ -122,20 +139,31 @@ class GenericAnnotationParser implements ParserInterface
             ));
         }
 
-        $this->annotations[]     = $annotation;
+        $this->annotations[] = $annotation;
         $this->annotationNames[] = $class;
     }
 
     /**
+     * Do we have an alias by the provided name?
+     *
+     * @param string $alias
+     * @return bool
+     */
+    protected function hasAlias($alias)
+    {
+        $alias = $this->normalizeAlias($alias);
+
+        return isset($this->aliases[$alias]);
+    }    /**
      * Register many annotations at once
      *
-     * @param  array|Traversable $annotations
-     * @throws Exception\InvalidArgumentException
+     * @param array|Traversable $annotations
      * @return GenericAnnotationParser
+     * @throws Exception\InvalidArgumentException
      */
     public function registerAnnotations($annotations)
     {
-        if (! is_array($annotations) && ! $annotations instanceof Traversable) {
+        if (!is_array($annotations) && !$annotations instanceof Traversable) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects an array or Traversable; received "%s"',
                 __METHOD__,
@@ -151,35 +179,43 @@ class GenericAnnotationParser implements ParserInterface
     }
 
     /**
-     * Checks if the manager has annotations for a class
+     * Normalize an alias name
      *
-     * @param  string $class
-     * @return bool
+     * @param string $alias
+     * @return string
      */
-    public function hasAnnotation($class)
+    protected function normalizeAlias($alias)
     {
-        if (in_array($class, $this->annotationNames)) {
-            return true;
-        }
+        return strtolower(str_replace(['-', '_', ' ', '\\', '/'], '', $alias));
+    }
 
-        if ($this->hasAlias($class)) {
-            return true;
-        }
+    /**
+     * Resolve an alias to a class name
+     *
+     * @param string $alias
+     * @return string
+     */
+    protected function resolveAlias($alias)
+    {
+        do {
+            $normalized = $this->normalizeAlias($alias);
+            $class = $this->aliases[$normalized];
+        } while ($this->hasAlias($class));
 
-        return false;
+        return $class;
     }
 
     /**
      * Alias an annotation name
      *
-     * @param  string $alias
-     * @param  string $class May be either a registered annotation name or another alias
-     * @throws Exception\InvalidArgumentException
+     * @param string $alias
+     * @param string $class May be either a registered annotation name or another alias
      * @return GenericAnnotationParser
+     * @throws Exception\InvalidArgumentException
      */
     public function setAlias($alias, $class)
     {
-        if (! in_array($class, $this->annotationNames) && ! $this->hasAlias($class)) {
+        if (!in_array($class, $this->annotationNames) && !$this->hasAlias($class)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: Cannot alias "%s" to "%s", as class "%s" is not currently a registered annotation or alias',
                 __METHOD__,
@@ -195,43 +231,7 @@ class GenericAnnotationParser implements ParserInterface
         return $this;
     }
 
-    /**
-     * Normalize an alias name
-     *
-     * @param  string $alias
-     * @return string
-     */
-    protected function normalizeAlias($alias)
-    {
-        return strtolower(str_replace(['-', '_', ' ', '\\', '/'], '', $alias));
-    }
 
-    /**
-     * Do we have an alias by the provided name?
-     *
-     * @param  string $alias
-     * @return bool
-     */
-    protected function hasAlias($alias)
-    {
-        $alias = $this->normalizeAlias($alias);
 
-        return isset($this->aliases[$alias]);
-    }
 
-    /**
-     * Resolve an alias to a class name
-     *
-     * @param  string $alias
-     * @return string
-     */
-    protected function resolveAlias($alias)
-    {
-        do {
-            $normalized = $this->normalizeAlias($alias);
-            $class      = $this->aliases[$normalized];
-        } while ($this->hasAlias($class));
-
-        return $class;
-    }
 }

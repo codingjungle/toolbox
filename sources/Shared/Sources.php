@@ -35,11 +35,10 @@ trait Sources
             'app=core&module=applications&controller=developer&appKey=' . Request::i()->appKey
         )->csrf();
         unset(Output::i()->breadcrumb['module']);
-        if( $this->front === false ) {
+        if ($this->front === false) {
             Output::i()->breadcrumb[] = [$url, 'Developer Center'];
             Output::i()->breadcrumb[] = [$url, $this->application->directory];
-        }
-        else{
+        } else {
             $title = $pageTitle;
         }
         Output::i()->breadcrumb[] = [null, $title];
@@ -214,7 +213,7 @@ trait Sources
                 $f = implode('\\', $ogClass);
                 $return[] = [
                     'value' => $f,
-                    'html' => '\\IPS\\' . $f,
+                    'html'  => '\\IPS\\' . $f,
                 ];
             }
             Output::i()->json($return);
@@ -234,7 +233,7 @@ trait Sources
             foreach ($foo as $f) {
                 $return[] = [
                     'value' => str_replace('IPS\\' . Request::i()->appKey . '\\', '', $f),
-                    'html' => '\\' . $f,
+                    'html'  => '\\' . $f,
                 ];
             }
             Output::i()->json($return);
@@ -253,7 +252,7 @@ trait Sources
             foreach ($foo as $f) {
                 $return[] = [
                     'value' => str_replace('IPS\\' . Request::i()->appKey . '\\', '', $f),
-                    'html' => '\\' . $f,
+                    'html'  => '\\' . $f,
                 ];
             }
             Output::i()->json($return);
@@ -272,7 +271,7 @@ trait Sources
             foreach ($foo as $f) {
                 $return[] = [
                     'value' => str_replace('IPS\\' . Request::i()->appKey . '\\', '', $f),
-                    'html' => '\\' . $f,
+                    'html'  => '\\' . $f,
                 ];
             }
             Output::i()->json($return);

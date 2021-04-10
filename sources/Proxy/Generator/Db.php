@@ -16,10 +16,11 @@ use IPS\Data\Store;
 use IPS\Db;
 
 use function array_values;
+use function defined;
 use function header;
 use function str_replace;
 
-if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
@@ -68,15 +69,15 @@ class _Db extends GeneratorAbstract
                 'IPS\\Db\\Select::join:0',
                 'IPS\\Helpers\\Table\\Db::__construct:0',
             ],
-            'provider' => 'database',
-            'language' => 'php',
+            'provider'  => 'database',
+            'language'  => 'php',
         ];
 
         $jsonMeta['providers'][] = [
-            'name' => 'database',
+            'name'   => 'database',
             'source' => [
                 'contributor' => 'return_array',
-                'parameter' => 'dtProxy\\DatabaseProvider::get',
+                'parameter'   => 'dtProxy\\DatabaseProvider::get',
             ],
         ];
 

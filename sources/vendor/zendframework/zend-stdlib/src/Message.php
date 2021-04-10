@@ -24,41 +24,29 @@ class Message implements MessageInterface
     protected $content = '';
 
     /**
-     * Set message metadata
-     *
-     * Non-destructive setting of message metadata; always adds to the metadata, never overwrites
-     * the entire metadata container.
-     *
-     * @param  string|int|array|Traversable $spec
-     * @param  mixed $value
-     * @throws Exception\InvalidArgumentException
-     * @return Message
+     * @return string
      */
-    public function setMetadata($spec, $value = null)
+    public function toString()
     {
-        if (is_scalar($spec)) {
-            $this->metadata[$spec] = $value;
-            return $this;
+        $request = '';
+        foreach ($this->getMetadata() as $key => $value) {
+            $request .= sprintf(
+                "%s: %s\r\n",
+                (string)$key,
+                (string)$value
+            );
         }
-        if (! is_array($spec) && ! $spec instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Expected a string, array, or Traversable argument in first position; received "%s"',
-                (is_object($spec) ? get_class($spec) : gettype($spec))
-            ));
-        }
-        foreach ($spec as $key => $value) {
-            $this->metadata[$key] = $value;
-        }
-        return $this;
+        $request .= "\r\n" . $this->getContent();
+        return $request;
     }
 
     /**
      * Retrieve all metadata or a single metadatum as specified by key
      *
-     * @param  null|string|int $key
-     * @param  null|mixed $default
-     * @throws Exception\InvalidArgumentException
+     * @param null|string|int $key
+     * @param null|mixed $default
      * @return mixed
+     * @throws Exception\InvalidArgumentException
      */
     public function getMetadata($key = null, $default = null)
     {
@@ -66,7 +54,7 @@ class Message implements MessageInterface
             return $this->metadata;
         }
 
-        if (! is_scalar($key)) {
+        if (!is_scalar($key)) {
             throw new Exception\InvalidArgumentException('Non-scalar argument provided for key');
         }
 
@@ -78,14 +66,31 @@ class Message implements MessageInterface
     }
 
     /**
-     * Set message content
+     * Set message metadata
      *
-     * @param  mixed $value
+     * Non-destructive setting of message metadata; always adds to the metadata, never overwrites
+     * the entire metadata container.
+     *
+     * @param string|int|array|Traversable $spec
+     * @param mixed $value
      * @return Message
+     * @throws Exception\InvalidArgumentException
      */
-    public function setContent($value)
+    public function setMetadata($spec, $value = null)
     {
-        $this->content = $value;
+        if (is_scalar($spec)) {
+            $this->metadata[$spec] = $value;
+            return $this;
+        }
+        if (!is_array($spec) && !$spec instanceof Traversable) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Expected a string, array, or Traversable argument in first position; received "%s"',
+                (is_object($spec) ? get_class($spec) : gettype($spec))
+            ));
+        }
+        foreach ($spec as $key => $value) {
+            $this->metadata[$key] = $value;
+        }
         return $this;
     }
 
@@ -100,19 +105,14 @@ class Message implements MessageInterface
     }
 
     /**
-     * @return string
+     * Set message content
+     *
+     * @param mixed $value
+     * @return Message
      */
-    public function toString()
+    public function setContent($value)
     {
-        $request = '';
-        foreach ($this->getMetadata() as $key => $value) {
-            $request .= sprintf(
-                "%s: %s\r\n",
-                (string) $key,
-                (string) $value
-            );
-        }
-        $request .= "\r\n" . $this->getContent();
-        return $request;
+        $this->content = $value;
+        return $this;
     }
 }

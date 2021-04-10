@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use ArrayIterator;
+use SplFileInfo;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Iterator\SizeRangeFilterIterator;
 
@@ -41,18 +43,16 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [[new NumberComparator('< 1K'), new NumberComparator('> 0.5K')], $this->toAbsolute($lessThan1KGreaterThan05K)],
+            [
+                [new NumberComparator('< 1K'), new NumberComparator('> 0.5K')],
+                $this->toAbsolute($lessThan1KGreaterThan05K)
+            ],
         ];
     }
 }
 
-class InnerSizeIterator extends \ArrayIterator
+class InnerSizeIterator extends ArrayIterator
 {
-    public function current()
-    {
-        return new \SplFileInfo(parent::current());
-    }
-
     public function getFilename()
     {
         return parent::current();
@@ -61,6 +61,11 @@ class InnerSizeIterator extends \ArrayIterator
     public function isFile()
     {
         return $this->current()->isFile();
+    }
+
+    public function current()
+    {
+        return new SplFileInfo(parent::current());
     }
 
     public function getSize()

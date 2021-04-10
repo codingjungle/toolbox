@@ -16,7 +16,7 @@ trait InitializationTrait
     /**
      * Is internal reflection is initialized or not
      *
-     * @var boolean
+     * @var bool
      */
     private $isInitialized = false;
 
@@ -32,6 +32,13 @@ trait InitializationTrait
     }
 
     /**
+     * Implementation of internal reflection initialization
+     *
+     * @return void
+     */
+    abstract protected function __initialize();
+
+    /**
      * Returns the status of initialization status for internal object
      *
      * @return bool
@@ -40,11 +47,4 @@ trait InitializationTrait
     {
         return $this->isInitialized;
     }
-
-    /**
-     * Implementation of internal reflection initialization
-     *
-     * @return void
-     */
-    abstract protected function __initialize();
 }

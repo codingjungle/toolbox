@@ -13,7 +13,6 @@
 namespace IPS\toolbox\DevCenter\Dev\Compiler;
 
 use function implode;
-
 use function json_encode;
 use function mb_strtolower;
 use function str_replace;

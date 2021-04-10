@@ -19,13 +19,14 @@ use IPS\forums\Topic\Post;
 use IPS\Member;
 use IPS\Patterns\ActiveRecord;
 use IPS\Settings;
+
 use function defined;
 use function header;
 use function random_int;
 use function time;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -63,27 +64,26 @@ class _Generator extends ActiveRecord
      */
     public function process()
     {
-
         try {
-            switch ( $this->type ) {
+            switch ($this->type) {
                 case 'member':
-                    $d = Member::load( $this->gid );
+                    $d = Member::load($this->gid);
                     $d->delete();
                     break;
                 case 'forum':
-                    $d = Forum::load( $this->gid );
+                    $d = Forum::load($this->gid);
                     $d->delete();
                     break;
                 case 'topic':
-                    $d = Topic::load( $this->gid );
+                    $d = Topic::load($this->gid);
                     $d->delete();
                     break;
                 case 'post':
-                    $d = Post::load( $this->gid );
+                    $d = Post::load($this->gid);
                     $d->delete();
                     break;
             }
-        } catch ( Exception $e ) {
+        } catch (Exception $e) {
         }
 
         $this->delete();
@@ -98,22 +98,21 @@ class _Generator extends ActiveRecord
      * @return float|int|mixed|null
      * @throws Exception
      */
-    protected function getTime( $start = \null, $end = \null )
+    protected function getTime($start = null, $end = null)
     {
-
         $this->loops++;
-        $rand = random_int( 1, 3 );
+        $rand = random_int(1, 3);
         $time = 60;
 
-        if ( $start === \null ) {
-            $start = Settings::i()->getFromConfGlobal( 'board_start' );
+        if ($start === null) {
+            $start = Settings::i()->getFromConfGlobal('board_start');
         }
 
-        if ( $end === \null ) {
+        if ($end === null) {
             $end = time();
         }
 
-        switch ( $rand ) {
+        switch ($rand) {
             case 1:
                 $time = 60;
                 break;
@@ -125,13 +124,12 @@ class _Generator extends ActiveRecord
                 break;
         }
 
-        $foo = random_int( 1, 1000 );
-        $time = $start + ( $foo * $time );
+        $foo = random_int(1, 1000);
+        $time = $start + ($foo * $time);
 
-        if ( $time > $end && $this->loops < 10 ) {
+        if ($time > $end && $this->loops < 10) {
             $time = $this->getTime();
-        }
-        else {
+        } else {
             $time = $start;
         }
 

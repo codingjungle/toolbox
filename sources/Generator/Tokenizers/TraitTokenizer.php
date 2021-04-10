@@ -18,11 +18,11 @@ use Generator\Builders\TraitGenerator;
 class TraitTokenizer extends TraitGenerator
 {
 
-    use Shared, ClassTrait;
+    use ClassTrait;
+    use Shared;
 
     protected function writeBody()
     {
-
         $this->rebuildMethods();
         parent::writeBody();
     }

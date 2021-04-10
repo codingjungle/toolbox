@@ -27,20 +27,10 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  * Class _ContentRouter
  *
  * @package IPS\toolbox\DevCenter\Extensions
- * @mixin \IPS\toolbox\DevCenter\Extensions\ExtensionsAbstract
+ * @mixin ExtensionsAbstract
  */
 class _ContentRouter extends ExtensionsAbstract
 {
-
-    /**
-     * @inheritdoc
-     */
-    public function elements()
-    {
-        $this->form->element('use_default')->toggles(['module', 'classRouter'], true);
-        $this->form->add('module')->required();
-        $this->form->add('classRouter', 'stack')->prefix('\\IPS\\' . $this->application->directory . '\\')->required();
-    }
 
     /**
      * @inheritdoc
@@ -54,9 +44,19 @@ class _ContentRouter extends ExtensionsAbstract
             }
             $this->classRouter = implode(",", $new);
         } else {
-            $this->classRouter = \null;
+            $this->classRouter = null;
         }
 
         return $this->_getFile($this->extension);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function elements()
+    {
+        $this->form->element('use_default')->toggles(['module', 'classRouter'], true);
+        $this->form->add('module')->required();
+        $this->form->add('classRouter', 'stack')->prefix('\\IPS\\' . $this->application->directory . '\\')->required();
     }
 }

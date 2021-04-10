@@ -14,6 +14,7 @@ namespace IPS\toolbox\Code;
 
 
 use Exception;
+use InvalidArgumentException;
 use IPS\toolbox\extensions\core\FileStorage\FileStorage;
 use UnderflowException;
 
@@ -63,16 +64,16 @@ class _FileStorage extends ParserAbstract
                     try {
                         $move = $extension->move(0, $id, null);
                         if (!is_numeric($move) && empty($move) === false) {
-                            throw new \InvalidArgumentException(
+                            throw new InvalidArgumentException(
                                 'The move method returned something other than a integer!'
                             );
                         }
                     } catch (UnderflowException $e) {
-                    } catch (\InvalidArgumentException $e) {
-                        throw new \Exception($e->getMessage() . "\n" . $e->getTraceAsString());
-                    } catch (\Exception $e) {
-                        throw new \Exception(
-                            "The move method threw an exception other than an UnderFlowException.\nException Thrown: " . \get_class(
+                    } catch (InvalidArgumentException $e) {
+                        throw new Exception($e->getMessage() . "\n" . $e->getTraceAsString());
+                    } catch (Exception $e) {
+                        throw new Exception(
+                            "The move method threw an exception other than an UnderFlowException.\nException Thrown: " . get_class(
                                 $e
                             ) . "\n" . $e->getMessage() . $e->getTraceAsString()
                         );
@@ -82,15 +83,15 @@ class _FileStorage extends ParserAbstract
                     try {
                         $valid = $extension->isValidFile('foobar.jpg');
                         if (!is_bool($valid)) {
-                            throw new \InvalidArgumentException(
+                            throw new InvalidArgumentException(
                                 'The isValidFile method returned something other than a bool!'
                             );
                         }
-                    } catch (\InvalidArgumentException $e) {
-                        throw new \Exception($e->getMessage() . "\n" . $e->getTraceAsString());
-                    } catch (\Exception $e) {
+                    } catch (InvalidArgumentException $e) {
+                        throw new Exception($e->getMessage() . "\n" . $e->getTraceAsString());
+                    } catch (Exception $e) {
                         throw new Exception(
-                            "The isValidFile method threw an exception! This method shouldn't throw an exception!\nException Thrown: " . \get_class(
+                            "The isValidFile method threw an exception! This method shouldn't throw an exception!\nException Thrown: " . get_class(
                                 $e
                             ) . "\n" . $e->getMessage() . $e->getTraceAsString()
                         );
@@ -99,15 +100,15 @@ class _FileStorage extends ParserAbstract
                     try {
                         $deleted = $extension->delete();
                         if (empty($deleted) === false) {
-                            throw new \InvalidArgumentException(
+                            throw new InvalidArgumentException(
                                 'The delete method returned a value, it shouldn\'t be void.'
                             );
                         }
-                    } catch (\InvalidArgumentException $e) {
-                        throw new \Exception($e->getMessage() . "\n" . $e->getTraceAsString());
-                    } catch (\Exception $e) {
+                    } catch (InvalidArgumentException $e) {
+                        throw new Exception($e->getMessage() . "\n" . $e->getTraceAsString());
+                    } catch (Exception $e) {
                         throw new Exception(
-                            "The delete method threw an exception! This method shouldn't throw an exception!\nException Thrown: " . \get_class(
+                            "The delete method threw an exception! This method shouldn't throw an exception!\nException Thrown: " . get_class(
                                 $e
                             ) . "\n" . $e->getMessage() . $e->getTraceAsString()
                         );
@@ -122,7 +123,7 @@ class _FileStorage extends ParserAbstract
                     //if they throw any error that isn't expected from the methods, then we consider it faulty.
                     $warnings[] = [
                         'path' => ['url' => $this->buildPath($class, 0), 'name' => $name],
-                        'pre' => $e->getMessage()
+                        'pre'  => $e->getMessage()
                     ];
                 }
             }

@@ -13,6 +13,7 @@
 namespace IPS\toolbox\Code;
 
 use IPS\Application;
+use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
 
 use function count;
@@ -66,7 +67,7 @@ class _Settings extends ParserAbstract
      */
     public function buildSettings(): self
     {
-        if ($this->app === \null) {
+        if ($this->app === null) {
             return $this;
         }
 
@@ -76,7 +77,7 @@ class _Settings extends ParserAbstract
                 /**
                  * @var array $appSettings
                  */
-                $appSettings = json_decode(file_get_contents($dir), \true);
+                $appSettings = json_decode(file_get_contents($dir), true);
                 foreach ($appSettings as $setting) {
                     $this->globalSettings[$setting['key']] = $setting['key'];
                 }
@@ -85,7 +86,7 @@ class _Settings extends ParserAbstract
 
         $dir = \IPS\ROOT_PATH . '/applications/' . $this->app->directory . '/data/settings.json';
         if (is_file($dir)) {
-            $settings = json_decode(file_get_contents($dir), \true) ?? [];
+            $settings = json_decode(file_get_contents($dir), true) ?? [];
             foreach ($settings as $setting) {
                 $this->appSettings[$setting['key']] = $setting['key'];
             }
@@ -105,11 +106,11 @@ class _Settings extends ParserAbstract
 
     /**
      * @inheritdoc
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function check(): array
     {
-        if ($this->files === \null) {
+        if ($this->files === null) {
             return [];
         }
 
@@ -127,7 +128,7 @@ class _Settings extends ParserAbstract
     /**
      * @inheritdoc
      * @return array
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function verify(): array
     {
@@ -168,26 +169,24 @@ class _Settings extends ParserAbstract
                     }
                 }
 
-                if ($file->getExtension() === 'php') {
-                    $matches = [];
-                    preg_match_all('#Settings::i\(\)->([^\s|\W]+)#u', $content, $matches);
-                    if (isset($matches[1]) && count($matches[1])) {
-                        /* @var array $found */
-                        $found = $matches[1];
-                        foreach ($found as $key => $val) {
-                            $val = trim($val);
-                            if ($val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues') {
-                                continue;
-                            }
-                            if ($val && !isset($this->globalSettings[$val]) && (!in_array(
-                                    mb_substr($val, 0, 1),
-                                    [
-                                        '$',
-                                        '{',
-                                    ]
-                                ))) {
-                                $warning[] = ['path' => ['url' => $path, 'name' => $name], 'key' => $val];
-                            }
+                $matches = [];
+                preg_match_all('#Settings::i\(\)->([^\s|\W]+)#u', $content, $matches);
+                if (isset($matches[1]) && count($matches[1])) {
+                    /* @var array $found */
+                    $found = $matches[1];
+                    foreach ($found as $key => $val) {
+                        $val = trim($val);
+                        if ($val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues') {
+                            continue;
+                        }
+                        if ($val && !isset($this->globalSettings[$val]) && (!in_array(
+                                mb_substr($val, 0, 1),
+                                [
+                                    '$',
+                                    '{',
+                                ]
+                            ))) {
+                            $warning[] = ['path' => ['url' => $path, 'name' => $name], 'key' => $val];
                         }
                     }
                 }

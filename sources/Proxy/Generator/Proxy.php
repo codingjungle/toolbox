@@ -20,10 +20,10 @@ use IPS\toolbox\Application;
 use IPS\toolbox\Generator\DTClassGenerator;
 use IPS\toolbox\Generator\DTFileGenerator;
 use IPS\toolbox\Profiler\Debug;
-use IPS\toolbox\Proxy\Helpers\Theme;
 use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\ReservedWords;
 use IPS\toolbox\Shared\Write;
+use IPS\Xml\_XMLReader;
 use ParseError;
 use ReflectionClass;
 use Zend\Code\Generator\ClassGenerator;
@@ -32,7 +32,6 @@ use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 
-use function _p;
 use function array_filter;
 use function array_merge;
 use function array_shift;
@@ -43,8 +42,8 @@ use function defined;
 use function explode;
 use function file_exists;
 use function file_get_contents;
+use function function_exists;
 use function header;
-use function hexdec;
 use function implode;
 use function in_array;
 use function is_array;
@@ -133,32 +132,35 @@ class _Proxy extends GeneratorAbstract
             $cc = $content;
             $codes = Store::i()->dt_error_codes ?? [];
 
-            preg_replace_callback('#Output::i\(\)->error\((.*?),(.*?)[,|)](.*?)$#msu', static function($m)use(&$codes){
-                if( !isset( $m[2] ) ){
-                    return;
-                }
-
-                $c =  trim(str_replace(['"',"'"],'',trim($m[2])));
-                $first = mb_substr($c, 0, 1);
-                if( $c && (int) $first && mb_strpos($c,'$') === false && mb_strpos($c, '<') === false && $c != 'FALSE' && $c != 'false') {
-                    $codes[] = $c;
-                }
-                return null;
-            }, $cc);
-            if( Application::appIsEnabled('chrono')){
-                preg_replace_callback('#Application::error\((.*?),(.*?)[,|)](.*?)$#msu', static function($m)use(&$codes){
-                    if( !isset( $m[2] ) ){
+            preg_replace_callback('#Output::i\(\)->error\((.*?),(.*?)[,|)](.*?)$#msu',
+                static function ($m) use (&$codes) {
+                    if (!isset($m[2])) {
                         return;
                     }
 
-                    $c =  trim(str_replace(['"',"'"],'',trim($m[2])));
+                    $c = trim(str_replace(['"', "'"], '', trim($m[2])));
                     $first = mb_substr($c, 0, 1);
-                    if( $c && (int) $first && mb_strpos($c,'$') === false && mb_strpos($c, '<') === false && $c != 'FALSE' && $c != 'false') {
+                    if ($c && (int)$first && mb_strpos($c, '$') === false && mb_strpos($c,
+                            '<') === false && $c != 'FALSE' && $c != 'false') {
                         $codes[] = $c;
                     }
                     return null;
                 }, $cc);
+            if (Application::appIsEnabled('chrono')) {
+                preg_replace_callback('#Application::error\((.*?),(.*?)[,|)](.*?)$#msu',
+                    static function ($m) use (&$codes) {
+                        if (!isset($m[2])) {
+                            return;
+                        }
 
+                        $c = trim(str_replace(['"', "'"], '', trim($m[2])));
+                        $first = mb_substr($c, 0, 1);
+                        if ($c && (int)$first && mb_strpos($c, '$') === false && mb_strpos($c,
+                                '<') === false && $c != 'FALSE' && $c != 'false') {
+                            $codes[] = $c;
+                        }
+                        return null;
+                    }, $cc);
             }
             Store::i()->dt_error_codes = $codes;
             $data = Proxyclass::i()->tokenize($content);
@@ -170,7 +172,7 @@ class _Proxy extends GeneratorAbstract
                 $app = array_shift($ns2);
                 $isApp = false;
                 $appPath = \IPS\ROOT_PATH . '/applications/' . $app;
-                if( isset( $this->exclude[$namespace . '\\' . $data['class']])){
+                if (isset($this->exclude[$namespace . '\\' . $data['class']])) {
                     return;
                 }
                 if ($app && is_dir($appPath)) {
@@ -262,7 +264,7 @@ class _Proxy extends GeneratorAbstract
                                     foreach ($bt as $key => $value) {
                                         foreach ($value as $k => $v) {
                                             $classDefinition[] = [
-                                                'pt' => 'p',
+                                                'pt'   => 'p',
                                                 'prop' => $k,
                                                 'type' => Bitwise::class,
                                             ];
@@ -273,9 +275,9 @@ class _Proxy extends GeneratorAbstract
                         }
                     }
                     $skip = false;
-                    if( \function_exists('str_contains')){
+                    if (function_exists('str_contains')) {
                         //we are in php8 and the xml reader is broken here! and it breaks the proxyclass generator
-                        if( $namespace . '\\' . $data['class'] === \IPS\Xml\_XMLReader::class){
+                        if ($namespace . '\\' . $data['class'] === _XMLReader::class) {
                             $skip = true;
                         }
                     }
@@ -455,9 +457,9 @@ class _Proxy extends GeneratorAbstract
                         }
 
                         $data[$key] = [
-                            'prop' => trim($key),
-                            'pt' => $pt,
-                            'type' => $return,
+                            'prop'    => trim($key),
+                            'pt'      => $pt,
+                            'type'    => $return,
                             'comment' => $comment,
                         ];
                     }
@@ -507,7 +509,7 @@ class _Proxy extends GeneratorAbstract
                 }
             }
         } catch (Exception $e) {
-                        Debug::add( 'helpers', $e );
+            Debug::add('helpers', $e);
         }
     }
 
@@ -625,7 +627,7 @@ class _Proxy extends GeneratorAbstract
 //                $file2->write();
 //            }
 
-         } catch (Exception $e) {
+        } catch (Exception $e) {
         }
     }
 

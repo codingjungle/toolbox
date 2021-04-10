@@ -83,40 +83,6 @@ class EventManager implements EventManagerInterface
     /**
      * @inheritDoc
      */
-    public function setEventPrototype(EventInterface $prototype)
-    {
-        $this->eventPrototype = $prototype;
-    }
-
-    /**
-     * Retrieve the shared event manager, if composed.
-     *
-     * @return null|SharedEventManagerInterface $sharedEventManager
-     */
-    public function getSharedManager()
-    {
-        return $this->sharedManager;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getIdentifiers()
-    {
-        return $this->identifiers;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setIdentifiers(array $identifiers)
-    {
-        $this->identifiers = array_unique($identifiers);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function addIdentifiers(array $identifiers)
     {
         $this->identifiers = array_unique(array_merge(
@@ -128,63 +94,9 @@ class EventManager implements EventManagerInterface
     /**
      * @inheritDoc
      */
-    public function trigger($eventName, $target = null, $argv = [])
-    {
-        $event = clone $this->eventPrototype;
-        $event->setName($eventName);
-
-        if ($target !== null) {
-            $event->setTarget($target);
-        }
-
-        if ($argv) {
-            $event->setParams($argv);
-        }
-
-        return $this->triggerListeners($event);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function triggerUntil(callable $callback, $eventName, $target = null, $argv = [])
-    {
-        $event = clone $this->eventPrototype;
-        $event->setName($eventName);
-
-        if ($target !== null) {
-            $event->setTarget($target);
-        }
-
-        if ($argv) {
-            $event->setParams($argv);
-        }
-
-        return $this->triggerListeners($event, $callback);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function triggerEvent(EventInterface $event)
-    {
-        return $this->triggerListeners($event);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function triggerEventUntil(callable $callback, EventInterface $event)
-    {
-        return $this->triggerListeners($event, $callback);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function attach($eventName, callable $listener, $priority = 1)
     {
-        if (! is_string($eventName)) {
+        if (!is_string($eventName)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a string for the event; received %s',
                 __METHOD__,
@@ -192,8 +104,18 @@ class EventManager implements EventManagerInterface
             ));
         }
 
-        $this->events[$eventName][(int) $priority][0][] = $listener;
+        $this->events[$eventName][(int)$priority][0][] = $listener;
         return $listener;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function clearListeners($eventName)
+    {
+        if (isset($this->events[$eventName])) {
+            unset($this->events[$eventName]);
+        }
     }
 
     /**
@@ -202,16 +124,15 @@ class EventManager implements EventManagerInterface
      */
     public function detach(callable $listener, $eventName = null, $force = false)
     {
-
         // If event is wildcard, we need to iterate through each listeners
-        if (null === $eventName || ('*' === $eventName && ! $force)) {
+        if (null === $eventName || ('*' === $eventName && !$force)) {
             foreach (array_keys($this->events) as $eventName) {
                 $this->detach($listener, $eventName, true);
             }
             return;
         }
 
-        if (! is_string($eventName)) {
+        if (!is_string($eventName)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a string for the event; received %s',
                 __METHOD__,
@@ -219,7 +140,7 @@ class EventManager implements EventManagerInterface
             ));
         }
 
-        if (! isset($this->events[$eventName])) {
+        if (!isset($this->events[$eventName])) {
             return;
         }
 
@@ -249,26 +170,54 @@ class EventManager implements EventManagerInterface
     /**
      * @inheritDoc
      */
-    public function clearListeners($eventName)
+    public function getIdentifiers()
     {
-        if (isset($this->events[$eventName])) {
-            unset($this->events[$eventName]);
-        }
+        return $this->identifiers;
     }
 
     /**
-     * Prepare arguments
-     *
-     * Use this method if you want to be able to modify arguments from within a
-     * listener. It returns an ArrayObject of the arguments, which may then be
-     * passed to trigger().
-     *
-     * @param  array $args
-     * @return ArrayObject
+     * @inheritDoc
      */
-    public function prepareArgs(array $args)
+    public function setIdentifiers(array $identifiers)
     {
-        return new ArrayObject($args);
+        $this->identifiers = array_unique($identifiers);
+    }
+
+    /**
+     * Retrieve the shared event manager, if composed.
+     *
+     * @return null|SharedEventManagerInterface $sharedEventManager
+     */
+    public function getSharedManager()
+    {
+        return $this->sharedManager;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setEventPrototype(EventInterface $prototype)
+    {
+        $this->eventPrototype = $prototype;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function trigger($eventName, $target = null, $argv = [])
+    {
+        $event = clone $this->eventPrototype;
+        $event->setName($eventName);
+
+        if ($target !== null) {
+            $event->setTarget($target);
+        }
+
+        if ($argv) {
+            $event->setParams($argv);
+        }
+
+        return $this->triggerListeners($event);
     }
 
     /**
@@ -276,8 +225,8 @@ class EventManager implements EventManagerInterface
      *
      * Actual functionality for triggering listeners, to which trigger() delegate.
      *
-     * @param  EventInterface $event
-     * @param  null|callable $callback
+     * @param EventInterface $event
+     * @param null|callable $callback
      * @return ResponseCollection
      */
     protected function triggerListeners(EventInterface $event, callable $callback = null)
@@ -339,5 +288,55 @@ class EventManager implements EventManagerInterface
         }
 
         return $responses;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function triggerEvent(EventInterface $event)
+    {
+        return $this->triggerListeners($event);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function triggerEventUntil(callable $callback, EventInterface $event)
+    {
+        return $this->triggerListeners($event, $callback);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function triggerUntil(callable $callback, $eventName, $target = null, $argv = [])
+    {
+        $event = clone $this->eventPrototype;
+        $event->setName($eventName);
+
+        if ($target !== null) {
+            $event->setTarget($target);
+        }
+
+        if ($argv) {
+            $event->setParams($argv);
+        }
+
+        return $this->triggerListeners($event, $callback);
+    }
+
+    /**
+     * Prepare arguments
+     *
+     * Use this method if you want to be able to modify arguments from within a
+     * listener. It returns an ArrayObject of the arguments, which may then be
+     * passed to trigger().
+     *
+     * @param array $args
+     * @return ArrayObject
+     */
+    public function prepareArgs(array $args)
+    {
+        return new ArrayObject($args);
     }
 }

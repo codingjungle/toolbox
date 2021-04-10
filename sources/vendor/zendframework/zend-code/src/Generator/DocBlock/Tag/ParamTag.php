@@ -28,7 +28,7 @@ class ParamTag extends AbstractTypeableTag implements TagInterface
      */
     public function __construct($variableName = null, $types = [], $description = null)
     {
-        if (! empty($variableName)) {
+        if (!empty($variableName)) {
             $this->setVariableName($variableName);
         }
 
@@ -56,24 +56,6 @@ class ParamTag extends AbstractTypeableTag implements TagInterface
     }
 
     /**
-     * @param string $variableName
-     * @return ParamTag
-     */
-    public function setVariableName($variableName)
-    {
-        $this->variableName = ltrim($variableName, '$');
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVariableName()
-    {
-        return $this->variableName;
-    }
-
-    /**
      * @param string $datatype
      * @return ParamTag
      * @deprecated Deprecated in 2.3. Use setTypes() instead
@@ -93,7 +75,7 @@ class ParamTag extends AbstractTypeableTag implements TagInterface
     }
 
     /**
-     * @param  string $paramName
+     * @param string $paramName
      * @return ParamTag
      * @deprecated Deprecated in 2.3. Use setVariableName() instead
      */
@@ -114,12 +96,30 @@ class ParamTag extends AbstractTypeableTag implements TagInterface
     /**
      * @return string
      */
+    public function getVariableName()
+    {
+        return $this->variableName;
+    }
+
+    /**
+     * @param string $variableName
+     * @return ParamTag
+     */
+    public function setVariableName($variableName)
+    {
+        $this->variableName = ltrim($variableName, '$');
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function generate()
     {
         $output = '@param'
-            . (! empty($this->types) ? ' ' . $this->getTypesAsString() : '')
-            . (! empty($this->variableName) ? ' $' . $this->variableName : '')
-            . (! empty($this->description) ? ' ' . $this->description : '');
+            . (!empty($this->types) ? ' ' . $this->getTypesAsString() : '')
+            . (!empty($this->variableName) ? ' $' . $this->variableName : '')
+            . (!empty($this->description) ? ' ' . $this->description : '');
 
         return $output;
     }

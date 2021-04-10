@@ -68,12 +68,12 @@ class DocBlockScanner implements ScannerInterface
     protected $annotations = [];
 
     /**
-     * @param  string $docComment
+     * @param string $docComment
      * @param null|NameInformation $nameInformation
      */
     public function __construct($docComment, NameInformation $nameInformation = null)
     {
-        $this->docComment      = $docComment;
+        $this->docComment = $docComment;
         $this->nameInformation = $nameInformation;
     }
 
@@ -88,36 +88,6 @@ class DocBlockScanner implements ScannerInterface
     }
 
     /**
-     * @return string
-     */
-    public function getLongDescription()
-    {
-        $this->scan();
-
-        return $this->longDescription;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTags()
-    {
-        $this->scan();
-
-        return $this->tags;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAnnotations()
-    {
-        $this->scan();
-
-        return $this->annotations;
-    }
-
-    /**
      * @return void
      */
     protected function scan()
@@ -128,7 +98,7 @@ class DocBlockScanner implements ScannerInterface
 
         $mode = 1;
 
-        $tokens   = $this->tokenize();
+        $tokens = $this->tokenize();
         $tagIndex = null;
         reset($tokens);
 
@@ -143,7 +113,7 @@ class DocBlockScanner implements ScannerInterface
                     $this->longDescription .= $token[1];
                 }
                 goto SCANNER_CONTINUE;
-                //goto no break needed
+            //goto no break needed
 
             case 'DOCBLOCK_WHITESPACE':
             case 'DOCBLOCK_TEXT':
@@ -160,7 +130,7 @@ class DocBlockScanner implements ScannerInterface
                     }
                     goto SCANNER_CONTINUE;
                 }
-                //gotos no break needed
+            //gotos no break needed
             case 'DOCBLOCK_TAG':
                 array_push($this->tags, [
                     'name'  => $token[1],
@@ -168,9 +138,9 @@ class DocBlockScanner implements ScannerInterface
                 ]);
                 end($this->tags);
                 $tagIndex = key($this->tags);
-                $mode     = 3;
+                $mode = 3;
                 goto SCANNER_CONTINUE;
-                //goto no break needed
+            //goto no break needed
 
             case 'DOCBLOCK_COMMENTEND':
                 goto SCANNER_END;
@@ -185,8 +155,8 @@ class DocBlockScanner implements ScannerInterface
         SCANNER_END:
 
         $this->shortDescription = trim($this->shortDescription);
-        $this->longDescription  = trim($this->longDescription);
-        $this->isScanned        = true;
+        $this->longDescription = trim($this->longDescription);
+        $this->isScanned = true;
     }
 
     /**
@@ -197,11 +167,11 @@ class DocBlockScanner implements ScannerInterface
         static $CONTEXT_INSIDE_DOCBLOCK = 0x01;
         static $CONTEXT_INSIDE_ASTERISK = 0x02;
 
-        $context     = 0x00;
-        $stream      = $this->docComment;
+        $context = 0x00;
+        $stream = $this->docComment;
         $streamIndex = null;
-        $tokens      = [];
-        $tokenIndex  = null;
+        $tokens = [];
+        $tokenIndex = null;
         $currentChar = null;
         $currentWord = null;
         $currentLine = null;
@@ -214,14 +184,14 @@ class DocBlockScanner implements ScannerInterface
             &$currentLine
         ) {
             $positionsForward = $positionsForward > 0 ? $positionsForward : 1;
-            $streamIndex      = $streamIndex === null ? 0 : $streamIndex + $positionsForward;
-            if (! isset($stream[$streamIndex])) {
+            $streamIndex = $streamIndex === null ? 0 : $streamIndex + $positionsForward;
+            if (!isset($stream[$streamIndex])) {
                 $currentChar = false;
 
                 return false;
             }
             $currentChar = $stream[$streamIndex];
-            $matches     = [];
+            $matches = [];
             $currentLine = preg_match('#(.*?)\r?\n#', $stream, $matches, null, $streamIndex) === 1
                 ? $matches[1]
                 : substr($stream, $streamIndex);
@@ -235,29 +205,29 @@ class DocBlockScanner implements ScannerInterface
 
             return $currentChar;
         };
-        $MACRO_STREAM_ADVANCE_WORD       = function () use (&$currentWord, &$MACRO_STREAM_ADVANCE_CHAR) {
+        $MACRO_STREAM_ADVANCE_WORD = function () use (&$currentWord, &$MACRO_STREAM_ADVANCE_CHAR) {
             return $MACRO_STREAM_ADVANCE_CHAR(strlen($currentWord));
         };
-        $MACRO_STREAM_ADVANCE_LINE       = function () use (&$currentLine, &$MACRO_STREAM_ADVANCE_CHAR) {
+        $MACRO_STREAM_ADVANCE_LINE = function () use (&$currentLine, &$MACRO_STREAM_ADVANCE_CHAR) {
             return $MACRO_STREAM_ADVANCE_CHAR(strlen($currentLine));
         };
-        $MACRO_TOKEN_ADVANCE             = function () use (&$tokenIndex, &$tokens) {
-            $tokenIndex          = $tokenIndex === null ? 0 : $tokenIndex + 1;
+        $MACRO_TOKEN_ADVANCE = function () use (&$tokenIndex, &$tokens) {
+            $tokenIndex = $tokenIndex === null ? 0 : $tokenIndex + 1;
             $tokens[$tokenIndex] = ['DOCBLOCK_UNKNOWN', ''];
         };
-        $MACRO_TOKEN_SET_TYPE            = function ($type) use (&$tokenIndex, &$tokens) {
+        $MACRO_TOKEN_SET_TYPE = function ($type) use (&$tokenIndex, &$tokens) {
             $tokens[$tokenIndex][0] = $type;
         };
-        $MACRO_TOKEN_APPEND_CHAR         = function () use (&$currentChar, &$tokens, &$tokenIndex) {
+        $MACRO_TOKEN_APPEND_CHAR = function () use (&$currentChar, &$tokens, &$tokenIndex) {
             $tokens[$tokenIndex][1] .= $currentChar;
         };
-        $MACRO_TOKEN_APPEND_WORD         = function () use (&$currentWord, &$tokens, &$tokenIndex) {
+        $MACRO_TOKEN_APPEND_WORD = function () use (&$currentWord, &$tokens, &$tokenIndex) {
             $tokens[$tokenIndex][1] .= $currentWord;
         };
         $MACRO_TOKEN_APPEND_WORD_PARTIAL = function ($length) use (&$currentWord, &$tokens, &$tokenIndex) {
             $tokens[$tokenIndex][1] .= substr($currentWord, 0, $length);
         };
-        $MACRO_TOKEN_APPEND_LINE         = function () use (&$currentLine, &$tokens, &$tokenIndex) {
+        $MACRO_TOKEN_APPEND_LINE = function () use (&$currentLine, &$tokens, &$tokenIndex) {
             $tokens[$tokenIndex][1] .= $currentLine;
         };
 
@@ -292,8 +262,8 @@ class DocBlockScanner implements ScannerInterface
         if ($currentChar === ' ' || $currentChar === "\t") {
             $MACRO_TOKEN_SET_TYPE(
                 $context & $CONTEXT_INSIDE_ASTERISK
-                ? 'DOCBLOCK_WHITESPACE'
-                : 'DOCBLOCK_WHITESPACE_INDENT'
+                    ? 'DOCBLOCK_WHITESPACE'
+                    : 'DOCBLOCK_WHITESPACE_INDENT'
             );
             $MACRO_TOKEN_APPEND_WORD();
             $MACRO_TOKEN_ADVANCE();
@@ -352,5 +322,35 @@ class DocBlockScanner implements ScannerInterface
         array_pop($tokens);
 
         return $tokens;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLongDescription()
+    {
+        $this->scan();
+
+        return $this->longDescription;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags()
+    {
+        $this->scan();
+
+        return $this->tags;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAnnotations()
+    {
+        $this->scan();
+
+        return $this->annotations;
     }
 }

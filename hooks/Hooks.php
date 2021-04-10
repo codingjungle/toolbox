@@ -1,24 +1,23 @@
 //<?php namespace toolbox_IPS_Plugin_Hook_ab9712a0d65901062b22f5262a724bd72;
 
-use IPS\Data\Store;
-use IPS\Http\Url;
-use IPS\Output;
-use IPS\Request;
-use IPS\Application;
-use DomainException; 
+use DomainException;
 use IPS\Helpers\Form;
 use IPS\Helpers\Form\Text;
+use IPS\Helpers\Table\Db;
+use IPS\Http\Url;
+use IPS\Plugin\Hook;
+use IPS\Request;
 
-use Generator\Builders\ClassGenerator;
-use IPS\toolbox\Proxy\Generator\Proxy;
+use IPS\toolbox\Application;
 
-use IPS\toolbox\Proxy\Proxyclass;
+use ReflectionException;
 
 use const IPS\ROOT_PATH;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    class _HOOK_CLASS_ extends \IPS\Plugin\Hook{}
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    class _HOOK_CLASS_ extends Hook { }
+
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -29,12 +28,12 @@ class toolbox_hook_Hooks extends _HOOK_CLASS_
      * @param Url $url
      * @param $appOrPluginId
      * @param $hookDir
-     * @return Form|\IPS\Helpers\Table\Db
-     * @throws \ReflectionException
+     * @return Form|Db
+     * @throws ReflectionException
      */
     public static function devTable($url, $appOrPluginId, $hookDir)
     {
-        \IPS\toolbox\Application::loadAutoLoader();
+        Application::loadAutoLoader();
         $dtProxyFolder = ROOT_PATH . '/dtProxy/namespace.json';
 
         $parent = parent::devTable($url, $appOrPluginId, $hookDir);
@@ -46,8 +45,7 @@ class toolbox_hook_Hooks extends _HOOK_CLASS_
             $options = [
                 'placeholder'  => 'Namespace',
                 'autocomplete' => [
-                    'source'               => 'app=toolbox&module=devcenter&controller=sources&do=findClass&appKey=' . Request::i(
-                        )->appKey,
+                    'source'               => 'app=toolbox&module=devcenter&controller=sources&do=findClass&appKey=' . Request::i()->appKey,
                     'minimized'            => false,
                     'commaTrigger'         => false,
                     'unique'               => true,
@@ -57,7 +55,7 @@ class toolbox_hook_Hooks extends _HOOK_CLASS_
                 ],
             ];
 
-            unset($elements[ 'plugin_hook_class' ]);
+            unset($elements['plugin_hook_class']);
             $parent->elements = $elements;
 
             $parent->add(

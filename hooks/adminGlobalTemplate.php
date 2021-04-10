@@ -6,7 +6,7 @@ use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
 
-if (!\defined('\IPS\SUITE_UNIQUE_KEY')) {
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 
@@ -16,7 +16,7 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-        return \array_merge_recursive(
+        return array_merge_recursive(
             [
                 'globalTemplate' => [
                     0 => [
@@ -41,7 +41,7 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
 
     public function globalTemplate($title, $html, $location = [])
     {
-        Output::i()->cssFiles = \array_merge(Output::i()->cssFiles, Theme::i()->css('devbar.css', 'toolbox', 'admin'));
+        Output::i()->cssFiles = array_merge(Output::i()->cssFiles, Theme::i()->css('devbar.css', 'toolbox', 'admin'));
 
         return parent::globalTemplate($title, $html, $location);
     }
@@ -56,9 +56,8 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
         $tabClasses = '',
         $panelClasses = ''
     ) {
-        if (Request::i()->app === 'core' && Request::i()->module === 'applications' && Request::i(
-            )->controller === 'developer' && !Request::i()->do) {
-            $tabNames[ 'SchemaImports' ] = 'dtdevplus_schema_imports';
+        if (Request::i()->app === 'core' && Request::i()->module === 'applications' && Request::i()->controller === 'developer' && !Request::i()->do) {
+            $tabNames['SchemaImports'] = 'dtdevplus_schema_imports';
 //            $tabNames[ 'GitHooks' ] = 'dtdevplus_dev_git_hooks';
         }
 

@@ -17,8 +17,8 @@ use function defined;
 use function header;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( isset( $_SERVER[ 'SERVER_PROTOCOL' ] ) ? $_SERVER[ 'SERVER_PROTOCOL' ] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -28,10 +28,9 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 class _generators
 {
 
-    public function addJsonMeta( &$jsonMeta )
+    public function addJsonMeta(&$jsonMeta)
     {
-
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signatures' => [
                 [
                     'class'  => 'Generator\\Builders\\Traits\\ClassMethods',
@@ -44,7 +43,7 @@ class _generators
             'language'   => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'           => 'ClassMethods',
             'lookup_strings' => [
                 'static',
@@ -56,7 +55,7 @@ class _generators
             ],
         ];
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signatures' => [
                 [
                     'class'  => 'Generator\\Builders\\Traits\\Constants',
@@ -69,7 +68,7 @@ class _generators
             'language'   => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'           => 'ConstMethod',
             'lookup_strings' => [
                 'visibility',
@@ -77,7 +76,7 @@ class _generators
             ],
         ];
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signatures' => [
                 [
                     'class'  => 'Generator\\Builders\\Traits\\Properties',
@@ -90,7 +89,7 @@ class _generators
             'language'   => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'           => 'addPropertyMethod',
             'lookup_strings' => [
                 'document',
@@ -100,7 +99,7 @@ class _generators
             ],
         ];
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signatures' => [
                 [
                     'class'  => 'Generator\\Builders\\Traits\\Properties',
@@ -113,7 +112,7 @@ class _generators
             'language'   => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'           => 'addPropertyTagMethod',
             'lookup_strings' => [
                 'type',
@@ -122,7 +121,7 @@ class _generators
             ],
         ];
 
-        $jsonMeta[ 'registrar' ][] = [
+        $jsonMeta['registrar'][] = [
             'signatures' => [
                 [
                     'class'  => 'Generator\\Builders\\InterfaceGenerator',
@@ -135,7 +134,7 @@ class _generators
             'language'   => 'php',
         ];
 
-        $jsonMeta[ 'providers' ][] = [
+        $jsonMeta['providers'][] = [
             'name'           => 'InterfaceGeneratorTagMethod',
             'lookup_strings' => [
                 'static',

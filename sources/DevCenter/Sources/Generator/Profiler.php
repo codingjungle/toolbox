@@ -12,12 +12,15 @@
 
 namespace IPS\toolbox\DevCenter\Sources\Generator;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 use IPS\toolbox\Text;
+
+use Zend\Code\Generator\Exception\InvalidArgumentException;
+
 use function defined;
 use function header;
 use function mb_strtolower;
@@ -26,16 +29,15 @@ class _Profiler extends GeneratorAbstract
 {
 
     /**
-     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function bodyGenerator()
     {
-
         $this->brief = 'Class';
-        $profiler = mb_ucfirst( mb_strtolower( $this->type ) );
+        $profiler = mb_ucfirst(mb_strtolower($this->type));
         $profilerClass = '\\IPS\\toolbox\\Profiler\\' . $profiler . '::class';
 
-        if ( $profiler === 'Debug' ) {
+        if ($profiler === 'Debug') {
             $body = <<<EOF
         if( defined('DTPROFILER') && DTPROFILER && class_exists( $profilerClass) ){
             \$class =  $profilerClass;
@@ -48,8 +50,7 @@ class _Profiler extends GeneratorAbstract
             \IPS\Log::debug(\$message, \$key);
         }   
 EOF;
-        }
-        else {
+        } else {
             $body = <<<EOF
         if( defined('DTPROFILER') && DTPROFILER && class_exists( $profilerClass) ){
             \$class =  $profilerClass;
@@ -61,15 +62,14 @@ EOF;
         }
 
         $params = [
-            [ 'name' => 'method' ],
-            [ 'name' => 'args' ],
+            ['name' => 'method'],
+            ['name' => 'args'],
         ];
 
         $extra = [
             'static' => true,
         ];
 
-        $this->generator->addmethod( '__callStatic', $body, $params, $extra );
-
+        $this->generator->addmethod('__callStatic', $body, $params, $extra);
     }
 }

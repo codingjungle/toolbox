@@ -23,36 +23,32 @@ use function is_array;
 use function mb_strtolower;
 use function property_exists;
 
-use function header;
-
-
-
 
 /**
  * Class _Element
  *
  * @package Forms
  * @mixin  Element
- * @property-read string                   $name
- * @property-read string                   $type
- * @property-read string|int|array         $value
- * @property-read bool                     $required
- * @property-read array                    $options
- * @property-read callable                 $validationCallback
- * @property-read string                   $prefix
- * @property-read string                   $suffix
- * @property-read string                   $id
- * @property-read string                   $tab
- * @property-read bool                     $skip
- * @property-read string                   $header
- * @property-read bool                     $appearRequired
- * @property-read array                    $toggles
- * @property-read array                    $label
- * @property-read array                    $description
- * @property-read array                    $extra
- * @property-read string                   $sidebar
+ * @property-read string $name
+ * @property-read string $type
+ * @property-read string|int|array $value
+ * @property-read bool $required
+ * @property-read array $options
+ * @property-read callable $validationCallback
+ * @property-read string $prefix
+ * @property-read string $suffix
+ * @property-read string $id
+ * @property-read string $tab
+ * @property-read bool $skip
+ * @property-read string $header
+ * @property-read bool $appearRequired
+ * @property-read array $toggles
+ * @property-read array $label
+ * @property-read array $description
+ * @property-read array $extra
+ * @property-read string $sidebar
  * @property-read FormAbstract|string|null $class
- * @property-read bool                     $custom
+ * @property-read bool $custom
  *
  */
 class _Element
@@ -73,7 +69,7 @@ class _Element
         'cm'           => 'Codemirror',
         'color'        => 'Color',
         'custom'       => 'Custom',
-        'cs' => 'Custom',
+        'cs'           => 'Custom',
         'date'         => 'Date',
         'daterange'    => 'DateRange',
         'dr'           => 'DateRange',
@@ -245,9 +241,9 @@ class _Element
     {
         $class = null;
         $type = mb_strtolower($type);
-        if (!isset(static::$nonHelpers[ $type ])) {
-            if (!($name instanceof FormAbstract) && isset(static::$helpers[ $type ])) {
-                $class = '\\IPS\\Helpers\\Form\\' . static::$helpers[ $type ] ?? 'Text';
+        if (!isset(static::$nonHelpers[$type])) {
+            if (!($name instanceof FormAbstract) && isset(static::$helpers[$type])) {
+                $class = '\\IPS\\Helpers\\Form\\' . static::$helpers[$type] ?? 'Text';
                 $type = 'helper';
             } else {
                 if ($name instanceof FormAbstract) {
@@ -279,9 +275,9 @@ class _Element
 
     public function changeType(string $type, $custom = '')
     {
-        if (!isset(static::$nonHelpers[ $type ])) {
-            if (!($this->name instanceof FormAbstract) && isset(static::$helpers[ $type ])) {
-                $this->class = '\\IPS\\Helpers\\Form\\' . static::$helpers[ $type ] ?? 'Text';
+        if (!isset(static::$nonHelpers[$type])) {
+            if (!($this->name instanceof FormAbstract) && isset(static::$helpers[$type])) {
+                $this->class = '\\IPS\\Helpers\\Form\\' . static::$helpers[$type] ?? 'Text';
                 $this->type = 'helper';
             } elseif ($this->name instanceof FormAbstract) {
                 $this->class = $this->name;
@@ -325,7 +321,7 @@ class _Element
      */
     public function options(array $options): self
     {
-        if (isset($options[ 'toggles' ], $options[ 'togglesOff' ], $options[ 'togglesOn' ])) {
+        if (isset($options['toggles'], $options['togglesOff'], $options['togglesOn'])) {
             throw new InvalidArgumentException(
                 'Your options array contains toggles/togglesOn/togglesOff, use the toggles() method instead'
             );
@@ -439,7 +435,7 @@ class _Element
     /**
      * @param string $label
      *
-     * @param array  $sprintf
+     * @param array $sprintf
      *
      * @return self
      */
@@ -456,7 +452,7 @@ class _Element
     /**
      * @param string $description
      *
-     * @param array  $sprintf
+     * @param array $sprintf
      *
      * @return self
      */
@@ -472,8 +468,8 @@ class _Element
 
     /**
      * @param array $toggles
-     * @param bool  $off
-     * @param bool  $na
+     * @param bool $off
+     * @param bool $na
      *
      * @return self
      */
@@ -489,7 +485,7 @@ class _Element
                 'YesNo'    => 1,
             ];
 
-            if (isset($togglesOn[ $class ])) {
+            if (isset($togglesOn[$class])) {
                 $key = 'togglesOn';
             }
             if ($class === 'Node') {

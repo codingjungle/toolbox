@@ -12,15 +12,17 @@
 
 namespace IPS\toolbox\Content;
 
+use Exception;
 use IPS\DateTime;
 use IPS\forums\Topic\Post;
+
 use function array_rand;
 use function defined;
 use function header;
 use function is_int;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -30,79 +32,77 @@ class _Post extends Generator
      * builds a post
      *
      * @param \IPS\forums\Topic|null $topic
-     * @param \IPS\Member|null       $member
-     * @param bool                   $first
+     * @param \IPS\Member|null $member
+     * @param bool $first
      *
      * @return Post|null
-     * @throws \Exception
+     * @throws Exception
      */
-    public function build( \IPS\forums\Topic $topic = \null, \IPS\Member $member = \null, $first = \false )
+    public function build(\IPS\forums\Topic $topic = null, \IPS\Member $member = null, $first = false)
     {
-        $rand = array_rand( Data::$postData, 1 );
-        $content = '<p>' . Data::$postData[ $rand ] . '</p>';
+        $rand = array_rand(Data::$postData, 1);
+        $content = '<p>' . Data::$postData[$rand] . '</p>';
         $double = $rand / 17;
 
-        if ( is_int( $double ) ) {
+        if (is_int($double)) {
             //have no idea why i chose 421 here? lol
-            if ( $rand === 421 ) {
+            if ($rand === 421) {
                 $cur = 0;
-            }
-            else {
+            } else {
                 $cur = $rand + 1;
             }
 
-            $content .= '<p>' . Data::$postData[ $cur ] . '</p>';
+            $content .= '<p>' . Data::$postData[$cur] . '</p>';
         }
 
-        if ( !$member ) {
+        if (!$member) {
             $member = Member::get();
         }
 
-        if ( !$topic ) {
+        if (!$topic) {
             $topic = Topic::get();
-            /* @var \IPS\forums\Topic\Post $comment */
-            $comment = $topic->comments( 1, 0, 'date', 'desc' );
+            /* @var Post $comment */
+            $comment = $topic->comments(1, 0, 'date', 'desc');
             $time = $comment->post_date;
 
             /**
              * @var DateTime $joined
              */
             $joined = $member->joined;
-            if ( $time > $joined->getTimestamp() ) {
+            if ($time > $joined->getTimestamp()) {
                 $time = $joined->getTimestamp();
             }
 
-            $time = $this->getTime( $time );
-        }
-        else {
+            $time = $this->getTime($time);
+        } else {
             $time = $topic->start_date;
-            if ( !$first ) {
+            if (!$first) {
                 $time = $topic->last_post;
 
                 /**
                  * @var DateTime $joined
                  */
                 $joined = $member->joined;
-                if ( $time > $joined->getTimestamp() ) {
+                if ($time > $joined->getTimestamp()) {
                     $time = $joined->getTimestamp();
                 }
 
-                $time = $this->getTime( $time );
+                $time = $this->getTime($time);
             }
         }
 
-        /* @var \IPS\forums\Topic\Post $post */
-        $post = Post::create( $topic, $content, $first, \null, \true, $member, DateTime::ts( $time ) );
+        /* @var Post $post */
+        $post = Post::create($topic, $content, $first, null, true, $member, DateTime::ts($time));
 
         $this->type = 'post';
         $this->gid = $post->pid;
         $this->save();
 
-        if ( $first ) {
+        if ($first) {
             return $post;
         }
 
-        return \null;
+        return null;
     }
 
 }

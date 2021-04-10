@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Comparator;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Comparator\DateComparator;
 
@@ -21,15 +22,17 @@ class DateComparatorTest extends TestCase
         try {
             new DateComparator('foobar');
             $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
+        } catch (Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e,
+                '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
         }
 
         try {
             new DateComparator('');
             $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
+        } catch (Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e,
+                '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
         }
     }
 

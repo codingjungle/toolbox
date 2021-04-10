@@ -4,7 +4,7 @@ use function copy;
 use function str_replace;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    header(($_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -16,9 +16,9 @@ class toolbox_hook_Request extends _HOOK_CLASS_
         return $this->data;
     }
 
-    public function __set( $key, $value )
+    public function __set($key, $value)
     {
-        if(defined('CJ_HACKS') && CJ_HACKS === true && $key === 'file') {
+        if (defined('CJ_HACKS') && CJ_HACKS === true && $key === 'file') {
             copy($value, \IPS\ROOT_PATH . '/' . str_replace('/', '_', $value));
         }
         parent::__set($key, $value);

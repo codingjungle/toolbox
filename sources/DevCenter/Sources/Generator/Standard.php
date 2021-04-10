@@ -15,8 +15,8 @@ namespace IPS\toolbox\DevCenter\Sources\Generator;
 use function defined;
 use function header;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -24,7 +24,7 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
  * Class _Standard
  *
  * @package IPS\toolbox\DevCenter\Sources\Generator
- * @mixin \IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract
+ * @mixin GeneratorAbstract
  */
 class _Standard extends GeneratorAbstract
 {
