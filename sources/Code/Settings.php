@@ -146,7 +146,7 @@ class _Settings extends ParserAbstract
                 $line++;
                 if ($file->getExtension() === 'phtml') {
                     $matches = [];
-                    preg_match_all("#\bsettings.([^\s|\W]+)#u", $content, $matches);
+                    preg_match_all("#\bsettings\.([^\s|\W]+)#u", $content, $matches);
                     if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
                         $found = $matches[1];
