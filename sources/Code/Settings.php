@@ -14,6 +14,7 @@ namespace IPS\toolbox\Code;
 
 use IPS\Application;
 use Symfony\Component\Finder\SplFileInfo;
+
 use function count;
 use function defined;
 use function explode;
@@ -26,8 +27,8 @@ use function mb_substr;
 use function preg_match_all;
 use function trim;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -50,9 +51,9 @@ class _Settings extends ParserAbstract
     /**
      * {@inheritdoc}
      */
-    public function __construct( $app )
+    public function __construct($app)
     {
-        parent::__construct( $app );
+        parent::__construct($app);
         $this->skip = [
             'settings.json',
         ];
@@ -65,36 +66,36 @@ class _Settings extends ParserAbstract
      */
     public function buildSettings(): self
     {
-        if ( $this->app === \null ) {
+        if ($this->app === \null) {
             return $this;
         }
 
-        foreach ( Application::applications() as $app ) {
+        foreach (Application::applications() as $app) {
             $dir = \IPS\ROOT_PATH . '/applications/' . $app->directory . '/data/settings.json';
-            if ( is_file( $dir ) ) {
+            if (is_file($dir)) {
                 /**
                  * @var array $appSettings
                  */
-                $appSettings = json_decode( file_get_contents( $dir ), \true );
-                foreach ( $appSettings as $setting ) {
-                    $this->globalSettings[ $setting[ 'key' ] ] = $setting[ 'key' ];
+                $appSettings = json_decode(file_get_contents($dir), \true);
+                foreach ($appSettings as $setting) {
+                    $this->globalSettings[$setting['key']] = $setting['key'];
                 }
             }
         }
 
         $dir = \IPS\ROOT_PATH . '/applications/' . $this->app->directory . '/data/settings.json';
-        if ( is_file( $dir ) ) {
-            $settings = json_decode( file_get_contents( $dir ), \true ) ?? [];
-            foreach ( $settings as $setting ) {
-                $this->appSettings[ $setting[ 'key' ] ] = $setting[ 'key' ];
+        if (is_file($dir)) {
+            $settings = json_decode(file_get_contents($dir), \true) ?? [];
+            foreach ($settings as $setting) {
+                $this->appSettings[$setting['key']] = $setting['key'];
             }
         }
 
         $INFO = [];
         require \IPS\ROOT_PATH . '/conf_global.php';
-        if ( $INFO ) {
-            foreach ( $INFO as $key => $val ) {
-                $this->globalSettings[ $key ] = $key;
+        if ($INFO) {
+            foreach ($INFO as $key => $val) {
+                $this->globalSettings[$key] = $key;
             }
         }
 
@@ -108,15 +109,15 @@ class _Settings extends ParserAbstract
      */
     public function check(): array
     {
-        if ( $this->files === \null ) {
+        if ($this->files === \null) {
             return [];
         }
 
         $content = $this->getContent();
         $warning = [];
-        foreach ( $this->appSettings as $find ) {
-            preg_match_all( '#' . $find . '#u', $content, $match );
-            if ( !count( $match[ 0 ] ) ) {
+        foreach ($this->appSettings as $find) {
+            preg_match_all('#' . $find . '#u', $content, $match);
+            if (!count($match[0])) {
                 $warning[] = $find;
             }
         }
@@ -135,51 +136,57 @@ class _Settings extends ParserAbstract
         /**
          * @var SplFileInfo $file
          */
-        foreach ( $this->files as $file ) {
+        foreach ($this->files as $file) {
             $data = $file->getContents();
-            $lines = explode( "\n", $data );
+            $lines = explode("\n", $data);
             $line = 1;
             $name = $file->getRealPath();
-            foreach ( $lines as $content ) {
-                $path = $this->buildPath( $name, $line );
+            foreach ($lines as $content) {
+                $path = $this->buildPath($name, $line);
                 $line++;
-                if ( $file->getExtension() === 'phtml' ) {
+                if ($file->getExtension() === 'phtml') {
                     $matches = [];
-                    preg_match_all( "#\bsettings.([^\s|\W]+)#u", $content, $matches );
-                    if ( isset( $matches[ 1 ] ) && count( $matches[ 1 ] ) ) {
+                    preg_match_all("#\bsettings.([^\s|\W]+)#u", $content, $matches);
+                    if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
-                        $found = $matches[ 1 ];
-                        foreach ( $found as $key => $val ) {
-                            $val = trim( $val );
-                            if ( $val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues' ) {
+                        $found = $matches[1];
+                        foreach ($found as $key => $val) {
+                            $val = trim($val);
+                            if ($val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues') {
                                 continue;
                             }
-                            if ( $val && !isset( $this->globalSettings[ $val ] ) && ( !in_array( mb_substr( $val, 0, 1 ), [
+                            if ($val && !isset($this->globalSettings[$val]) && (!in_array(
+                                    mb_substr($val, 0, 1),
+                                    [
                                         '$',
                                         '{',
-                                    ] ) ) ) {
-                                $warning[] = [ 'path' => ['url'=>$this->buildPath($path, $line),'name'=>$name], 'key' => $val ];
+                                    ]
+                                ))) {
+                                $warning[] = ['path' => ['url' => $path, 'name' => $name], 'key' => $val];
                             }
                         }
                     }
                 }
 
-                if ( $file->getExtension() === 'php' ) {
+                if ($file->getExtension() === 'php') {
                     $matches = [];
-                    preg_match_all( '#Settings::i\(\)->([^\s|\W]+)#u', $content, $matches );
-                    if ( isset( $matches[ 1 ] ) && count( $matches[ 1 ] ) ) {
+                    preg_match_all('#Settings::i\(\)->([^\s|\W]+)#u', $content, $matches);
+                    if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
-                        $found = $matches[ 1 ];
-                        foreach ( $found as $key => $val ) {
-                            $val = trim( $val );
-                            if ( $val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues' ) {
+                        $found = $matches[1];
+                        foreach ($found as $key => $val) {
+                            $val = trim($val);
+                            if ($val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues') {
                                 continue;
                             }
-                            if ( $val && !isset( $this->globalSettings[ $val ] ) && ( !in_array( mb_substr( $val, 0, 1 ), [
+                            if ($val && !isset($this->globalSettings[$val]) && (!in_array(
+                                    mb_substr($val, 0, 1),
+                                    [
                                         '$',
                                         '{',
-                                    ] ) ) ) {
-                                $warning[] = [ 'path' => ['url'=>$this->buildPath($path, $line),'name'=>$name], 'key' => $val ];
+                                    ]
+                                ))) {
+                                $warning[] = ['path' => ['url' => $path, 'name' => $name], 'key' => $val];
                             }
                         }
                     }
