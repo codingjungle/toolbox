@@ -15,7 +15,6 @@ namespace IPS\toolbox\Code;
 
 use Exception;
 use IPS\toolbox\extensions\core\FileStorage\FileStorage;
-use IPS\toolbox\Profiler\Debug;
 use UnderflowException;
 
 use function defined;
@@ -49,7 +48,6 @@ class _FileStorage extends ParserAbstract
         if (isset($settings['filestorage__toolbox_FileStorage'])) {
             $id = $settings['filestorage__toolbox_FileStorage'];
         }
-        Debug::log($id);
         if (empty($extensions) === false) {
             /** @var FileStorage $extension */
             foreach ($extensions as $extension) {
