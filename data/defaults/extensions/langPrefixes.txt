@@ -1,0 +1,29 @@
+<?php
+
+namespace IPS\{app}\extensions\toolbox\langPrefixes;
+use IPS\toolbox\Code\LangPrefix;
+use function defined;
+use function header;
+
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
+    exit;
+}
+
+/**
+ * {class}
+ */
+class _{class} implements LangPrefix
+{
+    /**
+     * add an array of lang prefixes to exclude in the lang check of analyzer
+     * @param array $prefixes
+     */
+    public function prefixes(array &$prefixes): void{}
+
+    /**
+     * add an array of lang suffixes to exclude in the lang check of analyzer
+     * @param array $suffixes
+     */
+    public function suffixes(array &$suffixes): void{}
+}

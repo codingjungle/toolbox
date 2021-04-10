@@ -12,33 +12,87 @@
 
 namespace IPS\toolbox\Code;
 
+use Exception;
+use InvalidArgumentException;
+use IPS\Application;
 use IPS\Member;
+use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+
+use function _p;
+use function abs;
 use function array_diff;
-use function array_keys;
 use function count;
 use function defined;
 use function explode;
 use function header;
 use function in_array;
 use function is_array;
+use function mb_strlen;
 use function mb_substr;
 use function preg_match_all;
 use function trim;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 class _Langs extends ParserAbstract
 {
+    public $prefixes = [
+        'app_',
+        '__app_',
+        'module__',
+        'menu__',
+        'frontnavigation__',
+        '__indefart',
+        '__defart',
+        'r__',
+        'modeperms__',
+        'acplogs__',
+        'task__',
+        'modlog__',
+        '__api',
+        'filestorage__',
+        'block_',
+        'widget_',
+        'mobilenavigation_',
+        'mailsub__'
+    ];
+    public $toIgnore = [
+        'app_' => 1,
+        '__app_' => 1,
+        'module__' => 1,
+        'menu__' => 1,
+        'frontnavigation__' => 1,
+        '__indefart' => 1,
+        '__defart' => 1,
+        'r__' => 1,
+        'modeperms__' => 1,
+        'acplogs__' => 1,
+        'task__' => 1,
+        'modlog__' => 1,
+        '__api' => 1,
+        'filestorage__' => 1,
+        'block_' => 1,
+        'widget_' => 1,
+        'mobilenavigation_' => 1,
+        'mailsub__' => 1
+    ];
+
+    public $suffixes = [
+        '_pl_lc',
+        '_lc',
+        '_pl',
+        '_desc',
+
+    ];
     /**
      * @var null|array
      */
     protected $langs;
-
     /**
      * @var null|array
      */
@@ -54,18 +108,29 @@ class _Langs extends ParserAbstract
 
     /**
      * {@inheritdoc}
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function __construct( $app )
+    public function __construct($app)
     {
-        parent::__construct( $app );
-        $this->addKeyToIgnoreList( '__app_' . $this->app->directory );
+        parent::__construct($app);
+        $this->addKeyToIgnoreList('__app_' . $this->app->directory);
         $this->getLangs();
         $this->skip = [
             'lang.php',
             'jslang.php',
             'lang.xml',
         ];
+        if (!($app instanceof Application)) {
+            $app = Application::load($app);
+        }
+        $extensions = $app->extensions('toolbox', 'langPrefixes');
+        if (empty($extensions) === false) {
+            /** @var LangPrefix $extension */
+            foreach ($extensions as $extension) {
+                $extension->prefixes($this->prefixes);
+                $extension->suffixes($this->suffixes);
+            }
+        }
     }
 
     /**
@@ -73,7 +138,7 @@ class _Langs extends ParserAbstract
      *
      * @param $name
      */
-    public function addKeyToIgnoreList( $name )
+    public function addKeyToIgnoreList($name)
     {
         $this->ignore[] = $name;
     }
@@ -81,33 +146,28 @@ class _Langs extends ParserAbstract
     /**
      * builds the lang strings into $this->langs and $this->jslangs
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function getLangs()
     {
-        if ( $this->app === \null ) {
+        if ($this->app === null) {
             return;
         }
 
-        $files = new Finder;
-        $files->in( $this->appPath . 'dev/' )->files()->name( '*lang.php' );
+        $files = new Finder();
+        $files->in($this->appPath . 'dev/')->files()->name('*lang.php');
+        $lf = $this->appPath . 'dev/lang.php';
+        if (\file_exists($lf)) {
+            $lang = null;
+            require $lf;
+            $this->langs = $lang;
+        }
 
-        /**
-         * @var SplFileInfo $langs
-         */
-        foreach ( $files as $langs ) {
-            if ( $langs->getFilename() === 'lang.php' ) {
-                $lang = \null;
-                require $langs->getRealPath();
-                $this->langs = $lang;
-            }
-            else {
-                if ( $langs->getFilename() === 'jslang.php' ) {
-                    $lang = \null;
-                    require $langs->getRealPath();
-                    $this->jslangs = $lang;
-                }
-            }
+        $jlf = $this->appPath . 'dev/jslang.php';
+        if (\file_exists($jlf)) {
+            $lang = null;
+            require $jlf;
+            $this->jslangs = $lang;
         }
     }
 
@@ -115,143 +175,239 @@ class _Langs extends ParserAbstract
      * checks to see if the language strings are in use
      *
      * @return array
-     * @throws \RuntimeException
-     * @throws \Exception
+     * @throws RuntimeException
+     * @throws Exception
      */
     public function check(): array
     {
-        if ( $this->files === \null ) {
+        if ($this->files === null) {
             return [];
         }
 
         $content = $this->getContent();
-        $keys = is_array( $this->langs ) ? array_keys( $this->langs ) : [];
-        $jskeys = is_array( $this->jslangs ) ? array_keys( $this->jslangs ) : [];
+        $keys = is_array($this->langs) ? $this->langs : [];
+        $jskeys = is_array($this->jslangs) ? $this->jslangs : [];
         $warning = [];
 
         /* Remove the ignored language strings like the app name */
-        $keys = array_diff( $keys, $this->ignore );
+        $keys = array_diff($keys, $this->ignore);
+        //_p($this->prefixes);
+        //check the removed prefix shit first
 
-        foreach ( $keys as $find ) {
-            preg_match_all( '#[\'|"]' . $find . '[\'|"]#u', $content, $match );
+        foreach ($keys as $find => $value) {
+            $find = trim($find);
+            foreach ($this->suffixes as $suffix) {
+                $check = mb_substr($find, -1 * abs(mb_strlen($suffix)));
+                if ((string)$check === (string)$suffix) {
+                    unset($keys[$find]);
+                    continue 2;
+                }
+            }
+            foreach ($this->prefixes as $prefix) {
+                $check = mb_substr($find, 0, mb_strlen(trim($prefix)));
+                if ((string)$check === (string)$prefix) {
+                    $find2 = mb_substr($find, mb_strlen(trim($prefix)), mb_strlen($find));
+                    preg_match_all('#[\'|"]' . $find2 . '[\'|"]#msu', $content, $match);
 
-            if ( !count( $match[ 0 ] ) ) {
-                $warning[ 'langs' ][] = $find;
+                    if (!count($match[0]) && !isset($this->toIgnore[$prefix])) {
+//
+                        $warning['langs'][$find] = $find;
+                    } else {
+                        unset($keys[$find]);
+                    }
+                    continue 2;
+                }
             }
         }
 
-        foreach ( $jskeys as $find ) {
-            preg_match_all( "#['|\"]" . $find . "['|\"]#u", $content, $match );
-            if ( !count( $match[ 0 ] ) ) {
-                $warning[ 'jslangs' ][] = $find;
+
+        foreach ($keys as $find => $value) {
+            $find = trim($find);
+            preg_match_all('#[\'|"]' . $find . '[\'|"]#msu', $content, $match);
+            if (!count($match[0])) {
+                $warning['langs'][$find] = $find;
+            } else {
+                unset($warning['langs'][$find]);
             }
         }
+
+        foreach ($jskeys as $find => $value) {
+            $find = trim($find);
+            foreach ($this->suffixes as $suffix) {
+                $check = mb_substr($find, -1 * abs(mb_strlen($suffix)));
+                if ((string)$check === (string)$suffix) {
+                    unset($jskeys[$find]);
+                    continue 2;
+                }
+            }
+            foreach ($this->prefixes as $prefix) {
+                $check = mb_substr($find, 0, mb_strlen(trim($prefix)));
+                if ((string)$check === (string)$prefix) {
+                    $find2 = mb_substr($find, mb_strlen(trim($prefix)), mb_strlen($find));
+                    preg_match_all('#[\'|"]' . $find2 . '[\'|"]#msu', $content, $match);
+                    if (!count($match[0]) && !isset($this->toIgnore[$prefix])) {
+                        $warning['jslangs'][$find] = $find;
+                    } else {
+                        unset($jskeys[$find]);
+                    }
+                    continue 2;
+                }
+            }
+        }
+
+        foreach ($jskeys as $find => $value) {
+            $find = trim($find);
+            preg_match_all('#[\'|"]' . $find . '[\'|"]#msu', $content, $match);
+            if (!count($match[0])) {
+                $warning['jslangs'][$find] = $find;
+            } else {
+                unset($warning['jslangs'][$find]);
+            }
+        }
+
         return $warning;
     }
 
     /**
      * checks to see the language strings in use are defined.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function verify(): array
     {
-        if ( $this->files === \null ) {
+        if ($this->files === null) {
             return [];
         }
 
-        $jskeys = is_array( $this->jslangs ) ? $this->jslangs : [];
+        $jskeys = is_array($this->jslangs) ? $this->jslangs : [];
         $warning = [];
-
+        $root = [];
         /**
          * @var SplFileInfo $file
          */
-        foreach ( $this->files as $file ) {
+        foreach ($this->files as $file) {
             $data = $file->getContents();
             $line = 1;
-            $lines = explode( "\n", $data );
+            $lines = explode("\n", $data);
             $name = $file->getRealPath();
-            foreach ( $lines as $content ) {
-                $path = $this->buildPath( $name, $line );
+            foreach ($lines as $content) {
+                $path = $this->buildPath($name, $line);
 
-                if ( $file->getExtension() === 'phtml' ) {
+                preg_match_all('#ROOT_PATH#u', $content, $matches);
+
+                if(mb_strpos($content, 'ROOT_PATH') !== false){
+                        $root[] = [
+                            'path' => ['url' => $path, 'name' => $name],
+                            'key' => '\\IPS\\ROOT_PATH',
+                            'line' => $line
+                        ];
+                }
+
+                if ($file->getExtension() === 'phtml') {
                     $matches = [];
-                    preg_match_all( "#{lang=['|\"](.*?)['|\"]#u", $content, $matches );
-                    if ( isset( $matches[ 1 ] ) && count( $matches[ 1 ] ) ) {
+                    preg_match_all("#{lang=['|\"](.*?)['|\"]#u", $content, $matches);
+                    if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
-                        $found = $matches[ 1 ];
-                        foreach ( $found as $key => $val ) {
-                            $val = trim( $val );
-                            if ( $val && ( !in_array( mb_substr( $val, 0, 1 ), [
-                                    '$',
-                                    '{',
-                                ] ) ) && !Member::loggedIn()->language()->checkKeyExists( $val ) ) {
-                                $warning[] = [ 'file' => $name, 'key' => $val, 'line' => $line, 'path' => $path ];
+                        $found = $matches[1];
+                        foreach ($found as $key => $val) {
+                            $val = trim($val);
+                            if ($val && (!in_array(
+                                    mb_substr($val, 0, 1),
+                                    [
+                                        '$',
+                                        '{',
+                                    ]
+                                )) && !Member::loggedIn()->language()->checkKeyExists($val)) {
+                                $warning[] = [
+                                    'path' => ['url' => $path, 'name' => $name],
+                                    'key' => $val,
+                                    'line' => $line
+                                ];
                             }
                         }
                     }
                 }
 
-                if ( $file->getExtension() === 'php' ) {
+                if ($file->getExtension() === 'php') {
                     $matches = [];
-                    preg_match_all( '/addToStack\((?:\s)[\'|"](.*?)[\'|"]/u', $content, $matches );
-                    if ( isset( $matches[ 1 ] ) && count( $matches[ 1 ] ) ) {
+                    preg_match_all('/addToStack\((?:\s)[\'|"](.*?)[\'|"]/u', $content, $matches);
+                    if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
-                        $found = $matches[ 1 ];
-                        foreach ( $found as $key => $val ) {
-                            $val = trim( $val );
-                            if ( $val && ( !in_array( mb_substr( $val, 0, 1 ), [
-                                    '$',
-                                    '{',
-                                ] ) ) && !Member::loggedIn()->language()->checkKeyExists( $val ) ) {
-                                $warning[] = [ 'file' => $name, 'key' => $val, 'line' => $line, 'path' => $path ];
+                        $found = $matches[1];
+                        foreach ($found as $key => $val) {
+                            $val = trim($val);
+                            if ($val && (!in_array(
+                                    mb_substr($val, 0, 1),
+                                    [
+                                        '$',
+                                        '{',
+                                    ]
+                                )) && !Member::loggedIn()->language()->checkKeyExists($val)) {
+                                $warning[] = [
+                                    'path' => ['url' => $path, 'name' => $name],
+                                    'key' => $val,
+                                    'line' => $line
+                                ];
                             }
                         }
                     }
 
                     $matches = [];
-                    preg_match_all( '/->get\((?:\s)[\'|"](.*?)[\'|"]/u', $content, $matches );
-                    if ( isset( $matches[ 1 ] ) && count( $matches[ 1 ] ) ) {
+                    preg_match_all('/->get\((?:\s)[\'|"](.*?)[\'|"]/u', $content, $matches);
+                    if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
-                        $found = $matches[ 1 ];
-                        foreach ( $found as $key => $val ) {
-                            $val = trim( $val );
-                            if ( $val && ( !in_array( mb_substr( $val, 0, 1 ), [
-                                    '$',
-                                    '{',
-                                ] ) ) && !Member::loggedIn()->language()->checkKeyExists( $val ) ) {
-                                $warning[] = [ 'file' => $name, 'key' => $val, 'line' => $line, 'path' => $path ];
+                        $found = $matches[1];
+                        foreach ($found as $key => $val) {
+                            $val = trim($val);
+                            if ($val && (!in_array(
+                                    mb_substr($val, 0, 1),
+                                    [
+                                        '$',
+                                        '{',
+                                    ]
+                                )) && !Member::loggedIn()->language()->checkKeyExists($val)) {
+                                $warning[] = [
+                                    'path' => ['url' => $path, 'name' => $name],
+                                    'key' => $val,
+                                    'line' => $line
+                                ];
                             }
                         }
                     }
                 }
 
-                if ( $file->getExtension() === 'js' ) {
+                if ($file->getExtension() === 'js') {
                     $matches = [];
-                    preg_match_all( '/getString\((?:\s)[\'|"](.*?)[\'|"]/u', $content, $matches );
+                    preg_match_all('/getString\((?:\s)[\'|"](.*?)[\'|"]/u', $content, $matches);
                     /**
                      * @var array $matches
                      */
-                    if ( isset( $matches[ 1 ] ) && count( $matches[ 1 ] ) ) {
+                    if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
-                        $found = $matches[ 1 ];
-                        foreach ( $found as $key => $val ) {
-                            $val = trim( $val );
-                            if ( $val && ( !in_array( mb_substr( $val, 0, 1 ), [
-                                    '$',
-                                    '{',
-                                ] ) ) && ( !isset( $jskeys[ $val ] ) && !Member::loggedIn()->language()->checkKeyExists( $val ) ) ) {
-                                $warning[] = [ 'file' => $name, 'key' => $val, 'line' => $line, 'path' => $path ];
+                        $found = $matches[1];
+                        foreach ($found as $key => $val) {
+                            $val = trim($val);
+                            if ($val && (!in_array(
+                                    mb_substr($val, 0, 1),
+                                    [
+                                        '$',
+                                        '{',
+                                    ]
+                                )) && (!isset($jskeys[$val]) && !Member::loggedIn()->language()->checkKeyExists(
+                                        $val
+                                    ))) {
+                                $warning[] = [
+                                    'path' => ['url' => $path, 'name' => $name],
+                                    'key' => $val,
+                                    'line' => $line
+                                ];
                             }
                         }
                     }
                 }
-
                 $line++;
-
             }
         }
-
-        return $warning;
+        return ['langs' => $warning,'root' => $root];
     }
 }

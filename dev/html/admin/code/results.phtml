@@ -1,0 +1,57 @@
+<ips:template parameters="array $data, $lang, $tableHead=[], $warning=false"/>
+{{$count = \count($data);}}
+    {{if $count }}
+        {{$msgType = 'error';}}
+        {{if $warning === true}}
+            {{$msgType = 'warning';}}
+        {{endif}}
+        {{else}}
+        {{$msgType = 'success';}}
+    {{endif}}
+<div{{if $count }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$lang}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+    {lang="{$lang}" sprintf="$count"} {{if $count }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$lang}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$lang}">
+<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_table">
+    {{if empty($tableHead) === false}}
+    <thead>
+        <tr>
+            {{foreach $tableHead as $head}}
+                <th>{lang="{$head}"}</th>
+            {{endforeach}}
+        </tr>
+    </thead>
+    {{endif}}
+    <tbody data-role="tableRows">
+    {{foreach $data as $values}}
+        {{if \is_array($values) }}
+        <tr class="ipsClearfix">
+        {{foreach $values as $key => $value}}
+            <td class="{{if $key === 'line' }}ipsTable_icon{{else}}ipsTable_wrap{{endif}}">
+                {{if \IPS\DEV_WHOOPS_EDITOR && $key === 'path'}}
+                <a href="{$value['url']}">{$value['name']}</a>
+                {{elseif $key === 'pre' }}
+                <pre>{$value|raw}</pre>
+                {{else}}
+                {$value|raw}
+                {{endif}}
+            </td>
+        {{endforeach}}
+        </tr>
+    {{else}}
+        <tr class="ipsClearfix">
+            <td class="ipsTable_wrap">
+                {$values|raw}
+            </td>
+        </tr>
+    {{endif}}
+
+    {{endforeach}}
+    </tbody>
+</table>
+</div>

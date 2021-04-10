@@ -158,7 +158,7 @@ class _Settings extends ParserAbstract
                                         '$',
                                         '{',
                                     ] ) ) ) {
-                                $warning[] = [ 'file' => $name, 'key' => $val, 'line' => $line, 'path' => $path ];
+                                $warning[] = [ 'path' => ['url'=>$this->buildPath($path, $line),'name'=>$name], 'key' => $val ];
                             }
                         }
                     }
@@ -179,7 +179,7 @@ class _Settings extends ParserAbstract
                                         '$',
                                         '{',
                                     ] ) ) ) {
-                                $warning[] = [ 'file' => $name, 'key' => $val, 'line' => $line, 'path' => $path ];
+                                $warning[] = [ 'path' => ['url'=>$this->buildPath($path, $line),'name'=>$name], 'key' => $val ];
                             }
                         }
                     }

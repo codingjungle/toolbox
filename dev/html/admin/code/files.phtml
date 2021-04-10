@@ -1,0 +1,41 @@
+<ips:template parameters="array $keys, $type, $msgType"/>
+<div{{if \count($keys) }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+        {lang="{$type}" sprintf="\count($keys)"} {{if \count($keys) }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$type}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$type}">
+    <table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_files">
+        <thead>
+        <tr class="ipsAreaBackground">
+            <th>File</th>
+            <th>Key</th>
+            <th>Line</th>
+        </tr>
+        </thead>
+        <tbody data-role="tableRows">
+        {{foreach $keys as $key }}
+        <tr class="ipsClearfix">
+            <td class="ipsTable_wrap dtcode_file_name">
+                {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
+                <a href="{$key['path']|raw}">
+                    {{endif}}
+                    {$key['file']}
+                    {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
+                </a>
+                {{endif}}
+            </td>
+            <td class="ipsTable_wrap dtcode_file_key">
+                {$key['key']}
+            </td>
+            <td class="ipsTable_icon dtcode_file_line">
+                {$key['line']}
+            </td>
+        </tr>
+        {{endforeach}}
+        </tbody>
+    </table>
+</div>

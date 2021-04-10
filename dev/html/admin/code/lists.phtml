@@ -1,0 +1,22 @@
+<ips:template parameters="array $keys, $type,$msgType"/>
+<div{{if \count($keys) }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+        {lang="{$type}" sprintf="\count($keys)"} {{if \count($keys) }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$type}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$type}">
+<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_lists">
+    <tbody data-role="tableRows">
+    {{foreach $keys as $key }}
+    <tr class="ipsClearfix">
+        <td class="ipsTable_wrap ">
+            {$key}
+        </td>
+    </tr>
+    {{endforeach}}
+    </tbody>
+</table>
+</div>

@@ -14,11 +14,12 @@ namespace IPS\toolbox\Code;
 
 use IPS\toolbox\ReservedWords;
 use Symfony\Component\Finder\Finder;
+
 use function defined;
 use function header;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -36,9 +37,9 @@ class _Template extends ParserAbstract
      *
      * @return bool
      */
-    public static function validateName( $name ): bool
+    public static function validateName($name): bool
     {
-        return ReservedWords::check( $name );
+        return ReservedWords::check($name);
     }
 
     /**
@@ -46,7 +47,7 @@ class _Template extends ParserAbstract
      */
     public function verify(): array
     {
-        foreach ( $this->finder as $invalidTemplate ) {
+        foreach ($this->finder as $invalidTemplate) {
             $this->warnings[] = $invalidTemplate->getPath();
         }
         return $this->warnings;
@@ -59,10 +60,10 @@ class _Template extends ParserAbstract
      */
     protected function getFiles()
     {
-        $this->finder = ( new Finder )->in( $this->appPath . 'dev/' )->files();
+        $this->finder = (new Finder())->in($this->appPath . 'dev/')->files();
 
-        foreach ( ReservedWords::get() as $invalidName ) {
-            $this->finder->name( $invalidName . '.php' );
+        foreach (ReservedWords::get() as $invalidName) {
+            $this->finder->name($invalidName . '.php');
         }
     }
 

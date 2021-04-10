@@ -18,10 +18,8 @@ use RuntimeException;
 
 use function count;
 use function file_put_contents;
-use function is_array;
-
-use function hash;
 use function implode;
+use function is_array;
 use function is_dir;
 use function md5;
 use function mkdir;
@@ -132,7 +130,7 @@ abstract class GeneratorAbstract
 
     /**
      * @param array $comment
-     * @param bool  $class
+     * @param bool $class
      *
      * @return $this
      */
@@ -327,13 +325,13 @@ EOF;
 
             foreach ($this->required as $required) {
                 $escaped = null;
-                if ($required[ 'escape' ] === true) {
+                if ($required['escape'] === true) {
                     $escaped = '"';
                 }
-                if ($required[ 'once' ] === true) {
-                    $replacement .= 'require_once ' . $escaped . $required[ 'path' ] . $escaped . ";\n";
+                if ($required['once'] === true) {
+                    $replacement .= 'require_once ' . $escaped . $required['path'] . $escaped . ";\n";
                 } else {
-                    $replacement .= 'require ' . $escaped . $required[ 'path' ] . $escaped . ";\n";
+                    $replacement .= 'require ' . $escaped . $required['path'] . $escaped . ";\n";
                 }
             }
         }
@@ -342,13 +340,13 @@ EOF;
             $replacement .= "\n";
             foreach ($this->included as $included) {
                 $escaped = null;
-                if ($included[ 'escape' ] === true) {
+                if ($included['escape'] === true) {
                     $escaped = '"';
                 }
-                if ($included[ 'once' ] === true) {
-                    $replacement .= 'include_once ' . $escaped . $included[ 'path' ] . $escaped . ";\n";
+                if ($included['once'] === true) {
+                    $replacement .= 'include_once ' . $escaped . $included['path'] . $escaped . ";\n";
                 } else {
-                    $replacement .= 'include ' . $escaped . $included[ 'path' ] . $escaped . ";\n";
+                    $replacement .= 'include ' . $escaped . $included['path'] . $escaped . ";\n";
                 }
             }
         }
@@ -369,7 +367,7 @@ EOF;
     public function addFileName(string $name)
     {
         $info = pathinfo($name);
-        $this->fileName = $info[ 'filename' ] ?? null;
+        $this->fileName = $info['filename'] ?? null;
     }
 
     /**
@@ -396,7 +394,7 @@ EOF;
     {
         $hash = $this->hash($path);
 
-        $this->required[ $hash ] = ['path' => $path, 'once' => $once, 'escape' => $escape];
+        $this->required[$hash] = ['path' => $path, 'once' => $once, 'escape' => $escape];
     }
 
     /**
@@ -427,6 +425,6 @@ EOF;
     public function addInclude($path, $once = false, $escape = true)
     {
         $hash = $this->hash($path);
-        $this->included[ $hash ] = ['path' => $path, 'once' => $once, 'escape' => $escape];
+        $this->included[$hash] = ['path' => $path, 'once' => $once, 'escape' => $escape];
     }
 }

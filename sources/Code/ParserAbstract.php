@@ -17,12 +17,12 @@ use IPS\Application;
 use IPS\toolbox\Editor;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+
 use function defined;
 use function header;
-use function in_array;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
@@ -55,18 +55,23 @@ abstract class _ParserAbstract
      *
      * @param $app
      */
-    public function __construct( $app )
+    public function __construct($app)
     {
         try {
             \IPS\toolbox\Application::loadAutoLoader();
-            if ( !( $app instanceof Application ) ) {
-                $app = Application::load( $app );
+            if (!($app instanceof Application)) {
+                $app = Application::load($app);
             }
             $this->app = $app;
-            $this->appPath = \IPS\ROOT_PATH . '/applications/' . $this->app->directory . '/';
+            $this->appPath = $app->getApplicationPath() . '/';
             $this->getFiles();
-        } catch ( Exception $e ) {
+        } catch (Exception $e) {
         }
+    }
+
+    protected function getFiles()
+    {
+        $this->files = $this->getLocalFiles();
     }
 
     /**
@@ -74,27 +79,16 @@ abstract class _ParserAbstract
      *
      * @throws \InvalidArgumentException
      */
-    protected function getFiles()
+    final protected function getLocalFiles()
     {
-        $files = new Finder;
-        $files->in( $this->appPath )->files();
-        if ( $this->skip !== \null ) {
-            foreach ( $this->skip as $name ) {
-                $files->notName( $name );
+        $files = new Finder();
+        $files->in($this->appPath)->name('*.php')->name('*.js')->name('*.phtml');
+        if ($this->skip !== \null) {
+            foreach ($this->skip as $name) {
+                $files->notName($name);
             }
         }
-
-        $filter = function ( \SplFileInfo $file )
-        {
-            if ( !in_array( $file->getExtension(), [ 'php', 'phtml', 'js' ] ) ) {
-                return \false;
-            }
-            return \true;
-        };
-
-        $files->filter( $filter );
-
-        $this->files = $files;
+        return $files->files();
     }
 
     /**
@@ -126,11 +120,12 @@ abstract class _ParserAbstract
      */
     protected function getContent(): string
     {
+        $files = $this->getLocalFiles();
         $content = '';
         /**
          * @var SplFileInfo $file
          */
-        foreach ( $this->files as $file ) {
+        foreach ($files as $file) {
             $content .= $file->getContents();
         }
         return $content;
@@ -144,8 +139,8 @@ abstract class _ParserAbstract
      *
      * @return mixed|null
      */
-    protected function buildPath( $path, $line )
+    protected function buildPath($path, $line)
     {
-        return ( new Editor )->replace( $path, $line );
+        return (new Editor())->replace($path, $line);
     }
 }
