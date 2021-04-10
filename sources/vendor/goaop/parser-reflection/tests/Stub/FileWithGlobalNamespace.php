@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This is test file with global namespace
  */

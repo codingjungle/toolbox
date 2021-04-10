@@ -1,12 +1,9 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node\Stmt;
 
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
-
-use function is_string;
 
 class UseUse extends Node\Stmt
 {
@@ -20,27 +17,20 @@ class UseUse extends Node\Stmt
     /**
      * Constructs an alias (use) node.
      *
-     * @param Node\Name $name Namespace/Class to alias
-     * @param null|string|Identifier $alias Alias
-     * @param int $type Type of the use element (for mixed group use only)
-     * @param array $attributes Additional attributes
+     * @param Node\Name              $name       Namespace/Class to alias
+     * @param null|string|Identifier $alias      Alias
+     * @param int                    $type       Type of the use element (for mixed group use only)
+     * @param array                  $attributes Additional attributes
      */
-    public function __construct(Node\Name $name, $alias = null, int $type = Use_::TYPE_UNKNOWN, array $attributes = [])
-    {
+    public function __construct(Node\Name $name, $alias = null, int $type = Use_::TYPE_UNKNOWN, array $attributes = []) {
         parent::__construct($attributes);
         $this->type = $type;
         $this->name = $name;
-        $this->alias = is_string($alias) ? new Identifier($alias) : $alias;
+        $this->alias = \is_string($alias) ? new Identifier($alias) : $alias;
     }
 
-    public function getSubNodeNames(): array
-    {
+    public function getSubNodeNames() : array {
         return ['type', 'name', 'alias'];
-    }
-
-    public function getType(): string
-    {
-        return 'Stmt_UseUse';
     }
 
     /**
@@ -48,12 +38,15 @@ class UseUse extends Node\Stmt
      *
      * @return Identifier
      */
-    public function getAlias(): Identifier
-    {
+    public function getAlias() : Identifier {
         if (null !== $this->alias) {
             return $this->alias;
         }
 
         return new Identifier($this->name->getLast());
+    }
+    
+    public function getType() : string {
+        return 'Stmt_UseUse';
     }
 }

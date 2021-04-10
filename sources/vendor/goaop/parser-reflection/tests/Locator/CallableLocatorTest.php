@@ -1,10 +1,7 @@
 <?php
-
 namespace Go\ParserReflection\Locator;
 
-use PHPUnit_Framework_TestCase;
-
-class CallableLocatorTest extends PHPUnit_Framework_TestCase
+class CallableLocatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testLocateClass()
     {

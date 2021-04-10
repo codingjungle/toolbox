@@ -19,8 +19,6 @@
 
 namespace Doctrine\Common\Annotations\Annotation;
 
-use RuntimeException;
-
 /**
  * Annotation that can be used to signal to the parser to ignore specific
  * annotations during the parsing process.
@@ -40,7 +38,7 @@ final class IgnoreAnnotation
      *
      * @param array $values
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function __construct(array $values)
     {
@@ -48,8 +46,7 @@ final class IgnoreAnnotation
             $values['value'] = array($values['value']);
         }
         if (!is_array($values['value'])) {
-            throw new RuntimeException(sprintf('@IgnoreAnnotation expects either a string name, or an array of strings, but got %s.',
-                json_encode($values['value'])));
+            throw new \RuntimeException(sprintf('@IgnoreAnnotation expects either a string name, or an array of strings, but got %s.', json_encode($values['value'])));
         }
 
         $this->names = $values['value'];

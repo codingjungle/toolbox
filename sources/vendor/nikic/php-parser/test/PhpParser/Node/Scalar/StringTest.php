@@ -1,17 +1,13 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node\Scalar;
 
-use PHPUnit\Framework\TestCase;
-
-class StringTest extends TestCase
+class StringTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider provideTestParseEscapeSequences
      */
-    public function testParseEscapeSequences($expected, $string, $quote)
-    {
+    public function testParseEscapeSequences($expected, $string, $quote) {
         $this->assertSame(
             $expected,
             String_::parseEscapeSequences($string, $quote)
@@ -21,16 +17,29 @@ class StringTest extends TestCase
     /**
      * @dataProvider provideTestParse
      */
-    public function testCreate($expected, $string)
-    {
+    public function testCreate($expected, $string) {
         $this->assertSame(
             $expected,
             String_::parse($string)
         );
     }
 
-    public function provideTestParse()
-    {
+    public function provideTestParseEscapeSequences() {
+        return [
+            ['"',              '\\"',              '"'],
+            ['\\"',            '\\"',              '`'],
+            ['\\"\\`',         '\\"\\`',           null],
+            ["\\\$\n\r\t\f\v", '\\\\\$\n\r\t\f\v', null],
+            ["\x1B",           '\e',               null],
+            [chr(255),         '\xFF',             null],
+            [chr(255),         '\377',             null],
+            [chr(0),           '\400',             null],
+            ["\0",             '\0',               null],
+            ['\xFF',           '\\\\xFF',          null],
+        ];
+    }
+
+    public function provideTestParse() {
         $tests = [
             ['A', '\'A\''],
             ['A', 'b\'A\''],
@@ -48,21 +57,5 @@ class StringTest extends TestCase
         }
 
         return $tests;
-    }
-
-    public function provideTestParseEscapeSequences()
-    {
-        return [
-            ['"', '\\"', '"'],
-            ['\\"', '\\"', '`'],
-            ['\\"\\`', '\\"\\`', null],
-            ["\\\$\n\r\t\f\v", '\\\\\$\n\r\t\f\v', null],
-            ["\x1B", '\e', null],
-            [chr(255), '\xFF', null],
-            [chr(255), '\377', null],
-            [chr(0), '\400', null],
-            ["\0", '\0', null],
-            ['\xFF', '\\\\xFF', null],
-        ];
     }
 }

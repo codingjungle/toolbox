@@ -1,18 +1,24 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser;
 
 use PhpParser\Node\Expr;
-use PHPUnit\Framework\TestCase;
 
-class NodeFinderTest extends TestCase
+class NodeFinderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testFind()
-    {
-        $finder = new NodeFinder();
+    private function getStmtsAndVars() {
+        $assign = new Expr\Assign(new Expr\Variable('a'), new Expr\BinaryOp\Concat(
+            new Expr\Variable('b'), new Expr\Variable('c')
+        ));
+        $stmts = [new Node\Stmt\Expression($assign)];
+        $vars = [$assign->var, $assign->expr->left, $assign->expr->right];
+        return [$stmts, $vars];
+    }
+
+    public function testFind() {
+        $finder = new NodeFinder;
         list($stmts, $vars) = $this->getStmtsAndVars();
-        $varFilter = function (Node $node) {
+        $varFilter = function(Node $node) {
             return $node instanceof Expr\Variable;
         };
         $this->assertSame($vars, $finder->find($stmts, $varFilter));
@@ -22,30 +28,18 @@ class NodeFinderTest extends TestCase
         $this->assertSame([], $finder->find($stmts, $noneFilter));
     }
 
-    private function getStmtsAndVars()
-    {
-        $assign = new Expr\Assign(new Expr\Variable('a'), new Expr\BinaryOp\Concat(
-            new Expr\Variable('b'), new Expr\Variable('c')
-        ));
-        $stmts = [new Node\Stmt\Expression($assign)];
-        $vars = [$assign->var, $assign->expr->left, $assign->expr->right];
-        return [$stmts, $vars];
-    }
-
-    public function testFindInstanceOf()
-    {
-        $finder = new NodeFinder();
+    public function testFindInstanceOf() {
+        $finder = new NodeFinder;
         list($stmts, $vars) = $this->getStmtsAndVars();
         $this->assertSame($vars, $finder->findInstanceOf($stmts, Expr\Variable::class));
         $this->assertSame($vars, $finder->findInstanceOf($stmts[0], Expr\Variable::class));
         $this->assertSame([], $finder->findInstanceOf($stmts, Expr\BinaryOp\Mul::class));
     }
 
-    public function testFindFirst()
-    {
-        $finder = new NodeFinder();
+    public function testFindFirst() {
+        $finder = new NodeFinder;
         list($stmts, $vars) = $this->getStmtsAndVars();
-        $varFilter = function (Node $node) {
+        $varFilter = function(Node $node) {
             return $node instanceof Expr\Variable;
         };
         $this->assertSame($vars[0], $finder->findFirst($stmts, $varFilter));
@@ -55,9 +49,8 @@ class NodeFinderTest extends TestCase
         $this->assertNull($finder->findFirst($stmts, $noneFilter));
     }
 
-    public function testFindFirstInstanceOf()
-    {
-        $finder = new NodeFinder();
+    public function testFindFirstInstanceOf() {
+        $finder = new NodeFinder;
         list($stmts, $vars) = $this->getStmtsAndVars();
         $this->assertSame($vars[0], $finder->findFirstInstanceOf($stmts, Expr\Variable::class));
         $this->assertSame($vars[0], $finder->findFirstInstanceOf($stmts[0], Expr\Variable::class));

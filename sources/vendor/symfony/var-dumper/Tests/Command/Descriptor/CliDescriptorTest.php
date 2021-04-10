@@ -72,11 +72,11 @@ TXT
         yield 'source full' => [
             [
                 'source' => [
-                    'name'          => 'CliDescriptorTest.php',
-                    'line'          => 30,
+                    'name' => 'CliDescriptorTest.php',
+                    'line' => 30,
                     'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
-                    'file'          => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
-                    'file_link'     => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
+                    'file' => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
+                    'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
                 ],
             ],
             <<<TXT
@@ -97,7 +97,7 @@ TXT
         yield 'cli' => [
             [
                 'cli' => [
-                    'identifier'   => 'd8bece1c',
+                    'identifier' => 'd8bece1c',
                     'command_line' => 'bin/phpunit',
                 ],
             ],
@@ -116,8 +116,8 @@ TXT
                 'request' => [
                     'identifier' => 'd8bece1c',
                     'controller' => new Data([['FooController.php']]),
-                    'method'     => 'GET',
-                    'uri'        => 'http://localhost/foo',
+                    'method' => 'GET',
+                    'uri' => 'http://localhost/foo',
                 ],
             ],
             <<<TXT

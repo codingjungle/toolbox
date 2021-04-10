@@ -1,18 +1,20 @@
 <?php
-
 namespace Go\ParserReflection\ValueResolver;
 
-use DateTime;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
-use PHPUnit_Framework_TestCase;
 
-class NodeExpressionResolverTest extends PHPUnit_Framework_TestCase
+class NodeExpressionResolverTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var null|Parser
      */
     protected $parser = null;
+
+    protected function setUp()
+    {
+        $this->parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+    }
 
     /**
      * Testing passing PhpParser\Node\Expr as class for constant fetch
@@ -23,9 +25,9 @@ class NodeExpressionResolverTest extends PHPUnit_Framework_TestCase
     public function testResolveConstFetchFromExpressionAsClass()
     {
         $expressionNodeTree = $this->parser->parse("<?php ('\\\\Date' . 'Time')::ATOM;");
-        $expressionSolver = new NodeExpressionResolver(null);
+        $expressionSolver = new NodeExpressionResolver(NULL);
         $expressionSolver->process($expressionNodeTree[0]);
-        $this->assertEquals(DateTime::ATOM, $expressionSolver->getValue());
+        $this->assertEquals(\DateTime::ATOM, $expressionSolver->getValue());
         $this->assertTrue($expressionSolver->isConstant());
         $this->assertEquals('DateTime::ATOM', $expressionSolver->getConstantName());
     }
@@ -41,7 +43,7 @@ class NodeExpressionResolverTest extends PHPUnit_Framework_TestCase
     public function testResolveConstFetchFromVariableAsClass()
     {
         $expressionNodeTree = $this->parser->parse("<?php \$someVariable::FOO;");
-        $expressionSolver = new NodeExpressionResolver(null);
+        $expressionSolver = new NodeExpressionResolver(NULL);
         $expressionSolver->process($expressionNodeTree[0]);
     }
 
@@ -59,12 +61,7 @@ class NodeExpressionResolverTest extends PHPUnit_Framework_TestCase
         $notAnExpressionNodeTree = $this->parser->parse("<?php if (true) { \$baz = 3; }");
         // This should never happen...
         $expressionNodeTree[0]->expr->class = $notAnExpressionNodeTree[0];
-        $expressionSolver = new NodeExpressionResolver(null);
+        $expressionSolver = new NodeExpressionResolver(NULL);
         $expressionSolver->process($expressionNodeTree[0]);
-    }
-
-    protected function setUp()
-    {
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
     }
 }

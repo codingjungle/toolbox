@@ -1,12 +1,9 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node\Expr;
 
 use PhpParser\Node\Expr;
 use PhpParser\Node\Identifier;
-
-use function is_string;
 
 class PropertyFetch extends Expr
 {
@@ -18,24 +15,21 @@ class PropertyFetch extends Expr
     /**
      * Constructs a function call node.
      *
-     * @param Expr $var Variable holding object
-     * @param string|Identifier|Expr $name Property name
-     * @param array $attributes Additional attributes
+     * @param Expr                   $var        Variable holding object
+     * @param string|Identifier|Expr $name       Property name
+     * @param array                  $attributes Additional attributes
      */
-    public function __construct(Expr $var, $name, array $attributes = [])
-    {
+    public function __construct(Expr $var, $name, array $attributes = []) {
         parent::__construct($attributes);
         $this->var = $var;
-        $this->name = is_string($name) ? new Identifier($name) : $name;
+        $this->name = \is_string($name) ? new Identifier($name) : $name;
     }
 
-    public function getSubNodeNames(): array
-    {
+    public function getSubNodeNames() : array {
         return ['var', 'name'];
     }
-
-    public function getType(): string
-    {
+    
+    public function getType() : string {
         return 'Expr_PropertyFetch';
     }
 }

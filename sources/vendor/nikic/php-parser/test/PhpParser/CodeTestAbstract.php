@@ -1,15 +1,11 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser;
 
-use PHPUnit\Framework\TestCase;
-
-abstract class CodeTestAbstract extends TestCase
+abstract class CodeTestAbstract extends \PHPUnit\Framework\TestCase
 {
-    protected function getTests($directory, $fileExtension, $chunksPerTest = 2)
-    {
-        $parser = new CodeTestParser();
+    protected function getTests($directory, $fileExtension, $chunksPerTest = 2) {
+        $parser = new CodeTestParser;
         $allTests = [];
         foreach (filesInDir($directory, $fileExtension) as $fileName => $fileContents) {
             list($name, $tests) = $parser->parseTest($fileContents, $chunksPerTest);

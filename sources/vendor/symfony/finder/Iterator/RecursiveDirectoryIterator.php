@@ -11,14 +11,8 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-use RecursiveArrayIterator;
-use RecursiveIterator;
-use RuntimeException;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Finder\SplFileInfo;
-use UnexpectedValueException;
-
-use const DIRECTORY_SEPARATOR;
 
 /**
  * Extends the \RecursiveDirectoryIterator to support relative paths.
@@ -43,19 +37,19 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     private $directorySeparator = '/';
 
     /**
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function __construct(string $path, int $flags, bool $ignoreUnreadableDirs = false)
     {
         if ($flags & (self::CURRENT_AS_PATHNAME | self::CURRENT_AS_SELF)) {
-            throw new RuntimeException('This iterator only support returning current as fileinfo.');
+            throw new \RuntimeException('This iterator only support returning current as fileinfo.');
         }
 
         parent::__construct($path, $flags);
         $this->ignoreUnreadableDirs = $ignoreUnreadableDirs;
         $this->rootPath = $path;
-        if ('/' !== DIRECTORY_SEPARATOR && !($flags & self::UNIX_PATHS)) {
-            $this->directorySeparator = DIRECTORY_SEPARATOR;
+        if ('/' !== \DIRECTORY_SEPARATOR && !($flags & self::UNIX_PATHS)) {
+            $this->directorySeparator = \DIRECTORY_SEPARATOR;
         }
     }
 
@@ -69,19 +63,18 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         // the logic here avoids redoing the same work in all iterations
 
         if (null === $subPathname = $this->subPath) {
-            $subPathname = $this->subPath = (string)$this->getSubPath();
+            $subPathname = $this->subPath = (string) $this->getSubPath();
         }
         if ('' !== $subPathname) {
             $subPathname .= $this->directorySeparator;
         }
         $subPathname .= $this->getFilename();
 
-        return new SplFileInfo($this->rootPath . $this->directorySeparator . $subPathname, $this->subPath,
-            $subPathname);
+        return new SplFileInfo($this->rootPath.$this->directorySeparator.$subPathname, $this->subPath, $subPathname);
     }
 
     /**
-     * @return RecursiveIterator
+     * @return \RecursiveIterator
      *
      * @throws AccessDeniedException
      */
@@ -100,10 +93,10 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             }
 
             return $children;
-        } catch (UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             if ($this->ignoreUnreadableDirs) {
                 // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.
-                return new RecursiveArrayIterator([]);
+                return new \RecursiveArrayIterator([]);
             } else {
                 throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
             }

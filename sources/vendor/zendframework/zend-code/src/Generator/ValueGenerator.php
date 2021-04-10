@@ -35,26 +35,26 @@ class ValueGenerator extends AbstractGenerator
     /**#@+
      * Constant values
      */
-    public const TYPE_AUTO = 'auto';
-    public const TYPE_BOOLEAN = 'boolean';
-    public const TYPE_BOOL = 'bool';
-    public const TYPE_NUMBER = 'number';
-    public const TYPE_INTEGER = 'integer';
-    public const TYPE_INT = 'int';
-    public const TYPE_FLOAT = 'float';
-    public const TYPE_DOUBLE = 'double';
-    public const TYPE_STRING = 'string';
-    public const TYPE_ARRAY = 'array';
-    public const TYPE_ARRAY_SHORT = 'array_short';
-    public const TYPE_ARRAY_LONG = 'array_long';
-    public const TYPE_CONSTANT = 'constant';
-    public const TYPE_NULL = 'null';
-    public const TYPE_OBJECT = 'object';
-    public const TYPE_OTHER = 'other';
+    const TYPE_AUTO        = 'auto';
+    const TYPE_BOOLEAN     = 'boolean';
+    const TYPE_BOOL        = 'bool';
+    const TYPE_NUMBER      = 'number';
+    const TYPE_INTEGER     = 'integer';
+    const TYPE_INT         = 'int';
+    const TYPE_FLOAT       = 'float';
+    const TYPE_DOUBLE      = 'double';
+    const TYPE_STRING      = 'string';
+    const TYPE_ARRAY       = 'array';
+    const TYPE_ARRAY_SHORT = 'array_short';
+    const TYPE_ARRAY_LONG  = 'array_long';
+    const TYPE_CONSTANT    = 'constant';
+    const TYPE_NULL        = 'null';
+    const TYPE_OBJECT      = 'object';
+    const TYPE_OTHER       = 'other';
     /**#@-*/
 
-    public const OUTPUT_MULTIPLE_LINE = 'multipleLine';
-    public const OUTPUT_SINGLE_LINE = 'singleLine';
+    const OUTPUT_MULTIPLE_LINE = 'multipleLine';
+    const OUTPUT_SINGLE_LINE   = 'singleLine';
 
     /**
      * @var mixed
@@ -89,9 +89,9 @@ class ValueGenerator extends AbstractGenerator
     protected $constants;
 
     /**
-     * @param mixed $value
-     * @param string $type
-     * @param string $outputMode
+     * @param mixed       $value
+     * @param string      $type
+     * @param string      $outputMode
      * @param null|SplArrayObject|StdlibArrayObject $constants
      */
     public function __construct(
@@ -112,7 +112,7 @@ class ValueGenerator extends AbstractGenerator
         }
         if ($constants === null) {
             $constants = new SplArrayObject();
-        } elseif (!($constants instanceof SplArrayObject || $constants instanceof StdlibArrayObject)) {
+        } elseif (! ($constants instanceof SplArrayObject || $constants instanceof StdlibArrayObject)) {
             throw new InvalidArgumentException(
                 '$constants must be an instance of ArrayObject or Zend\Stdlib\ArrayObject'
             );
@@ -125,7 +125,7 @@ class ValueGenerator extends AbstractGenerator
      */
     public function initEnvironmentConstants()
     {
-        $constants = [
+        $constants   = [
             '__DIR__',
             '__FILE__',
             '__LINE__',
@@ -171,6 +171,16 @@ class ValueGenerator extends AbstractGenerator
     }
 
     /**
+     * Return constant list
+     *
+     * @return SplArrayObject|StdlibArrayObject
+     */
+    public function getConstants()
+    {
+        return $this->constants;
+    }
+
+    /**
      * @return bool
      */
     public function isValidConstantType()
@@ -201,7 +211,93 @@ class ValueGenerator extends AbstractGenerator
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed $value
+     * @return ValueGenerator
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param  string $type
+     * @return ValueGenerator
+     */
+    public function setType($type)
+    {
+        $this->type = (string) $type;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param  int $arrayDepth
+     * @return ValueGenerator
+     */
+    public function setArrayDepth($arrayDepth)
+    {
+        $this->arrayDepth = (int) $arrayDepth;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getArrayDepth()
+    {
+        return $this->arrayDepth;
+    }
+
+    /**
+     * @param  string $type
+     * @return string
+     */
+    protected function getValidatedType($type)
+    {
+        $types = [
+            self::TYPE_AUTO,
+            self::TYPE_BOOLEAN,
+            self::TYPE_BOOL,
+            self::TYPE_NUMBER,
+            self::TYPE_INTEGER,
+            self::TYPE_INT,
+            self::TYPE_FLOAT,
+            self::TYPE_DOUBLE,
+            self::TYPE_STRING,
+            self::TYPE_ARRAY,
+            self::TYPE_ARRAY_SHORT,
+            self::TYPE_ARRAY_LONG,
+            self::TYPE_CONSTANT,
+            self::TYPE_NULL,
+            self::TYPE_OBJECT,
+            self::TYPE_OTHER,
+        ];
+
+        if (in_array($type, $types)) {
+            return $type;
+        }
+
+        return self::TYPE_AUTO;
+    }
+
+    /**
+     * @param  mixed $value
      * @return string
      */
     public function getAutoDeterminedType($value)
@@ -233,85 +329,8 @@ class ValueGenerator extends AbstractGenerator
     }
 
     /**
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * @param mixed $value
-     * @return ValueGenerator
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     * @return ValueGenerator
-     */
-    public function setType($type)
-    {
-        $this->type = (string)$type;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getArrayDepth()
-    {
-        return $this->arrayDepth;
-    }
-
-    /**
-     * @param int $arrayDepth
-     * @return ValueGenerator
-     */
-    public function setArrayDepth($arrayDepth)
-    {
-        $this->arrayDepth = (int)$arrayDepth;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOutputMode()
-    {
-        return $this->outputMode;
-    }
-
-    /**
-     * @param string $outputMode
-     * @return ValueGenerator
-     */
-    public function setOutputMode($outputMode)
-    {
-        $this->outputMode = (string)$outputMode;
-        return $this;
-    }
-
-    public function __toString()
-    {
-        return $this->generate();
-    }
-
-    /**
-     * @return string
      * @throws Exception\RuntimeException
+     * @return string
      */
     public function generate()
     {
@@ -371,7 +390,7 @@ class ValueGenerator extends AbstractGenerator
             case self::TYPE_ARRAY_SHORT:
                 if ($type === self::TYPE_ARRAY_LONG) {
                     $startArray = 'array(';
-                    $endArray = ')';
+                    $endArray   = ')';
                 } else {
                     $startArray = '[';
                     $endArray = ']';
@@ -382,7 +401,7 @@ class ValueGenerator extends AbstractGenerator
                     $output .= self::LINE_FEED . str_repeat($this->indentation, $this->arrayDepth + 1);
                 }
                 $outputParts = [];
-                $noKeyIndex = 0;
+                $noKeyIndex  = 0;
                 foreach ($value as $n => $v) {
                     /* @var $v ValueGenerator */
                     $v->setArrayDepth($this->arrayDepth + 1);
@@ -426,52 +445,10 @@ class ValueGenerator extends AbstractGenerator
     }
 
     /**
-     * @param string $type
-     * @return string
-     */
-    protected function getValidatedType($type)
-    {
-        $types = [
-            self::TYPE_AUTO,
-            self::TYPE_BOOLEAN,
-            self::TYPE_BOOL,
-            self::TYPE_NUMBER,
-            self::TYPE_INTEGER,
-            self::TYPE_INT,
-            self::TYPE_FLOAT,
-            self::TYPE_DOUBLE,
-            self::TYPE_STRING,
-            self::TYPE_ARRAY,
-            self::TYPE_ARRAY_SHORT,
-            self::TYPE_ARRAY_LONG,
-            self::TYPE_CONSTANT,
-            self::TYPE_NULL,
-            self::TYPE_OBJECT,
-            self::TYPE_OTHER,
-        ];
-
-        if (in_array($type, $types)) {
-            return $type;
-        }
-
-        return self::TYPE_AUTO;
-    }
-
-    /**
-     * Return constant list
-     *
-     * @return SplArrayObject|StdlibArrayObject
-     */
-    public function getConstants()
-    {
-        return $this->constants;
-    }
-
-    /**
      * Quotes value for PHP code.
      *
-     * @param string $input Raw string.
-     * @param bool $quote Whether add surrounding quotes or not.
+     * @param  string $input Raw string.
+     * @param  bool $quote Whether add surrounding quotes or not.
      * @return string PHP-ready code.
      */
     public static function escape($input, $quote = true)
@@ -484,5 +461,28 @@ class ValueGenerator extends AbstractGenerator
         }
 
         return $output;
+    }
+
+    /**
+     * @param  string $outputMode
+     * @return ValueGenerator
+     */
+    public function setOutputMode($outputMode)
+    {
+        $this->outputMode = (string) $outputMode;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOutputMode()
+    {
+        return $this->outputMode;
+    }
+
+    public function __toString()
+    {
+        return $this->generate();
     }
 }

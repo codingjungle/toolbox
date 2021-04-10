@@ -9,15 +9,13 @@
 
 namespace Zend\Code\Generator\DocBlock;
 
-use ReflectionClass;
-use ReflectionMethod;
 use Zend\Code\Generator\DocBlock\Tag\TagInterface;
 use Zend\Code\Generic\Prototype\PrototypeClassFactory;
 use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ReflectionTagInterface;
 
 use function method_exists;
-use function strpos;
 use function substr;
+use function strpos;
 use function ucfirst;
 
 /**
@@ -58,8 +56,8 @@ class TagManager extends PrototypeClassFactory
         $newTag = $this->getClonedPrototype($tagName);
 
         // transport any properties via accessors and mutators from reflection to codegen object
-        $reflectionClass = new ReflectionClass($reflectionTag);
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+        $reflectionClass = new \ReflectionClass($reflectionTag);
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
             if (0 === strpos($method->getName(), 'get')) {
                 $propertyName = substr($method->getName(), 3);
                 if (method_exists($newTag, 'set' . $propertyName)) {

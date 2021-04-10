@@ -9,8 +9,6 @@
 
 namespace Zend\Code\Annotation\Parser;
 
-use stdClass;
-use Traversable;
 use Zend\EventManager\EventInterface;
 
 interface ParserInterface
@@ -18,15 +16,15 @@ interface ParserInterface
     /**
      * Respond to the "createAnnotation" event
      *
-     * @param EventInterface $e
-     * @return false|stdClass
+     * @param  EventInterface  $e
+     * @return false|\stdClass
      */
     public function onCreateAnnotation(EventInterface $e);
 
     /**
      * Register an annotation this parser will accept
      *
-     * @param mixed $annotation
+     * @param  mixed $annotation
      * @return void
      */
     public function registerAnnotation($annotation);
@@ -34,7 +32,7 @@ interface ParserInterface
     /**
      * Register multiple annotations this parser will accept
      *
-     * @param array|Traversable $annotations
+     * @param  array|\Traversable $annotations
      * @return void
      */
     public function registerAnnotations($annotations);

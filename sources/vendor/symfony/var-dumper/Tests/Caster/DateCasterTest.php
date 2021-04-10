@@ -11,20 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use DateInterval;
-use DatePeriod;
-use DateTime;
-use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\DateCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
-
-use function extension_loaded;
-use function is_int;
-
-use const PHP_VERSION_ID;
 
 /**
  * @author Dany Maillard <danymaillard93b@gmail.com>
@@ -38,7 +29,7 @@ class DateCasterTest extends TestCase
      */
     public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp)
     {
-        $date = new DateTime($time, new DateTimeZone($timezone));
+        $date = new \DateTime($time, new \DateTimeZone($timezone));
 
         $xDump = <<<EODUMP
 DateTime @$xTimestamp {
@@ -55,7 +46,7 @@ EODUMP;
     public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
         $stub = new Stub();
-        $date = new DateTime($time, new DateTimeZone($timezone));
+        $date = new \DateTime($time, new \DateTimeZone($timezone));
         $cast = DateCaster::castDateTime($date, ['foo' => 'bar'], $stub, false, 0);
 
         $xDump = <<<EODUMP
@@ -85,70 +76,16 @@ EODUMP;
     public function provideDateTimes()
     {
         return [
-            [
-                '2017-04-30 00:00:00.000000',
-                'Europe/Zurich',
-                '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)',
-                1493503200,
-                'Sunday, April 30, 2017%Afrom now%ADST On'
-            ],
-            [
-                '2017-12-31 00:00:00.000000',
-                'Europe/Zurich',
-                '2017-12-31 00:00:00.0 Europe/Zurich (+01:00)',
-                1514674800,
-                'Sunday, December 31, 2017%Afrom now%ADST Off'
-            ],
-            [
-                '2017-04-30 00:00:00.000000',
-                '+02:00',
-                '2017-04-30 00:00:00.0 +02:00',
-                1493503200,
-                'Sunday, April 30, 2017%Afrom now'
-            ],
+            ['2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)', 1493503200, 'Sunday, April 30, 2017%Afrom now%ADST On'],
+            ['2017-12-31 00:00:00.000000', 'Europe/Zurich', '2017-12-31 00:00:00.0 Europe/Zurich (+01:00)', 1514674800, 'Sunday, December 31, 2017%Afrom now%ADST Off'],
+            ['2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.0 +02:00', 1493503200, 'Sunday, April 30, 2017%Afrom now'],
 
-            [
-                '2017-04-30 00:00:00.100000',
-                '+00:00',
-                '2017-04-30 00:00:00.100 +00:00',
-                1493510400,
-                'Sunday, April 30, 2017%Afrom now'
-            ],
-            [
-                '2017-04-30 00:00:00.120000',
-                '+00:00',
-                '2017-04-30 00:00:00.120 +00:00',
-                1493510400,
-                'Sunday, April 30, 2017%Afrom now'
-            ],
-            [
-                '2017-04-30 00:00:00.123000',
-                '+00:00',
-                '2017-04-30 00:00:00.123 +00:00',
-                1493510400,
-                'Sunday, April 30, 2017%Afrom now'
-            ],
-            [
-                '2017-04-30 00:00:00.123400',
-                '+00:00',
-                '2017-04-30 00:00:00.123400 +00:00',
-                1493510400,
-                'Sunday, April 30, 2017%Afrom now'
-            ],
-            [
-                '2017-04-30 00:00:00.123450',
-                '+00:00',
-                '2017-04-30 00:00:00.123450 +00:00',
-                1493510400,
-                'Sunday, April 30, 2017%Afrom now'
-            ],
-            [
-                '2017-04-30 00:00:00.123456',
-                '+00:00',
-                '2017-04-30 00:00:00.123456 +00:00',
-                1493510400,
-                'Sunday, April 30, 2017%Afrom now'
-            ],
+            ['2017-04-30 00:00:00.100000', '+00:00', '2017-04-30 00:00:00.100 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.120000', '+00:00', '2017-04-30 00:00:00.120 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123000', '+00:00', '2017-04-30 00:00:00.123 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123400', '+00:00', '2017-04-30 00:00:00.123400 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123450', '+00:00', '2017-04-30 00:00:00.123450 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123456', '+00:00', '2017-04-30 00:00:00.123456 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
         ];
     }
 
@@ -157,7 +94,7 @@ EODUMP;
      */
     public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
     {
-        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
+        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
         }
 
@@ -172,21 +109,12 @@ EODUMP;
         $this->assertDumpMatchesFormat($xDump, $interval);
     }
 
-    private function createInterval($intervalSpec, $ms, $invert)
-    {
-        $interval = new DateInterval($intervalSpec);
-        $interval->f = $ms;
-        $interval->invert = $invert;
-
-        return $interval;
-    }
-
     /**
      * @dataProvider provideIntervals
      */
     public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
     {
-        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
+        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
         }
 
@@ -206,7 +134,7 @@ EODUMP;
      */
     public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
     {
-        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
+        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
         }
 
@@ -281,7 +209,7 @@ EODUMP;
      */
     public function testDumpTimeZone($timezone, $expected)
     {
-        $timezone = new DateTimeZone($timezone);
+        $timezone = new \DateTimeZone($timezone);
 
         $xDump = <<<EODUMP
 DateTimeZone {
@@ -297,7 +225,7 @@ EODUMP;
      */
     public function testDumpTimeZoneExcludingVerbosity($timezone, $expected)
     {
-        $timezone = new DateTimeZone($timezone);
+        $timezone = new \DateTimeZone($timezone);
 
         $xDump = <<<EODUMP
 DateTimeZone {
@@ -313,7 +241,7 @@ EODUMP;
      */
     public function testCastTimeZone($timezone, $xTimezone, $xRegion)
     {
-        $timezone = new DateTimeZone($timezone);
+        $timezone = new \DateTimeZone($timezone);
         $stub = new Stub();
 
         $cast = DateCaster::castTimeZone($timezone, ['foo' => 'bar'], $stub, false, Caster::EXCLUDE_VERBOSE);
@@ -344,7 +272,7 @@ EODUMP;
 
     public function provideTimeZones()
     {
-        $xRegion = extension_loaded('intl') ? '%s' : '';
+        $xRegion = \extension_loaded('intl') ? '%s' : '';
 
         return [
             // type 1 (UTC offset)
@@ -374,8 +302,7 @@ EODUMP;
      */
     public function testDumpPeriod($start, $interval, $end, $options, $expected)
     {
-        $p = new DatePeriod(new DateTime($start), new DateInterval($interval),
-            is_int($end) ? $end : new DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
 
         $xDump = <<<EODUMP
 DatePeriod {
@@ -391,8 +318,7 @@ EODUMP;
      */
     public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
     {
-        $p = new DatePeriod(new DateTime($start), new DateInterval($interval),
-            is_int($end) ? $end : new DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
         $stub = new Stub();
 
         $cast = DateCaster::castPeriod($p, [], $stub, false, 0);
@@ -424,130 +350,41 @@ EODUMP;
     public function providePeriods()
     {
         $periods = [
-            [
-                '2017-01-01',
-                'P1D',
-                '2017-01-03',
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0',
-                '1) 2017-01-01%a2) 2017-01-02'
-            ],
-            [
-                '2017-01-01',
-                'P1D',
-                1,
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s',
-                '1) 2017-01-01%a2) 2017-01-02'
-            ],
+            ['2017-01-01', 'P1D', '2017-01-03', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02'],
+            ['2017-01-01', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01%a2) 2017-01-02'],
 
-            [
-                '2017-01-01',
-                'P1D',
-                '2017-01-04',
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-04 00:00:00.0',
-                '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'
-            ],
-            [
-                '2017-01-01',
-                'P1D',
-                2,
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 3 time/s',
-                '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'
-            ],
+            ['2017-01-01', 'P1D', '2017-01-04', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-04 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'],
+            ['2017-01-01', 'P1D', 2, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 3 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'],
 
-            [
-                '2017-01-01',
-                'P1D',
-                '2017-01-05',
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-05 00:00:00.0',
-                '1) 2017-01-01%a2) 2017-01-02%a1 more'
-            ],
-            [
-                '2017-01-01',
-                'P1D',
-                3,
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 4 time/s',
-                '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03%a1 more'
-            ],
+            ['2017-01-01', 'P1D', '2017-01-05', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-05 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a1 more'],
+            ['2017-01-01', 'P1D', 3, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 4 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03%a1 more'],
 
-            [
-                '2017-01-01',
-                'P1D',
-                '2017-01-21',
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-21 00:00:00.0',
-                '1) 2017-01-01%a17 more'
-            ],
-            [
-                '2017-01-01',
-                'P1D',
-                19,
-                0,
-                'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 20 time/s',
-                '1) 2017-01-01%a17 more'
-            ],
+            ['2017-01-01', 'P1D', '2017-01-21', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-21 00:00:00.0', '1) 2017-01-01%a17 more'],
+            ['2017-01-01', 'P1D', 19, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 20 time/s', '1) 2017-01-01%a17 more'],
 
-            [
-                '2017-01-01 01:00:00',
-                'P1D',
-                '2017-01-03 01:00:00',
-                0,
-                'every + 1d, from 2017-01-01 01:00:00.0 (included) to 2017-01-03 01:00:00.0',
-                '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'
-            ],
-            [
-                '2017-01-01 01:00:00',
-                'P1D',
-                1,
-                0,
-                'every + 1d, from 2017-01-01 01:00:00.0 (included) recurring 2 time/s',
-                '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'
-            ],
+            ['2017-01-01 01:00:00', 'P1D', '2017-01-03 01:00:00', 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) to 2017-01-03 01:00:00.0', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'],
+            ['2017-01-01 01:00:00', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'],
 
-            [
-                '2017-01-01',
-                'P1DT1H',
-                '2017-01-03',
-                0,
-                'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0',
-                '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'
-            ],
-            [
-                '2017-01-01',
-                'P1DT1H',
-                1,
-                0,
-                'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s',
-                '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'
-            ],
+            ['2017-01-01', 'P1DT1H', '2017-01-03', 0, 'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0', '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'],
+            ['2017-01-01', 'P1DT1H', 1, 0, 'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'],
 
-            [
-                '2017-01-01',
-                'P1D',
-                '2017-01-04',
-                DatePeriod::EXCLUDE_START_DATE,
-                'every + 1d, from 2017-01-01 00:00:00.0 (excluded) to 2017-01-04 00:00:00.0',
-                '1) 2017-01-02%a2) 2017-01-03'
-            ],
-            [
-                '2017-01-01',
-                'P1D',
-                2,
-                DatePeriod::EXCLUDE_START_DATE,
-                'every + 1d, from 2017-01-01 00:00:00.0 (excluded) recurring 2 time/s',
-                '1) 2017-01-02%a2) 2017-01-03'
-            ],
+            ['2017-01-01', 'P1D', '2017-01-04', \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) to 2017-01-04 00:00:00.0', '1) 2017-01-02%a2) 2017-01-03'],
+            ['2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'],
         ];
 
-        if (PHP_VERSION_ID < 70107) {
+        if (\PHP_VERSION_ID < 70107) {
             array_walk($periods, function (&$i) { $i[5] = ''; });
         }
 
         return $periods;
+    }
+
+    private function createInterval($intervalSpec, $ms, $invert)
+    {
+        $interval = new \DateInterval($intervalSpec);
+        $interval->f = $ms;
+        $interval->invert = $invert;
+
+        return $interval;
     }
 }

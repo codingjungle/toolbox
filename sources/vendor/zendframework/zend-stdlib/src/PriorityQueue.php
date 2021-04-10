@@ -27,9 +27,9 @@ use Serializable;
  */
 class PriorityQueue implements Countable, IteratorAggregate, Serializable
 {
-    public const EXTR_DATA = 0x00000001;
-    public const EXTR_PRIORITY = 0x00000002;
-    public const EXTR_BOTH = 0x00000003;
+    const EXTR_DATA     = 0x00000001;
+    const EXTR_PRIORITY = 0x00000002;
+    const EXTR_BOTH     = 0x00000003;
 
     /**
      * Inner queue class to use for iteration
@@ -42,13 +42,33 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
      * with keys "data" and "priority".
      * @var array
      */
-    protected $items = [];
+    protected $items      = [];
 
     /**
      * Inner queue object
      * @var SplPriorityQueue
      */
     protected $queue;
+
+    /**
+     * Insert an item into the queue
+     *
+     * Priority defaults to 1 (low priority) if none provided.
+     *
+     * @param  mixed $data
+     * @param  int $priority
+     * @return PriorityQueue
+     */
+    public function insert($data, $priority = 1)
+    {
+        $priority = (int) $priority;
+        $this->items[] = [
+            'data'     => $data,
+            'priority' => $priority,
+        ];
+        $this->getQueue()->insert($data, $priority);
+        return $this;
+    }
 
     /**
      * Remove an item from the queue
@@ -63,7 +83,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
      * the same item has been added multiple times, it will not remove other
      * instances.
      *
-     * @param mixed $datum
+     * @param  mixed $datum
      * @return bool False if the item was not found, true otherwise.
      */
     public function remove($datum)
@@ -79,7 +99,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
             unset($this->items[$key]);
             $this->queue = null;
 
-            if (!$this->isEmpty()) {
+            if (! $this->isEmpty()) {
                 $queue = $this->getQueue();
                 foreach ($this->items as $item) {
                     $queue->insert($item['data'], $item['priority']);
@@ -111,26 +131,6 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
     }
 
     /**
-     * Get the inner priority queue instance
-     *
-     * @return SplPriorityQueue
-     * @throws Exception\DomainException
-     */
-    protected function getQueue()
-    {
-        if (null === $this->queue) {
-            $this->queue = new $this->queueClass();
-            if (!$this->queue instanceof \SplPriorityQueue) {
-                throw new Exception\DomainException(sprintf(
-                    'PriorityQueue expects an internal queue of type SplPriorityQueue; received "%s"',
-                    get_class($this->queue)
-                ));
-            }
-        }
-        return $this->queue;
-    }
-
-    /**
      * Peek at the top node in the queue, based on priority.
      *
      * @return mixed
@@ -138,6 +138,16 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
     public function top()
     {
         return $this->getIterator()->top();
+    }
+
+    /**
+     * Extract a node from the inner queue and sift up
+     *
+     * @return mixed
+     */
+    public function extract()
+    {
+        return $this->getQueue()->extract();
     }
 
     /**
@@ -159,16 +169,6 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
     }
 
     /**
-     * Extract a node from the inner queue and sift up
-     *
-     * @return mixed
-     */
-    public function extract()
-    {
-        return $this->getQueue()->extract();
-    }
-
-    /**
      * Serialize the data structure
      *
      * @return string
@@ -183,7 +183,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
      *
      * Serialization format is compatible with {@link Zend\Stdlib\SplPriorityQueue}
      *
-     * @param string $data
+     * @param  string $data
      * @return void
      */
     public function unserialize($data)
@@ -194,33 +194,13 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
     }
 
     /**
-     * Insert an item into the queue
-     *
-     * Priority defaults to 1 (low priority) if none provided.
-     *
-     * @param mixed $data
-     * @param int $priority
-     * @return PriorityQueue
-     */
-    public function insert($data, $priority = 1)
-    {
-        $priority = (int)$priority;
-        $this->items[] = [
-            'data'     => $data,
-            'priority' => $priority,
-        ];
-        $this->getQueue()->insert($data, $priority);
-        return $this;
-    }
-
-    /**
      * Serialize to an array
      *
      * By default, returns only the item data, and in the order registered (not
      * sorted). You may provide one of the EXTR_* flags as an argument, allowing
      * the ability to return priorities or both data and priority.
      *
-     * @param int $flag
+     * @param  int $flag
      * @return array
      */
     public function toArray($flag = self::EXTR_DATA)
@@ -246,19 +226,19 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
      * Please see {@link getIterator()} for details on the necessity of an
      * internal queue class. The class provided should extend SplPriorityQueue.
      *
-     * @param string $class
+     * @param  string $class
      * @return PriorityQueue
      */
     public function setInternalQueueClass($class)
     {
-        $this->queueClass = (string)$class;
+        $this->queueClass = (string) $class;
         return $this;
     }
 
     /**
      * Does the queue contain the given datum?
      *
-     * @param mixed $datum
+     * @param  mixed $datum
      * @return bool
      */
     public function contains($datum)
@@ -274,7 +254,7 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
     /**
      * Does the queue have an item with the given priority?
      *
-     * @param int $priority
+     * @param  int $priority
      * @return bool
      */
     public function hasPriority($priority)
@@ -285,6 +265,26 @@ class PriorityQueue implements Countable, IteratorAggregate, Serializable
             }
         }
         return false;
+    }
+
+    /**
+     * Get the inner priority queue instance
+     *
+     * @throws Exception\DomainException
+     * @return SplPriorityQueue
+     */
+    protected function getQueue()
+    {
+        if (null === $this->queue) {
+            $this->queue = new $this->queueClass();
+            if (! $this->queue instanceof \SplPriorityQueue) {
+                throw new Exception\DomainException(sprintf(
+                    'PriorityQueue expects an internal queue of type SplPriorityQueue; received "%s"',
+                    get_class($this->queue)
+                ));
+            }
+        }
+        return $this->queue;
     }
 
     /**

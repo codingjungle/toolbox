@@ -76,8 +76,8 @@ class FileReflection implements ReflectionInterface
     protected $contents;
 
     /**
-     * @param string $filename
-     * @param bool $includeIfNotAlreadyIncluded
+     * @param  string $filename
+     * @param  bool $includeIfNotAlreadyIncluded
      * @throws Exception\InvalidArgumentException If file does not exists
      * @throws Exception\RuntimeException If file exists but is not included or required
      */
@@ -87,15 +87,15 @@ class FileReflection implements ReflectionInterface
             $fileRealPath = stream_resolve_include_path($filename);
         }
 
-        if (!$fileRealPath) {
+        if (! $fileRealPath) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'No file for %s was found.',
                 $filename
             ));
         }
 
-        if (!in_array($fileRealPath, get_included_files())) {
-            if (!$includeIfNotAlreadyIncluded) {
+        if (! in_array($fileRealPath, get_included_files())) {
+            if (! $includeIfNotAlreadyIncluded) {
                 throw new Exception\RuntimeException(sprintf(
                     'File %s must be required before it can be reflected',
                     $filename
@@ -110,20 +110,13 @@ class FileReflection implements ReflectionInterface
     }
 
     /**
-     * This method does the work of "reflecting" the file
+     * Required by the Reflector interface.
      *
-     * Uses Zend\Code\Scanner\FileScanner to gather file information
-     *
+     * @todo   What should this do?
      * @return void
      */
-    protected function reflect()
+    public static function export()
     {
-        $scanner = new CachingFileScanner($this->filePath);
-        $this->docComment = $scanner->getDocComment();
-        $this->requiredFiles = $scanner->getIncludes();
-        $this->classes = $scanner->getClassNames();
-        $this->namespaces = $scanner->getNamespaces();
-        $this->uses = $scanner->getUses();
     }
 
     /**
@@ -157,25 +150,25 @@ class FileReflection implements ReflectionInterface
     }
 
     /**
+     * @return string
+     */
+    public function getDocComment()
+    {
+        return $this->docComment;
+    }
+
+    /**
      * @return DocBlockReflection|false
      */
     public function getDocBlock()
     {
-        if (!($docComment = $this->getDocComment())) {
+        if (! ($docComment = $this->getDocComment())) {
             return false;
         }
 
         $instance = new DocBlockReflection($docComment);
 
         return $instance;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDocComment()
-    {
-        return $this->docComment;
     }
 
     /**
@@ -239,7 +232,7 @@ class FileReflection implements ReflectionInterface
     /**
      * Retrieve the reflection class of a given class found in this file
      *
-     * @param null|string $name
+     * @param  null|string $name
      * @return ClassReflection
      * @throws Exception\InvalidArgumentException for invalid class name or invalid reflection class
      */
@@ -272,13 +265,18 @@ class FileReflection implements ReflectionInterface
         return file_get_contents($this->filePath);
     }
 
+    public function toString()
+    {
+        return ''; // @todo
+    }
+
     /**
      * Serialize to string
      *
      * Required by the Reflector interface
      *
-     * @return string
      * @todo   What should this serialization look like?
+     * @return string
      */
     public function __toString()
     {
@@ -286,37 +284,39 @@ class FileReflection implements ReflectionInterface
     }
 
     /**
-     * Required by the Reflector interface.
+     * This method does the work of "reflecting" the file
+     *
+     * Uses Zend\Code\Scanner\FileScanner to gather file information
      *
      * @return void
-     * @todo   What should this do?
      */
-    public static function export()
+    protected function reflect()
     {
-    }
-
-    public function toString()
-    {
-        return ''; // @todo
+        $scanner             = new CachingFileScanner($this->filePath);
+        $this->docComment    = $scanner->getDocComment();
+        $this->requiredFiles = $scanner->getIncludes();
+        $this->classes       = $scanner->getClassNames();
+        $this->namespaces    = $scanner->getNamespaces();
+        $this->uses          = $scanner->getUses();
     }
 
     /**
      * Validate / check a file level DocBlock
      *
-     * @param array $tokens Array of tokenizer tokens
+     * @param  array $tokens Array of tokenizer tokens
      * @return void
      */
     protected function checkFileDocBlock($tokens)
     {
         foreach ($tokens as $token) {
-            $type = $token[0];
-            $value = $token[1];
+            $type    = $token[0];
+            $value   = $token[1];
             $lineNum = $token[2];
             if (($type == T_OPEN_TAG) || ($type == T_WHITESPACE)) {
                 continue;
             } elseif ($type == T_DOC_COMMENT) {
                 $this->docComment = $value;
-                $this->startLine = $lineNum + substr_count($value, "\n") + 1;
+                $this->startLine  = $lineNum + substr_count($value, "\n") + 1;
 
                 return;
             } else {

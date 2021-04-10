@@ -1,36 +1,30 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Builder;
 
-use LogicException;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Scalar;
-use PHPUnit\Framework\TestCase;
-use stdClass;
 
-class ParamTest extends TestCase
+class ParamTest extends \PHPUnit\Framework\TestCase
 {
+    public function createParamBuilder($name) {
+        return new Param($name);
+    }
+
     /**
      * @dataProvider provideTestDefaultValues
      */
-    public function testDefaultValues($value, $expectedValueNode)
-    {
+    public function testDefaultValues($value, $expectedValueNode) {
         $node = $this->createParamBuilder('test')
-                     ->setDefault($value)
-                     ->getNode();
+            ->setDefault($value)
+            ->getNode()
+        ;
 
         $this->assertEquals($expectedValueNode, $node->default);
     }
 
-    public function createParamBuilder($name)
-    {
-        return new Param($name);
-    }
-
-    public function provideTestDefaultValues()
-    {
+    public function provideTestDefaultValues() {
         return [
             [
                 null,
@@ -78,8 +72,8 @@ class ParamTest extends TestCase
                 ])
             ],
             [
-                new Scalar\MagicConst\Dir(),
-                new Scalar\MagicConst\Dir()
+                new Scalar\MagicConst\Dir,
+                new Scalar\MagicConst\Dir
             ]
         ];
     }
@@ -87,11 +81,11 @@ class ParamTest extends TestCase
     /**
      * @dataProvider provideTestTypes
      */
-    public function testTypes($typeHint, $expectedType)
-    {
+    public function testTypes($typeHint, $expectedType) {
         $node = $this->createParamBuilder('test')
-                     ->setTypeHint($typeHint)
-                     ->getNode();
+            ->setTypeHint($typeHint)
+            ->getNode()
+        ;
         $type = $node->type;
 
         /* Manually implement comparison to avoid __toString stupidity */
@@ -105,8 +99,7 @@ class ParamTest extends TestCase
         $this->assertEquals($expectedType, $type);
     }
 
-    public function provideTestTypes()
-    {
+    public function provideTestTypes() {
         return [
             ['array', new Node\Identifier('array')],
             ['callable', new Node\Identifier('callable')],
@@ -135,25 +128,23 @@ class ParamTest extends TestCase
         ];
     }
 
-    public function testVoidTypeError()
-    {
-        $this->expectException(LogicException::class);
+    public function testVoidTypeError() {
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Parameter type cannot be void');
         $this->createParamBuilder('test')->setType('void');
     }
 
-    public function testInvalidTypeError()
-    {
-        $this->expectException(LogicException::class);
+    public function testInvalidTypeError() {
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Type must be a string, or an instance of Name, Identifier or NullableType');
-        $this->createParamBuilder('test')->setType(new stdClass());
+        $this->createParamBuilder('test')->setType(new \stdClass);
     }
 
-    public function testByRef()
-    {
+    public function testByRef() {
         $node = $this->createParamBuilder('test')
-                     ->makeByRef()
-                     ->getNode();
+            ->makeByRef()
+            ->getNode()
+        ;
 
         $this->assertEquals(
             new Node\Param(new Expr\Variable('test'), null, null, true),
@@ -161,11 +152,11 @@ class ParamTest extends TestCase
         );
     }
 
-    public function testVariadic()
-    {
+    public function testVariadic() {
         $node = $this->createParamBuilder('test')
-                     ->makeVariadic()
-                     ->getNode();
+            ->makeVariadic()
+            ->getNode()
+        ;
 
         $this->assertEquals(
             new Node\Param(new Expr\Variable('test'), null, null, false, true),

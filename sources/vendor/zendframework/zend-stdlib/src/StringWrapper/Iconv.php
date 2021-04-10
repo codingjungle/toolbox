@@ -198,49 +198,6 @@ class Iconv extends AbstractStringWrapper
     ];
 
     /**
-     * Constructor
-     *
-     * @throws Exception\ExtensionNotLoadedException
-     */
-    public function __construct()
-    {
-        if (!extension_loaded('iconv')) {
-            throw new Exception\ExtensionNotLoadedException(
-                'PHP extension "iconv" is required for this wrapper'
-            );
-        }
-    }
-
-    /**
-     * Convert a string from defined encoding to the defined convert encoding
-     *
-     * @param string $str
-     * @param bool $reverse
-     * @return string|false
-     */
-    public function convert($str, $reverse = false)
-    {
-        $encoding = $this->getEncoding();
-        $convertEncoding = $this->getConvertEncoding();
-        if ($convertEncoding === null) {
-            throw new Exception\LogicException(
-                'No convert encoding defined'
-            );
-        }
-
-        if ($encoding === $convertEncoding) {
-            return $str;
-        }
-
-        $fromEncoding = $reverse ? $convertEncoding : $encoding;
-        $toEncoding = $reverse ? $encoding : $convertEncoding;
-
-        // automatically add "//IGNORE" to not stop converting on invalid characters
-        // invalid characters triggers a notice anyway
-        return iconv($fromEncoding, $toEncoding . '//IGNORE', $str);
-    }
-
-    /**
      * Get a list of supported character encodings
      *
      * @return string[]
@@ -248,6 +205,20 @@ class Iconv extends AbstractStringWrapper
     public static function getSupportedEncodings()
     {
         return static::$encodings;
+    }
+
+    /**
+     * Constructor
+     *
+     * @throws Exception\ExtensionNotLoadedException
+     */
+    public function __construct()
+    {
+        if (! extension_loaded('iconv')) {
+            throw new Exception\ExtensionNotLoadedException(
+                'PHP extension "iconv" is required for this wrapper'
+            );
+        }
     }
 
     /**
@@ -262,11 +233,24 @@ class Iconv extends AbstractStringWrapper
     }
 
     /**
+     * Returns the portion of string specified by the start and length parameters
+     *
+     * @param string   $str
+     * @param int      $offset
+     * @param int|null $length
+     * @return string|false
+     */
+    public function substr($str, $offset = 0, $length = null)
+    {
+        return iconv_substr($str, $offset, $length, $this->getEncoding());
+    }
+
+    /**
      * Find the position of the first occurrence of a substring in a string
      *
      * @param string $haystack
      * @param string $needle
-     * @param int $offset
+     * @param int    $offset
      * @return int|false
      */
     public function strpos($haystack, $needle, $offset = 0)
@@ -275,15 +259,31 @@ class Iconv extends AbstractStringWrapper
     }
 
     /**
-     * Returns the portion of string specified by the start and length parameters
+     * Convert a string from defined encoding to the defined convert encoding
      *
-     * @param string $str
-     * @param int $offset
-     * @param int|null $length
+     * @param string  $str
+     * @param bool $reverse
      * @return string|false
      */
-    public function substr($str, $offset = 0, $length = null)
+    public function convert($str, $reverse = false)
     {
-        return iconv_substr($str, $offset, $length, $this->getEncoding());
+        $encoding        = $this->getEncoding();
+        $convertEncoding = $this->getConvertEncoding();
+        if ($convertEncoding === null) {
+            throw new Exception\LogicException(
+                'No convert encoding defined'
+            );
+        }
+
+        if ($encoding === $convertEncoding) {
+            return $str;
+        }
+
+        $fromEncoding = $reverse ? $convertEncoding : $encoding;
+        $toEncoding   = $reverse ? $encoding : $convertEncoding;
+
+        // automatically add "//IGNORE" to not stop converting on invalid characters
+        // invalid characters triggers a notice anyway
+        return iconv($fromEncoding, $toEncoding . '//IGNORE', $str);
     }
 }

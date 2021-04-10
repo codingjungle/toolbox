@@ -34,12 +34,12 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     /**
      * Constant use in @MethodReflection to display prototype as an array
      */
-    public const PROTOTYPE_AS_ARRAY = 'prototype_as_array';
+    const PROTOTYPE_AS_ARRAY = 'prototype_as_array';
 
     /**
      * Constant use in @MethodReflection to display prototype as a string
      */
-    public const PROTOTYPE_AS_STRING = 'prototype_as_string';
+    const PROTOTYPE_AS_STRING = 'prototype_as_string';
 
     /**
      * @var AnnotationScanner
@@ -47,7 +47,23 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     protected $annotations;
 
     /**
-     * @param AnnotationManager $annotationManager
+     * Retrieve method DocBlock reflection
+     *
+     * @return DocBlockReflection|false
+     */
+    public function getDocBlock()
+    {
+        if ('' == $this->getDocComment()) {
+            return false;
+        }
+
+        $instance = new DocBlockReflection($this);
+
+        return $instance;
+    }
+
+    /**
+     * @param  AnnotationManager $annotationManager
      * @return AnnotationScanner|false
      */
     public function getAnnotations(AnnotationManager $annotationManager)
@@ -61,9 +77,9 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         }
 
         $cachingFileScanner = $this->createFileScanner($this->getFileName());
-        $nameInformation = $cachingFileScanner->getClassNameInformation($this->getDeclaringClass()->getName());
+        $nameInformation    = $cachingFileScanner->getClassNameInformation($this->getDeclaringClass()->getName());
 
-        if (!$nameInformation) {
+        if (! $nameInformation) {
             return false;
         }
 
@@ -73,18 +89,20 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     }
 
     /**
-     * Creates a new FileScanner instance.
+     * Get start line (position) of method
      *
-     * By having this as a separate method it allows the method to be overridden
-     * if a different FileScanner is needed.
-     *
-     * @param string $filename
-     *
-     * @return CachingFileScanner
+     * @param  bool $includeDocComment
+     * @return int
      */
-    protected function createFileScanner($filename)
+    public function getStartLine($includeDocComment = false)
     {
-        return new CachingFileScanner($filename);
+        if ($includeDocComment) {
+            if ($this->getDocComment() != '') {
+                return $this->getDocBlock()->getStartLine();
+            }
+        }
+
+        return parent::getStartLine();
     }
 
     /**
@@ -94,7 +112,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
      */
     public function getDeclaringClass()
     {
-        $phpReflection = parent::getDeclaringClass();
+        $phpReflection  = parent::getDeclaringClass();
         $zendReflection = new ClassReflection($phpReflection->getName());
         unset($phpReflection);
 
@@ -102,18 +120,107 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     }
 
     /**
+     * Get method prototype
+     *
+     * @param string $format
+     * @return array|string
+     */
+    public function getPrototype($format = MethodReflection::PROTOTYPE_AS_ARRAY)
+    {
+        $returnType = 'mixed';
+        $docBlock = $this->getDocBlock();
+        if ($docBlock) {
+            $return = $docBlock->getTag('return');
+            $returnTypes = $return->getTypes();
+            $returnType = count($returnTypes) > 1 ? implode('|', $returnTypes) : $returnTypes[0];
+        }
+
+        $declaringClass = $this->getDeclaringClass();
+        $prototype = [
+            'namespace'  => $declaringClass->getNamespaceName(),
+            'class'      => substr($declaringClass->getName(), strlen($declaringClass->getNamespaceName()) + 1),
+            'name'       => $this->getName(),
+            'visibility' => $this->isPublic() ? 'public' : ($this->isPrivate() ? 'private' : 'protected'),
+            'return'     => $returnType,
+            'arguments'  => [],
+        ];
+
+        $parameters = $this->getParameters();
+        foreach ($parameters as $parameter) {
+            $prototype['arguments'][$parameter->getName()] = [
+                'type'     => $parameter->detectType(),
+                'required' => ! $parameter->isOptional(),
+                'by_ref'   => $parameter->isPassedByReference(),
+                'default'  => $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null,
+            ];
+        }
+
+        if ($format == MethodReflection::PROTOTYPE_AS_STRING) {
+            $line = $prototype['visibility'] . ' ' . $prototype['return'] . ' ' . $prototype['name'] . '(';
+            $args = [];
+            foreach ($prototype['arguments'] as $name => $argument) {
+                $argsLine = ($argument['type'] ?
+                    $argument['type'] . ' '
+                    : '') . ($argument['by_ref'] ? '&' : '') . '$' . $name;
+                if (! $argument['required']) {
+                    $argsLine .= ' = ' . var_export($argument['default'], true);
+                }
+                $args[] = $argsLine;
+            }
+            $line .= implode(', ', $args);
+            $line .= ')';
+
+            return $line;
+        }
+
+        return $prototype;
+    }
+
+    /**
+     * Get all method parameter reflection objects
+     *
+     * @return ParameterReflection[]
+     */
+    public function getParameters()
+    {
+        $phpReflections  = parent::getParameters();
+        $zendReflections = [];
+        while ($phpReflections && ($phpReflection = array_shift($phpReflections))) {
+            $instance = new ParameterReflection(
+                [$this->getDeclaringClass()->getName(), $this->getName()],
+                $phpReflection->getName()
+            );
+            $zendReflections[] = $instance;
+            unset($phpReflection);
+        }
+        unset($phpReflections);
+
+        return $zendReflections;
+    }
+
+    /**
      * Get method contents
      *
-     * @param bool $includeDocBlock
+     * @param  bool $includeDocBlock
      * @return string
      */
     public function getContents($includeDocBlock = true)
     {
         $docComment = $this->getDocComment();
-        $content = $includeDocBlock && !empty($docComment) ? $docComment . "\n" : '';
+        $content  = $includeDocBlock && ! empty($docComment) ? $docComment . "\n" : '';
         $content .= $this->extractMethodContents();
 
         return $content;
+    }
+
+    /**
+     * Get method body
+     *
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->extractMethodContents(true);
     }
 
     /**
@@ -126,7 +233,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     {
         $fileName = $this->getFileName();
 
-        if ((class_exists($this->class) && false === $fileName) || !file_exists($fileName)) {
+        if ((class_exists($this->class) && false === $fileName) || ! file_exists($fileName)) {
             return '';
         }
 
@@ -143,7 +250,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         //remove first entry which is php open tag
         array_shift($tokens);
 
-        if (!count($tokens)) {
+        if (! count($tokens)) {
             return '';
         }
 
@@ -152,7 +259,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         $body = '';
 
         foreach ($tokens as $key => $token) {
-            $tokenType = is_array($token) ? token_name($token[0]) : $token;
+            $tokenType  = is_array($token) ? token_name($token[0]) : $token;
             $tokenValue = is_array($token) ? $token[1] : $token;
 
             switch ($tokenType) {
@@ -237,149 +344,6 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
 
         //remove ending whitespace and return
         return rtrim($body);
-    }    /**
-     * Get method prototype
-     *
-     * @param string $format
-     * @return array|string
-     */
-    public function getPrototype($format = MethodReflection::PROTOTYPE_AS_ARRAY)
-    {
-        $returnType = 'mixed';
-        $docBlock = $this->getDocBlock();
-        if ($docBlock) {
-            $return = $docBlock->getTag('return');
-            $returnTypes = $return->getTypes();
-            $returnType = count($returnTypes) > 1 ? implode('|', $returnTypes) : $returnTypes[0];
-        }
-
-        $declaringClass = $this->getDeclaringClass();
-        $prototype = [
-            'namespace'  => $declaringClass->getNamespaceName(),
-            'class'      => substr($declaringClass->getName(), strlen($declaringClass->getNamespaceName()) + 1),
-            'name'       => $this->getName(),
-            'visibility' => $this->isPublic() ? 'public' : ($this->isPrivate() ? 'private' : 'protected'),
-            'return'     => $returnType,
-            'arguments'  => [],
-        ];
-
-        $parameters = $this->getParameters();
-        foreach ($parameters as $parameter) {
-            $prototype['arguments'][$parameter->getName()] = [
-                'type'     => $parameter->detectType(),
-                'required' => !$parameter->isOptional(),
-                'by_ref'   => $parameter->isPassedByReference(),
-                'default'  => $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null,
-            ];
-        }
-
-        if ($format == MethodReflection::PROTOTYPE_AS_STRING) {
-            $line = $prototype['visibility'] . ' ' . $prototype['return'] . ' ' . $prototype['name'] . '(';
-            $args = [];
-            foreach ($prototype['arguments'] as $name => $argument) {
-                $argsLine = ($argument['type'] ?
-                        $argument['type'] . ' '
-                        : '') . ($argument['by_ref'] ? '&' : '') . '$' . $name;
-                if (!$argument['required']) {
-                    $argsLine .= ' = ' . var_export($argument['default'], true);
-                }
-                $args[] = $argsLine;
-            }
-            $line .= implode(', ', $args);
-            $line .= ')';
-
-            return $line;
-        }
-
-        return $prototype;
-    }
-
-    /**
-     * Get start line (position) of method
-     *
-     * @param bool $includeDocComment
-     * @return int
-     */
-    public function getStartLine($includeDocComment = false)
-    {
-        if ($includeDocComment) {
-            if ($this->getDocComment() != '') {
-                return $this->getDocBlock()->getStartLine();
-            }
-        }
-
-        return parent::getStartLine();
-    }    /**
-     * Get all method parameter reflection objects
-     *
-     * @return ParameterReflection[]
-     */
-    public function getParameters()
-    {
-        $phpReflections = parent::getParameters();
-        $zendReflections = [];
-        while ($phpReflections && ($phpReflection = array_shift($phpReflections))) {
-            $instance = new ParameterReflection(
-                [$this->getDeclaringClass()->getName(), $this->getName()],
-                $phpReflection->getName()
-            );
-            $zendReflections[] = $instance;
-            unset($phpReflection);
-        }
-        unset($phpReflections);
-
-        return $zendReflections;
-    }
-
-    /**
-     * Retrieve method DocBlock reflection
-     *
-     * @return DocBlockReflection|false
-     */
-    public function getDocBlock()
-    {
-        if ('' == $this->getDocComment()) {
-            return false;
-        }
-
-        $instance = new DocBlockReflection($this);
-
-        return $instance;
-    }
-
-    /**
-     * Test to see if current position is valid function or
-     * closure.  Returns true if it's a function and NOT a closure
-     *
-     * @param array $haystack
-     * @param int $position
-     * @param string $functionName
-     * @return bool
-     */
-    protected function isValidFunction($haystack, $position, $functionName = null)
-    {
-        $isValid = false;
-        $count = count($haystack);
-        for ($i = $position + 1; $i < $count; $i++) {
-            $tokenType = is_array($haystack[$i]) ? token_name($haystack[$i][0]) : $haystack[$i];
-            $tokenValue = is_array($haystack[$i]) ? $haystack[$i][1] : $haystack[$i];
-
-            //check for occurrence of ( or
-            if ($tokenType == 'T_STRING') {
-                //check to see if function name is passed, if so validate against that
-                if ($functionName !== null && $tokenValue != $functionName) {
-                    $isValid = false;
-                    break;
-                }
-
-                $isValid = true;
-                break;
-            } elseif ($tokenValue == '(') {
-                break;
-            }
-        }
-
-        return $isValid;
     }
 
     /**
@@ -480,13 +444,46 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     }
 
     /**
-     * Get method body
+     * Test to see if current position is valid function or
+     * closure.  Returns true if it's a function and NOT a closure
      *
+     * @param array $haystack
+     * @param int $position
+     * @param string $functionName
+     * @return bool
+     */
+    protected function isValidFunction($haystack, $position, $functionName = null)
+    {
+        $isValid = false;
+        $count = count($haystack);
+        for ($i = $position + 1; $i < $count; $i++) {
+            $tokenType = is_array($haystack[$i]) ? token_name($haystack[$i][0]) : $haystack[$i];
+            $tokenValue = is_array($haystack[$i]) ? $haystack[$i][1] : $haystack[$i];
+
+            //check for occurrence of ( or
+            if ($tokenType == 'T_STRING') {
+                //check to see if function name is passed, if so validate against that
+                if ($functionName !== null && $tokenValue != $functionName) {
+                    $isValid = false;
+                    break;
+                }
+
+                $isValid = true;
+                break;
+            } elseif ($tokenValue == '(') {
+                break;
+            }
+        }
+
+        return $isValid;
+    }
+
+    /**
      * @return string
      */
-    public function getBody()
+    public function toString()
     {
-        return $this->extractMethodContents(true);
+        return parent::__toString();
     }
 
     /**
@@ -498,14 +495,17 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     }
 
     /**
-     * @return string
+     * Creates a new FileScanner instance.
+     *
+     * By having this as a separate method it allows the method to be overridden
+     * if a different FileScanner is needed.
+     *
+     * @param  string $filename
+     *
+     * @return CachingFileScanner
      */
-    public function toString()
+    protected function createFileScanner($filename)
     {
-        return parent::__toString();
+        return new CachingFileScanner($filename);
     }
-
-
-
-
 }

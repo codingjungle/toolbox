@@ -9,10 +9,10 @@
 
 namespace Zend\Code\Generator;
 
-use ReflectionException;
 use ReflectionParameter;
 use Zend\Code\Reflection\ParameterReflection;
 
+use function is_string;
 use function method_exists;
 use function str_replace;
 use function strtolower;
@@ -55,38 +55,7 @@ class ParameterGenerator extends AbstractGenerator
     private $omitDefaultValue = false;
 
     /**
-     * @param string $name
-     * @param string $type
-     * @param mixed $defaultValue
-     * @param int $position
-     * @param bool $passByReference
-     */
-    public function __construct(
-        $name = null,
-        $type = null,
-        $defaultValue = null,
-        $position = null,
-        $passByReference = false
-    ) {
-        if (null !== $name) {
-            $this->setName($name);
-        }
-        if (null !== $type) {
-            $this->setType($type);
-        }
-        if (null !== $defaultValue) {
-            $this->setDefaultValue($defaultValue);
-        }
-        if (null !== $position) {
-            $this->setPosition($position);
-        }
-        if (false !== $passByReference) {
-            $this->setPassedByReference(true);
-        }
-    }
-
-    /**
-     * @param ParameterReflection $reflectionParameter
+     * @param  ParameterReflection $reflectionParameter
      * @return ParameterGenerator
      */
     public static function fromReflection(ParameterReflection $reflectionParameter)
@@ -105,10 +74,10 @@ class ParameterGenerator extends AbstractGenerator
 
         $param->setVariadic($variadic);
 
-        if (!$variadic && ($reflectionParameter->isOptional() || $reflectionParameter->isDefaultValueAvailable())) {
+        if (! $variadic && ($reflectionParameter->isOptional() || $reflectionParameter->isDefaultValueAvailable())) {
             try {
                 $param->setDefaultValue($reflectionParameter->getDefaultValue());
-            } catch (ReflectionException $e) {
+            } catch (\ReflectionException $e) {
                 $param->setDefaultValue(null);
             }
         }
@@ -116,76 +85,6 @@ class ParameterGenerator extends AbstractGenerator
         $param->setPassedByReference($reflectionParameter->isPassedByReference());
 
         return $param;
-    }
-
-    /**
-     * @param ParameterReflection $reflectionParameter
-     *
-     * @return null|string
-     */
-    private static function extractFQCNTypeFromReflectionType(ParameterReflection $reflectionParameter)
-    {
-        if (!method_exists($reflectionParameter, 'getType')) {
-            return self::prePhp7ExtractFQCNTypeFromReflectionType($reflectionParameter);
-        }
-
-        $type = method_exists($reflectionParameter, 'getType')
-            ? $reflectionParameter->getType()
-            : null;
-
-        if (!$type) {
-            return null;
-        }
-
-        if (!method_exists($type, 'getName')) {
-            return self::expandLiteralParameterType((string)$type, $reflectionParameter);
-        }
-
-        return ($type->allowsNull() ? '?' : '')
-            . self::expandLiteralParameterType($type->getName(), $reflectionParameter);
-    }
-
-    /**
-     * For ancient PHP versions (yes, you should upgrade to 7.0):
-     *
-     * @param ParameterReflection $reflectionParameter
-     *
-     * @return string|null
-     */
-    private static function prePhp7ExtractFQCNTypeFromReflectionType(ParameterReflection $reflectionParameter)
-    {
-        if ($reflectionParameter->isCallable()) {
-            return 'callable';
-        }
-
-        if ($reflectionParameter->isArray()) {
-            return 'array';
-        }
-
-        if ($class = $reflectionParameter->getClass()) {
-            return $class->getName();
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $literalParameterType
-     * @param ReflectionParameter $reflectionParameter
-     *
-     * @return string
-     */
-    private static function expandLiteralParameterType($literalParameterType, ReflectionParameter $reflectionParameter)
-    {
-        if ('self' === strtolower($literalParameterType)) {
-            return $reflectionParameter->getDeclaringClass()->getName();
-        }
-
-        if ('parent' === strtolower($literalParameterType)) {
-            return $reflectionParameter->getDeclaringClass()->getParentClass()->getName();
-        }
-
-        return $literalParameterType;
     }
 
     /**
@@ -201,13 +100,13 @@ class ParameterGenerator extends AbstractGenerator
      * @configkey sourcecontent         string
      * @configkey omitdefaultvalue      bool
      *
-     * @param array $array
-     * @return ParameterGenerator
      * @throws Exception\InvalidArgumentException
+     * @param  array $array
+     * @return ParameterGenerator
      */
     public static function fromArray(array $array)
     {
-        if (!isset($array['name'])) {
+        if (! isset($array['name'])) {
             throw new Exception\InvalidArgumentException(
                 'Parameter generator requires that a name is provided for this object'
             );
@@ -248,28 +147,38 @@ class ParameterGenerator extends AbstractGenerator
     }
 
     /**
-     * @param bool $omit
-     * @return ParameterGenerator
+     * @param  string $name
+     * @param  string $type
+     * @param  mixed $defaultValue
+     * @param  int $position
+     * @param  bool $passByReference
      */
-    public function omitDefaultValue(bool $omit = true)
-    {
-        $this->omitDefaultValue = $omit;
-
-        return $this;
+    public function __construct(
+        $name = null,
+        $type = null,
+        $defaultValue = null,
+        $position = null,
+        $passByReference = false
+    ) {
+        if (null !== $name) {
+            $this->setName($name);
+        }
+        if (null !== $type) {
+            $this->setType($type);
+        }
+        if (null !== $defaultValue) {
+            $this->setDefaultValue($defaultValue);
+        }
+        if (null !== $position) {
+            $this->setPosition($position);
+        }
+        if (false !== $passByReference) {
+            $this->setPassedByReference(true);
+        }
     }
 
     /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type
-            ? (string)$this->type
-            : null;
-    }
-
-    /**
-     * @param string $type
+     * @param  string $type
      * @return ParameterGenerator
      */
     public function setType($type)
@@ -282,18 +191,46 @@ class ParameterGenerator extends AbstractGenerator
     /**
      * @return string
      */
+    public function getType()
+    {
+        return $this->type
+            ? (string) $this->type
+            : null;
+    }
+
+    /**
+     * @param  string $name
+     * @return ParameterGenerator
+     */
+    public function setName($name)
+    {
+        $this->name = (string) $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
+     * Set the default value of the parameter.
+     *
+     * Certain variables are difficult to express
+     *
+     * @param  null|bool|string|int|float|array|ValueGenerator $defaultValue
      * @return ParameterGenerator
      */
-    public function setName($name)
+    public function setDefaultValue($defaultValue)
     {
-        $this->name = (string)$name;
+        if (! $defaultValue instanceof ValueGenerator) {
+            $defaultValue = new ValueGenerator($defaultValue);
+        }
+        $this->defaultValue = $defaultValue;
+
         return $this;
     }
 
@@ -306,20 +243,12 @@ class ParameterGenerator extends AbstractGenerator
     }
 
     /**
-     * Set the default value of the parameter.
-     *
-     * Certain variables are difficult to express
-     *
-     * @param null|bool|string|int|float|array|ValueGenerator $defaultValue
+     * @param  int $position
      * @return ParameterGenerator
      */
-    public function setDefaultValue($defaultValue)
+    public function setPosition($position)
     {
-        if (!$defaultValue instanceof ValueGenerator) {
-            $defaultValue = new ValueGenerator($defaultValue);
-        }
-        $this->defaultValue = $defaultValue;
-
+        $this->position = (int) $position;
         return $this;
     }
 
@@ -332,16 +261,6 @@ class ParameterGenerator extends AbstractGenerator
     }
 
     /**
-     * @param int $position
-     * @return ParameterGenerator
-     */
-    public function setPosition($position)
-    {
-        $this->position = (int)$position;
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function getPassedByReference()
@@ -350,21 +269,13 @@ class ParameterGenerator extends AbstractGenerator
     }
 
     /**
-     * @param bool $passedByReference
+     * @param  bool $passedByReference
      * @return ParameterGenerator
      */
     public function setPassedByReference($passedByReference)
     {
-        $this->passedByReference = (bool)$passedByReference;
+        $this->passedByReference = (bool) $passedByReference;
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getVariadic()
-    {
-        return $this->variadic;
     }
 
     /**
@@ -374,9 +285,17 @@ class ParameterGenerator extends AbstractGenerator
      */
     public function setVariadic($variadic)
     {
-        $this->variadic = (bool)$variadic;
+        $this->variadic = (bool) $variadic;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVariadic()
+    {
+        return $this->variadic;
     }
 
     /**
@@ -410,6 +329,76 @@ class ParameterGenerator extends AbstractGenerator
     }
 
     /**
+     * @param ParameterReflection $reflectionParameter
+     *
+     * @return null|string
+     */
+    private static function extractFQCNTypeFromReflectionType(ParameterReflection $reflectionParameter)
+    {
+        if (! method_exists($reflectionParameter, 'getType')) {
+            return self::prePhp7ExtractFQCNTypeFromReflectionType($reflectionParameter);
+        }
+
+        $type = method_exists($reflectionParameter, 'getType')
+            ? $reflectionParameter->getType()
+            : null;
+
+        if (! $type) {
+            return null;
+        }
+
+        if (! method_exists($type, 'getName')) {
+            return self::expandLiteralParameterType((string) $type, $reflectionParameter);
+        }
+
+        return ($type->allowsNull() ? '?' : '')
+            . self::expandLiteralParameterType($type->getName(), $reflectionParameter);
+    }
+
+    /**
+     * For ancient PHP versions (yes, you should upgrade to 7.0):
+     *
+     * @param ParameterReflection $reflectionParameter
+     *
+     * @return string|null
+     */
+    private static function prePhp7ExtractFQCNTypeFromReflectionType(ParameterReflection $reflectionParameter)
+    {
+        if ($reflectionParameter->isCallable()) {
+            return 'callable';
+        }
+
+        if ($reflectionParameter->isArray()) {
+            return 'array';
+        }
+
+        if ($class = $reflectionParameter->getClass()) {
+            return $class->getName();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string              $literalParameterType
+     * @param ReflectionParameter $reflectionParameter
+     *
+     * @return string
+     */
+    private static function expandLiteralParameterType($literalParameterType, ReflectionParameter $reflectionParameter)
+    {
+        if ('self' === strtolower($literalParameterType)) {
+            return $reflectionParameter->getDeclaringClass()->getName();
+        }
+
+        if ('parent' === strtolower($literalParameterType)) {
+            return $reflectionParameter->getDeclaringClass()->getParentClass()->getName();
+        }
+
+        return $literalParameterType;
+    }
+
+    /**
      * @return string
      */
     private function generateTypeHint()
@@ -419,5 +408,16 @@ class ParameterGenerator extends AbstractGenerator
         }
 
         return $this->type->generate() . ' ';
+    }
+
+    /**
+     * @param bool $omit
+     * @return ParameterGenerator
+     */
+    public function omitDefaultValue(bool $omit = true)
+    {
+        $this->omitDefaultValue = $omit;
+
+        return $this;
     }
 }

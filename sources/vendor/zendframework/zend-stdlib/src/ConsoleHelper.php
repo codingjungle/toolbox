@@ -27,12 +27,12 @@ namespace Zend\Stdlib;
  */
 class ConsoleHelper
 {
-    public const COLOR_GREEN = "\033[32m";
-    public const COLOR_RED = "\033[31m";
-    public const COLOR_RESET = "\033[0m";
+    const COLOR_GREEN = "\033[32m";
+    const COLOR_RED   = "\033[31m";
+    const COLOR_RESET = "\033[0m";
 
-    public const HIGHLIGHT_INFO = 'info';
-    public const HIGHLIGHT_ERROR = 'error';
+    const HIGHLIGHT_INFO  = 'info';
+    const HIGHLIGHT_ERROR = 'error';
 
     private $highlightMap = [
         self::HIGHLIGHT_INFO  => self::COLOR_GREEN,
@@ -63,46 +63,24 @@ class ConsoleHelper
     }
 
     /**
-     * @param resource $resource
-     * @return bool
-     */
-    private function detectColorCapabilities($resource = STDOUT)
-    {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            // Windows
-            return false !== getenv('ANSICON')
-                || 'ON' === getenv('ConEmuANSI')
-                || 'xterm' === getenv('TERM');
-        }
-
-        return function_exists('posix_isatty') && posix_isatty($resource);
-    }
-
-    /**
-     * Emit an error message.
+     * Colorize a string for use with the terminal.
      *
-     * Wraps the message in `<error></error>`, and passes it to `writeLine()`,
-     * using STDERR as the resource; emits an additional empty line when done,
-     * also to STDERR.
+     * Takes strings formatted as `<key>string</key>` and formats them per the
+     * $highlightMap; if color support is disabled, simply removes the formatting
+     * tags.
      *
-     * @param string $message
-     * @return void
-     */
-    public function writeErrorMessage($message)
-    {
-        $this->writeLine(sprintf('<error>%s</error>', $message), true, $this->stderr);
-        $this->writeLine('', false, $this->stderr);
-    }
-
-    /**
      * @param string $string
-     * @param bool $colorize Whether or not to colorize the line
-     * @param resource $resource Defaults to STDOUT
-     * @return void
+     * @return string
      */
-    public function writeLine($string, $colorize = true, $resource = STDOUT)
+    public function colorize($string)
     {
-        $this->write($string . $this->eol, $colorize, $resource);
+        $reset = $this->supportsColor ? self::COLOR_RESET : '';
+        foreach ($this->highlightMap as $key => $color) {
+            $pattern = sprintf('#<%s>(.*?)</%s>#s', $key, $key);
+            $color   = $this->supportsColor ? $color : '';
+            $string  = preg_replace($pattern, $color . '$1' . $reset, $string);
+        }
+        return $string;
     }
 
     /**
@@ -123,24 +101,46 @@ class ConsoleHelper
     }
 
     /**
-     * Colorize a string for use with the terminal.
-     *
-     * Takes strings formatted as `<key>string</key>` and formats them per the
-     * $highlightMap; if color support is disabled, simply removes the formatting
-     * tags.
-     *
      * @param string $string
-     * @return string
+     * @param bool $colorize Whether or not to colorize the line
+     * @param resource $resource Defaults to STDOUT
+     * @return void
      */
-    public function colorize($string)
+    public function writeLine($string, $colorize = true, $resource = STDOUT)
     {
-        $reset = $this->supportsColor ? self::COLOR_RESET : '';
-        foreach ($this->highlightMap as $key => $color) {
-            $pattern = sprintf('#<%s>(.*?)</%s>#s', $key, $key);
-            $color = $this->supportsColor ? $color : '';
-            $string = preg_replace($pattern, $color . '$1' . $reset, $string);
+        $this->write($string . $this->eol, $colorize, $resource);
+    }
+
+    /**
+     * Emit an error message.
+     *
+     * Wraps the message in `<error></error>`, and passes it to `writeLine()`,
+     * using STDERR as the resource; emits an additional empty line when done,
+     * also to STDERR.
+     *
+     * @param string $message
+     * @return void
+     */
+    public function writeErrorMessage($message)
+    {
+        $this->writeLine(sprintf('<error>%s</error>', $message), true, $this->stderr);
+        $this->writeLine('', false, $this->stderr);
+    }
+
+    /**
+     * @param resource $resource
+     * @return bool
+     */
+    private function detectColorCapabilities($resource = STDOUT)
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            // Windows
+            return false !== getenv('ANSICON')
+                || 'ON' === getenv('ConEmuANSI')
+                || 'xterm' === getenv('TERM');
         }
-        return $string;
+
+        return function_exists('posix_isatty') && posix_isatty($resource);
     }
 
     /**

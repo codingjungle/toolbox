@@ -1,8 +1,5 @@
 <?php
-
 namespace Go\ParserReflection;
-
-use Closure;
 
 class ReflectionMethodTest extends AbstractTestCase
 {
@@ -11,9 +8,9 @@ class ReflectionMethodTest extends AbstractTestCase
     public function testGetClosureMethod()
     {
         $refMethod = $this->parsedRefClass->getMethod('funcWithDocAndBody');
-        $closure = $refMethod->getClosure(null);
+        $closure   = $refMethod->getClosure(null);
 
-        $this->assertInstanceOf(Closure::class, $closure);
+        $this->assertInstanceOf(\Closure::class, $closure);
         $retValue = $closure();
         $this->assertEquals('hello', $retValue);
     }
@@ -21,22 +18,22 @@ class ReflectionMethodTest extends AbstractTestCase
     public function testInvokeMethod()
     {
         $refMethod = $this->parsedRefClass->getMethod('funcWithReturnArgs');
-        $retValue = $refMethod->invoke(null, 1, 2, 3);
+        $retValue  = $refMethod->invoke(null, 1, 2, 3);
         $this->assertEquals([1, 2, 3], $retValue);
     }
 
     public function testInvokeArgsMethod()
     {
         $refMethod = $this->parsedRefClass->getMethod('funcWithReturnArgs');
-        $retValue = $refMethod->invokeArgs(null, [1, 2, 3]);
+        $retValue  = $refMethod->invokeArgs(null, [1, 2, 3]);
         $this->assertEquals([1, 2, 3], $retValue);
     }
 
     public function testDebugInfoMethod()
     {
-        $parsedRefMethod = $this->parsedRefClass->getMethod('funcWithDocAndBody');
+        $parsedRefMethod   = $this->parsedRefClass->getMethod('funcWithDocAndBody');
         $originalRefMethod = new \ReflectionMethod($this->parsedRefClass->getName(), 'funcWithDocAndBody');
-        $expectedValue = (array)$originalRefMethod;
+        $expectedValue     = (array) $originalRefMethod;
         $this->assertSame($expectedValue, $parsedRefMethod->___debugInfo());
     }
 
@@ -51,13 +48,13 @@ class ReflectionMethodTest extends AbstractTestCase
     public function testGetPrototypeMethod()
     {
         $refMethod = $this->parsedRefClass->getMethod('prototypeMethod');
-        $retValue = $refMethod->invokeArgs(null, []);
+        $retValue  = $refMethod->invokeArgs(null, []);
         $this->assertEquals($this->parsedRefClass->getName(), $retValue);
 
         $prototype = $refMethod->getPrototype();
         $this->assertInstanceOf(\ReflectionMethod::class, $prototype);
         $prototype->setAccessible(true);
-        $retValue = $prototype->invokeArgs(null, []);
+        $retValue  = $prototype->invokeArgs(null, []);
         $this->assertNotEquals($this->parsedRefClass->getName(), $retValue);
     }
 
@@ -66,17 +63,17 @@ class ReflectionMethodTest extends AbstractTestCase
      *
      * @dataProvider caseProvider
      *
-     * @param ReflectionClass $parsedClass Parsed class
+     * @param ReflectionClass   $parsedClass Parsed class
      * @param \ReflectionMethod $refMethod Method to analyze
-     * @param string $getterName Name of the reflection method to test
+     * @param string                  $getterName Name of the reflection method to test
      */
     public function testReflectionMethodParity(
         ReflectionClass $parsedClass,
         \ReflectionMethod $refMethod,
         $getterName
     ) {
-        $methodName = $refMethod->getName();
-        $className = $parsedClass->getName();
+        $methodName   = $refMethod->getName();
+        $className    = $parsedClass->getName();
         $parsedMethod = $parsedClass->getMethod($methodName);
         if (empty($parsedMethod)) {
             echo "Couldn't find method $methodName in the $className", PHP_EOL;
@@ -84,7 +81,7 @@ class ReflectionMethodTest extends AbstractTestCase
         }
 
         $expectedValue = $refMethod->$getterName();
-        $actualValue = $parsedMethod->$getterName();
+        $actualValue   = $parsedMethod->$getterName();
         $this->assertSame(
             $expectedValue,
             $actualValue,
@@ -102,7 +99,7 @@ class ReflectionMethodTest extends AbstractTestCase
         $allNameGetters = $this->getGettersToCheck();
 
         $testCases = [];
-        $files = $this->getFilesToAnalyze();
+        $files     = $this->getFilesToAnalyze();
         foreach ($files as $fileList) {
             foreach ($fileList as $fileName) {
                 $fileName = stream_resolve_include_path($fileName);
@@ -140,34 +137,11 @@ class ReflectionMethodTest extends AbstractTestCase
     protected function getGettersToCheck()
     {
         $allNameGetters = [
-            'getStartLine',
-            'getEndLine',
-            'getDocComment',
-            'getExtension',
-            'getExtensionName',
-            'getName',
-            'getNamespaceName',
-            'getShortName',
-            'inNamespace',
-            'getStaticVariables',
-            'isClosure',
-            'isDeprecated',
-            'isInternal',
-            'isUserDefined',
-            'isAbstract',
-            'isConstructor',
-            'isDestructor',
-            'isFinal',
-            'isPrivate',
-            'isProtected',
-            'isPublic',
-            'isStatic',
-            '__toString',
-            'getNumberOfParameters',
-            'getNumberOfRequiredParameters',
-            'returnsReference',
-            'getClosureScopeClass',
-            'getClosureThis'
+            'getStartLine', 'getEndLine', 'getDocComment', 'getExtension', 'getExtensionName', 'getName',
+            'getNamespaceName', 'getShortName', 'inNamespace', 'getStaticVariables', 'isClosure', 'isDeprecated',
+            'isInternal', 'isUserDefined', 'isAbstract', 'isConstructor', 'isDestructor', 'isFinal', 'isPrivate',
+            'isProtected', 'isPublic', 'isStatic', '__toString', 'getNumberOfParameters',
+            'getNumberOfRequiredParameters', 'returnsReference', 'getClosureScopeClass', 'getClosureThis'
         ];
 
         if (PHP_VERSION_ID >= 50600) {

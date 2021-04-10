@@ -11,21 +11,16 @@
 
 namespace Symfony\Component\VarDumper\Exception;
 
-use Exception;
-
-use function get_class;
-
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ThrowingCasterException extends Exception
+class ThrowingCasterException extends \Exception
 {
     /**
-     * @param Exception $prev The exception thrown from the caster
+     * @param \Exception $prev The exception thrown from the caster
      */
-    public function __construct(Exception $prev)
+    public function __construct(\Exception $prev)
     {
-        parent::__construct('Unexpected ' . get_class($prev) . ' thrown from a caster: ' . $prev->getMessage(), 0,
-            $prev);
+        parent::__construct('Unexpected '.\get_class($prev).' thrown from a caster: '.$prev->getMessage(), 0, $prev);
     }
 }

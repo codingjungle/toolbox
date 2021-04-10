@@ -1,12 +1,9 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node\Stmt;
 
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt;
-
-use function is_string;
 
 class Label extends Stmt
 {
@@ -16,22 +13,19 @@ class Label extends Stmt
     /**
      * Constructs a label node.
      *
-     * @param string|Identifier $name Name
-     * @param array $attributes Additional attributes
+     * @param string|Identifier $name       Name
+     * @param array             $attributes Additional attributes
      */
-    public function __construct($name, array $attributes = [])
-    {
+    public function __construct($name, array $attributes = []) {
         parent::__construct($attributes);
-        $this->name = is_string($name) ? new Identifier($name) : $name;
+        $this->name = \is_string($name) ? new Identifier($name) : $name;
     }
 
-    public function getSubNodeNames(): array
-    {
+    public function getSubNodeNames() : array {
         return ['name'];
     }
-
-    public function getType(): string
-    {
+    
+    public function getType() : string {
         return 'Stmt_Label';
     }
 }

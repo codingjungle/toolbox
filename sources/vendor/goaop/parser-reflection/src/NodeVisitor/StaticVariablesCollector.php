@@ -51,7 +51,7 @@ class StaticVariablesCollector extends NodeVisitorAbstract
 
         if ($node instanceof Node\Stmt\Static_) {
             $expressionSolver = new NodeExpressionResolver($this->context);
-            $staticVariables = $node->vars;
+            $staticVariables  = $node->vars;
             foreach ($staticVariables as $staticVariable) {
                 $expr = $staticVariable->default;
                 if ($expr) {

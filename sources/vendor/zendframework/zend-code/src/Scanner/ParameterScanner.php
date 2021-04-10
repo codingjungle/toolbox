@@ -96,29 +96,30 @@ class ParameterScanner
     protected $nameInformation;
 
     /**
-     * @param array $parameterTokens
-     * @param NameInformation $nameInformation
+     * @param  array $parameterTokens
+     * @param  NameInformation $nameInformation
      */
     public function __construct(array $parameterTokens, NameInformation $nameInformation = null)
     {
-        $this->tokens = $parameterTokens;
+        $this->tokens          = $parameterTokens;
         $this->nameInformation = $nameInformation;
     }
 
     /**
-     * Get declaring scanner class
+     * Set declaring class
      *
-     * @return ClassScanner
+     * @param  string $class
+     * @return void
      */
-    public function getDeclaringScannerClass()
+    public function setDeclaringClass($class)
     {
-        return $this->declaringScannerClass;
+        $this->declaringClass = (string) $class;
     }
 
     /**
      * Set declaring scanner class
      *
-     * @param ClassScanner $scannerClass
+     * @param  ClassScanner $scannerClass
      * @return void
      */
     public function setDeclaringScannerClass(ClassScanner $scannerClass)
@@ -127,61 +128,9 @@ class ParameterScanner
     }
 
     /**
-     * Get declaring class
-     *
-     * @return string
-     */
-    public function getDeclaringClass()
-    {
-        return $this->declaringClass;
-    }
-
-    /**
-     * Set declaring class
-     *
-     * @param string $class
-     * @return void
-     */
-    public function setDeclaringClass($class)
-    {
-        $this->declaringClass = (string)$class;
-    }
-
-    /**
-     * Get declaring scanner function
-     *
-     * @return MethodScanner
-     */
-    public function getDeclaringScannerFunction()
-    {
-        return $this->declaringScannerFunction;
-    }
-
-    /**
-     * Set declaring scanner function
-     *
-     * @param MethodScanner $scannerFunction
-     * @return void
-     */
-    public function setDeclaringScannerFunction(MethodScanner $scannerFunction)
-    {
-        $this->declaringScannerFunction = $scannerFunction;
-    }
-
-    /**
-     * Get declaring function
-     *
-     * @return string
-     */
-    public function getDeclaringFunction()
-    {
-        return $this->declaringFunction;
-    }
-
-    /**
      * Set declaring function
      *
-     * @param string $function
+     * @param  string $function
      * @return void
      */
     public function setDeclaringFunction($function)
@@ -190,15 +139,25 @@ class ParameterScanner
     }
 
     /**
-     * Get default value
+     * Set declaring scanner function
      *
-     * @return string
+     * @param  MethodScanner $scannerFunction
+     * @return void
      */
-    public function getDefaultValue()
+    public function setDeclaringScannerFunction(MethodScanner $scannerFunction)
     {
-        $this->scan();
+        $this->declaringScannerFunction = $scannerFunction;
+    }
 
-        return $this->defaultValue;
+    /**
+     * Set position
+     *
+     * @param  int $position
+     * @return void
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
     }
 
     /**
@@ -227,7 +186,7 @@ class ParameterScanner
                 goto SCANNER_CONTINUE;
             }
             if ($token === '=') {
-                $this->isOptional = true;
+                $this->isOptional              = true;
                 $this->isDefaultValueAvailable = true;
                 goto SCANNER_CONTINUE;
             }
@@ -260,6 +219,58 @@ class ParameterScanner
         }
 
         $this->isScanned = true;
+    }
+
+    /**
+     * Get declaring scanner class
+     *
+     * @return ClassScanner
+     */
+    public function getDeclaringScannerClass()
+    {
+        return $this->declaringScannerClass;
+    }
+
+    /**
+     * Get declaring class
+     *
+     * @return string
+     */
+    public function getDeclaringClass()
+    {
+        return $this->declaringClass;
+    }
+
+    /**
+     * Get declaring scanner function
+     *
+     * @return MethodScanner
+     */
+    public function getDeclaringScannerFunction()
+    {
+        return $this->declaringScannerFunction;
+    }
+
+    /**
+     * Get declaring function
+     *
+     * @return string
+     */
+    public function getDeclaringFunction()
+    {
+        return $this->declaringFunction;
+    }
+
+    /**
+     * Get default value
+     *
+     * @return string
+     */
+    public function getDefaultValue()
+    {
+        $this->scan();
+
+        return $this->defaultValue;
     }
 
     /**
@@ -296,17 +307,6 @@ class ParameterScanner
         $this->scan();
 
         return $this->position;
-    }
-
-    /**
-     * Set position
-     *
-     * @param int $position
-     * @return void
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
     }
 
     /**

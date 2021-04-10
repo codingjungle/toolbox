@@ -1,33 +1,28 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser;
 
 use PhpParser\Parser\Tokens;
-use PHPUnit\Framework\TestCase;
 
-class LexerTest extends TestCase
+class LexerTest extends \PHPUnit\Framework\TestCase
 {
     /* To allow overwriting in parent class */
+    protected function getLexer(array $options = []) {
+        return new Lexer($options);
+    }
+
     /**
      * @dataProvider provideTestError
      */
-    public function testError($code, $messages)
-    {
+    public function testError($code, $messages) {
         if (defined('HHVM_VERSION')) {
             $this->markTestSkipped('HHVM does not throw warnings from token_get_all()');
         }
 
         $errorHandler = new ErrorHandler\Collecting();
-        $lexer = $this->getLexer([
-            'usedAttributes' => [
-                'comments',
-                'startLine',
-                'endLine',
-                'startFilePos',
-                'endFilePos'
-            ]
-        ]);
+        $lexer = $this->getLexer(['usedAttributes' => [
+            'comments', 'startLine', 'endLine', 'startFilePos', 'endFilePos'
+        ]]);
         $lexer->startLexing($code, $errorHandler);
         $errors = $errorHandler->getErrors();
 
@@ -37,35 +32,25 @@ class LexerTest extends TestCase
         }
     }
 
-    protected function getLexer(array $options = [])
-    {
-        return new Lexer($options);
-    }
-
-    public function provideTestError()
-    {
+    public function provideTestError() {
         return [
             ["<?php /*", ["Unterminated comment from 1:7 to 1:9"]],
             ["<?php \1", ["Unexpected character \"\1\" (ASCII 1) from 1:7 to 1:7"]],
             ["<?php \0", ["Unexpected null byte from 1:7 to 1:7"]],
             // Error with potentially emulated token
             ["<?php ?? \0", ["Unexpected null byte from 1:10 to 1:10"]],
-            [
-                "<?php\n\0\1 foo /* bar",
-                [
-                    "Unexpected null byte from 2:1 to 2:1",
-                    "Unexpected character \"\1\" (ASCII 1) from 2:2 to 2:2",
-                    "Unterminated comment from 2:8 to 2:14"
-                ]
-            ],
+            ["<?php\n\0\1 foo /* bar", [
+                "Unexpected null byte from 2:1 to 2:1",
+                "Unexpected character \"\1\" (ASCII 1) from 2:2 to 2:2",
+                "Unterminated comment from 2:8 to 2:14"
+            ]],
         ];
     }
 
     /**
      * @dataProvider provideTestLex
      */
-    public function testLex($code, $options, $tokens)
-    {
+    public function testLex($code, $options, $tokens) {
         $lexer = $this->getLexer($options);
         $lexer->startLexing($code);
         while ($id = $lexer->getNextToken($value, $startAttributes, $endAttributes)) {
@@ -78,8 +63,7 @@ class LexerTest extends TestCase
         }
     }
 
-    public function provideTestLex()
-    {
+    public function provideTestLex() {
         return [
             // tests conversion of closing PHP tag and drop of whitespace and opening tags
             [
@@ -87,20 +71,15 @@ class LexerTest extends TestCase
                 [],
                 [
                     [
-                        Tokens::T_STRING,
-                        'tokens',
-                        ['startLine' => 1],
-                        ['endLine' => 1]
+                        Tokens::T_STRING, 'tokens',
+                        ['startLine' => 1], ['endLine' => 1]
                     ],
                     [
-                        ord(';'),
-                        '?>',
-                        ['startLine' => 1],
-                        ['endLine' => 1]
+                        ord(';'), '?>',
+                        ['startLine' => 1], ['endLine' => 1]
                     ],
                     [
-                        Tokens::T_INLINE_HTML,
-                        'plaintext',
+                        Tokens::T_INLINE_HTML, 'plaintext',
                         ['startLine' => 1, 'hasLeadingNewline' => false],
                         ['endLine' => 1]
                     ],
@@ -112,23 +91,18 @@ class LexerTest extends TestCase
                 [],
                 [
                     [
-                        ord('$'),
-                        '$',
-                        ['startLine' => 2],
-                        ['endLine' => 2]
+                        ord('$'), '$',
+                        ['startLine' => 2], ['endLine' => 2]
                     ],
                     [
-                        Tokens::T_STRING,
-                        'token',
-                        ['startLine' => 2],
-                        ['endLine' => 2]
+                        Tokens::T_STRING, 'token',
+                        ['startLine' => 2], ['endLine' => 2]
                     ],
                     [
-                        ord('$'),
-                        '$',
+                        ord('$'), '$',
                         [
                             'startLine' => 3,
-                            'comments'  => [
+                            'comments' => [
                                 new Comment\Doc('/** doc' . "\n" . 'comment */', 2, 14, 5),
                             ]
                         ],
@@ -142,11 +116,10 @@ class LexerTest extends TestCase
                 [],
                 [
                     [
-                        Tokens::T_STRING,
-                        'token',
+                        Tokens::T_STRING, 'token',
                         [
                             'startLine' => 2,
-                            'comments'  => [
+                            'comments' => [
                                 new Comment('/* comment */', 1, 6, 1),
                                 new Comment('// comment' . "\n", 1, 20, 3),
                                 new Comment\Doc('/** docComment 1 */', 2, 31, 4),
@@ -163,10 +136,8 @@ class LexerTest extends TestCase
                 [],
                 [
                     [
-                        Tokens::T_CONSTANT_ENCAPSED_STRING,
-                        '"foo' . "\n" . 'bar"',
-                        ['startLine' => 1],
-                        ['endLine' => 2]
+                        Tokens::T_CONSTANT_ENCAPSED_STRING, '"foo' . "\n" . 'bar"',
+                        ['startLine' => 1], ['endLine' => 2]
                     ],
                 ]
             ],
@@ -176,28 +147,20 @@ class LexerTest extends TestCase
                 ['usedAttributes' => ['startFilePos', 'endFilePos']],
                 [
                     [
-                        Tokens::T_CONSTANT_ENCAPSED_STRING,
-                        '"a"',
-                        ['startFilePos' => 6],
-                        ['endFilePos' => 8]
+                        Tokens::T_CONSTANT_ENCAPSED_STRING, '"a"',
+                        ['startFilePos' => 6], ['endFilePos' => 8]
                     ],
                     [
-                        ord(';'),
-                        ';',
-                        ['startFilePos' => 9],
-                        ['endFilePos' => 9]
+                        ord(';'), ';',
+                        ['startFilePos' => 9], ['endFilePos' => 9]
                     ],
                     [
-                        Tokens::T_CONSTANT_ENCAPSED_STRING,
-                        '"b"',
-                        ['startFilePos' => 18],
-                        ['endFilePos' => 20]
+                        Tokens::T_CONSTANT_ENCAPSED_STRING, '"b"',
+                        ['startFilePos' => 18], ['endFilePos' => 20]
                     ],
                     [
-                        ord(';'),
-                        ';',
-                        ['startFilePos' => 21],
-                        ['endFilePos' => 21]
+                        ord(';'), ';',
+                        ['startFilePos' => 21], ['endFilePos' => 21]
                     ],
                 ]
             ],
@@ -207,28 +170,20 @@ class LexerTest extends TestCase
                 ['usedAttributes' => ['startTokenPos', 'endTokenPos']],
                 [
                     [
-                        Tokens::T_CONSTANT_ENCAPSED_STRING,
-                        '"a"',
-                        ['startTokenPos' => 1],
-                        ['endTokenPos' => 1]
+                        Tokens::T_CONSTANT_ENCAPSED_STRING, '"a"',
+                        ['startTokenPos' => 1], ['endTokenPos' => 1]
                     ],
                     [
-                        ord(';'),
-                        ';',
-                        ['startTokenPos' => 2],
-                        ['endTokenPos' => 2]
+                        ord(';'), ';',
+                        ['startTokenPos' => 2], ['endTokenPos' => 2]
                     ],
                     [
-                        Tokens::T_CONSTANT_ENCAPSED_STRING,
-                        '"b"',
-                        ['startTokenPos' => 5],
-                        ['endTokenPos' => 5]
+                        Tokens::T_CONSTANT_ENCAPSED_STRING, '"b"',
+                        ['startTokenPos' => 5], ['endTokenPos' => 5]
                     ],
                     [
-                        ord(';'),
-                        ';',
-                        ['startTokenPos' => 6],
-                        ['endTokenPos' => 6]
+                        ord(';'), ';',
+                        ['startTokenPos' => 6], ['endTokenPos' => 6]
                     ],
                 ]
             ],
@@ -238,16 +193,12 @@ class LexerTest extends TestCase
                 ['usedAttributes' => []],
                 [
                     [
-                        Tokens::T_VARIABLE,
-                        '$bar',
-                        [],
-                        []
+                        Tokens::T_VARIABLE, '$bar',
+                        [], []
                     ],
                     [
-                        ord(';'),
-                        ';',
-                        [],
-                        []
+                        ord(';'), ';',
+                        [], []
                     ]
                 ]
             ],
@@ -263,43 +214,37 @@ class LexerTest extends TestCase
     /**
      * @dataProvider provideTestHaltCompiler
      */
-    public function testHandleHaltCompiler($code, $remaining)
-    {
+    public function testHandleHaltCompiler($code, $remaining) {
         $lexer = $this->getLexer();
         $lexer->startLexing($code);
 
-        while (Tokens::T_HALT_COMPILER !== $lexer->getNextToken()) {
-        }
+        while (Tokens::T_HALT_COMPILER !== $lexer->getNextToken());
 
         $this->assertSame($remaining, $lexer->handleHaltCompiler());
         $this->assertSame(0, $lexer->getNextToken());
     }
 
-    public function provideTestHaltCompiler()
-    {
+    public function provideTestHaltCompiler() {
         return [
             ['<?php ... __halt_compiler();Remaining Text', 'Remaining Text'],
             ['<?php ... __halt_compiler ( ) ;Remaining Text', 'Remaining Text'],
             ['<?php ... __halt_compiler() ?>Remaining Text', 'Remaining Text'],
-            ' . "\0", "\0"),
-            //array('
+            //array('<?php ... __halt_compiler();' . "\0", "\0"),
+            //array('<?php ... __halt_compiler /* */ ( ) ;Remaining Text', 'Remaining Text'),
         ];
     }
 
-    public function testHandleHaltCompilerError()
-    {
+    public function testHandleHaltCompilerError() {
         $this->expectException(Error::class);
         $this->expectExceptionMessage('__HALT_COMPILER must be followed by "();"');
         $lexer = $this->getLexer();
         $lexer->startLexing('<?php ... __halt_compiler invalid ();');
 
-        while (Tokens::T_HALT_COMPILER !== $lexer->getNextToken()) {
-        }
+        while (Tokens::T_HALT_COMPILER !== $lexer->getNextToken());
         $lexer->handleHaltCompiler();
     }
 
-    public function testGetTokens()
-    {
+    public function testGetTokens() {
         $code = '<?php "a";' . "\n" . '// foo' . "\n" . '"b";';
         $expectedTokens = [
             [T_OPEN_TAG, '<?php ', 1],

@@ -1,20 +1,17 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node\Stmt;
 
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
-use PHPUnit\Framework\TestCase;
 
-class ClassMethodTest extends TestCase
+class ClassMethodTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider provideModifiers
      */
-    public function testModifiers($modifier)
-    {
+    public function testModifiers($modifier) {
         $node = new ClassMethod('foo', [
             'type' => constant('PhpParser\Node\Stmt\Class_::MODIFIER_' . strtoupper($modifier))
         ]);
@@ -22,8 +19,7 @@ class ClassMethodTest extends TestCase
         $this->assertTrue($node->{'is' . $modifier}());
     }
 
-    public function testNoModifiers()
-    {
+    public function testNoModifiers() {
         $node = new ClassMethod('foo', ['type' => 0]);
 
         $this->assertTrue($node->isPublic());
@@ -35,8 +31,7 @@ class ClassMethodTest extends TestCase
         $this->assertFalse($node->isMagic());
     }
 
-    public function provideModifiers()
-    {
+    public function provideModifiers() {
         return [
             ['public'],
             ['protected'],
@@ -63,8 +58,7 @@ class ClassMethodTest extends TestCase
         $this->assertTrue($node->isPublic(), 'Node should be implicitly public');
     }
 
-    public function implicitPublicModifiers()
-    {
+    public function implicitPublicModifiers() {
         return [
             ['abstract'],
             ['final'],
@@ -77,43 +71,40 @@ class ClassMethodTest extends TestCase
      *
      * @param string $name Node name
      */
-    public function testMagic(string $name)
-    {
+    public function testMagic(string $name) {
         $node = new ClassMethod($name);
         $this->assertTrue($node->isMagic(), 'Method should be magic');
     }
 
-    public function provideMagics()
-    {
+    public function provideMagics() {
         return [
-            ['__construct'],
-            ['__DESTRUCT'],
-            ['__caLL'],
-            ['__callstatic'],
-            ['__get'],
-            ['__set'],
-            ['__isset'],
-            ['__unset'],
-            ['__sleep'],
-            ['__wakeup'],
-            ['__tostring'],
-            ['__set_state'],
-            ['__clone'],
-            ['__invoke'],
-            ['__debuginfo'],
+             ['__construct'],
+             ['__DESTRUCT'],
+             ['__caLL'],
+             ['__callstatic'],
+             ['__get'],
+             ['__set'],
+             ['__isset'],
+             ['__unset'],
+             ['__sleep'],
+             ['__wakeup'],
+             ['__tostring'],
+             ['__set_state'],
+             ['__clone'],
+             ['__invoke'],
+             ['__debuginfo'],
         ];
     }
 
-    public function testFunctionLike()
-    {
+    public function testFunctionLike() {
         $param = new Param(new Variable('a'));
         $type = new Name('Foo');
         $return = new Return_(new Variable('a'));
         $method = new ClassMethod('test', [
-            'byRef'      => false,
-            'params'     => [$param],
+            'byRef' => false,
+            'params' => [$param],
             'returnType' => $type,
-            'stmts'      => [$return],
+            'stmts' => [$return],
         ]);
 
         $this->assertFalse($method->returnsByRef());

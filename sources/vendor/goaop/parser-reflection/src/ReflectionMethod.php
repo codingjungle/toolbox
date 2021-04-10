@@ -14,7 +14,6 @@ use Go\ParserReflection\Traits\InternalPropertiesEmulationTrait;
 use Go\ParserReflection\Traits\ReflectionFunctionLikeTrait;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
-use Reflection;
 use ReflectionMethod as BaseReflectionMethod;
 
 /**
@@ -22,8 +21,7 @@ use ReflectionMethod as BaseReflectionMethod;
  */
 class ReflectionMethod extends BaseReflectionMethod
 {
-    use InternalPropertiesEmulationTrait;
-    use ReflectionFunctionLikeTrait;
+    use ReflectionFunctionLikeTrait, InternalPropertiesEmulationTrait;
 
     /**
      * Name of the class
@@ -54,41 +52,12 @@ class ReflectionMethod extends BaseReflectionMethod
         ReflectionClass $declaringClass = null
     ) {
         //for some reason, ReflectionMethod->getNamespaceName in php always returns '', so we shouldn't use it too
-        $this->className = ltrim($className, '\\');
-        $this->declaringClass = $declaringClass;
+        $this->className        = ltrim($className, '\\');
+        $this->declaringClass   = $declaringClass;
         $this->functionLikeNode = $classMethodNode ?: ReflectionEngine::parseClassMethod($className, $methodName);
 
         // Let's unset original read-only properties to have a control over them via __get
         unset($this->name, $this->class);
-    }
-
-    /**
-     * Parses methods from the concrete class node
-     *
-     * @param ClassLike $classLikeNode Class-like node
-     * @param ReflectionClass $reflectionClass Reflection of the class
-     *
-     * @return array|ReflectionMethod[]
-     */
-    public static function collectFromClassNode(ClassLike $classLikeNode, ReflectionClass $reflectionClass)
-    {
-        $methods = [];
-
-        foreach ($classLikeNode->stmts as $classLevelNode) {
-            if ($classLevelNode instanceof ClassMethod) {
-                $classLevelNode->setAttribute('fileName', $classLikeNode->getAttribute('fileName'));
-
-                $methodName = $classLevelNode->name->toString();
-                $methods[$methodName] = new ReflectionMethod(
-                    $reflectionClass->name,
-                    $methodName,
-                    $classLevelNode,
-                    $reflectionClass
-                );
-            }
-        }
-
-        return $methods;
     }
 
     /**
@@ -113,16 +82,6 @@ class ReflectionMethod extends BaseReflectionMethod
     }
 
     /**
-     * Returns ClassMethod node to prevent all possible type checks with instanceof
-     *
-     * @return ClassMethod
-     */
-    private function getClassMethodNode()
-    {
-        return $this->functionLikeNode;
-    }
-
-    /**
      * Returns the string representation of the Reflection method object.
      *
      * @link http://php.net/manual/en/reflectionmethod.tostring.php
@@ -132,11 +91,11 @@ class ReflectionMethod extends BaseReflectionMethod
     public function __toString()
     {
         // Internally $this->getReturnType() !== null is the same as $this->hasReturnType()
-        $returnType = $this->getReturnType();
-        $hasReturnType = $returnType !== null;
-        $paramsNeeded = $hasReturnType || $this->getNumberOfParameters() > 0;
-        $paramFormat = $paramsNeeded ? "\n\n  - Parameters [%d] {%s\n  }" : '';
-        $returnFormat = $hasReturnType ? "\n  - Return [ %s ]" : '';
+        $returnType       = $this->getReturnType();
+        $hasReturnType    = $returnType !== null;
+        $paramsNeeded     = $hasReturnType || $this->getNumberOfParameters() > 0;
+        $paramFormat      = $paramsNeeded ? "\n\n  - Parameters [%d] {%s\n  }" : '';
+        $returnFormat     = $hasReturnType ? "\n  - Return [ %s ]" : '';
         $methodParameters = $this->getParameters();
         try {
             $prototype = $this->getPrototype();
@@ -146,7 +105,7 @@ class ReflectionMethod extends BaseReflectionMethod
         $prototypeClass = $prototype ? $prototype->getDeclaringClass()->name : '';
 
         $paramString = '';
-        $identation = str_repeat(' ', 4);
+        $identation  = str_repeat(' ', 4);
         foreach ($methodParameters as $methodParameter) {
             $paramString .= "\n{$identation}" . $methodParameter;
         }
@@ -162,7 +121,7 @@ class ReflectionMethod extends BaseReflectionMethod
             $this->isAbstract() ? ' abstract' : '',
             join(
                 ' ',
-                Reflection::getModifierNames(
+                \Reflection::getModifierNames(
                     $this->getModifiers() & (self::IS_PUBLIC | self::IS_PROTECTED | self::IS_PRIVATE)
                 )
             ),
@@ -179,19 +138,11 @@ class ReflectionMethod extends BaseReflectionMethod
     /**
      * {@inheritDoc}
      */
-    public function getPrototype()
+    public function getClosure($object)
     {
-        $parent = $this->getDeclaringClass()->getParentClass();
-        if (!$parent) {
-            throw new ReflectionException("No prototype");
-        }
+        $this->initializeInternalReflection();
 
-        $prototypeMethod = $parent->getMethod($this->getName());
-        if (!$prototypeMethod) {
-            throw new ReflectionException("No prototype");
-        }
-
-        return $prototypeMethod;
+        return parent::getClosure($object);
     }
 
     /**
@@ -200,46 +151,6 @@ class ReflectionMethod extends BaseReflectionMethod
     public function getDeclaringClass()
     {
         return isset($this->declaringClass) ? $this->declaringClass : new ReflectionClass($this->className);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isConstructor()
-    {
-        return $this->getClassMethodNode()->name == '__construct';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isDestructor()
-    {
-        return $this->getClassMethodNode()->name == '__destruct';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isFinal()
-    {
-        return $this->getClassMethodNode()->isFinal();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isStatic()
-    {
-        return $this->getClassMethodNode()->isStatic();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isAbstract()
-    {
-        return $this->getDeclaringClass()->isInterface() || $this->getClassMethodNode()->isAbstract();
     }
 
     /**
@@ -273,35 +184,19 @@ class ReflectionMethod extends BaseReflectionMethod
     /**
      * {@inheritDoc}
      */
-    public function isPublic()
+    public function getPrototype()
     {
-        return $this->getClassMethodNode()->isPublic();
-    }
+        $parent = $this->getDeclaringClass()->getParentClass();
+        if (!$parent) {
+            throw new ReflectionException("No prototype");
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isProtected()
-    {
-        return $this->getClassMethodNode()->isProtected();
-    }
+        $prototypeMethod = $parent->getMethod($this->getName());
+        if (!$prototypeMethod) {
+            throw new ReflectionException("No prototype");
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPrivate()
-    {
-        return $this->getClassMethodNode()->isPrivate();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getClosure($object)
-    {
-        $this->initializeInternalReflection();
-
-        return parent::getClosure($object);
+        return $prototypeMethod;
     }
 
     /**
@@ -327,11 +222,104 @@ class ReflectionMethod extends BaseReflectionMethod
     /**
      * {@inheritDoc}
      */
+    public function isAbstract()
+    {
+        return $this->getDeclaringClass()->isInterface() || $this->getClassMethodNode()->isAbstract();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isConstructor()
+    {
+        return $this->getClassMethodNode()->name == '__construct';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isDestructor()
+    {
+        return $this->getClassMethodNode()->name == '__destruct';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isFinal()
+    {
+        return $this->getClassMethodNode()->isFinal();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isPrivate()
+    {
+        return $this->getClassMethodNode()->isPrivate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isProtected()
+    {
+        return $this->getClassMethodNode()->isProtected();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isPublic()
+    {
+        return $this->getClassMethodNode()->isPublic();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isStatic()
+    {
+        return $this->getClassMethodNode()->isStatic();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setAccessible($accessible)
     {
         $this->initializeInternalReflection();
 
         parent::setAccessible($accessible);
+    }
+
+    /**
+     * Parses methods from the concrete class node
+     *
+     * @param ClassLike $classLikeNode Class-like node
+     * @param ReflectionClass $reflectionClass Reflection of the class
+     *
+     * @return array|ReflectionMethod[]
+     */
+    public static function collectFromClassNode(ClassLike $classLikeNode, ReflectionClass $reflectionClass)
+    {
+        $methods = [];
+
+        foreach ($classLikeNode->stmts as $classLevelNode) {
+            if ($classLevelNode instanceof ClassMethod) {
+                $classLevelNode->setAttribute('fileName', $classLikeNode->getAttribute('fileName'));
+
+                $methodName = $classLevelNode->name->toString();
+                $methods[$methodName] = new ReflectionMethod(
+                    $reflectionClass->name,
+                    $methodName,
+                    $classLevelNode,
+                    $reflectionClass
+                );
+            }
+        }
+
+        return $methods;
     }
 
     /**
@@ -342,5 +330,15 @@ class ReflectionMethod extends BaseReflectionMethod
     protected function __initialize()
     {
         parent::__construct($this->className, $this->getName());
+    }
+
+    /**
+     * Returns ClassMethod node to prevent all possible type checks with instanceof
+     *
+     * @return ClassMethod
+     */
+    private function getClassMethodNode()
+    {
+        return $this->functionLikeNode;
     }
 }

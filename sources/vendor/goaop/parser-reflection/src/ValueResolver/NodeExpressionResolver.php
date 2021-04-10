@@ -18,8 +18,6 @@ use PhpParser\Node\Expr;
 use PhpParser\Node\Scalar;
 use PhpParser\Node\Scalar\MagicConst;
 use PhpParser\Node\Stmt\Expression;
-use ReflectionFunctionAbstract;
-use ReflectionMethod;
 
 /**
  * Tries to resolve expression into value
@@ -48,7 +46,7 @@ class NodeExpressionResolver
     /**
      * Current reflection context for parsing
      *
-     * @var mixed|ReflectionClass
+     * @var mixed|\Go\ParserReflection\ReflectionClass
      */
     private $context;
 
@@ -101,10 +99,10 @@ class NodeExpressionResolver
             $node = $node->expr;
         }
 
-        $this->nodeLevel = 0;
-        $this->isConstant = false;
+        $this->nodeLevel    = 0;
+        $this->isConstant   = false;
         $this->constantName = null;
-        $this->value = $this->resolve($node);
+        $this->value        = $this->resolve($node);
     }
 
     /**
@@ -131,12 +129,6 @@ class NodeExpressionResolver
         return $value;
     }
 
-    private function getDispatchMethodFor(Node $node)
-    {
-        $nodeType = $node->getType();
-        return 'resolve' . str_replace('_', '', $nodeType);
-    }
-
     protected function resolveScalarDNumber(Scalar\DNumber $node)
     {
         return $node->value;
@@ -154,7 +146,7 @@ class NodeExpressionResolver
 
     protected function resolveScalarMagicConstMethod()
     {
-        if ($this->context instanceof ReflectionMethod) {
+        if ($this->context instanceof \ReflectionMethod) {
             $fullName = $this->context->getDeclaringClass()->name . '::' . $this->context->getShortName();
 
             return $fullName;
@@ -165,7 +157,20 @@ class NodeExpressionResolver
 
     protected function resolveScalarMagicConstFunction()
     {
-        if ($this->context instanceof ReflectionFunctionAbstract) {
+        if ($this->context instanceof \ReflectionFunctionAbstract) {
+            return $this->context->getName();
+        }
+
+        return '';
+    }
+
+    protected function resolveScalarMagicConstNamespace()
+    {
+        if (method_exists($this->context, 'getNamespaceName')) {
+            return $this->context->getNamespaceName();
+        }
+
+        if ($this->context instanceof ReflectionFileNamespace) {
             return $this->context->getName();
         }
 
@@ -222,20 +227,20 @@ class NodeExpressionResolver
     protected function resolveExprConstFetch(Expr\ConstFetch $node)
     {
         $constantValue = null;
-        $isResolved = false;
+        $isResolved    = false;
 
         $isFQNConstant = $node->name instanceof Node\Name\FullyQualified;
-        $constantName = $node->name->toString();
+        $constantName  = $node->name->toString();
 
         if (!$isFQNConstant) {
             if (method_exists($this->context, 'getFileName')) {
-                $fileName = $this->context->getFileName();
+                $fileName      = $this->context->getFileName();
                 $namespaceName = $this->resolveScalarMagicConstNamespace();
                 $fileNamespace = new ReflectionFileNamespace($fileName, $namespaceName);
                 if ($fileNamespace->hasConstant($constantName)) {
                     $constantValue = $fileNamespace->getConstant($constantName);
-                    $constantName = $fileNamespace->getName() . '\\' . $constantName;
-                    $isResolved = true;
+                    $constantName  = $fileNamespace->getName() . '\\' . $constantName;
+                    $isResolved    = true;
                 }
             }
         }
@@ -245,24 +250,11 @@ class NodeExpressionResolver
         }
 
         if ($this->nodeLevel === 1 && !isset(self::$notConstants[$constantName])) {
-            $this->isConstant = true;
+            $this->isConstant   = true;
             $this->constantName = $constantName;
         }
 
         return $constantValue;
-    }
-
-    protected function resolveScalarMagicConstNamespace()
-    {
-        if (method_exists($this->context, 'getNamespaceName')) {
-            return $this->context->getNamespaceName();
-        }
-
-        if ($this->context instanceof ReflectionFileNamespace) {
-            return $this->context->getName();
-        }
-
-        return '';
     }
 
     protected function resolveExprClassConstFetch(Expr\ClassConstFetch $node)
@@ -296,70 +288,12 @@ class NodeExpressionResolver
         return $refClass->getConstant($constantName);
     }
 
-    /**
-     * Utility method to fetch reflection class instance by name
-     *
-     * Supports:
-     *   'self' keyword
-     *   'parent' keyword
-     *    not-FQN class names
-     *
-     * @param Node\Name $node Class name node
-     *
-     * @return bool|\ReflectionClass
-     *
-     * @throws ReflectionException
-     */
-    private function fetchReflectionClass(Node\Name $node)
-    {
-        $className = $node->toString();
-        $isFQNClass = $node instanceof Node\Name\FullyQualified;
-        if ($isFQNClass) {
-            // check to see if the class is already loaded and is safe to use
-            // PHP's ReflectionClass to determine if the class is user defined
-            if (class_exists($className, false)) {
-                $refClass = new \ReflectionClass($className);
-                if (!$refClass->isUserDefined()) {
-                    return $refClass;
-                }
-            }
-            return new ReflectionClass($className);
-        }
-
-        if ('self' === $className) {
-            if ($this->context instanceof \ReflectionClass) {
-                return $this->context;
-            } elseif (method_exists($this->context, 'getDeclaringClass')) {
-                return $this->context->getDeclaringClass();
-            }
-        }
-
-        if ('parent' === $className) {
-            if ($this->context instanceof \ReflectionClass) {
-                return $this->context->getParentClass();
-            } elseif (method_exists($this->context, 'getDeclaringClass')) {
-                return $this->context->getDeclaringClass()->getParentClass();
-            }
-        }
-
-        if (method_exists($this->context, 'getFileName')) {
-            /** @var ReflectionFileNamespace|null $fileNamespace */
-            $fileName = $this->context->getFileName();
-            $namespaceName = $this->resolveScalarMagicConstNamespace();
-
-            $fileNamespace = new ReflectionFileNamespace($fileName, $namespaceName);
-            return $fileNamespace->getClass($className);
-        }
-
-        throw new ReflectionException("Can not resolve class $className");
-    }
-
     protected function resolveExprArray(Expr\Array_ $node)
     {
         $result = [];
         foreach ($node->items as $itemIndex => $arrayItem) {
             $itemValue = $this->resolve($arrayItem->value);
-            $itemKey = isset($arrayItem->key) ? $this->resolve($arrayItem->key) : $itemIndex;
+            $itemKey   = isset($arrayItem->key) ? $this->resolve($arrayItem->key) : $itemIndex;
             $result[$itemKey] = $itemValue;
         }
 
@@ -512,5 +446,69 @@ class NodeExpressionResolver
     protected function resolveExprBinaryOpLogicalXor(Expr\BinaryOp\LogicalXor $node)
     {
         return $this->resolve($node->left) xor $this->resolve($node->right);
+    }
+
+    private function getDispatchMethodFor(Node $node)
+    {
+        $nodeType = $node->getType();
+        return 'resolve' . str_replace('_', '', $nodeType);
+    }
+
+    /**
+     * Utility method to fetch reflection class instance by name
+     *
+     * Supports:
+     *   'self' keyword
+     *   'parent' keyword
+     *    not-FQN class names
+     *
+     * @param Node\Name $node Class name node
+     *
+     * @return bool|\ReflectionClass
+     *
+     * @throws ReflectionException
+     */
+    private function fetchReflectionClass(Node\Name $node)
+    {
+        $className  = $node->toString();
+        $isFQNClass = $node instanceof Node\Name\FullyQualified;
+        if ($isFQNClass) {
+            // check to see if the class is already loaded and is safe to use
+            // PHP's ReflectionClass to determine if the class is user defined
+            if (class_exists($className, false)) {
+                $refClass = new \ReflectionClass($className);
+                if (!$refClass->isUserDefined()) {
+                    return $refClass;
+                }
+            }
+            return new ReflectionClass($className);
+        }
+
+        if ('self' === $className) {
+            if ($this->context instanceof \ReflectionClass) {
+                return $this->context;
+            } elseif (method_exists($this->context, 'getDeclaringClass')) {
+                return $this->context->getDeclaringClass();
+            }
+        }
+
+        if ('parent' === $className) {
+            if ($this->context instanceof \ReflectionClass) {
+                return $this->context->getParentClass();
+            } elseif (method_exists($this->context, 'getDeclaringClass')) {
+                return $this->context->getDeclaringClass()->getParentClass();
+            }
+        }
+
+        if (method_exists($this->context, 'getFileName')) {
+            /** @var ReflectionFileNamespace|null $fileNamespace */
+            $fileName      = $this->context->getFileName();
+            $namespaceName = $this->resolveScalarMagicConstNamespace();
+
+            $fileNamespace = new ReflectionFileNamespace($fileName, $namespaceName);
+            return $fileNamespace->getClass($className);
+        }
+
+        throw new ReflectionException("Can not resolve class $className");
     }
 }

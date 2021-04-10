@@ -11,7 +11,6 @@ namespace Zend\Code\Scanner;
 
 use Zend\Code\Annotation\AnnotationManager;
 use Zend\Code\Exception;
-use Zend\Code\Exception\InvalidArgumentException;
 use Zend\Code\NameInformation;
 
 use function array_slice;
@@ -19,6 +18,7 @@ use function count;
 use function is_int;
 use function is_string;
 use function ltrim;
+use function strtolower;
 use function substr_count;
 use function var_export;
 
@@ -110,32 +110,27 @@ class MethodScanner implements ScannerInterface
     protected $infos = [];
 
     /**
-     * @param array $methodTokens
+     * @param  array $methodTokens
      * @param NameInformation $nameInformation
      */
     public function __construct(array $methodTokens, NameInformation $nameInformation = null)
     {
-        $this->tokens = $methodTokens;
+        $this->tokens          = $methodTokens;
         $this->nameInformation = $nameInformation;
     }
 
-    public static function export()
-    {
-        // @todo
-    }
-
     /**
-     * @param string $class
+     * @param  string $class
      * @return MethodScanner
      */
     public function setClass($class)
     {
-        $this->class = (string)$class;
+        $this->class = (string) $class;
         return $this;
     }
 
     /**
-     * @param ClassScanner $scannerClass
+     * @param  ClassScanner  $scannerClass
      * @return MethodScanner
      */
     public function setScannerClass(ClassScanner $scannerClass)
@@ -163,267 +158,6 @@ class MethodScanner implements ScannerInterface
     }
 
     /**
-     * Override the given name for a method, this is necessary to
-     * support traits.
-     *
-     * @param string $name
-     * @return self
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    protected function scan()
-    {
-        if ($this->isScanned) {
-            return;
-        }
-
-        if (!$this->tokens) {
-            throw new Exception\RuntimeException('No tokens were provided');
-        }
-
-        /**
-         * Variables & Setup
-         */
-        $tokens = &$this->tokens; // localize
-        $infos = &$this->infos; // localize
-        $tokenIndex = null;
-        $token = null;
-        $tokenType = null;
-        $tokenContent = null;
-        $tokenLine = null;
-        $infoIndex = 0;
-        $parentCount = 0;
-
-        /*
-         * MACRO creation
-         */
-        $MACRO_TOKEN_ADVANCE = function () use (
-            &$tokens,
-            &$tokenIndex,
-            &$token,
-            &$tokenType,
-            &$tokenContent,
-            &$tokenLine
-        ) {
-            static $lastTokenArray = null;
-            $tokenIndex = $tokenIndex === null ? 0 : $tokenIndex + 1;
-            if (!isset($tokens[$tokenIndex])) {
-                $token = false;
-                $tokenContent = false;
-                $tokenType = false;
-                $tokenLine = false;
-
-                return false;
-            }
-            $token = $tokens[$tokenIndex];
-            if (is_string($token)) {
-                $tokenType = null;
-                $tokenContent = $token;
-                $tokenLine = $tokenLine + substr_count(
-                        $lastTokenArray[1],
-                        "\n"
-                    ); // adjust token line by last known newline count
-            } else {
-                list($tokenType, $tokenContent, $tokenLine) = $token;
-            }
-
-            return $tokenIndex;
-        };
-        $MACRO_INFO_START = function () use (&$infoIndex, &$infos, &$tokenIndex, &$tokenLine) {
-            $infos[$infoIndex] = [
-                'type'       => 'parameter',
-                'tokenStart' => $tokenIndex,
-                'tokenEnd'   => null,
-                'lineStart'  => $tokenLine,
-                'lineEnd'    => $tokenLine,
-                'name'       => null,
-                'position'   => $infoIndex + 1, // position is +1 of infoIndex
-            ];
-        };
-        $MACRO_INFO_ADVANCE = function () use (&$infoIndex, &$infos, &$tokenIndex, &$tokenLine) {
-            $infos[$infoIndex]['tokenEnd'] = $tokenIndex;
-            $infos[$infoIndex]['lineEnd'] = $tokenLine;
-            $infoIndex++;
-
-            return $infoIndex;
-        };
-
-        /**
-         * START FINITE STATE MACHINE FOR SCANNING TOKENS
-         */
-        // Initialize token
-        $MACRO_TOKEN_ADVANCE();
-
-        SCANNER_TOP:
-
-        $this->lineStart = $this->lineStart ?: $tokenLine;
-
-        switch ($tokenType) {
-            case T_DOC_COMMENT:
-                $this->lineStart = null;
-                if ($this->docComment === null && $this->name === null) {
-                    $this->docComment = $tokenContent;
-                }
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_FINAL:
-                $this->isFinal = true;
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_ABSTRACT:
-                $this->isAbstract = true;
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_PUBLIC:
-                // use defaults
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_PROTECTED:
-                $this->setVisibility(T_PROTECTED);
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_PRIVATE:
-                $this->setVisibility(T_PRIVATE);
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_STATIC:
-                $this->isStatic = true;
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_NS_SEPARATOR:
-                if (!isset($infos[$infoIndex])) {
-                    $MACRO_INFO_START();
-                }
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case T_VARIABLE:
-            case T_STRING:
-                if ($tokenType === T_STRING && $parentCount === 0) {
-                    $this->name = $tokenContent;
-                }
-
-                if ($parentCount === 1) {
-                    if (!isset($infos[$infoIndex])) {
-                        $MACRO_INFO_START();
-                    }
-                    if ($tokenType === T_VARIABLE) {
-                        $infos[$infoIndex]['name'] = ltrim($tokenContent, '$');
-                    }
-                }
-
-                goto SCANNER_CONTINUE_SIGNATURE;
-            // goto (no break needed);
-
-            case null:
-                switch ($tokenContent) {
-                    case '&':
-                        if (!isset($infos[$infoIndex])) {
-                            $MACRO_INFO_START();
-                        }
-                        goto SCANNER_CONTINUE_SIGNATURE;
-                    // goto (no break needed);
-                    case '(':
-                        $parentCount++;
-                        goto SCANNER_CONTINUE_SIGNATURE;
-                    // goto (no break needed);
-                    case ')':
-                        $parentCount--;
-                        if ($parentCount > 0) {
-                            goto SCANNER_CONTINUE_SIGNATURE;
-                        }
-                        if ($parentCount === 0) {
-                            if ($infos) {
-                                $MACRO_INFO_ADVANCE();
-                            }
-                            $context = 'body';
-                        }
-                        goto SCANNER_CONTINUE_BODY;
-                    // goto (no break needed);
-                    case ',':
-                        if ($parentCount === 1) {
-                            $MACRO_INFO_ADVANCE();
-                        }
-                        goto SCANNER_CONTINUE_SIGNATURE;
-                }
-        }
-
-        SCANNER_CONTINUE_SIGNATURE:
-
-        if ($MACRO_TOKEN_ADVANCE() === false) {
-            goto SCANNER_END;
-        }
-        goto SCANNER_TOP;
-
-        SCANNER_CONTINUE_BODY:
-
-        $braceCount = 0;
-        while ($MACRO_TOKEN_ADVANCE() !== false) {
-            if ($tokenContent == '}') {
-                $braceCount--;
-            }
-            if ($braceCount > 0) {
-                $this->body .= $tokenContent;
-            }
-            if ($tokenContent == '{') {
-                $braceCount++;
-            }
-            $this->lineEnd = $tokenLine;
-        }
-
-        SCANNER_END:
-
-        $this->isScanned = true;
-    }
-
-    /**
-     * Visibility must be of T_PUBLIC, T_PRIVATE or T_PROTECTED
-     * Needed to support traits
-     *
-     * @param int $visibility T_PUBLIC | T_PRIVATE | T_PROTECTED
-     * @return self
-     * @throws InvalidArgumentException
-     */
-    public function setVisibility($visibility)
-    {
-        switch ($visibility) {
-            case T_PUBLIC:
-                $this->isPublic = true;
-                $this->isPrivate = false;
-                $this->isProtected = false;
-                break;
-
-            case T_PRIVATE:
-                $this->isPublic = false;
-                $this->isPrivate = true;
-                $this->isProtected = false;
-                break;
-
-            case T_PROTECTED:
-                $this->isPublic = false;
-                $this->isPrivate = false;
-                $this->isProtected = true;
-                break;
-
-            default:
-                throw new InvalidArgumentException('Invalid visibility argument passed to setVisibility.');
-        }
-
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getLineStart()
@@ -444,7 +178,17 @@ class MethodScanner implements ScannerInterface
     }
 
     /**
-     * @param AnnotationManager $annotationManager
+     * @return string
+     */
+    public function getDocComment()
+    {
+        $this->scan();
+
+        return $this->docComment;
+    }
+
+    /**
+     * @param  AnnotationManager $annotationManager
      * @return AnnotationScanner|false
      */
     public function getAnnotations(AnnotationManager $annotationManager)
@@ -454,16 +198,6 @@ class MethodScanner implements ScannerInterface
         }
 
         return new AnnotationScanner($annotationManager, $docComment, $this->nameInformation);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDocComment()
-    {
-        $this->scan();
-
-        return $this->docComment;
     }
 
     /**
@@ -527,6 +261,55 @@ class MethodScanner implements ScannerInterface
     }
 
     /**
+     * Override the given name for a method, this is necessary to
+     * support traits.
+     *
+     * @param string $name
+     * @return self
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Visibility must be of T_PUBLIC, T_PRIVATE or T_PROTECTED
+     * Needed to support traits
+     *
+     * @param int $visibility   T_PUBLIC | T_PRIVATE | T_PROTECTED
+     * @return self
+     * @throws \Zend\Code\Exception\InvalidArgumentException
+     */
+    public function setVisibility($visibility)
+    {
+        switch ($visibility) {
+            case T_PUBLIC:
+                $this->isPublic = true;
+                $this->isPrivate = false;
+                $this->isProtected = false;
+                break;
+
+            case T_PRIVATE:
+                $this->isPublic = false;
+                $this->isPrivate = true;
+                $this->isProtected = false;
+                break;
+
+            case T_PROTECTED:
+                $this->isPublic = false;
+                $this->isPrivate = false;
+                $this->isProtected = true;
+                break;
+
+            default:
+                throw new Exception\InvalidArgumentException('Invalid visibility argument passed to setVisibility.');
+        }
+
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getNumberOfParameters()
@@ -535,7 +318,7 @@ class MethodScanner implements ScannerInterface
     }
 
     /**
-     * @param bool $returnScanner
+     * @param  bool $returnScanner
      * @return array
      */
     public function getParameters($returnScanner = false)
@@ -549,7 +332,7 @@ class MethodScanner implements ScannerInterface
                 continue;
             }
 
-            if (!$returnScanner) {
+            if (! $returnScanner) {
                 $return[] = $info['name'];
             } else {
                 $return[] = $this->getParameter($info['name']);
@@ -560,9 +343,9 @@ class MethodScanner implements ScannerInterface
     }
 
     /**
-     * @param int|string $parameterNameOrInfoIndex
+     * @param  int|string $parameterNameOrInfoIndex
      * @return ParameterScanner
-     * @throws InvalidArgumentException
+     * @throws Exception\InvalidArgumentException
      */
     public function getParameter($parameterNameOrInfoIndex)
     {
@@ -571,7 +354,7 @@ class MethodScanner implements ScannerInterface
         if (is_int($parameterNameOrInfoIndex)) {
             $info = $this->infos[$parameterNameOrInfoIndex];
             if ($info['type'] != 'parameter') {
-                throw new InvalidArgumentException('Index of info offset is not about a parameter');
+                throw new Exception\InvalidArgumentException('Index of info offset is not about a parameter');
             }
         } elseif (is_string($parameterNameOrInfoIndex)) {
             foreach ($this->infos as $info) {
@@ -580,8 +363,8 @@ class MethodScanner implements ScannerInterface
                 }
                 unset($info);
             }
-            if (!isset($info)) {
-                throw new InvalidArgumentException('Index of info offset is not about a parameter');
+            if (! isset($info)) {
+                throw new Exception\InvalidArgumentException('Index of info offset is not about a parameter');
             }
         }
 
@@ -608,10 +391,227 @@ class MethodScanner implements ScannerInterface
         return $this->body;
     }
 
+    public static function export()
+    {
+        // @todo
+    }
+
     public function __toString()
     {
         $this->scan();
 
         return var_export($this, true);
+    }
+
+    protected function scan()
+    {
+        if ($this->isScanned) {
+            return;
+        }
+
+        if (! $this->tokens) {
+            throw new Exception\RuntimeException('No tokens were provided');
+        }
+
+        /**
+         * Variables & Setup
+         */
+        $tokens       = &$this->tokens; // localize
+        $infos        = &$this->infos; // localize
+        $tokenIndex   = null;
+        $token        = null;
+        $tokenType    = null;
+        $tokenContent = null;
+        $tokenLine    = null;
+        $infoIndex    = 0;
+        $parentCount  = 0;
+
+        /*
+         * MACRO creation
+         */
+        $MACRO_TOKEN_ADVANCE = function () use (
+            &$tokens,
+            &$tokenIndex,
+            &$token,
+            &$tokenType,
+            &$tokenContent,
+            &$tokenLine
+        ) {
+            static $lastTokenArray = null;
+            $tokenIndex = $tokenIndex === null ? 0 : $tokenIndex + 1;
+            if (! isset($tokens[$tokenIndex])) {
+                $token        = false;
+                $tokenContent = false;
+                $tokenType    = false;
+                $tokenLine    = false;
+
+                return false;
+            }
+            $token = $tokens[$tokenIndex];
+            if (is_string($token)) {
+                $tokenType    = null;
+                $tokenContent = $token;
+                $tokenLine    = $tokenLine + substr_count(
+                    $lastTokenArray[1],
+                    "\n"
+                ); // adjust token line by last known newline count
+            } else {
+                list($tokenType, $tokenContent, $tokenLine) = $token;
+            }
+
+            return $tokenIndex;
+        };
+        $MACRO_INFO_START    = function () use (&$infoIndex, &$infos, &$tokenIndex, &$tokenLine) {
+            $infos[$infoIndex] = [
+                'type'        => 'parameter',
+                'tokenStart'  => $tokenIndex,
+                'tokenEnd'    => null,
+                'lineStart'   => $tokenLine,
+                'lineEnd'     => $tokenLine,
+                'name'        => null,
+                'position'    => $infoIndex + 1, // position is +1 of infoIndex
+            ];
+        };
+        $MACRO_INFO_ADVANCE  = function () use (&$infoIndex, &$infos, &$tokenIndex, &$tokenLine) {
+            $infos[$infoIndex]['tokenEnd'] = $tokenIndex;
+            $infos[$infoIndex]['lineEnd']  = $tokenLine;
+            $infoIndex++;
+
+            return $infoIndex;
+        };
+
+        /**
+         * START FINITE STATE MACHINE FOR SCANNING TOKENS
+         */
+        // Initialize token
+        $MACRO_TOKEN_ADVANCE();
+
+        SCANNER_TOP:
+
+        $this->lineStart = $this->lineStart ? : $tokenLine;
+
+        switch ($tokenType) {
+            case T_DOC_COMMENT:
+                $this->lineStart = null;
+                if ($this->docComment === null && $this->name === null) {
+                    $this->docComment = $tokenContent;
+                }
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_FINAL:
+                $this->isFinal = true;
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_ABSTRACT:
+                $this->isAbstract = true;
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_PUBLIC:
+                // use defaults
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_PROTECTED:
+                $this->setVisibility(T_PROTECTED);
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_PRIVATE:
+                $this->setVisibility(T_PRIVATE);
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_STATIC:
+                $this->isStatic = true;
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_NS_SEPARATOR:
+                if (! isset($infos[$infoIndex])) {
+                    $MACRO_INFO_START();
+                }
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case T_VARIABLE:
+            case T_STRING:
+                if ($tokenType === T_STRING && $parentCount === 0) {
+                    $this->name = $tokenContent;
+                }
+
+                if ($parentCount === 1) {
+                    if (! isset($infos[$infoIndex])) {
+                        $MACRO_INFO_START();
+                    }
+                    if ($tokenType === T_VARIABLE) {
+                        $infos[$infoIndex]['name'] = ltrim($tokenContent, '$');
+                    }
+                }
+
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
+
+            case null:
+                switch ($tokenContent) {
+                    case '&':
+                        if (! isset($infos[$infoIndex])) {
+                            $MACRO_INFO_START();
+                        }
+                        goto SCANNER_CONTINUE_SIGNATURE;
+                        // goto (no break needed);
+                    case '(':
+                        $parentCount++;
+                        goto SCANNER_CONTINUE_SIGNATURE;
+                        // goto (no break needed);
+                    case ')':
+                        $parentCount--;
+                        if ($parentCount > 0) {
+                            goto SCANNER_CONTINUE_SIGNATURE;
+                        }
+                        if ($parentCount === 0) {
+                            if ($infos) {
+                                $MACRO_INFO_ADVANCE();
+                            }
+                            $context = 'body';
+                        }
+                        goto SCANNER_CONTINUE_BODY;
+                        // goto (no break needed);
+                    case ',':
+                        if ($parentCount === 1) {
+                            $MACRO_INFO_ADVANCE();
+                        }
+                        goto SCANNER_CONTINUE_SIGNATURE;
+                }
+        }
+
+        SCANNER_CONTINUE_SIGNATURE:
+
+        if ($MACRO_TOKEN_ADVANCE() === false) {
+            goto SCANNER_END;
+        }
+        goto SCANNER_TOP;
+
+        SCANNER_CONTINUE_BODY:
+
+        $braceCount = 0;
+        while ($MACRO_TOKEN_ADVANCE() !== false) {
+            if ($tokenContent == '}') {
+                $braceCount--;
+            }
+            if ($braceCount > 0) {
+                $this->body .= $tokenContent;
+            }
+            if ($tokenContent == '{') {
+                $braceCount++;
+            }
+            $this->lineEnd = $tokenLine;
+        }
+
+        SCANNER_END:
+
+        $this->isScanned = true;
     }
 }

@@ -10,14 +10,13 @@
 namespace Zend\Stdlib;
 
 use Countable;
-use Exception;
 use Iterator;
 
 class PriorityList implements Iterator, Countable
 {
-    public const EXTR_DATA = 0x00000001;
-    public const EXTR_PRIORITY = 0x00000002;
-    public const EXTR_BOTH = 0x00000003;
+    const EXTR_DATA     = 0x00000001;
+    const EXTR_PRIORITY = 0x00000002;
+    const EXTR_BOTH     = 0x00000003;
     /**
      * Internal list of all items.
      *
@@ -34,7 +33,7 @@ class PriorityList implements Iterator, Countable
 
     /**
      * Serial order mode
-     * @var int
+     * @var integer
      */
     protected $isLIFO = 1;
 
@@ -55,15 +54,15 @@ class PriorityList implements Iterator, Countable
     /**
      * Insert a new item.
      *
-     * @param string $name
-     * @param mixed $value
-     * @param int $priority
+     * @param  string  $name
+     * @param  mixed   $value
+     * @param  int     $priority
      *
      * @return void
      */
     public function insert($name, $value, $priority = 0)
     {
-        if (!isset($this->items[$name])) {
+        if (! isset($this->items[$name])) {
             $this->count++;
         }
 
@@ -71,27 +70,27 @@ class PriorityList implements Iterator, Countable
 
         $this->items[$name] = [
             'data'     => $value,
-            'priority' => (int)$priority,
+            'priority' => (int) $priority,
             'serial'   => $this->serial++,
         ];
     }
 
     /**
      * @param string $name
-     * @param int $priority
+     * @param int    $priority
      *
      * @return $this
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function setPriority($name, $priority)
     {
-        if (!isset($this->items[$name])) {
-            throw new Exception("item $name not found");
+        if (! isset($this->items[$name])) {
+            throw new \Exception("item $name not found");
         }
 
-        $this->items[$name]['priority'] = (int)$priority;
-        $this->sorted = false;
+        $this->items[$name]['priority'] = (int) $priority;
+        $this->sorted                   = false;
 
         return $this;
     }
@@ -99,7 +98,7 @@ class PriorityList implements Iterator, Countable
     /**
      * Remove a item.
      *
-     * @param string $name
+     * @param  string $name
      * @return void
      */
     public function remove($name)
@@ -118,25 +117,52 @@ class PriorityList implements Iterator, Countable
      */
     public function clear()
     {
-        $this->items = [];
+        $this->items  = [];
         $this->serial = 0;
-        $this->count = 0;
+        $this->count  = 0;
         $this->sorted = false;
     }
 
     /**
      * Get a item.
      *
-     * @param string $name
+     * @param  string $name
      * @return mixed
      */
     public function get($name)
     {
-        if (!isset($this->items[$name])) {
+        if (! isset($this->items[$name])) {
             return;
         }
 
         return $this->items[$name]['data'];
+    }
+
+    /**
+     * Sort all items.
+     *
+     * @return void
+     */
+    protected function sort()
+    {
+        if (! $this->sorted) {
+            uasort($this->items, [$this, 'compare']);
+            $this->sorted = true;
+        }
+    }
+
+    /**
+     * Compare the priority of two items.
+     *
+     * @param  array $item1,
+     * @param  array $item2
+     * @return int
+     */
+    protected function compare(array $item1, array $item2)
+    {
+        return ($item1['priority'] === $item2['priority'])
+            ? ($item1['serial'] > $item2['serial'] ? -1 : 1) * $this->isLIFO
+            : ($item1['priority'] > $item2['priority'] ? -1 : 1);
     }
 
     /**
@@ -158,6 +184,15 @@ class PriorityList implements Iterator, Countable
         }
 
         return 1 === $this->isLIFO;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function rewind()
+    {
+        $this->sort();
+        reset($this->items);
     }
 
     /**
@@ -188,28 +223,6 @@ class PriorityList implements Iterator, Countable
         $node = next($this->items);
 
         return $node ? $node['data'] : false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function rewind()
-    {
-        $this->sort();
-        reset($this->items);
-    }
-
-    /**
-     * Sort all items.
-     *
-     * @return void
-     */
-    protected function sort()
-    {
-        if (!$this->sorted) {
-            uasort($this->items, [$this, 'compare']);
-            $this->sorted = true;
-        }
     }
 
     /**
@@ -257,19 +270,5 @@ class PriorityList implements Iterator, Countable
             },
             $this->items
         );
-    }
-
-    /**
-     * Compare the priority of two items.
-     *
-     * @param array $item1 ,
-     * @param array $item2
-     * @return int
-     */
-    protected function compare(array $item1, array $item2)
-    {
-        return ($item1['priority'] === $item2['priority'])
-            ? ($item1['serial'] > $item2['serial'] ? -1 : 1) * $this->isLIFO
-            : ($item1['priority'] > $item2['priority'] ? -1 : 1);
     }
 }

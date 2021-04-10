@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-use ArrayIterator;
-
-class MockFileListIterator extends ArrayIterator
+class MockFileListIterator extends \ArrayIterator
 {
     public function __construct(array $filesArray = [])
     {

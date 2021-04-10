@@ -7,48 +7,48 @@
  * This source file is subject to the license that is bundled
  * with this source code in the file LICENSE.
  */
-
 namespace Go\ParserReflection;
 
 use Go\ParserReflection\Stub\AbstractClassWithMethods;
-use PHPUnit_Framework_TestCase;
-use Reflection;
 
-abstract class AbstractTestCase extends PHPUnit_Framework_TestCase
+abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
-    public const DEFAULT_STUB_FILENAME = '/Stub/FileWithClasses55.php';
+    const DEFAULT_STUB_FILENAME = '/Stub/FileWithClasses55.php';
+
+    /**
+     * @var ReflectionFileNamespace
+     */
+    protected $parsedRefFileNamespace;
+
+    /**
+     * @var ReflectionClass
+     */
+    protected $parsedRefClass;
+
     /**
      * Name of the class to compare
      *
      * @var string
      */
-    protected static $reflectionClassToTest = Reflection::class;
+    protected static $reflectionClassToTest = \Reflection::class;
+
     /**
      * Name of the class to load for default tests
      *
      * @var string
      */
     protected static $defaultClassToLoad = AbstractClassWithMethods::class;
-    /**
-     * @var ReflectionFileNamespace
-     */
-    protected $parsedRefFileNamespace;
-    /**
-     * @var ReflectionClass
-     */
-    protected $parsedRefClass;
 
     public function testCoverAllMethods()
     {
         $allInternalMethods = get_class_methods(static::$reflectionClassToTest);
-        $allMissedMethods = [];
+        $allMissedMethods   = [];
 
         foreach ($allInternalMethods as $internalMethodName) {
             if ('export' === $internalMethodName) {
                 continue;
             }
-            $refMethod = new \ReflectionMethod(__NAMESPACE__ . '\\' . static::$reflectionClassToTest,
-                $internalMethodName);
+            $refMethod    = new \ReflectionMethod(__NAMESPACE__ . '\\' . static::$reflectionClassToTest, $internalMethodName);
             $definerClass = $refMethod->getDeclaringClass()->getName();
             if (strpos($definerClass, __NAMESPACE__) !== 0) {
                 $allMissedMethods[] = $internalMethodName;
@@ -90,11 +90,6 @@ abstract class AbstractTestCase extends PHPUnit_Framework_TestCase
      */
     abstract protected function getGettersToCheck();
 
-    protected function setUp()
-    {
-        $this->setUpFile(__DIR__ . self::DEFAULT_STUB_FILENAME);
-    }
-
     /**
      * Setups file for parsing
      *
@@ -107,10 +102,15 @@ abstract class AbstractTestCase extends PHPUnit_Framework_TestCase
 
         $reflectionFile = new ReflectionFile($fileName, $fileNode);
 
-        $parsedFileNamespace = $reflectionFile->getFileNamespace('Go\ParserReflection\Stub');
+        $parsedFileNamespace          = $reflectionFile->getFileNamespace('Go\ParserReflection\Stub');
         $this->parsedRefFileNamespace = $parsedFileNamespace;
-        $this->parsedRefClass = $parsedFileNamespace->getClass(static::$defaultClassToLoad);
+        $this->parsedRefClass         = $parsedFileNamespace->getClass(static::$defaultClassToLoad);
 
         include_once $fileName;
+    }
+
+    protected function setUp()
+    {
+        $this->setUpFile(__DIR__ . self::DEFAULT_STUB_FILENAME);
     }
 }

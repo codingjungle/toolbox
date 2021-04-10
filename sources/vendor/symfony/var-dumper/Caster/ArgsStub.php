@@ -11,13 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
-use ReflectionException;
-use ReflectionFunction;
-use ReflectionMethod;
 use Symfony\Component\VarDumper\Cloner\Stub;
-
-use function array_slice;
-use function count;
 
 /**
  * Represents a list of function arguments.
@@ -41,10 +35,10 @@ class ArgsStub extends EnumStub
 
             return;
         }
-        if (count($values) < count($params)) {
-            $params = array_slice($params, 0, count($values));
-        } elseif (count($values) > count($params)) {
-            $values[] = new EnumStub(array_splice($values, count($params)), false);
+        if (\count($values) < \count($params)) {
+            $params = \array_slice($params, 0, \count($values));
+        } elseif (\count($values) > \count($params)) {
+            $values[] = new EnumStub(array_splice($values, \count($params)), false);
             $params[] = $variadic;
         }
         if (['...'] === $params) {
@@ -57,22 +51,22 @@ class ArgsStub extends EnumStub
 
     private static function getParameters($function, $class)
     {
-        if (isset(self::$parameters[$k = $class . '::' . $function])) {
+        if (isset(self::$parameters[$k = $class.'::'.$function])) {
             return self::$parameters[$k];
         }
 
         try {
-            $r = null !== $class ? new ReflectionMethod($class, $function) : new ReflectionFunction($function);
-        } catch (ReflectionException $e) {
+            $r = null !== $class ? new \ReflectionMethod($class, $function) : new \ReflectionFunction($function);
+        } catch (\ReflectionException $e) {
             return [null, null];
         }
 
         $variadic = '...';
         $params = [];
         foreach ($r->getParameters() as $v) {
-            $k = '$' . $v->name;
+            $k = '$'.$v->name;
             if ($v->isPassedByReference()) {
-                $k = '&' . $k;
+                $k = '&'.$k;
             }
             if ($v->isVariadic()) {
                 $variadic .= $k;

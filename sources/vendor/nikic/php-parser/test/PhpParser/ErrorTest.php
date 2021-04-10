@@ -1,18 +1,13 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser;
 
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
-
-class ErrorTest extends TestCase
+class ErrorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstruct()
-    {
+    public function testConstruct() {
         $attributes = [
             'startLine' => 10,
-            'endLine'   => 11,
+            'endLine' => 11,
         ];
         $error = new Error('Some error', $attributes);
 
@@ -28,8 +23,7 @@ class ErrorTest extends TestCase
     /**
      * @depends testConstruct
      */
-    public function testSetMessageAndLine(Error $error)
-    {
+    public function testSetMessageAndLine(Error $error) {
         $error->setRawMessage('Some other error');
         $this->assertSame('Some other error', $error->getRawMessage());
 
@@ -38,8 +32,7 @@ class ErrorTest extends TestCase
         $this->assertSame('Some other error on line 15', $error->getMessage());
     }
 
-    public function testUnknownLine()
-    {
+    public function testUnknownLine() {
         $error = new Error('Some error');
 
         $this->assertSame(-1, $error->getStartLine());
@@ -48,20 +41,19 @@ class ErrorTest extends TestCase
     }
 
     /** @dataProvider provideTestColumnInfo */
-    public function testColumnInfo($code, $startPos, $endPos, $startColumn, $endColumn)
-    {
+    public function testColumnInfo($code, $startPos, $endPos, $startColumn, $endColumn) {
         $error = new Error('Some error', [
             'startFilePos' => $startPos,
-            'endFilePos'   => $endPos,
+            'endFilePos' => $endPos,
         ]);
 
         $this->assertTrue($error->hasColumnInfo());
         $this->assertSame($startColumn, $error->getStartColumn($code));
         $this->assertSame($endColumn, $error->getEndColumn($code));
+
     }
 
-    public function provideTestColumnInfo()
-    {
+    public function provideTestColumnInfo() {
         return [
             // Error at "bar"
             ["<?php foo bar baz", 10, 12, 11, 13],
@@ -82,32 +74,30 @@ class ErrorTest extends TestCase
         ];
     }
 
-    public function testNoColumnInfo()
-    {
+    public function testNoColumnInfo() {
         $error = new Error('Some error', 3);
 
         $this->assertFalse($error->hasColumnInfo());
         try {
             $error->getStartColumn('');
             $this->fail('Expected RuntimeException');
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->assertSame('Error does not have column information', $e->getMessage());
         }
         try {
             $error->getEndColumn('');
             $this->fail('Expected RuntimeException');
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->assertSame('Error does not have column information', $e->getMessage());
         }
     }
 
-    public function testInvalidPosInfo()
-    {
-        $this->expectException(RuntimeException::class);
+    public function testInvalidPosInfo() {
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid position information');
         $error = new Error('Some error', [
             'startFilePos' => 10,
-            'endFilePos'   => 11,
+            'endFilePos' => 11,
         ]);
         $error->getStartColumn('code');
     }

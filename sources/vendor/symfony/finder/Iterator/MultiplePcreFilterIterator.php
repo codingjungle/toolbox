@@ -11,25 +11,22 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-use FilterIterator;
-use Iterator;
-
 /**
  * MultiplePcreFilterIterator filters files using patterns (regexps, globs or strings).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class MultiplePcreFilterIterator extends FilterIterator
+abstract class MultiplePcreFilterIterator extends \FilterIterator
 {
     protected $matchRegexps = [];
     protected $noMatchRegexps = [];
 
     /**
-     * @param Iterator $iterator The Iterator to filter
-     * @param array $matchPatterns An array of patterns that need to match
-     * @param array $noMatchPatterns An array of patterns that need to not match
+     * @param \Iterator $iterator        The Iterator to filter
+     * @param array     $matchPatterns   An array of patterns that need to match
+     * @param array     $noMatchPatterns An array of patterns that need to not match
      */
-    public function __construct(Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
+    public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
     {
         foreach ($matchPatterns as $pattern) {
             $this->matchRegexps[] = $this->toRegex($pattern);
@@ -41,15 +38,6 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
 
         parent::__construct($iterator);
     }
-
-    /**
-     * Converts string into regexp.
-     *
-     * @param string $str Pattern
-     *
-     * @return string regexp corresponding to a given string
-     */
-    abstract protected function toRegex($str);
 
     /**
      * Checks whether the string is accepted by the regex filters.
@@ -112,4 +100,13 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
 
         return false;
     }
+
+    /**
+     * Converts string into regexp.
+     *
+     * @param string $str Pattern
+     *
+     * @return string regexp corresponding to a given string
+     */
+    abstract protected function toRegex($str);
 }

@@ -11,15 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Tests\Cloner;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
-
-use function count;
-use function gettype;
 
 class DataTest extends TestCase
 {
@@ -30,18 +26,18 @@ class DataTest extends TestCase
         $clonedValues = [];
 
         $this->assertInstanceOf(Data::class, $data);
-        $this->assertCount(count($values), $data);
+        $this->assertCount(\count($values), $data);
         $this->assertFalse(isset($data->{0}));
         $this->assertFalse(isset($data[0]));
 
         foreach ($data as $k => $v) {
             $this->assertTrue(isset($data->{$k}));
             $this->assertTrue(isset($data[$k]));
-            $this->assertSame(gettype($values[$k]), $data->seek($k)->getType());
+            $this->assertSame(\gettype($values[$k]), $data->seek($k)->getType());
             $this->assertSame($values[$k], $data->seek($k)->getValue());
             $this->assertSame($values[$k], $data->{$k});
             $this->assertSame($values[$k], $data[$k]);
-            $this->assertSame((string)$values[$k], (string)$data->seek($k));
+            $this->assertSame((string) $values[$k], (string) $data->seek($k));
 
             $clonedValues[$k] = $v->getValue();
         }
@@ -49,26 +45,19 @@ class DataTest extends TestCase
         $this->assertSame($values, $clonedValues);
     }
 
-    private function cloneVar($value)
-    {
-        $cloner = new VarCloner();
-
-        return $cloner->cloneVar($value);
-    }
-
     public function testObject()
     {
-        $data = $this->cloneVar(new Exception('foo'));
+        $data = $this->cloneVar(new \Exception('foo'));
 
         $this->assertSame('Exception', $data->getType());
 
         $this->assertSame('foo', $data->message);
-        $this->assertSame('foo', $data->{Caster::PREFIX_PROTECTED . 'message'});
+        $this->assertSame('foo', $data->{Caster::PREFIX_PROTECTED.'message'});
 
         $this->assertSame('foo', $data['message']);
-        $this->assertSame('foo', $data[Caster::PREFIX_PROTECTED . 'message']);
+        $this->assertSame('foo', $data[Caster::PREFIX_PROTECTED.'message']);
 
-        $this->assertStringMatchesFormat('Exception (count=%d)', (string)$data);
+        $this->assertStringMatchesFormat('Exception (count=%d)', (string) $data);
     }
 
     public function testArray()
@@ -99,7 +88,7 @@ class DataTest extends TestCase
 
         $this->assertSame('string', $data->getType());
         $this->assertSame('stdClass', $data->getValue());
-        $this->assertSame('stdClass', (string)$data);
+        $this->assertSame('stdClass', (string) $data);
     }
 
     public function testHardRefs()
@@ -114,6 +103,13 @@ class DataTest extends TestCase
         $this->assertSame([], $data[1]->getValue());
         $this->assertEquals([$data[2]->getValue()], $data[2]->getValue(true));
 
-        $this->assertSame('array (count=3)', (string)$data);
+        $this->assertSame('array (count=3)', (string) $data);
+    }
+
+    private function cloneVar($value)
+    {
+        $cloner = new VarCloner();
+
+        return $cloner->cloneVar($value);
     }
 }

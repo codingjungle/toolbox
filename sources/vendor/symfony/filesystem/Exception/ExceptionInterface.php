@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Filesystem\Exception;
 
-use Throwable;
-
 /**
  * Exception interface for all exceptions thrown by the component.
  *
  * @author Romain Neutron <imprec@gmail.com>
  */
-interface ExceptionInterface extends Throwable
+interface ExceptionInterface extends \Throwable
 {
 }

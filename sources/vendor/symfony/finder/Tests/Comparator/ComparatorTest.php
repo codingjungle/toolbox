@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Finder\Tests\Comparator;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Comparator\Comparator;
 
@@ -23,9 +22,8 @@ class ComparatorTest extends TestCase
         try {
             $comparator->setOperator('foo');
             $this->fail('->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
-        } catch (Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e,
-                '->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
         }
 
         $comparator = new Comparator();

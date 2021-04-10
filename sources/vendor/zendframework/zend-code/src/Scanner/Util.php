@@ -30,17 +30,17 @@ class Util
     /**
      * Resolve imports
      *
-     * @param string $value
-     * @param null|string $key
-     * @param stdClass $data
+     * @param  string $value
+     * @param  null|string $key
+     * @param  \stdClass $data
      * @return void
      * @throws Exception\InvalidArgumentException
      */
     public static function resolveImports(&$value, $key = null, stdClass $data = null)
     {
-        if (!is_object($data)
-            || !property_exists($data, 'uses')
-            || !property_exists($data, 'namespace')
+        if (! is_object($data)
+            || ! property_exists($data, 'uses')
+            || ! property_exists($data, 'namespace')
         ) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a data object containing "uses" and "namespace" properties; on or both missing',
@@ -48,13 +48,13 @@ class Util
             ));
         }
 
-        if ($data->namespace && !$data->uses && strlen($value) > 0 && $value{0} != '\\') {
+        if ($data->namespace && ! $data->uses && strlen($value) > 0 && $value{0} != '\\') {
             $value = $data->namespace . '\\' . $value;
 
             return;
         }
 
-        if (!$data->uses || strlen($value) <= 0 || $value{0} == '\\') {
+        if (! $data->uses || strlen($value) <= 0 || $value{0} == '\\') {
             $value = ltrim($value, '\\');
 
             return;

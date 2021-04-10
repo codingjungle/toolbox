@@ -11,8 +11,6 @@ namespace Zend\Stdlib;
 
 use ErrorException;
 
-use const E_WARNING;
-
 /**
  * ErrorHandler that can be used to catch internal PHP errors
  * and convert to an ErrorException instance.
@@ -33,7 +31,7 @@ abstract class ErrorHandler
      */
     public static function started()
     {
-        return (bool)static::getNestedLevel();
+        return (bool) static::getNestedLevel();
     }
 
     /**
@@ -51,9 +49,9 @@ abstract class ErrorHandler
      *
      * @param int $errorLevel
      */
-    public static function start($errorLevel = E_WARNING)
+    public static function start($errorLevel = \E_WARNING)
     {
-        if (!static::$stack) {
+        if (! static::$stack) {
             set_error_handler([get_called_class(), 'addError'], $errorLevel);
         }
 
@@ -63,7 +61,7 @@ abstract class ErrorHandler
     /**
      * Stopping the error handler
      *
-     * @param bool $throw Throw the ErrorException if any
+     * @param  bool $throw Throw the ErrorException if any
      * @return null|ErrorException
      * @throws ErrorException If an error has been caught and $throw is true
      */
@@ -74,7 +72,7 @@ abstract class ErrorHandler
         if (static::$stack) {
             $errorException = array_pop(static::$stack);
 
-            if (!static::$stack) {
+            if (! static::$stack) {
                 restore_error_handler();
             }
 
@@ -103,15 +101,15 @@ abstract class ErrorHandler
     /**
      * Add an error to the stack
      *
-     * @param int $errno
+     * @param int    $errno
      * @param string $errstr
      * @param string $errfile
-     * @param int $errline
+     * @param int    $errline
      * @return void
      */
     public static function addError($errno, $errstr = '', $errfile = '', $errline = 0)
     {
-        $stack = &static::$stack[count(static::$stack) - 1];
+        $stack = & static::$stack[count(static::$stack) - 1];
         $stack = new ErrorException($errstr, 0, $errno, $errfile, $errline, $stack);
     }
 }

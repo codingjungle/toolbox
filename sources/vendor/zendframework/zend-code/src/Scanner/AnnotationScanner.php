@@ -53,9 +53,9 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
     protected $annotations = [];
 
     /**
-     * @param AnnotationManager $annotationManager
-     * @param string $docComment
-     * @param NameInformation $nameInformation
+     * @param  AnnotationManager $annotationManager
+     * @param  string $docComment
+     * @param  NameInformation $nameInformation
      * @return AnnotationScanner
      */
     public function __construct(
@@ -64,19 +64,27 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
         NameInformation $nameInformation = null
     ) {
         $this->annotationManager = $annotationManager;
-        $this->docComment = $docComment;
-        $this->nameInformation = $nameInformation;
+        $this->docComment        = $docComment;
+        $this->nameInformation   = $nameInformation;
         $this->scan($this->tokenize());
     }
 
     /**
-     * @param array $tokens
+     * @param NameInformation $nameInformation
+     */
+    public function setNameInformation(NameInformation $nameInformation)
+    {
+        $this->nameInformation = $nameInformation;
+    }
+
+    /**
+     * @param  array $tokens
      */
     protected function scan(array $tokens)
     {
-        $annotations = [];
+        $annotations     = [];
         $annotationIndex = -1;
-        $contentEnd = false;
+        $contentEnd      = false;
 
         reset($tokens);
 
@@ -87,21 +95,21 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
             case 'ANNOTATION_CLASS':
                 $contentEnd = false;
                 $annotationIndex++;
-                $class = substr($token[1], 1);
-                $class = $this->nameInformation->resolveName($class);
+                $class                         = substr($token[1], 1);
+                $class                         = $this->nameInformation->resolveName($class);
                 $annotations[$annotationIndex] = [$class, null];
                 goto SCANNER_CONTINUE;
-            // goto no break needed
+                // goto no break needed
 
             case 'ANNOTATION_CONTENT_START':
                 $annotations[$annotationIndex][1] = '';
-            // fall-through
+                // fall-through
 
             case 'ANNOTATION_CONTENT_END':
             case 'ANNOTATION_CONTENT':
             case 'ANNOTATION_WHITESPACE':
             case 'ANNOTATION_NEWLINE':
-                if (!$contentEnd
+                if (! $contentEnd
                     && isset($annotations[$annotationIndex])
                     && is_string($annotations[$annotationIndex][1])
                 ) {
@@ -113,7 +121,7 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
                 }
 
                 goto SCANNER_CONTINUE;
-            // goto no break needed
+                // goto no break needed
         }
 
         SCANNER_CONTINUE:
@@ -125,7 +133,7 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
         SCANNER_END:
 
         foreach ($annotations as $annotation) {
-            $annotation[] = '@' . $annotation[0] . $annotation[1];
+            $annotation[]     = '@' . $annotation[0] . $annotation[1];
             $annotationObject = $this->annotationManager->createAnnotation($annotation);
             if ($annotationObject) {
                 $this->append($annotationObject);
@@ -143,11 +151,11 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
         static $CONTEXT_CLASS = 0x04;
         static $CONTEXT_CONTENT = 0x08;
 
-        $context = 0x00;
-        $stream = $this->docComment;
+        $context     = 0x00;
+        $stream      = $this->docComment;
         $streamIndex = null;
-        $tokens = [];
-        $tokenIndex = null;
+        $tokens      = [];
+        $tokenIndex  = null;
         $currentChar = null;
         $currentWord = null;
         $currentLine = null;
@@ -162,14 +170,14 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
             &$currentLine
         ) {
             $positionsForward = $positionsForward > 0 ? $positionsForward : 1;
-            $streamIndex = $streamIndex === null ? 0 : $streamIndex + $positionsForward;
-            if (!isset($stream[$streamIndex])) {
+            $streamIndex      = $streamIndex === null ? 0 : $streamIndex + $positionsForward;
+            if (! isset($stream[$streamIndex])) {
                 $currentChar = false;
 
                 return false;
             }
             $currentChar = $stream[$streamIndex];
-            $matches = [];
+            $matches     = [];
             $currentLine = preg_match('#(.*?)(?:\n|\r\n?)#', $stream, $matches, null, $streamIndex) === 1
                 ? $matches[1]
                 : substr($stream, $streamIndex);
@@ -189,23 +197,23 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
         $MACRO_STREAM_ADVANCE_LINE = function () use (&$currentLine, &$MACRO_STREAM_ADVANCE_CHAR) {
             return $MACRO_STREAM_ADVANCE_CHAR(strlen($currentLine));
         };
-        $MACRO_TOKEN_ADVANCE = function () use (&$tokenIndex, &$tokens) {
-            $tokenIndex = $tokenIndex === null ? 0 : $tokenIndex + 1;
+        $MACRO_TOKEN_ADVANCE       = function () use (&$tokenIndex, &$tokens) {
+            $tokenIndex          = $tokenIndex === null ? 0 : $tokenIndex + 1;
             $tokens[$tokenIndex] = ['ANNOTATION_UNKNOWN', ''];
         };
-        $MACRO_TOKEN_SET_TYPE = function ($type) use (&$tokenIndex, &$tokens) {
+        $MACRO_TOKEN_SET_TYPE      = function ($type) use (&$tokenIndex, &$tokens) {
             $tokens[$tokenIndex][0] = $type;
         };
-        $MACRO_TOKEN_APPEND_CHAR = function () use (&$currentChar, &$tokens, &$tokenIndex) {
+        $MACRO_TOKEN_APPEND_CHAR   = function () use (&$currentChar, &$tokens, &$tokenIndex) {
             $tokens[$tokenIndex][1] .= $currentChar;
         };
-        $MACRO_TOKEN_APPEND_WORD = function () use (&$currentWord, &$tokens, &$tokenIndex) {
+        $MACRO_TOKEN_APPEND_WORD   = function () use (&$currentWord, &$tokens, &$tokenIndex) {
             $tokens[$tokenIndex][1] .= $currentWord;
         };
-        $MACRO_TOKEN_APPEND_LINE = function () use (&$currentLine, &$tokens, &$tokenIndex) {
+        $MACRO_TOKEN_APPEND_LINE   = function () use (&$currentLine, &$tokens, &$tokenIndex) {
             $tokens[$tokenIndex][1] .= $currentLine;
         };
-        $MACRO_HAS_CONTEXT = function ($which) use (&$context) {
+        $MACRO_HAS_CONTEXT         = function ($which) use (&$context) {
             return ($context & $which) === $which;
         };
 
@@ -269,8 +277,8 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
         if ($currentChar === ' ') {
             $MACRO_TOKEN_SET_TYPE(
                 $MACRO_HAS_CONTEXT($CONTEXT_ASTERISK)
-                    ? 'ANNOTATION_WHITESPACE'
-                    : 'ANNOTATION_WHITESPACE_INDENT'
+                ? 'ANNOTATION_WHITESPACE'
+                : 'ANNOTATION_WHITESPACE_INDENT'
             );
             $MACRO_TOKEN_APPEND_WORD();
             $MACRO_TOKEN_ADVANCE();
@@ -367,13 +375,5 @@ class AnnotationScanner extends AnnotationCollection implements ScannerInterface
         array_pop($tokens);
 
         return $tokens;
-    }
-
-    /**
-     * @param NameInformation $nameInformation
-     */
-    public function setNameInformation(NameInformation $nameInformation)
-    {
-        $this->nameInformation = $nameInformation;
     }
 }

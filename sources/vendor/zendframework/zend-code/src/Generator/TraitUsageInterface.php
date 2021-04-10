@@ -14,8 +14,8 @@ interface TraitUsageInterface
     /**
      * Add a class to "use" classes
      *
-     * @param string $use
-     * @param string|null $useAlias
+     * @param  string $use
+     * @param  string|null $useAlias
      * @return self
      */
     public function addUse($use, $useAlias = null);
@@ -34,17 +34,17 @@ interface TraitUsageInterface
      * key: traitName value: String
      *
      * key: aliases value: array of arrays
-     *      key: method value: @param mixed $trait String | Array
-     * @return self
-     * @see addTraitAlias
+     *      key: method value: @see addTraitAlias
+     *      key: alias value: @see addTraitAlias
+     *      key: visibility value: @see addTraitAlias
      *
      * key: insteadof value: array of arrays
      *      key: method value: @see self::addTraitOverride
      *      key: traitToReplace value: @see self::addTraitOverride
      *
-     * @see addTraitAlias
-     *      key: alias value: @see addTraitAlias
-     *      key: visibility value:/
+     * @param mixed $trait String | Array
+     * @return self
+     */
     public function addTrait($trait);
 
     /**
@@ -122,6 +122,7 @@ interface TraitUsageInterface
      * This method provides 2 ways for defining the trait method.
      * Option 1: String of trait to replace
      * Option 2: Array of strings of traits to replace
+
      * @param mixed $method
      * @param mixed $traitsToReplace
      */

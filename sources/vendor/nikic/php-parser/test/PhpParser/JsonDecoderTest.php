@@ -1,15 +1,10 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser;
 
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
-
-class JsonDecoderTest extends TestCase
+class JsonDecoderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRoundTrip()
-    {
+    public function testRoundTrip() {
         $code = <<<'PHP'
 <?php
 // comment
@@ -29,16 +24,14 @@ PHP;
     }
 
     /** @dataProvider provideTestDecodingError */
-    public function testDecodingError($json, $expectedMessage)
-    {
+    public function testDecodingError($json, $expectedMessage) {
         $jsonDecoder = new JsonDecoder();
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedMessage);
         $jsonDecoder->decode($json);
     }
 
-    public function provideTestDecodingError()
-    {
+    public function provideTestDecodingError() {
         return [
             ['???', 'JSON decoding error: Syntax error'],
             ['{"nodeType":123}', 'Node type must be a string'],

@@ -1,17 +1,18 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Builder;
 
 use PhpParser\Builder;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
-use PHPUnit\Framework\TestCase;
 
-class UseTest extends TestCase
+class UseTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCreation()
-    {
+    protected function createUseBuilder($name, $type = Stmt\Use_::TYPE_NORMAL) {
+        return new Builder\Use_($name, $type);
+    }
+
+    public function testCreation() {
         $node = $this->createUseBuilder('Foo\Bar')->getNode();
         $this->assertEquals(new Stmt\Use_([
             new Stmt\UseUse(new Name('Foo\Bar'), null)
@@ -31,10 +32,5 @@ class UseTest extends TestCase
         $this->assertEquals(new Stmt\Use_([
             new Stmt\UseUse(new Name('foo\BAR'), 'FOO')
         ], Stmt\Use_::TYPE_CONSTANT), $node);
-    }
-
-    protected function createUseBuilder($name, $type = Stmt\Use_::TYPE_NORMAL)
-    {
-        return new Builder\Use_($name, $type);
     }
 }

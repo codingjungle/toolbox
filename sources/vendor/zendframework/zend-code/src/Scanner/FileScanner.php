@@ -25,14 +25,14 @@ class FileScanner extends TokenArrayScanner implements ScannerInterface
     protected $file;
 
     /**
-     * @param string $file
-     * @param null|AnnotationManager $annotationManager
+     * @param  string $file
+     * @param  null|AnnotationManager $annotationManager
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($file, AnnotationManager $annotationManager = null)
     {
         $this->file = $file;
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'File "%s" not found',
                 $file

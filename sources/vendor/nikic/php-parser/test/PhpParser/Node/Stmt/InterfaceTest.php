@@ -1,15 +1,12 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node\Stmt;
 
 use PhpParser\Node;
-use PHPUnit\Framework\TestCase;
 
-class InterfaceTest extends TestCase
+class InterfaceTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetMethods()
-    {
+    public function testGetMethods() {
         $methods = [
             new ClassMethod('foo'),
             new ClassMethod('bar'),

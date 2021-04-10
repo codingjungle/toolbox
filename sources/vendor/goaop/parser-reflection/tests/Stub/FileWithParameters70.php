@@ -10,12 +10,10 @@
 
 namespace Go\ParserReflection\Stub;
 
-use const INF;
-
 function miscScalarParameters(
     int $acceptsInteger,
     string $acceptsString,
-    float $acceptsFloat = INF,
+    float $acceptsFloat = \INF,
     boolean $acceptsBool,
     int $acceptsVariadicInteger,
     string ...$acceptsDefaultString

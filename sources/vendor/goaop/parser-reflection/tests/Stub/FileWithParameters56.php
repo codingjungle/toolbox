@@ -10,10 +10,7 @@
 
 namespace Go\ParserReflection\Stub;
 
-function arrayVariadicParameters(array ...$acceptsArrays) { }
-
-function callableVariadicParameters(callable ...$acceptsArrays) { }
-
-function constantExpressionAsDefault($value = 0.5 * 2 * 10, $another = __FUNCTION__ . 'test') { }
-
-function constantExponentiation($value = 0.5 * 2 ** 2) { }
+function arrayVariadicParameters(array ...$acceptsArrays) {}
+function callableVariadicParameters(callable ...$acceptsArrays) {}
+function constantExpressionAsDefault($value = 0.5 * 2 * 10, $another = __FUNCTION__ . 'test') {}
+function constantExponentiation($value = 0.5 * 2**2) {}

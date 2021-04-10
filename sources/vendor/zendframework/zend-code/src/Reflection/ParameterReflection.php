@@ -9,8 +9,6 @@
 
 namespace Zend\Code\Reflection;
 
-use ReflectionClass;
-use ReflectionMethod;
 use ReflectionParameter;
 
 use function method_exists;
@@ -23,46 +21,17 @@ class ParameterReflection extends ReflectionParameter implements ReflectionInter
     protected $isFromMethod = false;
 
     /**
-     * Get parameter type
+     * Get declaring class reflection object
      *
-     * @return string|null
+     * @return ClassReflection
      */
-    public function detectType()
+    public function getDeclaringClass()
     {
-        if (method_exists($this, 'getType')
-            && ($type = $this->getType())
-            && $type->isBuiltin()
-        ) {
-            return (string)$type;
-        }
+        $phpReflection  = parent::getDeclaringClass();
+        $zendReflection = new ClassReflection($phpReflection->getName());
+        unset($phpReflection);
 
-        // can be dropped when dropping PHP7 support:
-        if ($this->isArray()) {
-            return 'array';
-        }
-
-        // can be dropped when dropping PHP7 support:
-        if ($this->isCallable()) {
-            return 'callable';
-        }
-
-        if (($class = $this->getClass()) instanceof ReflectionClass) {
-            return $class->getName();
-        }
-
-        $docBlock = $this->getDeclaringFunction()->getDocBlock();
-
-        if (!$docBlock instanceof DocBlockReflection) {
-            return null;
-        }
-
-        $params = $docBlock->getTags('param');
-
-        if (isset($params[$this->getPosition()])) {
-            return $params[$this->getPosition()]->getType();
-        }
-
-        return null;
+        return $zendReflection;
     }
 
     /**
@@ -91,7 +60,7 @@ class ParameterReflection extends ReflectionParameter implements ReflectionInter
     public function getDeclaringFunction()
     {
         $phpReflection = parent::getDeclaringFunction();
-        if ($phpReflection instanceof ReflectionMethod) {
+        if ($phpReflection instanceof \ReflectionMethod) {
             $zendReflection = new MethodReflection($this->getDeclaringClass()->getName(), $phpReflection->getName());
         } else {
             $zendReflection = new FunctionReflection($phpReflection->getName());
@@ -102,23 +71,52 @@ class ParameterReflection extends ReflectionParameter implements ReflectionInter
     }
 
     /**
-     * Get declaring class reflection object
+     * Get parameter type
      *
-     * @return ClassReflection
+     * @return string|null
      */
-    public function getDeclaringClass()
+    public function detectType()
     {
-        $phpReflection = parent::getDeclaringClass();
-        $zendReflection = new ClassReflection($phpReflection->getName());
-        unset($phpReflection);
+        if (method_exists($this, 'getType')
+            && ($type = $this->getType())
+            && $type->isBuiltin()
+        ) {
+            return (string) $type;
+        }
 
-        return $zendReflection;
+        // can be dropped when dropping PHP7 support:
+        if ($this->isArray()) {
+            return 'array';
+        }
+
+        // can be dropped when dropping PHP7 support:
+        if ($this->isCallable()) {
+            return 'callable';
+        }
+
+        if (($class = $this->getClass()) instanceof \ReflectionClass) {
+            return $class->getName();
+        }
+
+        $docBlock = $this->getDeclaringFunction()->getDocBlock();
+
+        if (! $docBlock instanceof DocBlockReflection) {
+            return null;
+        }
+
+        $params = $docBlock->getTags('param');
+
+        if (isset($params[$this->getPosition()])) {
+            return $params[$this->getPosition()]->getType();
+        }
+
+        return null;
     }
 
     /**
      * @return string
      */
-    public function __toString()
+    public function toString()
     {
         return parent::__toString();
     }
@@ -126,7 +124,7 @@ class ParameterReflection extends ReflectionParameter implements ReflectionInter
     /**
      * @return string
      */
-    public function toString()
+    public function __toString()
     {
         return parent::__toString();
     }

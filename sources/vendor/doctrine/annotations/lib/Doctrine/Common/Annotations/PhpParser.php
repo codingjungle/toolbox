@@ -19,7 +19,6 @@
 
 namespace Doctrine\Common\Annotations;
 
-use ReflectionClass;
 use SplFileObject;
 
 /**
@@ -33,11 +32,11 @@ final class PhpParser
     /**
      * Parses a class.
      *
-     * @param ReflectionClass $class A <code>ReflectionClass</code> object.
+     * @param \ReflectionClass $class A <code>ReflectionClass</code> object.
      *
      * @return array A list with use statements in the form (Alias => FQN).
      */
-    public function parseClass(ReflectionClass $class)
+    public function parseClass(\ReflectionClass $class)
     {
         if (method_exists($class, 'getUseStatements')) {
             return $class->getUseStatements();
@@ -65,14 +64,14 @@ final class PhpParser
     /**
      * Gets the content of the file right up to the given line number.
      *
-     * @param string $filename The name of the file to load.
-     * @param int $lineNumber The number of lines to read from file.
+     * @param string  $filename   The name of the file to load.
+     * @param integer $lineNumber The number of lines to read from file.
      *
      * @return string|null The content of the file or null if the file does not exist.
      */
     private function getFileContent($filename, $lineNumber)
     {
-        if (!is_file($filename)) {
+        if ( ! is_file($filename)) {
             return null;
         }
 

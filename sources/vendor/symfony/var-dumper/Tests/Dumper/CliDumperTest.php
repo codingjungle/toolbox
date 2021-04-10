@@ -11,16 +11,12 @@
 
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
-use __TwigTemplate_VarDumperFixture_u75a09;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-
-use const PHP_VERSION_ID;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -31,7 +27,7 @@ class CliDumperTest extends TestCase
 
     public function testGet()
     {
-        require __DIR__ . '/../Fixtures/dumb-var.php';
+        require __DIR__.'/../Fixtures/dumb-var.php';
 
         $dumper = new CliDumper('php://output');
         $dumper->setColors(false);
@@ -50,7 +46,7 @@ class CliDumperTest extends TestCase
         $out = ob_get_clean();
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
-        $res = (int)$var['res'];
+        $res = (int) $var['res'];
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -126,8 +122,8 @@ EOTXT
         $cloner = new VarCloner();
 
         $var = [
-            'array'            => ['a', 'b'],
-            'string'           => 'hello',
+            'array' => ['a', 'b'],
+            'string' => 'hello',
             'multiline string' => "this\nis\na\multiline\nstring",
         ];
 
@@ -142,7 +138,7 @@ EOTXT
         $dumper->setColors(false);
         $cloner = new VarCloner();
 
-        $ex = new RuntimeException('foo');
+        $ex = new \RuntimeException('foo');
 
         $dump = $dumper->dump($cloner->cloneVar($ex)->withRefHandles(false), true);
 
@@ -230,13 +226,13 @@ EOTXT
 
     public function testJsonCast()
     {
-        $var = (array)json_decode('{"0":{},"1":null}');
+        $var = (array) json_decode('{"0":{},"1":null}');
         foreach ($var as &$v) {
         }
         $var[] = &$v;
         $var[''] = 2;
 
-        if (PHP_VERSION_ID >= 70200) {
+        if (\PHP_VERSION_ID >= 70200) {
             $this->assertDumpMatchesFormat(
                 <<<'EOTXT'
 array:4 [
@@ -267,10 +263,10 @@ EOTXT
 
     public function testObjectCast()
     {
-        $var = (object)[1 => 1];
+        $var = (object) [1 => 1];
         $var->{1} = 2;
 
-        if (PHP_VERSION_ID >= 70200) {
+        if (\PHP_VERSION_ID >= 70200) {
             $this->assertDumpMatchesFormat(
                 <<<'EOTXT'
 {
@@ -307,7 +303,7 @@ EOTXT
         ob_start();
         $dumper->dump($data);
         $out = ob_get_clean();
-        $res = (int)$var;
+        $res = (int) $var;
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -358,8 +354,8 @@ EOTXT
     {
         $out = fopen('php://memory', 'r+b');
 
-        require_once __DIR__ . '/../Fixtures/Twig.php';
-        $twig = new __TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader()));
+        require_once __DIR__.'/../Fixtures/Twig.php';
+        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader()));
 
         $dumper = new CliDumper();
         $dumper->setColors(false);
@@ -372,15 +368,15 @@ EOTXT
             },
         ]);
         $cloner->addCasters([
-            ':stream' => eval('use Twig\Error\RuntimeError;return function () use ($twig) {
+            ':stream' => eval('return function () use ($twig) {
                 try {
                     $twig->render([]);
-                } catch (RuntimeError $e) {
+                } catch (\Twig\Error\RuntimeError $e) {
                     throw $e->getPrevious();
                 }
             };'),
         ]);
-        $ref = (int)$out;
+        $ref = (int) $out;
 
         $data = $cloner->cloneVar($out);
         $dumper->dump($data, $out);
@@ -420,7 +416,7 @@ EOTXT
 
     public function testRefsInProperties()
     {
-        $var = (object)['foo' => 'foo'];
+        $var = (object) ['foo' => 'foo'];
         $var->bar = &$var->foo;
 
         $dumper = new CliDumper();
@@ -472,24 +468,6 @@ EOTXT
         );
     }
 
-    private function getSpecialVars()
-    {
-        foreach (array_keys($GLOBALS) as $var) {
-            if ('GLOBALS' !== $var) {
-                unset($GLOBALS[$var]);
-            }
-        }
-
-        $var = function &() {
-            $var = [];
-            $var[] = &$var;
-
-            return $var;
-        };
-
-        return [$var(), $GLOBALS, &$GLOBALS];
-    }
-
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -502,7 +480,7 @@ EOTXT
 
         $dumper = new CliDumper(function ($line, $depth) use (&$out) {
             if ($depth >= 0) {
-                $out .= str_repeat('  ', $depth) . $line . "\n";
+                $out .= str_repeat('  ', $depth).$line."\n";
             }
         });
         $dumper->setColors(false);
@@ -541,5 +519,23 @@ EOTXT
             ,
             $var
         );
+    }
+
+    private function getSpecialVars()
+    {
+        foreach (array_keys($GLOBALS) as $var) {
+            if ('GLOBALS' !== $var) {
+                unset($GLOBALS[$var]);
+            }
+        }
+
+        $var = function &() {
+            $var = [];
+            $var[] = &$var;
+
+            return $var;
+        };
+
+        return [$var(), $GLOBALS, &$GLOBALS];
     }
 }

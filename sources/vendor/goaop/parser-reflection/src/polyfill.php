@@ -14,7 +14,6 @@
  */
 if (!class_exists(ReflectionType::class, false)) {
     /* Dummy polyfill class */
-
     class ReflectionType
     {
         public function allowsNull()

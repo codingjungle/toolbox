@@ -1,9 +1,7 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Builder;
 
-use LogicException;
 use PhpParser;
 use PhpParser\BuilderHelpers;
 use PhpParser\Node\Name;
@@ -21,8 +19,7 @@ class Interface_ extends Declaration
      *
      * @param string $name Name of the interface
      */
-    public function __construct(string $name)
-    {
+    public function __construct(string $name) {
         $this->name = $name;
     }
 
@@ -33,8 +30,7 @@ class Interface_ extends Declaration
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function extend(...$interfaces)
-    {
+    public function extend(...$interfaces) {
         foreach ($interfaces as $interface) {
             $this->extends[] = BuilderHelpers::normalizeName($interface);
         }
@@ -49,8 +45,7 @@ class Interface_ extends Declaration
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function addStmt($stmt)
-    {
+    public function addStmt($stmt) {
         $stmt = BuilderHelpers::normalizeNode($stmt);
 
         if ($stmt instanceof Stmt\ClassConst) {
@@ -60,7 +55,7 @@ class Interface_ extends Declaration
             $stmt->stmts = null;
             $this->methods[] = $stmt;
         } else {
-            throw new LogicException(sprintf('Unexpected node of type "%s"', $stmt->getType()));
+            throw new \LogicException(sprintf('Unexpected node of type "%s"', $stmt->getType()));
         }
 
         return $this;
@@ -71,11 +66,10 @@ class Interface_ extends Declaration
      *
      * @return Stmt\Interface_ The built interface node
      */
-    public function getNode(): PhpParser\Node
-    {
+    public function getNode() : PhpParser\Node {
         return new Stmt\Interface_($this->name, [
             'extends' => $this->extends,
-            'stmts'   => array_merge($this->constants, $this->methods),
+            'stmts' => array_merge($this->constants, $this->methods),
         ], $this->attributes);
     }
 }

@@ -61,7 +61,7 @@ class DirectoryScanner implements ScannerInterface
     }
 
     /**
-     * @param DirectoryScanner|string $directory
+     * @param  DirectoryScanner|string $directory
      * @return void
      * @throws Exception\InvalidArgumentException
      */
@@ -71,7 +71,7 @@ class DirectoryScanner implements ScannerInterface
             $this->directories[] = $directory;
         } elseif (is_string($directory)) {
             $realDir = realpath($directory);
-            if (!$realDir || !is_dir($realDir)) {
+            if (! $realDir || ! is_dir($realDir)) {
                 throw new Exception\InvalidArgumentException(sprintf(
                     'Directory "%s" does not exist',
                     $realDir
@@ -86,17 +86,7 @@ class DirectoryScanner implements ScannerInterface
     }
 
     /**
-     * Export
-     *
-     * @todo implement method
-     */
-    public static function export()
-    {
-        // @todo
-    }
-
-    /**
-     * @param DirectoryScanner $directoryScanner
+     * @param  DirectoryScanner $directoryScanner
      * @return void
      */
     public function addDirectoryScanner(DirectoryScanner $directoryScanner)
@@ -105,36 +95,12 @@ class DirectoryScanner implements ScannerInterface
     }
 
     /**
-     * @param FileScanner $fileScanner
+     * @param  FileScanner $fileScanner
      * @return void
      */
     public function addFileScanner(FileScanner $fileScanner)
     {
         $this->fileScanners[] = $fileScanner;
-    }
-
-    /**
-     * @todo implement method
-     */
-    public function getNamespaces()
-    {
-        // @todo
-    }
-
-    /**
-     * @param bool $returnFileScanners
-     * @return array
-     */
-    public function getFiles($returnFileScanners = false)
-    {
-        $this->scan();
-
-        $return = [];
-        foreach ($this->fileScanners as $fileScanner) {
-            $return[] = $returnFileScanners ? $fileScanner : $fileScanner->getFile();
-        }
-
-        return $return;
     }
 
     /**
@@ -167,6 +133,30 @@ class DirectoryScanner implements ScannerInterface
     }
 
     /**
+     * @todo implement method
+     */
+    public function getNamespaces()
+    {
+        // @todo
+    }
+
+    /**
+     * @param  bool $returnFileScanners
+     * @return array
+     */
+    public function getFiles($returnFileScanners = false)
+    {
+        $this->scan();
+
+        $return = [];
+        foreach ($this->fileScanners as $fileScanner) {
+            $return[] = $returnFileScanners ? $fileScanner : $fileScanner->getFile();
+        }
+
+        return $return;
+    }
+
+    /**
      * @return array
      */
     public function getClassNames()
@@ -178,6 +168,74 @@ class DirectoryScanner implements ScannerInterface
         }
 
         return array_keys($this->classToFileScanner);
+    }
+
+    /**
+     * @param  bool  $returnDerivedScannerClass
+     * @return array
+     */
+    public function getClasses($returnDerivedScannerClass = false)
+    {
+        $this->scan();
+
+        if ($this->classToFileScanner === null) {
+            $this->createClassToFileScannerCache();
+        }
+
+        $returnClasses = [];
+        foreach ($this->classToFileScanner as $className => $fsIndex) {
+            $classScanner = $this->fileScanners[$fsIndex]->getClass($className);
+            if ($returnDerivedScannerClass) {
+                $classScanner = new DerivedClassScanner($classScanner, $this);
+            }
+            $returnClasses[] = $classScanner;
+        }
+
+        return $returnClasses;
+    }
+
+    /**
+     * @param  string $class
+     * @return bool
+     */
+    public function hasClass($class)
+    {
+        $this->scan();
+
+        if ($this->classToFileScanner === null) {
+            $this->createClassToFileScannerCache();
+        }
+
+        return isset($this->classToFileScanner[$class]);
+    }
+
+    /**
+     * @param  string $class
+     * @param  bool $returnDerivedScannerClass
+     * @return ClassScanner|DerivedClassScanner
+     * @throws Exception\InvalidArgumentException
+     */
+    public function getClass($class, $returnDerivedScannerClass = false)
+    {
+        $this->scan();
+
+        if ($this->classToFileScanner === null) {
+            $this->createClassToFileScannerCache();
+        }
+
+        if (! isset($this->classToFileScanner[$class])) {
+            throw new Exception\InvalidArgumentException('Class not found.');
+        }
+
+        /** @var FileScanner $fs */
+        $fs          = $this->fileScanners[$this->classToFileScanner[$class]];
+        $returnClass = $fs->getClass($class);
+
+        if ($returnClass instanceof ClassScanner && $returnDerivedScannerClass) {
+            return new DerivedClassScanner($returnClass, $this);
+        }
+
+        return $returnClass;
     }
 
     /**
@@ -203,71 +261,13 @@ class DirectoryScanner implements ScannerInterface
     }
 
     /**
-     * @param bool $returnDerivedScannerClass
-     * @return array
+     * Export
+     *
+     * @todo implement method
      */
-    public function getClasses($returnDerivedScannerClass = false)
+    public static function export()
     {
-        $this->scan();
-
-        if ($this->classToFileScanner === null) {
-            $this->createClassToFileScannerCache();
-        }
-
-        $returnClasses = [];
-        foreach ($this->classToFileScanner as $className => $fsIndex) {
-            $classScanner = $this->fileScanners[$fsIndex]->getClass($className);
-            if ($returnDerivedScannerClass) {
-                $classScanner = new DerivedClassScanner($classScanner, $this);
-            }
-            $returnClasses[] = $classScanner;
-        }
-
-        return $returnClasses;
-    }
-
-    /**
-     * @param string $class
-     * @return bool
-     */
-    public function hasClass($class)
-    {
-        $this->scan();
-
-        if ($this->classToFileScanner === null) {
-            $this->createClassToFileScannerCache();
-        }
-
-        return isset($this->classToFileScanner[$class]);
-    }
-
-    /**
-     * @param string $class
-     * @param bool $returnDerivedScannerClass
-     * @return ClassScanner|DerivedClassScanner
-     * @throws Exception\InvalidArgumentException
-     */
-    public function getClass($class, $returnDerivedScannerClass = false)
-    {
-        $this->scan();
-
-        if ($this->classToFileScanner === null) {
-            $this->createClassToFileScannerCache();
-        }
-
-        if (!isset($this->classToFileScanner[$class])) {
-            throw new Exception\InvalidArgumentException('Class not found.');
-        }
-
-        /** @var FileScanner $fs */
-        $fs = $this->fileScanners[$this->classToFileScanner[$class]];
-        $returnClass = $fs->getClass($class);
-
-        if ($returnClass instanceof ClassScanner && $returnDerivedScannerClass) {
-            return new DerivedClassScanner($returnClass, $this);
-        }
-
-        return $returnClass;
+        // @todo
     }
 
     /**

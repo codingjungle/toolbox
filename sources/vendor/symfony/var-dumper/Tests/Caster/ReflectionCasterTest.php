@@ -12,17 +12,10 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionGenerator;
-use ReflectionMethod;
-use ReflectionParameter;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
-
-use function defined;
-use function extension_loaded;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -33,7 +26,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionCaster()
     {
-        $var = new ReflectionClass('ReflectionClass');
+        $var = new \ReflectionClass('ReflectionClass');
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -72,7 +65,7 @@ EOTXT
     public function testClosureCaster()
     {
         $a = $b = 123;
-        $var = function ($x) use ($a, &$b) { };
+        $var = function ($x) use ($a, &$b) {};
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -94,12 +87,12 @@ EOTXT
 
     public function testFromCallableClosureCaster()
     {
-        if (defined('HHVM_VERSION_ID')) {
+        if (\defined('HHVM_VERSION_ID')) {
             $this->markTestSkipped('Not for HHVM.');
         }
         $var = [
-            (new ReflectionMethod($this, __FUNCTION__))->getClosure($this),
-            (new ReflectionMethod(__CLASS__, 'tearDownAfterClass'))->getClosure(),
+            (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
+            (new \ReflectionMethod(__CLASS__, 'tearDownAfterClass'))->getClosure(),
         ];
 
         $this->assertDumpMatchesFormat(
@@ -122,14 +115,14 @@ EOTXT
 
     public function testClosureCasterExcludingVerbosity()
     {
-        $var = function &($a = 5) { };
+        $var = function &($a = 5) {};
 
         $this->assertDumpEquals('Closure&($a = 5) { …6}', $var, Caster::EXCLUDE_VERBOSE);
     }
 
     public function testReflectionParameter()
     {
-        $var = new ReflectionParameter(__NAMESPACE__ . '\reflectionParameterFixture', 0);
+        $var = new \ReflectionParameter(__NAMESPACE__.'\reflectionParameterFixture', 0);
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -147,7 +140,7 @@ EOTXT
     public function testReflectionParameterScalar()
     {
         $f = eval('return function (int $a) {};');
-        $var = new ReflectionParameter($f, 0);
+        $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -182,7 +175,7 @@ EOTXT
 
     public function testGenerator()
     {
-        if (extension_loaded('xdebug')) {
+        if (\extension_loaded('xdebug')) {
             $this->markTestSkipped('xdebug is active');
         }
 
@@ -241,7 +234,7 @@ array:2 [
 ]
 EODUMP;
 
-        $r = new ReflectionGenerator($generator);
+        $r = new \ReflectionGenerator($generator);
         $this->assertDumpMatchesFormat($expectedDump, [$r, $r->getExecutingGenerator()]);
 
         foreach ($generator as $v) {

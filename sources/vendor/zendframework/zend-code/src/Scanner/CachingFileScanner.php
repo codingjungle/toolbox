@@ -32,13 +32,13 @@ class CachingFileScanner extends FileScanner
     protected $fileScanner;
 
     /**
-     * @param string $file
-     * @param AnnotationManager $annotationManager
+     * @param  string $file
+     * @param  AnnotationManager $annotationManager
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($file, AnnotationManager $annotationManager = null)
     {
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'File "%s" not found',
                 $file
@@ -48,13 +48,13 @@ class CachingFileScanner extends FileScanner
         $file = realpath($file);
 
         $cacheId = md5($file) . '/' . (isset($annotationManager)
-                ? spl_object_hash($annotationManager)
-                : 'no-annotation');
+            ? spl_object_hash($annotationManager)
+            : 'no-annotation');
 
         if (isset(static::$cache[$cacheId])) {
             $this->fileScanner = static::$cache[$cacheId];
         } else {
-            $this->fileScanner = new FileScanner($file, $annotationManager);
+            $this->fileScanner       = new FileScanner($file, $annotationManager);
             static::$cache[$cacheId] = $this->fileScanner;
         }
     }
@@ -76,21 +76,44 @@ class CachingFileScanner extends FileScanner
     }
 
     /**
-     * @param int|string $className
-     * @return ClassScanner
+     * @return array|null|string
      */
-    public function getClass($className)
+    public function getFile()
     {
-        return $this->fileScanner->getClass($className);
+        return $this->fileScanner->getFile();
     }
 
     /**
-     * @param string $className
-     * @return bool|null|NameInformation
+     * @return null|string
      */
-    public function getClassNameInformation($className)
+    public function getDocComment()
     {
-        return $this->fileScanner->getClassNameInformation($className);
+        return $this->fileScanner->getDocComment();
+    }
+
+    /**
+     * @return array
+     */
+    public function getNamespaces()
+    {
+        return $this->fileScanner->getNamespaces();
+    }
+
+    /**
+     * @param  null|string $namespace
+     * @return array|null
+     */
+    public function getUses($namespace = null)
+    {
+        return $this->fileScanner->getUses($namespace);
+    }
+
+    /**
+     * @return array
+     */
+    public function getIncludes()
+    {
+        return $this->fileScanner->getIncludes();
     }
 
     /**
@@ -110,19 +133,21 @@ class CachingFileScanner extends FileScanner
     }
 
     /**
-     * @return null|string
+     * @param  int|string $className
+     * @return ClassScanner
      */
-    public function getDocComment()
+    public function getClass($className)
     {
-        return $this->fileScanner->getDocComment();
+        return $this->fileScanner->getClass($className);
     }
 
     /**
-     * @return array|null|string
+     * @param  string $className
+     * @return bool|null|NameInformation
      */
-    public function getFile()
+    public function getClassNameInformation($className)
     {
-        return $this->fileScanner->getFile();
+        return $this->fileScanner->getClassNameInformation($className);
     }
 
     /**
@@ -139,30 +164,5 @@ class CachingFileScanner extends FileScanner
     public function getFunctions()
     {
         return $this->fileScanner->getFunctions();
-    }
-
-    /**
-     * @return array
-     */
-    public function getIncludes()
-    {
-        return $this->fileScanner->getIncludes();
-    }
-
-    /**
-     * @return array
-     */
-    public function getNamespaces()
-    {
-        return $this->fileScanner->getNamespaces();
-    }
-
-    /**
-     * @param null|string $namespace
-     * @return array|null
-     */
-    public function getUses($namespace = null)
-    {
-        return $this->fileScanner->getUses($namespace);
     }
 }

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-use ArrayIterator;
-use SplFileInfo;
 use Symfony\Component\Finder\Iterator\FilenameFilterIterator;
 
 class FilenameFilterIteratorTest extends IteratorTestCase
@@ -42,11 +40,11 @@ class FilenameFilterIteratorTest extends IteratorTestCase
     }
 }
 
-class InnerNameIterator extends ArrayIterator
+class InnerNameIterator extends \ArrayIterator
 {
     public function current()
     {
-        return new SplFileInfo(parent::current());
+        return new \SplFileInfo(parent::current());
     }
 
     public function getFilename()

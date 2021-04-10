@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Node\Stmt;
 
@@ -15,25 +14,18 @@ class ClassConst extends Node\Stmt
     /**
      * Constructs a class const list node.
      *
-     * @param Node\Const_[] $consts Constant declarations
-     * @param int $flags Modifiers
-     * @param array $attributes Additional attributes
+     * @param Node\Const_[] $consts     Constant declarations
+     * @param int           $flags      Modifiers
+     * @param array         $attributes Additional attributes
      */
-    public function __construct(array $consts, int $flags = 0, array $attributes = [])
-    {
+    public function __construct(array $consts, int $flags = 0, array $attributes = []) {
         parent::__construct($attributes);
         $this->flags = $flags;
         $this->consts = $consts;
     }
 
-    public function getSubNodeNames(): array
-    {
+    public function getSubNodeNames() : array {
         return ['flags', 'consts'];
-    }
-
-    public function getType(): string
-    {
-        return 'Stmt_ClassConst';
     }
 
     /**
@@ -41,8 +33,7 @@ class ClassConst extends Node\Stmt
      *
      * @return bool
      */
-    public function isPublic(): bool
-    {
+    public function isPublic() : bool {
         return ($this->flags & Class_::MODIFIER_PUBLIC) !== 0
             || ($this->flags & Class_::VISIBILITY_MODIFIER_MASK) === 0;
     }
@@ -52,9 +43,8 @@ class ClassConst extends Node\Stmt
      *
      * @return bool
      */
-    public function isProtected(): bool
-    {
-        return (bool)($this->flags & Class_::MODIFIER_PROTECTED);
+    public function isProtected() : bool {
+        return (bool) ($this->flags & Class_::MODIFIER_PROTECTED);
     }
 
     /**
@@ -62,8 +52,11 @@ class ClassConst extends Node\Stmt
      *
      * @return bool
      */
-    public function isPrivate(): bool
-    {
-        return (bool)($this->flags & Class_::MODIFIER_PRIVATE);
+    public function isPrivate() : bool {
+        return (bool) ($this->flags & Class_::MODIFIER_PRIVATE);
+    }
+    
+    public function getType() : string {
+        return 'Stmt_ClassConst';
     }
 }

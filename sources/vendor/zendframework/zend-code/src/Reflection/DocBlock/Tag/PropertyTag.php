@@ -31,6 +31,39 @@ class PropertyTag implements TagInterface, PhpDocTypedTagInterface
     protected $description;
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'property';
+    }
+
+    /**
+     * Initializer
+     *
+     * @param  string $tagDocblockLine
+     */
+    public function initialize($tagDocblockLine)
+    {
+        $match = [];
+        if (! preg_match('#^(.+)?(\$[\S]+)[\s]*(.*)$#m', $tagDocblockLine, $match)) {
+            return;
+        }
+
+        if ($match[1] !== '') {
+            $this->types = explode('|', rtrim($match[1]));
+        }
+
+        if ($match[2] !== '') {
+            $this->propertyName = $match[2];
+        }
+
+        if ($match[3] !== '') {
+            $this->description = $match[3];
+        }
+    }
+
+    /**
      * @return null|string
      * @deprecated 2.0.4 use getTypes instead
      */
@@ -67,38 +100,5 @@ class PropertyTag implements TagInterface, PhpDocTypedTagInterface
     public function __toString()
     {
         return 'DocBlock Tag [ * @' . $this->getName() . ' ]' . "\n";
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'property';
-    }
-
-    /**
-     * Initializer
-     *
-     * @param string $tagDocblockLine
-     */
-    public function initialize($tagDocblockLine)
-    {
-        $match = [];
-        if (!preg_match('#^(.+)?(\$[\S]+)[\s]*(.*)$#m', $tagDocblockLine, $match)) {
-            return;
-        }
-
-        if ($match[1] !== '') {
-            $this->types = explode('|', rtrim($match[1]));
-        }
-
-        if ($match[2] !== '') {
-            $this->propertyName = $match[2];
-        }
-
-        if ($match[3] !== '') {
-            $this->description = $match[3];
-        }
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ArgsStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
@@ -20,8 +19,6 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\FooInterface;
-
-use function get_class;
 
 class StubCasterTest extends TestCase
 {
@@ -195,10 +192,8 @@ EODUMP;
 
     public function testClassStubWithAnonymousClass()
     {
-        $var = [
-            new ClassStub(get_class(new class() extends Exception {
-            }))
-        ];
+        $var = [new ClassStub(\get_class(new class() extends \Exception {
+        }))];
 
         $cloner = new VarCloner();
         $dumper = new HtmlDumper();

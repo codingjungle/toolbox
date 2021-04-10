@@ -23,11 +23,11 @@ class CasterTest extends TestCase
     use VarDumperTestTrait;
 
     private $referenceArray = [
-        'null'           => null,
-        'empty'          => false,
-        'public'         => 'pub',
-        "\0~\0virtual"   => 'virt',
-        "\0+\0dynamic"   => 'dyn',
+        'null' => null,
+        'empty' => false,
+        'public' => 'pub',
+        "\0~\0virtual" => 'virt',
+        "\0+\0dynamic" => 'dyn',
         "\0*\0protected" => 'prot',
         "\0Foo\0private" => 'priv',
     ];
@@ -56,8 +56,8 @@ class CasterTest extends TestCase
             [
                 Caster::EXCLUDE_PUBLIC,
                 [
-                    'null'   => null,
-                    'empty'  => false,
+                    'null' => null,
+                    'empty' => false,
                     'public' => 'pub',
                 ],
             ],
@@ -70,7 +70,7 @@ class CasterTest extends TestCase
             [
                 Caster::EXCLUDE_EMPTY,
                 [
-                    'null'  => null,
+                    'null' => null,
                     'empty' => false,
                 ],
             ],
@@ -101,7 +101,7 @@ class CasterTest extends TestCase
             [
                 Caster::EXCLUDE_VERBOSE,
                 [
-                    'public'         => 'pub',
+                    'public' => 'pub',
                     "\0*\0protected" => 'prot',
                 ],
                 ['public', "\0*\0protected"],
@@ -109,10 +109,10 @@ class CasterTest extends TestCase
             [
                 Caster::EXCLUDE_NOT_IMPORTANT,
                 [
-                    'null'           => null,
-                    'empty'          => false,
-                    "\0~\0virtual"   => 'virt',
-                    "\0+\0dynamic"   => 'dyn',
+                    'null' => null,
+                    'empty' => false,
+                    "\0~\0virtual" => 'virt',
+                    "\0+\0dynamic" => 'dyn',
                     "\0Foo\0private" => 'priv',
                 ],
                 ['public', "\0*\0protected"],
@@ -132,10 +132,10 @@ class CasterTest extends TestCase
             [
                 Caster::EXCLUDE_NOT_IMPORTANT | Caster::EXCLUDE_EMPTY,
                 [
-                    'null'           => null,
-                    'empty'          => false,
-                    "\0~\0virtual"   => 'virt',
-                    "\0+\0dynamic"   => 'dyn',
+                    'null' => null,
+                    'empty' => false,
+                    "\0~\0virtual" => 'virt',
+                    "\0+\0dynamic" => 'dyn',
                     "\0*\0protected" => 'prot',
                     "\0Foo\0private" => 'priv',
                 ],

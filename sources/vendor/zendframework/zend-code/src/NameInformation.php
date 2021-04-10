@@ -35,8 +35,8 @@ class NameInformation
     protected $uses = [];
 
     /**
-     * @param string $namespace
-     * @param array $uses
+     * @param  string $namespace
+     * @param  array $uses
      */
     public function __construct($namespace = null, array $uses = [])
     {
@@ -49,21 +49,21 @@ class NameInformation
     }
 
     /**
+     * @param  string $namespace
+     * @return NameInformation
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = (string) $namespace;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getNamespace()
     {
         return $this->namespace;
-    }
-
-    /**
-     * @param string $namespace
-     * @return NameInformation
-     */
-    public function setNamespace($namespace)
-    {
-        $this->namespace = (string)$namespace;
-        return $this;
     }
 
     /**
@@ -75,7 +75,19 @@ class NameInformation
     }
 
     /**
-     * @param array $uses
+     * @param  array $uses
+     * @return NameInformation
+     */
+    public function setUses(array $uses)
+    {
+        $this->uses = [];
+        $this->addUses($uses);
+
+        return $this;
+    }
+
+    /**
+     * @param  array $uses
      * @return NameInformation
      */
     public function addUses(array $uses)
@@ -92,20 +104,20 @@ class NameInformation
     }
 
     /**
-     * @param array|string $use
-     * @param string $as
+     * @param  array|string $use
+     * @param  string $as
      */
     public function addUse($use, $as = null)
     {
         if (is_array($use) && array_key_exists('use', $use) && array_key_exists('as', $use)) {
             $uses = $use;
-            $use = $uses['use'];
-            $as = $uses['as'];
+            $use  = $uses['use'];
+            $as   = $uses['as'];
         }
 
         $use = trim($use, '\\');
         if ($as === null) {
-            $as = trim($use, '\\');
+            $as                  = trim($use, '\\');
             $nsSeparatorPosition = strrpos($as, '\\');
             if ($nsSeparatorPosition !== false && $nsSeparatorPosition !== 0 && $nsSeparatorPosition != strlen($as)) {
                 $as = substr($as, $nsSeparatorPosition + 1);
@@ -124,28 +136,16 @@ class NameInformation
     }
 
     /**
-     * @param array $uses
-     * @return NameInformation
-     */
-    public function setUses(array $uses)
-    {
-        $this->uses = [];
-        $this->addUses($uses);
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
+     * @param  string $name
      * @return string
      */
     public function resolveName($name)
     {
-        if ($this->namespace && !$this->uses && strlen($name) > 0 && $name{0} != '\\') {
+        if ($this->namespace && ! $this->uses && strlen($name) > 0 && $name{0} != '\\') {
             return $this->namespace . '\\' . $name;
         }
 
-        if (!$this->uses || strlen($name) <= 0 || $name{0} == '\\') {
+        if (! $this->uses || strlen($name) <= 0 || $name{0} == '\\') {
             return ltrim($name, '\\');
         }
 

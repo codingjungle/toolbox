@@ -76,13 +76,25 @@ class DocBlockReflection implements ReflectionInterface
     protected $isReflected = false;
 
     /**
-     * @param Reflector|string $commentOrReflector
-     * @param null|DocBlockTagManager $tagManager
+     * Export reflection
+     *
+     * Required by the Reflector interface.
+     *
+     * @todo   What should this do?
+     * @return void
+     */
+    public static function export()
+    {
+    }
+
+    /**
+     * @param  Reflector|string $commentOrReflector
+     * @param  null|DocBlockTagManager $tagManager
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($commentOrReflector, DocBlockTagManager $tagManager = null)
     {
-        if (!$tagManager) {
+        if (! $tagManager) {
             $tagManager = new DocBlockTagManager();
             $tagManager->initializeDefaultTags();
         }
@@ -90,16 +102,16 @@ class DocBlockReflection implements ReflectionInterface
 
         if ($commentOrReflector instanceof Reflector) {
             $this->reflector = $commentOrReflector;
-            if (!method_exists($commentOrReflector, 'getDocComment')) {
+            if (! method_exists($commentOrReflector, 'getDocComment')) {
                 throw new Exception\InvalidArgumentException('Reflector must contain method "getDocComment"');
             }
             /* @var MethodReflection $commentOrReflector */
             $this->docComment = $commentOrReflector->getDocComment();
 
             // determine line numbers
-            $lineCount = substr_count($this->docComment, "\n");
+            $lineCount       = substr_count($this->docComment, "\n");
             $this->startLine = $this->reflector->getStartLine() - $lineCount - 1;
-            $this->endLine = $this->reflector->getStartLine() - 1;
+            $this->endLine   = $this->reflector->getStartLine() - 1;
         } elseif (is_string($commentOrReflector)) {
             $this->docComment = $commentOrReflector;
         } else {
@@ -114,36 +126,6 @@ class DocBlockReflection implements ReflectionInterface
         }
 
         $this->reflect();
-    }
-
-    /**
-     * Parse the DocBlock
-     *
-     * @return void
-     */
-    protected function reflect()
-    {
-        if ($this->isReflected) {
-            return;
-        }
-
-        $docComment = preg_replace('#[ ]{0,1}\*/$#', '', $this->docComment);
-
-        // create a clean docComment
-        $this->cleanDocComment = preg_replace("#[ \t]*(?:/\*\*|\*/|\*)[ ]{0,1}(.*)?#", '$1', $docComment);
-
-        // @todo should be changed to remove first and last empty line
-        $this->cleanDocComment = ltrim($this->cleanDocComment, "\r\n");
-
-        $scanner = new DocBlockScanner($docComment);
-        $this->shortDescription = ltrim($scanner->getShortDescription());
-        $this->longDescription = ltrim($scanner->getLongDescription());
-
-        foreach ($scanner->getTags() as $tag) {
-            $this->tags[] = $this->tagManager->createTag(ltrim($tag['name'], '@'), ltrim($tag['value']));
-        }
-
-        $this->isReflected = true;
     }
 
     /**
@@ -209,7 +191,7 @@ class DocBlockReflection implements ReflectionInterface
     /**
      * Does the DocBlock contain the given annotation tag?
      *
-     * @param string $name
+     * @param  string $name
      * @return bool
      */
     public function hasTag($name)
@@ -227,7 +209,7 @@ class DocBlockReflection implements ReflectionInterface
     /**
      * Retrieve the given DocBlock tag
      *
-     * @param string $name
+     * @param  string $name
      * @return DocBlockTagInterface|false
      */
     public function getTag($name)
@@ -245,13 +227,13 @@ class DocBlockReflection implements ReflectionInterface
     /**
      * Get all DocBlock annotation tags
      *
-     * @param string $filter
+     * @param  string $filter
      * @return DocBlockTagInterface[]
      */
     public function getTags($filter = null)
     {
         $this->reflect();
-        if ($filter === null || !is_string($filter)) {
+        if ($filter === null || ! is_string($filter)) {
             return $this->tags;
         }
 
@@ -266,15 +248,33 @@ class DocBlockReflection implements ReflectionInterface
     }
 
     /**
-     * Serialize to string
+     * Parse the DocBlock
      *
-     * Required by the Reflector interface
-     *
-     * @return string
+     * @return void
      */
-    public function __toString()
+    protected function reflect()
     {
-        return $this->toString();
+        if ($this->isReflected) {
+            return;
+        }
+
+        $docComment = preg_replace('#[ ]{0,1}\*/$#', '', $this->docComment);
+
+        // create a clean docComment
+        $this->cleanDocComment = preg_replace("#[ \t]*(?:/\*\*|\*/|\*)[ ]{0,1}(.*)?#", '$1', $docComment);
+
+        // @todo should be changed to remove first and last empty line
+        $this->cleanDocComment = ltrim($this->cleanDocComment, "\r\n");
+
+        $scanner                = new DocBlockScanner($docComment);
+        $this->shortDescription = ltrim($scanner->getShortDescription());
+        $this->longDescription  = ltrim($scanner->getLongDescription());
+
+        foreach ($scanner->getTags() as $tag) {
+            $this->tags[] = $this->tagManager->createTag(ltrim($tag['name'], '@'), ltrim($tag['value']));
+        }
+
+        $this->isReflected = true;
     }
 
     /**
@@ -296,14 +296,14 @@ class DocBlockReflection implements ReflectionInterface
     }
 
     /**
-     * Export reflection
+     * Serialize to string
      *
-     * Required by the Reflector interface.
+     * Required by the Reflector interface
      *
-     * @return void
-     * @todo   What should this do?
+     * @return string
      */
-    public static function export()
+    public function __toString()
     {
+        return $this->toString();
     }
 }

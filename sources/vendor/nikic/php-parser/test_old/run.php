@@ -7,10 +7,9 @@ if ('cli' !== php_sapi_name()) {
     die('This script is designed for running on the command line.');
 }
 
-function showHelp($error)
-{
+function showHelp($error) {
     die($error . "\n\n" .
-        <<<OUTPUT
+<<<OUTPUT
 This script has to be called with the following signature:
 
     php run.php [--no-progress] testType pathToTestFiles
@@ -61,7 +60,7 @@ $dir = $arguments[1];
 switch ($testType) {
     case 'Symfony':
         $version = 'Php7';
-        $fileFilter = function ($path) {
+        $fileFilter = function($path) {
             if (!preg_match('~\.php$~', $path)) {
                 return false;
             }
@@ -79,17 +78,17 @@ switch ($testType) {
 
             return true;
         };
-        $codeExtractor = function ($file, $code) {
+        $codeExtractor = function($file, $code) {
             return $code;
         };
         break;
     case 'PHP5':
     case 'PHP7':
-        $version = $testType === 'PHP5' ? 'Php5' : 'Php7';
-        $fileFilter = function ($path) {
+    $version = $testType === 'PHP5' ? 'Php5' : 'Php7';
+        $fileFilter = function($path) {
             return preg_match('~\.phpt$~', $path);
         };
-        $codeExtractor = function ($file, $code) {
+        $codeExtractor = function($file, $code) {
             if (preg_match('~(?:
 # skeleton files
   ext.gmp.tests.001
@@ -133,23 +132,17 @@ switch ($testType) {
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$lexer = new PhpParser\Lexer\Emulative([
-    'usedAttributes' => [
-        'comments',
-        'startLine',
-        'endLine',
-        'startTokenPos',
-        'endTokenPos',
-    ]
-]);
+$lexer = new PhpParser\Lexer\Emulative(['usedAttributes' => [
+    'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos',
+]]);
 $parserName = 'PhpParser\Parser\\' . $version;
 /** @var PhpParser\Parser $parser */
 $parser = new $parserName($lexer);
-$prettyPrinter = new PhpParser\PrettyPrinter\Standard();
-$nodeDumper = new PhpParser\NodeDumper();
+$prettyPrinter = new PhpParser\PrettyPrinter\Standard;
+$nodeDumper = new PhpParser\NodeDumper;
 
-$cloningTraverser = new PhpParser\NodeTraverser();
-$cloningTraverser->addVisitor(new PhpParser\NodeVisitor\CloningVisitor());
+$cloningTraverser = new PhpParser\NodeTraverser;
+$cloningTraverser->addVisitor(new PhpParser\NodeVisitor\CloningVisitor);
 
 $parseFail = $fpppFail = $ppFail = $compareFail = $count = 0;
 
@@ -157,12 +150,10 @@ $readTime = $parseTime = $cloneTime = 0;
 $fpppTime = $ppTime = $reparseTime = $compareTime = 0;
 $totalStartTime = microtime(true);
 
-foreach (
-    new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir),
-        RecursiveIteratorIterator::LEAVES_ONLY)
-    as $file
-) {
+foreach (new RecursiveIteratorIterator(
+             new RecursiveDirectoryIterator($dir),
+             RecursiveIteratorIterator::LEAVES_ONLY)
+         as $file) {
     if (!$fileFilter($file)) {
         continue;
     }
@@ -250,31 +241,31 @@ if (0 === $parseFail && 0 === $ppFail && 0 === $compareFail) {
     $exit = 1;
     echo "\n\n", '==========', "\n\n", 'There were: ', "\n";
     if (0 !== $parseFail) {
-        echo '    ', $parseFail, ' parse failures.', "\n";
+        echo '    ', $parseFail,   ' parse failures.',        "\n";
     }
     if (0 !== $ppFail) {
-        echo '    ', $ppFail, ' pretty print failures.', "\n";
+        echo '    ', $ppFail,      ' pretty print failures.', "\n";
     }
     if (0 !== $fpppFail) {
-        echo '    ', $fpppFail, ' FPPP failures.', "\n";
+        echo '    ', $fpppFail,      ' FPPP failures.', "\n";
     }
     if (0 !== $compareFail) {
-        echo '    ', $compareFail, ' compare failures.', "\n";
+        echo '    ', $compareFail, ' compare failures.',      "\n";
     }
 }
 
 echo "\n",
-'Tested files:         ', $count, "\n",
-"\n",
-'Reading files took:   ', $readTime, "\n",
-'Parsing took:         ', $parseTime, "\n",
-'Cloning took:         ', $cloneTime, "\n",
-'FPPP took:            ', $fpppTime, "\n",
-'Pretty printing took: ', $ppTime, "\n",
-'Reparsing took:       ', $reparseTime, "\n",
-'Comparing took:       ', $compareTime, "\n",
-"\n",
-'Total time:           ', microtime(true) - $totalStartTime, "\n",
-'Maximum memory usage: ', memory_get_peak_usage(true), "\n";
+     'Tested files:         ', $count,        "\n",
+     "\n",
+     'Reading files took:   ', $readTime,    "\n",
+     'Parsing took:         ', $parseTime,   "\n",
+     'Cloning took:         ', $cloneTime,   "\n",
+     'FPPP took:            ', $fpppTime,    "\n",
+     'Pretty printing took: ', $ppTime,      "\n",
+     'Reparsing took:       ', $reparseTime, "\n",
+     'Comparing took:       ', $compareTime, "\n",
+     "\n",
+     'Total time:           ', microtime(true) - $totalStartTime, "\n",
+     'Maximum memory usage: ', memory_get_peak_usage(true), "\n";
 
 exit($exit);

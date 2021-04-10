@@ -27,51 +27,33 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
     protected $convertEncoding;
 
     /**
-     * Convert a string from defined character encoding to the defined convert encoding
+     * Check if the given character encoding is supported by this wrapper
+     * and the character encoding to convert to is also supported.
      *
-     * @param string $str
-     * @param bool $reverse
-     * @return string|false
+     * @param  string      $encoding
+     * @param  string|null $convertEncoding
+     * @return bool
      */
-    public function convert($str, $reverse = false)
+    public static function isSupported($encoding, $convertEncoding = null)
     {
-        $encoding = $this->getEncoding();
-        $convertEncoding = $this->getConvertEncoding();
-        if ($convertEncoding === null) {
-            throw new Exception\LogicException(
-                'No convert encoding defined'
-            );
+        $supportedEncodings = static::getSupportedEncodings();
+
+        if (! in_array(strtoupper($encoding), $supportedEncodings)) {
+            return false;
         }
 
-        if ($encoding === $convertEncoding) {
-            return $str;
+        if ($convertEncoding !== null && ! in_array(strtoupper($convertEncoding), $supportedEncodings)) {
+            return false;
         }
 
-        $from = $reverse ? $convertEncoding : $encoding;
-        $to = $reverse ? $encoding : $convertEncoding;
-        throw new Exception\RuntimeException(sprintf(
-            'Converting from "%s" to "%s" isn\'t supported by this string wrapper',
-            $from,
-            $to
-        ));
-    }
-
-    /**
-     * Get the defined character encoding to work with
-     *
-     * @return string
-     * @throws Exception\LogicException If no encoding was defined
-     */
-    public function getEncoding()
-    {
-        return $this->encoding;
+        return true;
     }
 
     /**
      * Set character encoding working with and convert to
      *
-     * @param string $encoding The character encoding to work with
-     * @param string|null $convertEncoding The character encoding to convert to
+     * @param string      $encoding         The character encoding to work with
+     * @param string|null $convertEncoding  The character encoding to convert to
      * @return StringWrapperInterface
      */
     public function setEncoding($encoding, $convertEncoding = null)
@@ -79,7 +61,7 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
         $supportedEncodings = static::getSupportedEncodings();
 
         $encodingUpper = strtoupper($encoding);
-        if (!in_array($encodingUpper, $supportedEncodings)) {
+        if (! in_array($encodingUpper, $supportedEncodings)) {
             throw new Exception\InvalidArgumentException(
                 'Wrapper doesn\'t support character encoding "' . $encoding . '"'
             );
@@ -87,7 +69,7 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
 
         if ($convertEncoding !== null) {
             $convertEncodingUpper = strtoupper($convertEncoding);
-            if (!in_array($convertEncodingUpper, $supportedEncodings)) {
+            if (! in_array($convertEncodingUpper, $supportedEncodings)) {
                 throw new Exception\InvalidArgumentException(
                     'Wrapper doesn\'t support character encoding "' . $convertEncoding . '"'
                 );
@@ -103,45 +85,144 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
     }
 
     /**
+     * Get the defined character encoding to work with
+     *
+     * @return string
+     * @throws Exception\LogicException If no encoding was defined
+     */
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
      * Get the defined character encoding to convert to
      *
      * @return string|null
-     */
+    */
     public function getConvertEncoding()
     {
         return $this->convertEncoding;
     }
 
     /**
-     * Check if the given character encoding is supported by this wrapper
-     * and the character encoding to convert to is also supported.
+     * Convert a string from defined character encoding to the defined convert encoding
      *
-     * @param string $encoding
-     * @param string|null $convertEncoding
-     * @return bool
+     * @param string  $str
+     * @param bool $reverse
+     * @return string|false
      */
-    public static function isSupported($encoding, $convertEncoding = null)
+    public function convert($str, $reverse = false)
     {
-        $supportedEncodings = static::getSupportedEncodings();
-
-        if (!in_array(strtoupper($encoding), $supportedEncodings)) {
-            return false;
+        $encoding        = $this->getEncoding();
+        $convertEncoding = $this->getConvertEncoding();
+        if ($convertEncoding === null) {
+            throw new Exception\LogicException(
+                'No convert encoding defined'
+            );
         }
 
-        if ($convertEncoding !== null && !in_array(strtoupper($convertEncoding), $supportedEncodings)) {
-            return false;
+        if ($encoding === $convertEncoding) {
+            return $str;
         }
 
-        return true;
+        $from = $reverse ? $convertEncoding : $encoding;
+        $to   = $reverse ? $encoding : $convertEncoding;
+        throw new Exception\RuntimeException(sprintf(
+            'Converting from "%s" to "%s" isn\'t supported by this string wrapper',
+            $from,
+            $to
+        ));
+    }
+
+    /**
+     * Wraps a string to a given number of characters
+     *
+     * @param  string  $string
+     * @param  int $width
+     * @param  string  $break
+     * @param  bool $cut
+     * @return string|false
+     */
+    public function wordWrap($string, $width = 75, $break = "\n", $cut = false)
+    {
+        $string = (string) $string;
+        if ($string === '') {
+            return '';
+        }
+
+        $break = (string) $break;
+        if ($break === '') {
+            throw new Exception\InvalidArgumentException('Break string cannot be empty');
+        }
+
+        $width = (int) $width;
+        if ($width === 0 && $cut) {
+            throw new Exception\InvalidArgumentException('Cannot force cut when width is zero');
+        }
+
+        if (StringUtils::isSingleByteEncoding($this->getEncoding())) {
+            return wordwrap($string, $width, $break, $cut);
+        }
+
+        $stringWidth = $this->strlen($string);
+        $breakWidth  = $this->strlen($break);
+
+        $result    = '';
+        $lastStart = $lastSpace = 0;
+
+        for ($current = 0; $current < $stringWidth; $current++) {
+            $char = $this->substr($string, $current, 1);
+
+            $possibleBreak = $char;
+            if ($breakWidth !== 1) {
+                $possibleBreak = $this->substr($string, $current, $breakWidth);
+            }
+
+            if ($possibleBreak === $break) {
+                $result    .= $this->substr($string, $lastStart, $current - $lastStart + $breakWidth);
+                $current   += $breakWidth - 1;
+                $lastStart  = $lastSpace = $current + 1;
+                continue;
+            }
+
+            if ($char === ' ') {
+                if ($current - $lastStart >= $width) {
+                    $result    .= $this->substr($string, $lastStart, $current - $lastStart) . $break;
+                    $lastStart  = $current + 1;
+                }
+
+                $lastSpace = $current;
+                continue;
+            }
+
+            if ($current - $lastStart >= $width && $cut && $lastStart >= $lastSpace) {
+                $result    .= $this->substr($string, $lastStart, $current - $lastStart) . $break;
+                $lastStart  = $lastSpace = $current;
+                continue;
+            }
+
+            if ($current - $lastStart >= $width && $lastStart < $lastSpace) {
+                $result    .= $this->substr($string, $lastStart, $lastSpace - $lastStart) . $break;
+                $lastStart  = $lastSpace = $lastSpace + 1;
+                continue;
+            }
+        }
+
+        if ($lastStart !== $current) {
+            $result .= $this->substr($string, $lastStart, $current - $lastStart);
+        }
+
+        return $result;
     }
 
     /**
      * Pad a string to a certain length with another string
      *
-     * @param string $input
-     * @param int $padLength
-     * @param string $padString
-     * @param int $padType
+     * @param  string  $input
+     * @param  int $padLength
+     * @param  string  $padString
+     * @param  int $padType
      * @return string
      */
     public function strPad($input, $padLength, $padString = ' ', $padType = STR_PAD_RIGHT)
@@ -165,11 +246,11 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
         if ($padType === STR_PAD_BOTH) {
             $repeatCountLeft = $repeatCountRight = ($repeatCount - $repeatCount % 2) / 2;
 
-            $lastStringLength = $lengthOfPadding - 2 * $repeatCountLeft * $padStringLength;
-            $lastStringLeftLength = $lastStringRightLength = floor($lastStringLength / 2);
+            $lastStringLength       = $lengthOfPadding - 2 * $repeatCountLeft * $padStringLength;
+            $lastStringLeftLength   = $lastStringRightLength = floor($lastStringLength / 2);
             $lastStringRightLength += $lastStringLength % 2;
 
-            $lastStringLeft = $this->substr($padString, 0, $lastStringLeftLength);
+            $lastStringLeft  = $this->substr($padString, 0, $lastStringLeftLength);
             $lastStringRight = $this->substr($padString, 0, $lastStringRightLength);
 
             return str_repeat($padString, $repeatCountLeft) . $lastStringLeft
@@ -184,86 +265,5 @@ abstract class AbstractStringWrapper implements StringWrapperInterface
         }
 
         return $input . str_repeat($padString, $repeatCount) . $lastString;
-    }
-
-    /**
-     * Wraps a string to a given number of characters
-     *
-     * @param string $string
-     * @param int $width
-     * @param string $break
-     * @param bool $cut
-     * @return string|false
-     */
-    public function wordWrap($string, $width = 75, $break = "\n", $cut = false)
-    {
-        $string = (string)$string;
-        if ($string === '') {
-            return '';
-        }
-
-        $break = (string)$break;
-        if ($break === '') {
-            throw new Exception\InvalidArgumentException('Break string cannot be empty');
-        }
-
-        $width = (int)$width;
-        if ($width === 0 && $cut) {
-            throw new Exception\InvalidArgumentException('Cannot force cut when width is zero');
-        }
-
-        if (StringUtils::isSingleByteEncoding($this->getEncoding())) {
-            return wordwrap($string, $width, $break, $cut);
-        }
-
-        $stringWidth = $this->strlen($string);
-        $breakWidth = $this->strlen($break);
-
-        $result = '';
-        $lastStart = $lastSpace = 0;
-
-        for ($current = 0; $current < $stringWidth; $current++) {
-            $char = $this->substr($string, $current, 1);
-
-            $possibleBreak = $char;
-            if ($breakWidth !== 1) {
-                $possibleBreak = $this->substr($string, $current, $breakWidth);
-            }
-
-            if ($possibleBreak === $break) {
-                $result .= $this->substr($string, $lastStart, $current - $lastStart + $breakWidth);
-                $current += $breakWidth - 1;
-                $lastStart = $lastSpace = $current + 1;
-                continue;
-            }
-
-            if ($char === ' ') {
-                if ($current - $lastStart >= $width) {
-                    $result .= $this->substr($string, $lastStart, $current - $lastStart) . $break;
-                    $lastStart = $current + 1;
-                }
-
-                $lastSpace = $current;
-                continue;
-            }
-
-            if ($current - $lastStart >= $width && $cut && $lastStart >= $lastSpace) {
-                $result .= $this->substr($string, $lastStart, $current - $lastStart) . $break;
-                $lastStart = $lastSpace = $current;
-                continue;
-            }
-
-            if ($current - $lastStart >= $width && $lastStart < $lastSpace) {
-                $result .= $this->substr($string, $lastStart, $lastSpace - $lastStart) . $break;
-                $lastStart = $lastSpace = $lastSpace + 1;
-                continue;
-            }
-        }
-
-        if ($lastStart !== $current) {
-            $result .= $this->substr($string, $lastStart, $current - $lastStart);
-        }
-
-        return $result;
     }
 }

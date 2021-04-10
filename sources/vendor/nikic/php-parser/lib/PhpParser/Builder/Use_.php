@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Builder;
 
@@ -18,10 +17,9 @@ class Use_ implements Builder
      * Creates a name use (alias) builder.
      *
      * @param Node\Name|string $name Name of the entity (namespace, class, function, constant) to alias
-     * @param int $type One of the Stmt\Use_::TYPE_* constants
+     * @param int              $type One of the Stmt\Use_::TYPE_* constants
      */
-    public function __construct($name, int $type)
-    {
+    public function __construct($name, int $type) {
         $this->name = BuilderHelpers::normalizeName($name);
         $this->type = $type;
     }
@@ -33,8 +31,7 @@ class Use_ implements Builder
      *
      * @return $this The builder instance (for fluid interface)
      */
-    public function as(string $alias)
-    {
+    public function as(string $alias) {
         $this->alias = $alias;
         return $this;
     }
@@ -44,8 +41,7 @@ class Use_ implements Builder
      *
      * @return Node The built node
      */
-    public function getNode(): Node
-    {
+    public function getNode() : Node {
         return new Stmt\Use_([
             new Stmt\UseUse($this->name, $this->alias)
         ], $this->type);

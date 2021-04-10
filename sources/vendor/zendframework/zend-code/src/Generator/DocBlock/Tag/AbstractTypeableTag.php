@@ -35,25 +35,17 @@ abstract class AbstractTypeableTag extends AbstractGenerator
 
     /**
      * @param string|string[] $types
-     * @param string $description
+     * @param string          $description
      */
     public function __construct($types = [], $description = null)
     {
-        if (!empty($types)) {
+        if (! empty($types)) {
             $this->setTypes($types);
         }
 
-        if (!empty($description)) {
+        if (! empty($description)) {
             $this->setDescription($description);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 
     /**
@@ -67,11 +59,11 @@ abstract class AbstractTypeableTag extends AbstractGenerator
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getTypes()
+    public function getDescription()
     {
-        return $this->types;
+        return $this->description;
     }
 
     /**
@@ -88,6 +80,14 @@ abstract class AbstractTypeableTag extends AbstractGenerator
         }
         $this->types = $types;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
     }
 
     /**

@@ -29,30 +29,7 @@ class VarTag implements TagInterface, PhpDocTypedTagInterface
     /**
      * {@inheritDoc}
      */
-    public function getTypes(): array
-    {
-        return $this->types;
-    }
-
-    public function getVariableName(): ?string
-    {
-        return $this->variableName;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function __toString(): string
-    {
-        return 'DocBlock Tag [ * @' . $this->getName() . ' ]' . PHP_EOL;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName(): string
+    public function getName() : string
     {
         return 'var';
     }
@@ -60,11 +37,11 @@ class VarTag implements TagInterface, PhpDocTypedTagInterface
     /**
      * {@inheritDoc}
      */
-    public function initialize($tagDocblockLine): void
+    public function initialize($tagDocblockLine) : void
     {
         $match = [];
 
-        if (!preg_match(
+        if (! preg_match(
             '#^([^\$]\S+)?\s*(\$[\S]+)?\s*(.*)$#m',
             $tagDocblockLine,
             $match
@@ -83,5 +60,28 @@ class VarTag implements TagInterface, PhpDocTypedTagInterface
         if ($match[3] !== '') {
             $this->description = $match[3];
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTypes() : array
+    {
+        return $this->types;
+    }
+
+    public function getVariableName() : ?string
+    {
+        return $this->variableName;
+    }
+
+    public function getDescription() : ?string
+    {
+        return $this->description;
+    }
+
+    public function __toString() : string
+    {
+        return 'DocBlock Tag [ * @' . $this->getName() . ' ]' . PHP_EOL;
     }
 }

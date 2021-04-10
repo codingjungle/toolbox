@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-use InvalidArgumentException;
-use SplFileInfo;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 
 class CustomFilterIteratorTest extends IteratorTestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testWithInvalidFilter()
     {
@@ -40,8 +38,8 @@ class CustomFilterIteratorTest extends IteratorTestCase
     public function getAcceptData()
     {
         return [
-            [[function (SplFileInfo $fileinfo) { return false; }], []],
-            [[function (SplFileInfo $fileinfo) { return 0 === strpos($fileinfo, 'test'); }], ['test.php', 'test.py']],
+            [[function (\SplFileInfo $fileinfo) { return false; }], []],
+            [[function (\SplFileInfo $fileinfo) { return 0 === strpos($fileinfo, 'test'); }], ['test.php', 'test.py']],
             [['is_dir'], []],
         ];
     }

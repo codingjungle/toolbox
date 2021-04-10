@@ -1,7 +1,6 @@
 <?php
 
 namespace {
-
     function testResolveDefaults($a = null, $b = false, $c = true)
     {
     }
@@ -16,10 +15,7 @@ namespace {
 
 namespace Go\ParserReflection\Stub {
 
-    use DateTime;
     use Go\ParserReflection\ReflectionParameter;
-    use stdClass;
-    use Traversable;
 
     const TEST_PARAMETER = 42;
 
@@ -37,41 +33,37 @@ namespace Go\ParserReflection\Stub {
         array $arrayNullable = null,
         callable $callableParam,
         callable $callableNullable = null,
-        stdClass $objectParam,
-        stdClass $objectNullable = null,
+        \stdClass $objectParam,
+        \stdClass $objectNullable = null,
         ReflectionParameter $typehintedParamWithNs,
         &$byReferenceParam,
         &$byReferenceNullable = __CLASS__,
         $constParam = TEST_PARAMETER,
         $constValueParam = __NAMESPACE__, // This line is long and should be truncated
-        Traversable $traversable
+        \Traversable $traversable
     ) {
     }
 
     class Foo
     {
-        public const CLASS_CONST = __CLASS__;
+        const CLASS_CONST = __CLASS__;
 
         public function methodParam($firstParam, $optionalParam = null)
         {
         }
 
-        public function methodParamConst(
-            $firstParam = self::CLASS_CONST,
-            $another = __CLASS__,
-            $ns = TEST_PARAMETER,
-            $someOther = SubFoo::ANOTHER_CLASS_CONST
-        ) {
+        public function methodParamConst($firstParam = self::CLASS_CONST, $another = __CLASS__, $ns = TEST_PARAMETER, $someOther = SubFoo::ANOTHER_CLASS_CONST)
+        {
         }
 
-        public function methodParamBuiltInClassConst($firstParam = DateTime::ATOM)
+        public function methodParamBuiltInClassConst($firstParam = \DateTime::ATOM)
         {
         }
     }
 
     class SubFoo extends Foo
     {
-        public const ANOTHER_CLASS_CONST = __CLASS__;
+        const ANOTHER_CLASS_CONST = __CLASS__;
 
         public function anotherMethodParam(self $selfParam, parent $parentParam)
         {

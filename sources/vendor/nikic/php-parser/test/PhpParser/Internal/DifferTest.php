@@ -1,22 +1,10 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Internal;
 
-use PHPUnit\Framework\TestCase;
-
-class DifferTest extends TestCase
+class DifferTest extends \PHPUnit\Framework\TestCase
 {
-    /** @dataProvider provideTestDiff */
-    public function testDiff($oldStr, $newStr, $expectedDiffStr)
-    {
-        $differ = new Differ(function ($a, $b) { return $a === $b; });
-        $diff = $differ->diff(str_split($oldStr), str_split($newStr));
-        $this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
-    }
-
-    private function formatDiffString(array $diff)
-    {
+    private function formatDiffString(array $diff) {
         $diffStr = '';
         foreach ($diff as $diffElem) {
             switch ($diffElem->type) {
@@ -40,8 +28,14 @@ class DifferTest extends TestCase
         return $diffStr;
     }
 
-    public function provideTestDiff()
-    {
+    /** @dataProvider provideTestDiff */
+    public function testDiff($oldStr, $newStr, $expectedDiffStr) {
+        $differ = new Differ(function($a, $b) { return $a === $b; });
+        $diff = $differ->diff(str_split($oldStr), str_split($newStr));
+        $this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
+    }
+
+    public function provideTestDiff() {
         return [
             ['abc', 'abc', 'abc'],
             ['abc', 'abcdef', 'abc+d+e+f'],
@@ -54,15 +48,13 @@ class DifferTest extends TestCase
     }
 
     /** @dataProvider provideTestDiffWithReplacements */
-    public function testDiffWithReplacements($oldStr, $newStr, $expectedDiffStr)
-    {
-        $differ = new Differ(function ($a, $b) { return $a === $b; });
+    public function testDiffWithReplacements($oldStr, $newStr, $expectedDiffStr) {
+        $differ = new Differ(function($a, $b) { return $a === $b; });
         $diff = $differ->diffWithReplacements(str_split($oldStr), str_split($newStr));
         $this->assertSame($expectedDiffStr, $this->formatDiffString($diff));
     }
 
-    public function provideTestDiffWithReplacements()
-    {
+    public function provideTestDiffWithReplacements() {
         return [
             ['abcde', 'axyze', 'a/bx/cy/dze'],
             ['abcde', 'xbcdy', '/axbcd/ey'],

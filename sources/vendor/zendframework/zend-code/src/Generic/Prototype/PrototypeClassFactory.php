@@ -42,7 +42,7 @@ class PrototypeClassFactory
      */
     public function __construct($prototypes = [], PrototypeGenericInterface $genericPrototype = null)
     {
-        foreach ((array)$prototypes as $prototype) {
+        foreach ((array) $prototypes as $prototype) {
             $this->addPrototype($prototype);
         }
 
@@ -67,15 +67,6 @@ class PrototypeClassFactory
     }
 
     /**
-     * @param string $name
-     * @return string
-     */
-    protected function normalizeName($name)
-    {
-        return str_replace(['-', '_'], '', $name);
-    }
-
-    /**
      * @param PrototypeGenericInterface $prototype
      * @throws Exception\InvalidArgumentException
      */
@@ -89,26 +80,12 @@ class PrototypeClassFactory
     }
 
     /**
-     * @param string $prototypeName
-     * @return PrototypeInterface
-     * @throws Exception\RuntimeException
+     * @param string $name
+     * @return string
      */
-    public function getClonedPrototype($prototypeName)
+    protected function normalizeName($name)
     {
-        $prototypeName = $this->normalizeName($prototypeName);
-
-        if (!$this->hasPrototype($prototypeName) && !isset($this->genericPrototype)) {
-            throw new Exception\RuntimeException('This tag name is not supported by this tag manager');
-        }
-
-        if (!$this->hasPrototype($prototypeName)) {
-            $newPrototype = clone $this->genericPrototype;
-            $newPrototype->setName($prototypeName);
-        } else {
-            $newPrototype = clone $this->prototypes[$prototypeName];
-        }
-
-        return $newPrototype;
+        return str_replace(['-', '_'], '', $name);
     }
 
     /**
@@ -119,5 +96,28 @@ class PrototypeClassFactory
     {
         $name = $this->normalizeName($name);
         return isset($this->prototypes[$name]);
+    }
+
+    /**
+     * @param  string $prototypeName
+     * @return PrototypeInterface
+     * @throws Exception\RuntimeException
+     */
+    public function getClonedPrototype($prototypeName)
+    {
+        $prototypeName = $this->normalizeName($prototypeName);
+
+        if (! $this->hasPrototype($prototypeName) && ! isset($this->genericPrototype)) {
+            throw new Exception\RuntimeException('This tag name is not supported by this tag manager');
+        }
+
+        if (! $this->hasPrototype($prototypeName)) {
+            $newPrototype = clone $this->genericPrototype;
+            $newPrototype->setName($prototypeName);
+        } else {
+            $newPrototype = clone $this->prototypes[$prototypeName];
+        }
+
+        return $newPrototype;
     }
 }

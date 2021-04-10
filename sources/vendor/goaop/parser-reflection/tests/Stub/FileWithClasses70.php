@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Parser Reflection API
  *
@@ -17,32 +16,21 @@ use Go\ParserReflection\{ReflectionMethod, ReflectionProperty as P};
 
 class ClassWithScalarTypeHints
 {
-    public function acceptsInteger(int $value) { }
-
-    public function acceptsString(string $value) { }
-
-    public function acceptsFloat(float $value) { }
-
-    public function acceptsBool(bool $value) { }
-
-    public function acceptsVariadicInteger(int ...$values) { }
-
-    public function acceptsDefaultString(string $class = ReflectionMethod::class, string $name = P::class) { }
-
-    public function acceptsStringDefaultToNull(string $someName = null) { }
+    public function acceptsInteger(int $value) {}
+    public function acceptsString(string $value) {}
+    public function acceptsFloat(float $value) {}
+    public function acceptsBool(bool $value) {}
+    public function acceptsVariadicInteger(int ...$values) {}
+    public function acceptsDefaultString(string $class = ReflectionMethod::class, string $name = P::class) {}
+    public function acceptsStringDefaultToNull(string $someName = null) {}
 }
 
 class ClassWithReturnTypeHints
 {
-    public function returnsInteger(): int { }
-
-    public function returnsString(): string { }
-
-    public function returnsFloat(): float { }
-
-    public function returnsBool(): bool { }
-
-    public function returnsObject(): ReflectionMethod { }
-
-    public function returnsNamedObject(): P { }
+    public function returnsInteger() : int {}
+    public function returnsString() : string {}
+    public function returnsFloat() : float {}
+    public function returnsBool() : bool {}
+    public function returnsObject() : ReflectionMethod {}
+    public function returnsNamedObject() : P {}
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-use BadFunctionCallException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
@@ -57,7 +56,7 @@ class TestMultiplePcreFilterIterator extends MultiplePcreFilterIterator
 
     public function accept()
     {
-        throw new BadFunctionCallException('Not implemented');
+        throw new \BadFunctionCallException('Not implemented');
     }
 
     public function isRegex($str)
@@ -67,6 +66,6 @@ class TestMultiplePcreFilterIterator extends MultiplePcreFilterIterator
 
     public function toRegex($str)
     {
-        throw new BadFunctionCallException('Not implemented');
+        throw new \BadFunctionCallException('Not implemented');
     }
 }

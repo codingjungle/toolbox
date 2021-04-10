@@ -25,52 +25,39 @@ use function wordwrap;
 class DocBlockGenerator extends AbstractGenerator
 {
     /**
-     * @var TagManager
-     */
-    protected static $tagManager;
-    /**
      * @var string
      */
     protected $shortDescription;
+
     /**
      * @var string
      */
     protected $longDescription;
+
     /**
      * @var array
      */
     protected $tags = [];
+
     /**
      * @var string
      */
     protected $indentation = '';
+
     /**
      * @var bool
      */
     protected $wordwrap = true;
 
     /**
-     * @param string $shortDescription
-     * @param string $longDescription
-     * @param array $tags
+     * @var TagManager
      */
-    public function __construct($shortDescription = null, $longDescription = null, array $tags = [])
-    {
-        if ($shortDescription) {
-            $this->setShortDescription($shortDescription);
-        }
-        if ($longDescription) {
-            $this->setLongDescription($longDescription);
-        }
-        if (is_array($tags) && $tags) {
-            $this->setTags($tags);
-        }
-    }
+    protected static $tagManager;
 
     /**
      * Build a DocBlock generator object from a reflection object
      *
-     * @param DocBlockReflection $reflectionDocBlock
+     * @param  DocBlockReflection $reflectionDocBlock
      * @return DocBlockGenerator
      */
     public static function fromReflection(DocBlockReflection $reflectionDocBlock)
@@ -91,51 +78,15 @@ class DocBlockGenerator extends AbstractGenerator
     }
 
     /**
-     * @param array|TagInterface $tag
-     * @return DocBlockGenerator
-     * @throws Exception\InvalidArgumentException
-     */
-    public function setTag($tag)
-    {
-        if (is_array($tag)) {
-            // use deprecated Tag class for backward compatibility to old array-keys
-            $genericTag = new Tag();
-            $genericTag->setOptions($tag);
-            $tag = $genericTag;
-        } elseif (!$tag instanceof TagInterface) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects either an array of method options or an instance of %s\DocBlock\Tag\TagInterface',
-                __METHOD__,
-                __NAMESPACE__
-            ));
-        }
-
-        $this->tags[] = $tag;
-        return $this;
-    }
-
-    /**
-     * @return TagManager
-     */
-    protected static function getTagManager()
-    {
-        if (!isset(static::$tagManager)) {
-            static::$tagManager = new TagManager();
-            static::$tagManager->initializeDefaultTags();
-        }
-        return static::$tagManager;
-    }
-
-    /**
      * Generate from array
      *
      * @configkey shortdescription string The short description for this doc block
      * @configkey longdescription  string The long description for this doc block
      * @configkey tags             array
      *
-     * @param array $array
-     * @return DocBlockGenerator
      * @throws Exception\InvalidArgumentException
+     * @param  array $array
+     * @return DocBlockGenerator
      */
     public static function fromArray(array $array)
     {
@@ -160,11 +111,140 @@ class DocBlockGenerator extends AbstractGenerator
     }
 
     /**
+     * @return TagManager
+     */
+    protected static function getTagManager()
+    {
+        if (! isset(static::$tagManager)) {
+            static::$tagManager = new TagManager();
+            static::$tagManager->initializeDefaultTags();
+        }
+        return static::$tagManager;
+    }
+
+    /**
+     * @param  string $shortDescription
+     * @param  string $longDescription
+     * @param  array $tags
+     */
+    public function __construct($shortDescription = null, $longDescription = null, array $tags = [])
+    {
+        if ($shortDescription) {
+            $this->setShortDescription($shortDescription);
+        }
+        if ($longDescription) {
+            $this->setLongDescription($longDescription);
+        }
+        if (is_array($tags) && $tags) {
+            $this->setTags($tags);
+        }
+    }
+
+    /**
+     * @param  string $shortDescription
+     * @return DocBlockGenerator
+     */
+    public function setShortDescription($shortDescription)
+    {
+        $this->shortDescription = $shortDescription;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getShortDescription()
+    {
+        return $this->shortDescription;
+    }
+
+    /**
+     * @param  string $longDescription
+     * @return DocBlockGenerator
+     */
+    public function setLongDescription($longDescription)
+    {
+        $this->longDescription = $longDescription;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLongDescription()
+    {
+        return $this->longDescription;
+    }
+
+    /**
+     * @param  array $tags
+     * @return DocBlockGenerator
+     */
+    public function setTags(array $tags)
+    {
+        foreach ($tags as $tag) {
+            $this->setTag($tag);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array|TagInterface $tag
+     * @throws Exception\InvalidArgumentException
+     * @return DocBlockGenerator
+     */
+    public function setTag($tag)
+    {
+        if (is_array($tag)) {
+            // use deprecated Tag class for backward compatibility to old array-keys
+            $genericTag = new Tag();
+            $genericTag->setOptions($tag);
+            $tag = $genericTag;
+        } elseif (! $tag instanceof TagInterface) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s expects either an array of method options or an instance of %s\DocBlock\Tag\TagInterface',
+                __METHOD__,
+                __NAMESPACE__
+            ));
+        }
+
+        $this->tags[] = $tag;
+        return $this;
+    }
+
+    /**
+     * @return TagInterface[]
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param bool $value
+     * @return DocBlockGenerator
+     */
+    public function setWordWrap($value)
+    {
+        $this->wordwrap = (bool) $value;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getWordWrap()
+    {
+        return $this->wordwrap;
+    }
+
+    /**
      * @return string
      */
     public function generate()
     {
-        if (!$this->isSourceDirty()) {
+        if (! $this->isSourceDirty()) {
             return $this->docCommentize(trim($this->getSourceContent()));
         }
 
@@ -185,15 +265,15 @@ class DocBlockGenerator extends AbstractGenerator
     }
 
     /**
-     * @param string $content
+     * @param  string $content
      * @return string
      */
     protected function docCommentize($content)
     {
-        $indent = $this->getIndentation();
-        $output = $indent . '/**' . self::LINE_FEED;
+        $indent  = $this->getIndentation();
+        $output  = $indent . '/**' . self::LINE_FEED;
         $content = $this->getWordWrap() == true ? wordwrap($content, 80, self::LINE_FEED) : $content;
-        $lines = explode(self::LINE_FEED, $content);
+        $lines   = explode(self::LINE_FEED, $content);
         foreach ($lines as $line) {
             $output .= $indent . ' *';
             if ($line) {
@@ -204,80 +284,5 @@ class DocBlockGenerator extends AbstractGenerator
         $output .= $indent . ' */' . self::LINE_FEED;
 
         return $output;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getWordWrap()
-    {
-        return $this->wordwrap;
-    }
-
-    /**
-     * @param bool $value
-     * @return DocBlockGenerator
-     */
-    public function setWordWrap($value)
-    {
-        $this->wordwrap = (bool)$value;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getShortDescription()
-    {
-        return $this->shortDescription;
-    }
-
-    /**
-     * @param string $shortDescription
-     * @return DocBlockGenerator
-     */
-    public function setShortDescription($shortDescription)
-    {
-        $this->shortDescription = $shortDescription;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLongDescription()
-    {
-        return $this->longDescription;
-    }
-
-    /**
-     * @param string $longDescription
-     * @return DocBlockGenerator
-     */
-    public function setLongDescription($longDescription)
-    {
-        $this->longDescription = $longDescription;
-        return $this;
-    }
-
-    /**
-     * @return TagInterface[]
-     */
-    public function getTags()
-    {
-        return $this->tags;
-    }
-
-    /**
-     * @param array $tags
-     * @return DocBlockGenerator
-     */
-    public function setTags(array $tags)
-    {
-        foreach ($tags as $tag) {
-            $this->setTag($tag);
-        }
-
-        return $this;
     }
 }

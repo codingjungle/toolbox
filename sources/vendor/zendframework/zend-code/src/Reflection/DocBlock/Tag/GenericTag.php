@@ -37,7 +37,7 @@ class GenericTag implements TagInterface, PrototypeGenericInterface
     protected $values = [];
 
     /**
-     * @param string $contentSplitCharacter
+     * @param  string $contentSplitCharacter
      */
     public function __construct($contentSplitCharacter = ' ')
     {
@@ -45,21 +45,12 @@ class GenericTag implements TagInterface, PrototypeGenericInterface
     }
 
     /**
-     * @param string $tagDocBlockLine
+     * @param  string $tagDocBlockLine
      * @return void
      */
     public function initialize($tagDocBlockLine)
     {
         $this->parse($tagDocBlockLine);
-    }
-
-    /**
-     * @param string $docBlockLine
-     */
-    protected function parse($docBlockLine)
-    {
-        $this->content = trim($docBlockLine);
-        $this->values = explode($this->contentSplitCharacter, $docBlockLine);
     }
 
     /**
@@ -73,7 +64,7 @@ class GenericTag implements TagInterface, PrototypeGenericInterface
     }
 
     /**
-     * @param string $name
+     * @param  string $name
      */
     public function setName($name)
     {
@@ -89,7 +80,7 @@ class GenericTag implements TagInterface, PrototypeGenericInterface
     }
 
     /**
-     * @param int $position
+     * @param  int $position
      * @return string
      */
     public function returnValue($position)
@@ -102,11 +93,20 @@ class GenericTag implements TagInterface, PrototypeGenericInterface
      *
      * Required by Reflector
      *
-     * @return string
      * @todo   What should this do?
+     * @return string
      */
     public function __toString()
     {
         return 'DocBlock Tag [ * @' . $this->name . ' ]' . "\n";
+    }
+
+    /**
+     * @param  string $docBlockLine
+     */
+    protected function parse($docBlockLine)
+    {
+        $this->content = trim($docBlockLine);
+        $this->values = explode($this->contentSplitCharacter, $docBlockLine);
     }
 }

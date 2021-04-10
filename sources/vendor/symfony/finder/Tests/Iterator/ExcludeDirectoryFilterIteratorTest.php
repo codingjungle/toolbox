@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-use FilesystemIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
@@ -23,8 +21,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($directories, $expected)
     {
-        $inner = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->toAbsolute(),
-            FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
+        $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
         $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
 

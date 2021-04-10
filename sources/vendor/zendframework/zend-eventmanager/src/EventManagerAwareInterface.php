@@ -17,7 +17,7 @@ interface EventManagerAwareInterface extends EventsCapableInterface
     /**
      * Inject an EventManager instance
      *
-     * @param EventManagerInterface $eventManager
+     * @param  EventManagerInterface $eventManager
      * @return void
      */
     public function setEventManager(EventManagerInterface $eventManager);

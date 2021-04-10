@@ -23,8 +23,7 @@ use ReflectionClass as InternalReflectionClass;
  */
 class ReflectionClass extends InternalReflectionClass
 {
-    use InternalPropertiesEmulationTrait;
-    use ReflectionClassLikeTrait;
+    use ReflectionClassLikeTrait, InternalPropertiesEmulationTrait;
 
     /**
      * Initializes reflection instance
@@ -34,9 +33,9 @@ class ReflectionClass extends InternalReflectionClass
      */
     public function __construct($argument, ClassLike $classLikeNode = null)
     {
-        $fullClassName = is_object($argument) ? get_class($argument) : ltrim($argument, '\\');
-        $namespaceParts = explode('\\', $fullClassName);
-        $this->className = array_pop($namespaceParts);
+        $fullClassName       = is_object($argument) ? get_class($argument) : ltrim($argument, '\\');
+        $namespaceParts      = explode('\\', $fullClassName);
+        $this->className     = array_pop($namespaceParts);
         // Let's unset original read-only property to have a control over it via __get
         unset($this->name);
 
@@ -50,21 +49,21 @@ class ReflectionClass extends InternalReflectionClass
      *
      * @param ClassLike $classLikeNode Class-like node
      *
-     * @return array|InternalReflectionClass[] List of reflections of interfaces
+     * @return array|\ReflectionClass[] List of reflections of interfaces
      */
     public static function collectInterfacesFromClassNode(ClassLike $classLikeNode)
     {
         $interfaces = [];
 
-        $isInterface = $classLikeNode instanceof Interface_;
+        $isInterface    = $classLikeNode instanceof Interface_;
         $interfaceField = $isInterface ? 'extends' : 'implements';
-        $hasInterfaces = in_array($interfaceField, $classLikeNode->getSubNodeNames());
+        $hasInterfaces  = in_array($interfaceField, $classLikeNode->getSubNodeNames());
         $implementsList = $hasInterfaces ? $classLikeNode->$interfaceField : array();
         if ($implementsList) {
             foreach ($implementsList as $implementNode) {
                 if ($implementNode instanceof FullyQualified) {
-                    $implementName = $implementNode->toString();
-                    $interface = interface_exists($implementName, false)
+                    $implementName  = $implementNode->toString();
+                    $interface      = interface_exists($implementName, false)
                         ? new parent($implementName)
                         : new static($implementName);
                     $interfaces[$implementName] = $interface;
@@ -79,9 +78,9 @@ class ReflectionClass extends InternalReflectionClass
      * Parses traits from the concrete class node
      *
      * @param ClassLike $classLikeNode Class-like node
-     * @param array $traitAdaptations List of method adaptations
+     * @param array     $traitAdaptations List of method adaptations
      *
-     * @return array|InternalReflectionClass[] List of reflections of traits
+     * @return array|\ReflectionClass[] List of reflections of traits
      */
     public static function collectTraitsFromClassNode(ClassLike $classLikeNode, array &$traitAdaptations)
     {
@@ -92,8 +91,8 @@ class ReflectionClass extends InternalReflectionClass
                 if ($classLevelNode instanceof TraitUse) {
                     foreach ($classLevelNode->traits as $classTraitName) {
                         if ($classTraitName instanceof FullyQualified) {
-                            $traitName = $classTraitName->toString();
-                            $trait = trait_exists($traitName, false)
+                            $traitName          = $classTraitName->toString();
+                            $trait              = trait_exists($traitName, false)
                                 ? new parent($traitName)
                                 : new static($traitName);
                             $traits[$traitName] = $trait;

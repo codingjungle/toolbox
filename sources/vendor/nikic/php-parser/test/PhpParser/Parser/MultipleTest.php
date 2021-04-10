@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpParser\Parser;
 
@@ -8,31 +7,40 @@ use PhpParser\Lexer;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt;
-use PhpParser\Parser;
 use PhpParser\ParserTest;
 
 class MultipleTest extends ParserTest
 {
     // This provider is for the generic parser tests, just pick an arbitrary order here
+    protected function getParser(Lexer $lexer) {
+        return new Multiple([new Php5($lexer), new Php7($lexer)]);
+    }
+
+    private function getPrefer7() {
+        $lexer = new Lexer(['usedAttributes' => []]);
+        return new Multiple([new Php7($lexer), new Php5($lexer)]);
+    }
+
+    private function getPrefer5() {
+        $lexer = new Lexer(['usedAttributes' => []]);
+        return new Multiple([new Php5($lexer), new Php7($lexer)]);
+    }
+
     /** @dataProvider provideTestParse */
-    public function testParse($code, Multiple $parser, $expected)
-    {
+    public function testParse($code, Multiple $parser, $expected) {
         $this->assertEquals($expected, $parser->parse($code));
     }
 
-    public function provideTestParse()
-    {
+    public function provideTestParse() {
         return [
             [
                 // PHP 7 only code
-                '<?php class Test { publicfunction function() {} }',
+                '<?php class Test { function function() {} }',
                 $this->getPrefer5(),
                 [
-                    new Stmt\Class_('Test', [
-                        'stmts' => [
-                            new Stmt\ClassMethod('function')
-                        ]
-                    ]),
+                    new Stmt\Class_('Test', ['stmts' => [
+                        new Stmt\ClassMethod('function')
+                    ]]),
                 ]
             ],
             [
@@ -68,37 +76,19 @@ class MultipleTest extends ParserTest
         ];
     }
 
-    private function getPrefer5()
-    {
-        $lexer = new Lexer(['usedAttributes' => []]);
-        return new Multiple([new Php5($lexer), new Php7($lexer)]);
-    }
-
-    private function getPrefer7()
-    {
-        $lexer = new Lexer(['usedAttributes' => []]);
-        return new Multiple([new Php7($lexer), new Php5($lexer)]);
-    }
-
-    public function testThrownError()
-    {
+    public function testThrownError() {
         $this->expectException(Error::class);
         $this->expectExceptionMessage('FAIL A');
 
-        $parserA = $this->getMockBuilder(Parser::class)->getMock();
+        $parserA = $this->getMockBuilder(\PhpParser\Parser::class)->getMock();
         $parserA->expects($this->at(0))
-                ->method('parse')->willThrowException(new Error('FAIL A'));
+            ->method('parse')->willThrowException(new Error('FAIL A'));
 
-        $parserB = $this->getMockBuilder(Parser::class)->getMock();
+        $parserB = $this->getMockBuilder(\PhpParser\Parser::class)->getMock();
         $parserB->expects($this->at(0))
-                ->method('parse')->willThrowException(new Error('FAIL B'));
+            ->method('parse')->willThrowException(new Error('FAIL B'));
 
         $parser = new Multiple([$parserA, $parserB]);
         $parser->parse('dummy');
-    }
-
-    protected function getParser(Lexer $lexer)
-    {
-        return new Multiple([new Php5($lexer), new Php7($lexer)]);
     }
 }

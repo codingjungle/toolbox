@@ -181,7 +181,7 @@ trait ReflectionFunctionLikeTrait
      */
     public function getReturnType()
     {
-        $isBuiltin = false;
+        $isBuiltin  = false;
         $returnType = $this->functionLikeNode->getReturnType();
         $isNullable = $returnType instanceof NullableType;
 
@@ -233,7 +233,7 @@ trait ReflectionFunctionLikeTrait
         // In nikic/PHP-Parser >= 3.0.0 the option to clone nodes was removed
         //     as a constructor parameter, so Scrutinizer will pick this up as
         //     an issue. It is retained for legacy compatibility.
-        $nodeTraverser = new NodeTraverser(false);
+        $nodeTraverser      = new NodeTraverser(false);
         $variablesCollector = new StaticVariablesCollector($this);
         $nodeTraverser->addVisitor($variablesCollector);
 
@@ -297,7 +297,7 @@ trait ReflectionFunctionLikeTrait
         //     as a constructor parameter, so Scrutinizer will pick this up as
         //     an issue. It is retained for legacy compatibility.
         $nodeTraverser = new NodeTraverser(false);
-        $nodeDetector = new GeneratorDetector();
+        $nodeDetector  = new GeneratorDetector();
         $nodeTraverser->addVisitor($nodeDetector);
 
         /* @see https://github.com/nikic/PHP-Parser/issues/235 */

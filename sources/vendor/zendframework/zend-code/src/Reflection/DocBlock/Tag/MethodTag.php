@@ -40,6 +40,42 @@ class MethodTag implements TagInterface, PhpDocTypedTagInterface
     protected $isStatic = false;
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'method';
+    }
+
+    /**
+     * Initializer
+     *
+     * @param  string $tagDocblockLine
+     */
+    public function initialize($tagDocblockLine)
+    {
+        $match = [];
+
+        if (! preg_match('#^(static[\s]+)?(.+[\s]+)?(.+\(\))[\s]*(.*)$#m', $tagDocblockLine, $match)) {
+            return;
+        }
+
+        if ($match[1] !== '') {
+            $this->isStatic = true;
+        }
+
+        if ($match[2] !== '') {
+            $this->types = explode('|', rtrim($match[2]));
+        }
+
+        $this->methodName = $match[3];
+
+        if ($match[4] !== '') {
+            $this->description = $match[4];
+        }
+    }
+
+    /**
      * Get return value type
      *
      * @return null|string
@@ -86,41 +122,5 @@ class MethodTag implements TagInterface, PhpDocTypedTagInterface
     public function __toString()
     {
         return 'DocBlock Tag [ * @' . $this->getName() . ' ]' . "\n";
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'method';
-    }
-
-    /**
-     * Initializer
-     *
-     * @param string $tagDocblockLine
-     */
-    public function initialize($tagDocblockLine)
-    {
-        $match = [];
-
-        if (!preg_match('#^(static[\s]+)?(.+[\s]+)?(.+\(\))[\s]*(.*)$#m', $tagDocblockLine, $match)) {
-            return;
-        }
-
-        if ($match[1] !== '') {
-            $this->isStatic = true;
-        }
-
-        if ($match[2] !== '') {
-            $this->types = explode('|', rtrim($match[2]));
-        }
-
-        $this->methodName = $match[3];
-
-        if ($match[4] !== '') {
-            $this->description = $match[4];
-        }
     }
 }

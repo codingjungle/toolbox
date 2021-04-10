@@ -9,8 +9,6 @@
 
 namespace Zend\Stdlib\Guard;
 
-use Exception;
-
 /**
  * Provide a guard method against null data
  */
@@ -19,10 +17,10 @@ trait NullGuardTrait
     /**
      * Verify that the data is not null
      *
-     * @param mixed $data the data to verify
-     * @param string $dataName the data name
-     * @param string $exceptionClass FQCN for the exception
-     * @throws Exception
+     * @param  mixed  $data           the data to verify
+     * @param  string $dataName       the data name
+     * @param  string $exceptionClass FQCN for the exception
+     * @throws \Exception
      */
     protected function guardAgainstNull(
         $data,

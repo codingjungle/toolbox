@@ -17,9 +17,9 @@ use function current;
 use function is_string;
 use function next;
 use function reset;
-use function strpos;
 use function strtolower;
 use function substr;
+use function strpos;
 use function var_export;
 
 class ConstantScanner implements ScannerInterface
@@ -98,12 +98,60 @@ class ConstantScanner implements ScannerInterface
     }
 
     /**
+     * @return ClassScanner
+     */
+    public function getClassScanner()
+    {
+        return $this->scannerClass;
+    }
+
+    /**
      * @return string
      */
     public function getName()
     {
         $this->scan();
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        $this->scan();
+        return $this->value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocComment()
+    {
+        $this->scan();
+        return $this->docComment;
+    }
+
+    /**
+     * @param Annotation\AnnotationManager $annotationManager
+     * @return AnnotationScanner
+     */
+    public function getAnnotations(Annotation\AnnotationManager $annotationManager)
+    {
+        if (($docComment = $this->getDocComment()) == '') {
+            return false;
+        }
+
+        return new AnnotationScanner($annotationManager, $docComment, $this->nameInformation);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        $this->scan();
+        return var_export($this, true);
     }
 
     /**
@@ -117,7 +165,7 @@ class ConstantScanner implements ScannerInterface
             return;
         }
 
-        if (!$this->tokens) {
+        if (! $this->tokens) {
             throw new Exception\RuntimeException('No tokens were provided');
         }
 
@@ -132,7 +180,7 @@ class ConstantScanner implements ScannerInterface
 
         $token = current($tokens);
 
-        if (!is_string($token)) {
+        if (! is_string($token)) {
             list($tokenType, $tokenContent, $tokenLine) = $token;
 
             switch ($tokenType) {
@@ -141,7 +189,7 @@ class ConstantScanner implements ScannerInterface
                         $this->docComment = $tokenContent;
                     }
                     goto SCANNER_CONTINUE;
-                // fall-through
+                    // fall-through
 
                 case T_STRING:
                     $string = is_string($token) ? $token : $tokenContent;
@@ -163,7 +211,7 @@ class ConstantScanner implements ScannerInterface
                     }
 
                     goto SCANNER_CONTINUE;
-                // fall-through
+                    // fall-through
 
                 case T_CONSTANT_ENCAPSED_STRING:
                 case T_DNUMBER:
@@ -176,7 +224,7 @@ class ConstantScanner implements ScannerInterface
                         $this->value = $string;
                     }
                     goto SCANNER_CONTINUE;
-                // fall-trough
+                    // fall-trough
 
                 default:
                     goto SCANNER_CONTINUE;
@@ -193,53 +241,5 @@ class ConstantScanner implements ScannerInterface
         SCANNER_END:
 
         $this->isScanned = true;
-    }
-
-    /**
-     * @return ClassScanner
-     */
-    public function getClassScanner()
-    {
-        return $this->scannerClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue()
-    {
-        $this->scan();
-        return $this->value;
-    }
-
-    /**
-     * @param Annotation\AnnotationManager $annotationManager
-     * @return AnnotationScanner
-     */
-    public function getAnnotations(Annotation\AnnotationManager $annotationManager)
-    {
-        if (($docComment = $this->getDocComment()) == '') {
-            return false;
-        }
-
-        return new AnnotationScanner($annotationManager, $docComment, $this->nameInformation);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDocComment()
-    {
-        $this->scan();
-        return $this->docComment;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        $this->scan();
-        return var_export($this, true);
     }
 }

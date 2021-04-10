@@ -25,17 +25,17 @@ class PropertyReflection extends PhpReflectionProperty implements ReflectionInte
     protected $annotations;
 
     /**
-     * @return false|DocBlockReflection
+     * Get declaring class reflection object
+     *
+     * @return ClassReflection
      */
-    public function getDocBlock()
+    public function getDeclaringClass()
     {
-        if (!($docComment = $this->getDocComment())) {
-            return false;
-        }
+        $phpReflection  = parent::getDeclaringClass();
+        $zendReflection = new ClassReflection($phpReflection->getName());
+        unset($phpReflection);
 
-        $docBlockReflection = new DocBlockReflection($docComment);
-
-        return $docBlockReflection;
+        return $zendReflection;
     }
 
     /**
@@ -49,7 +49,21 @@ class PropertyReflection extends PhpReflectionProperty implements ReflectionInte
     }
 
     /**
-     * @param AnnotationManager $annotationManager
+     * @return false|DocBlockReflection
+     */
+    public function getDocBlock()
+    {
+        if (! ($docComment = $this->getDocComment())) {
+            return false;
+        }
+
+        $docBlockReflection = new DocBlockReflection($docComment);
+
+        return $docBlockReflection;
+    }
+
+    /**
+     * @param  AnnotationManager $annotationManager
      * @return AnnotationScanner|false
      */
     public function getAnnotations(AnnotationManager $annotationManager)
@@ -62,46 +76,17 @@ class PropertyReflection extends PhpReflectionProperty implements ReflectionInte
             return false;
         }
 
-        $class = $this->getDeclaringClass();
+        $class              = $this->getDeclaringClass();
         $cachingFileScanner = $this->createFileScanner($class->getFileName());
-        $nameInformation = $cachingFileScanner->getClassNameInformation($class->getName());
+        $nameInformation    = $cachingFileScanner->getClassNameInformation($class->getName());
 
-        if (!$nameInformation) {
+        if (! $nameInformation) {
             return false;
         }
 
-        $this->annotations = new AnnotationScanner($annotationManager, $docComment, $nameInformation);
+        $this->annotations  = new AnnotationScanner($annotationManager, $docComment, $nameInformation);
 
         return $this->annotations;
-    }
-
-    /**
-     * Get declaring class reflection object
-     *
-     * @return ClassReflection
-     */
-    public function getDeclaringClass()
-    {
-        $phpReflection = parent::getDeclaringClass();
-        $zendReflection = new ClassReflection($phpReflection->getName());
-        unset($phpReflection);
-
-        return $zendReflection;
-    }
-
-    /**
-     * Creates a new FileScanner instance.
-     *
-     * By having this as a separate method it allows the method to be overridden
-     * if a different FileScanner is needed.
-     *
-     * @param string $filename
-     *
-     * @return CachingFileScanner
-     */
-    protected function createFileScanner($filename)
-    {
-        return new CachingFileScanner($filename);
     }
 
     /**
@@ -110,5 +95,20 @@ class PropertyReflection extends PhpReflectionProperty implements ReflectionInte
     public function toString()
     {
         return $this->__toString();
+    }
+
+    /**
+     * Creates a new FileScanner instance.
+     *
+     * By having this as a separate method it allows the method to be overridden
+     * if a different FileScanner is needed.
+     *
+     * @param  string $filename
+     *
+     * @return CachingFileScanner
+     */
+    protected function createFileScanner($filename)
+    {
+        return new CachingFileScanner($filename);
     }
 }

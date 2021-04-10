@@ -30,17 +30,54 @@ class FunctionReflection extends ReflectionFunction implements ReflectionInterfa
     /**
      * Constant use in @MethodReflection to display prototype as an array
      */
-    public const PROTOTYPE_AS_ARRAY = 'prototype_as_array';
+    const PROTOTYPE_AS_ARRAY = 'prototype_as_array';
 
     /**
      * Constant use in @MethodReflection to display prototype as a string
      */
-    public const PROTOTYPE_AS_STRING = 'prototype_as_string';
+    const PROTOTYPE_AS_STRING = 'prototype_as_string';
+
+    /**
+     * Get function DocBlock
+     *
+     * @throws Exception\InvalidArgumentException
+     * @return DocBlockReflection
+     */
+    public function getDocBlock()
+    {
+        if ('' == ($comment = $this->getDocComment())) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s does not have a DocBlock',
+                $this->getName()
+            ));
+        }
+
+        $instance = new DocBlockReflection($comment);
+
+        return $instance;
+    }
+
+    /**
+     * Get start line (position) of function
+     *
+     * @param  bool $includeDocComment
+     * @return int
+     */
+    public function getStartLine($includeDocComment = false)
+    {
+        if ($includeDocComment) {
+            if ($this->getDocComment() != '') {
+                return $this->getDocBlock()->getStartLine();
+            }
+        }
+
+        return parent::getStartLine();
+    }
 
     /**
      * Get contents of function
      *
-     * @param bool $includeDocBlock
+     * @param  bool   $includeDocBlock
      * @return string
      */
     public function getContents($includeDocBlock = true)
@@ -92,43 +129,6 @@ class FunctionReflection extends ReflectionFunction implements ReflectionInterfa
     }
 
     /**
-     * Get start line (position) of function
-     *
-     * @param bool $includeDocComment
-     * @return int
-     */
-    public function getStartLine($includeDocComment = false)
-    {
-        if ($includeDocComment) {
-            if ($this->getDocComment() != '') {
-                return $this->getDocBlock()->getStartLine();
-            }
-        }
-
-        return parent::getStartLine();
-    }
-
-    /**
-     * Get function DocBlock
-     *
-     * @return DocBlockReflection
-     * @throws Exception\InvalidArgumentException
-     */
-    public function getDocBlock()
-    {
-        if ('' == ($comment = $this->getDocComment())) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s does not have a DocBlock',
-                $this->getName()
-            ));
-        }
-
-        $instance = new DocBlockReflection($comment);
-
-        return $instance;
-    }
-
-    /**
      * Get method prototype
      *
      * @param string $format
@@ -155,7 +155,7 @@ class FunctionReflection extends ReflectionFunction implements ReflectionInterfa
         foreach ($parameters as $parameter) {
             $prototype['arguments'][$parameter->getName()] = [
                 'type'     => $parameter->detectType(),
-                'required' => !$parameter->isOptional(),
+                'required' => ! $parameter->isOptional(),
                 'by_ref'   => $parameter->isPassedByReference(),
                 'default'  => $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null,
             ];
@@ -166,9 +166,9 @@ class FunctionReflection extends ReflectionFunction implements ReflectionInterfa
             $args = [];
             foreach ($prototype['arguments'] as $name => $argument) {
                 $argsLine = ($argument['type']
-                        ? $argument['type'] . ' '
-                        : '') . ($argument['by_ref'] ? '&' : '') . '$' . $name;
-                if (!$argument['required']) {
+                    ? $argument['type'] . ' '
+                    : '') . ($argument['by_ref'] ? '&' : '') . '$' . $name;
+                if (! $argument['required']) {
                     $argsLine .= ' = ' . var_export($argument['default'], true);
                 }
                 $args[] = $argsLine;
@@ -189,10 +189,10 @@ class FunctionReflection extends ReflectionFunction implements ReflectionInterfa
      */
     public function getParameters()
     {
-        $phpReflections = parent::getParameters();
+        $phpReflections  = parent::getParameters();
         $zendReflections = [];
         while ($phpReflections && ($phpReflection = array_shift($phpReflections))) {
-            $instance = new ParameterReflection($this->getName(), $phpReflection->getName());
+            $instance          = new ParameterReflection($this->getName(), $phpReflection->getName());
             $zendReflections[] = $instance;
             unset($phpReflection);
         }
@@ -204,19 +204,19 @@ class FunctionReflection extends ReflectionFunction implements ReflectionInterfa
     /**
      * Get return type tag
      *
-     * @return DocBlockReflection
      * @throws Exception\InvalidArgumentException
+     * @return DocBlockReflection
      */
     public function getReturn()
     {
         $docBlock = $this->getDocBlock();
-        if (!$docBlock->hasTag('return')) {
+        if (! $docBlock->hasTag('return')) {
             throw new Exception\InvalidArgumentException(
                 'Function does not specify an @return annotation tag; cannot determine return type'
             );
         }
 
-        $tag = $docBlock->getTag('return');
+        $tag    = $docBlock->getTag('return');
 
         return new DocBlockReflection('@return ' . $tag->getDescription());
     }
