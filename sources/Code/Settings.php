@@ -58,6 +58,7 @@ class _Settings extends ParserAbstract
         $this->skip = [
             'settings.json',
         ];
+        $this->buildSettings();
     }
 
     /**
@@ -71,8 +72,9 @@ class _Settings extends ParserAbstract
             return $this;
         }
 
+        /** @var Application $app */
         foreach (Application::applications() as $app) {
-            $dir = \IPS\ROOT_PATH . '/applications/' . $app->directory . '/data/settings.json';
+            $dir = $app->getApplicationPath() . '/data/settings.json';
             if (is_file($dir)) {
                 /**
                  * @var array $appSettings
@@ -84,7 +86,7 @@ class _Settings extends ParserAbstract
             }
         }
 
-        $dir = \IPS\ROOT_PATH . '/applications/' . $this->app->directory . '/data/settings.json';
+        $dir = $this->app->getApplicationPath() . '/data/settings.json';
         if (is_file($dir)) {
             $settings = json_decode(file_get_contents($dir), true) ?? [];
             foreach ($settings as $setting) {
@@ -93,7 +95,7 @@ class _Settings extends ParserAbstract
         }
 
         $INFO = [];
-        require \IPS\ROOT_PATH . '/conf_global.php';
+        require Application::getRootPath('core') . '/conf_global.php';
         if ($INFO) {
             foreach ($INFO as $key => $val) {
                 $this->globalSettings[$key] = $key;
@@ -142,27 +144,23 @@ class _Settings extends ParserAbstract
             $lines = explode("\n", $data);
             $line = 1;
             $name = $file->getRealPath();
+            $checkArray = [
+                '$',
+                '{',
+            ];
             foreach ($lines as $content) {
                 $path = $this->buildPath($name, $line);
                 $line++;
                 if ($file->getExtension() === 'phtml') {
                     $matches = [];
-                    preg_match_all("#\bsettings\.([^\s|\W]+)#u", $content, $matches);
+                    preg_match_all("#\bsettings\.(\w*+(?!\())#u", $content, $matches);
                     if (isset($matches[1]) && count($matches[1])) {
                         /* @var array $found */
                         $found = $matches[1];
                         foreach ($found as $key => $val) {
                             $val = trim($val);
-                            if ($val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues') {
-                                continue;
-                            }
-                            if ($val && !isset($this->globalSettings[$val]) && (!in_array(
-                                    mb_substr($val, 0, 1),
-                                    [
-                                        '$',
-                                        '{',
-                                    ]
-                                ))) {
+                            $cc = mb_substr($val, 0, 1);
+                            if ($val && !isset($this->globalSettings[$val]) && (!in_array($cc, $checkArray, true))) {
                                 $warning[] = ['path' => ['url' => $path, 'name' => $name], 'key' => $val];
                             }
                         }
@@ -170,22 +168,14 @@ class _Settings extends ParserAbstract
                 }
 
                 $matches = [];
-                preg_match_all('#Settings::i\(\)->([^\s|\W]+)#u', $content, $matches);
+                preg_match_all('#Settings::i\(\)->(\w*+(?!\())#u', $content, $matches);
                 if (isset($matches[1]) && count($matches[1])) {
                     /* @var array $found */
                     $found = $matches[1];
                     foreach ($found as $key => $val) {
                         $val = trim($val);
-                        if ($val === 'base_url' || $val === 'changeValues(' || $val === 'changeValues') {
-                            continue;
-                        }
-                        if ($val && !isset($this->globalSettings[$val]) && (!in_array(
-                                mb_substr($val, 0, 1),
-                                [
-                                    '$',
-                                    '{',
-                                ]
-                            ))) {
+                        $cc = mb_substr($val, 0, 1);
+                        if ($val && !isset($this->globalSettings[$val]) && (!in_array($cc, $checkArray, true))) {
                             $warning[] = ['path' => ['url' => $path, 'name' => $name], 'key' => $val];
                         }
                     }

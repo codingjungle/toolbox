@@ -31,7 +31,6 @@ use IPS\toolbox\Code\FileStorage;
 use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\Settings;
-
 use OutOfRangeException;
 use RuntimeException;
 use UnexpectedValueException;
@@ -80,8 +79,9 @@ class _analyzer extends Controller
     protected function manage()
     {
         $form = new Form();
-        (new FileStorage('chrono'))->check();
-        (new Langs('chrono'))->verify();
+        // (new Settings())->buildSettings()->verify();
+//        (new FileStorage('chrono'))->check();
+//        (new Langs('chrono'))->verify();
         //(new Db('chrono'))->check();
         foreach (Application::applications() as $key => $val) {
             if (!defined('DTCODE_NO_SKIP') && in_array($val->directory, IPS::$ipsApps, true)) {
@@ -158,11 +158,11 @@ class _analyzer extends Controller
                     $complete = 2;
                     break;
                 case 2:
-                    $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
+                    $warnings['settings_check'] = (new Settings($app))->check();
                     $complete = 3;
                     break;
                 case 3:
-                    $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
+                    $warnings['settings_verify'] = (new Settings($app))->verify();
                     $complete = 4;
                     break;
                 case 4:
