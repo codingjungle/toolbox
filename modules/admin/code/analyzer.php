@@ -26,10 +26,13 @@ use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
+use IPS\toolbox\Code\_ParserAbstract;
+use IPS\toolbox\Code\_Settings;
 use IPS\toolbox\Code\Db;
 use IPS\toolbox\Code\FileStorage;
 use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
+use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
 use OutOfRangeException;
 use RuntimeException;
@@ -128,7 +131,7 @@ class _analyzer extends Controller
                     'application' => Request::i()->application,
                 ]
             )->csrf(), function ($data) {
-            $total = 7;
+            $total = 8;
             $percent = round(100 / $total);
             $app = Request::i()->application;
             $complete = 0;
@@ -148,34 +151,36 @@ class _analyzer extends Controller
                     $complete++;
                     break;
                 case 0:
-                    $warnings['langs_check'] = (new Langs($app))->check();
+                    $warnings['sql_check'] = (new Db($app))->check();
                     $complete = 1;
                     break;
                 case 1:
-                    $verify = (new Langs($app))->verify();
-                    $warnings['langs_verify'] = $verify['langs'] ?? [];
-                    $warnings['root_path'] = $verify['root'] ?? [];
+                    $warnings['filestorage_check'] = (new FileStorage($app))->check();
                     $complete = 2;
                     break;
                 case 2:
-                    $warnings['settings_check'] = (new Settings($app))->check();
+                    $warnings['root_path'] = (new RootPath($app))->check();
                     $complete = 3;
                     break;
                 case 3:
-                    $warnings['settings_verify'] = (new Settings($app))->verify();
+                    $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
                     $complete = 4;
                     break;
                 case 4:
-                    $warnings['sql_check'] = (new Db($app))->check();
+                    $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
                     $complete = 5;
                     break;
                 case 5:
-                    $warnings['filestorage_check'] = (new FileStorage($app))->check();
+                    $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
                     $complete = 6;
                     break;
                 case 6:
-                    $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
+                    $warnings['langs_check'] = (new Langs($app))->check();
                     $complete = 7;
+                    break;
+                case 7:
+                    $warnings['langs_verify'] = (new Langs($app))->verify();
+                    $complete = 8;
                     break;
             }
 

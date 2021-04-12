@@ -35,13 +35,13 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Settings extends ParserAbstract
 {
+    protected static $instance;
     /**
      * contains a list of all the settings currently in the suite
      *
      * @var array
      */
     protected $globalSettings = [];
-
     /**
      * contains a list of all the settings for current application
      *
@@ -58,7 +58,6 @@ class _Settings extends ParserAbstract
         $this->skip = [
             'settings.json',
         ];
-        $this->buildSettings();
     }
 
     /**

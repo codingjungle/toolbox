@@ -17,7 +17,6 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 
-Application::loadAutoLoader();
 
 use IPS\toolbox\Application;
 use Zend\Code\Generator\TraitGenerator;
@@ -25,6 +24,8 @@ use Zend\Code\Generator\TraitGenerator;
 use function defined;
 use function header;
 use function preg_replace;
+
+Application::loadAutoLoader();
 
 /**
  * Class _DTClassGenerator

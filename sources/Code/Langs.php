@@ -191,8 +191,6 @@ class _Langs extends ParserAbstract
 
         /* Remove the ignored language strings like the app name */
         $keys = array_diff($keys, $this->ignore);
-        //_p($this->prefixes);
-        //check the removed prefix shit first
 
         foreach ($keys as $find => $value) {
             $find = trim($find);
@@ -210,7 +208,6 @@ class _Langs extends ParserAbstract
                     preg_match_all('#[\'|"]' . $find2 . '[\'|"]#msu', $content, $match);
 
                     if (!count($match[0]) && !isset($this->toIgnore[$prefix])) {
-//
                         $warning['langs'][$find] = $find;
                     } else {
                         unset($keys[$find]);
@@ -292,17 +289,6 @@ class _Langs extends ParserAbstract
             $name = $file->getRealPath();
             foreach ($lines as $content) {
                 $path = $this->buildPath($name, $line);
-
-                preg_match_all('#ROOT_PATH#u', $content, $matches);
-
-                if (mb_strpos($content, 'ROOT_PATH') !== false) {
-                    $root[] = [
-                        'path' => ['url' => $path, 'name' => $name],
-                        'key'  => '\\IPS\\ROOT_PATH',
-                        'line' => $line
-                    ];
-                }
-
                 if ($file->getExtension() === 'phtml') {
                     $matches = [];
                     preg_match_all("#{lang=['|\"](.*?)['|\"]#u", $content, $matches);
@@ -408,6 +394,6 @@ class _Langs extends ParserAbstract
                 $line++;
             }
         }
-        return ['langs' => $warning, 'root' => $root];
+        return $warning;
     }
 }
