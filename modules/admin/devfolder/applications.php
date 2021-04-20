@@ -14,7 +14,6 @@ namespace IPS\toolbox\modules\admin\devfolder;
 
 use Exception;
 use InvalidArgumentException;
-use IPS\Application;
 use IPS\Dispatcher;
 use IPS\Dispatcher\Controller;
 use IPS\Helpers\MultipleRedirect;
@@ -24,6 +23,7 @@ use IPS\Output;
 use IPS\Request;
 use IPS\toolbox\DevFolder\Applications;
 use IPS\toolbox\Form;
+use IPS\IPS;
 
 use RuntimeException;
 
@@ -72,7 +72,7 @@ class _applications extends Controller
         $groups['select'] = Member::loggedIn()->language()->addToStack('dtdevfolder_apps_select');
 
         foreach (Application::applications() as $key => $val) {
-            if (!in_array($val->directory, Application::$ipsApps, true)) {
+            if (!in_array($val->directory, IPS::$ipsApps, true)) {
                 $groups[$val->directory] = Member::loggedIn()->language()->addToStack("__app_{$val->directory}");
             }
         }
