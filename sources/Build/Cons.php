@@ -197,7 +197,9 @@ class _Cons extends Singleton
                 $toWrite[] = "\\define('" . $key . "'," . $dataType . ');';
             }
         }
-        $toWrite = implode("\n", $toWrite);
+        $toWrite = 'include __DIR__.\'/applications/toolbox/sources/Debug/Helpers.php\';'."\n";
+
+        $toWrite .= implode("\n", $toWrite);
         $fileData = <<<EOF
 <?php
 {$toWrite}
