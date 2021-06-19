@@ -4,7 +4,6 @@
         // Functions that become public methods
         let dialogId = null,
             respond = function( elements ) {
-
                 let elem = $( elements );
                 if ( !elem.data( '_respond' ) ) {
                     let h = elem.parent().outerHeight();
@@ -14,6 +13,7 @@
                         $( '.dtProfilerPlaceHolder' ).css( 'height', h );
                     } );
 
+                    console.log(Date.parse("1970-01-01T00:00:00Z"));
                     // $(document).on('hideDialog', function () {
                     //     dialogId = null;
                     // });
@@ -98,3 +98,4 @@
         };
     } );
 }( jQuery, _ ) );
+

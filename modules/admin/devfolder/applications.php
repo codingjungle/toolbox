@@ -22,6 +22,7 @@ use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\toolbox\DevFolder\Applications;
+use IPS\toolbox\Application;
 use IPS\toolbox\Form;
 use IPS\IPS;
 
@@ -161,8 +162,7 @@ class _applications extends Controller
 
         $app = Request::i()->appKey;
 
-        Output::i()->output = new MultipleRedirect(Url::internal('app=toolbox&module=devfolder&controller=applications&do=queue&appKey=' . $app)
-                                                      ->csrf(), static function ($data) {
+        Output::i()->output = new MultipleRedirect(Url::internal('app=toolbox&module=devfolder&controller=applications&do=queue&appKey=' . $app), static function ($data) {
             $app = Request::i()->appKey;
             $next = null;
             $end = false;
@@ -217,7 +217,7 @@ class _applications extends Controller
             $msg = Member::loggedIn()->language()->addToStack('dtdevfolder_completed', false, ['sprintf' => [$app]]);
             $url = Url::internal('app=toolbox&module=devfolder&controller=applications');
             /* And redirect back to the overview screen */
-            Output::i()->redirect($url->csrf(), $msg);
+            Output::i()->redirect($url, $msg);
         });
     }
 }

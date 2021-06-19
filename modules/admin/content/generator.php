@@ -222,7 +222,7 @@ class _generator extends Controller
             'club'     => $club,
         ]);
 
-        Output::i()->output = new MultipleRedirect($url->csrf(), function ($data) {
+        Output::i()->output = new MultipleRedirect($url, function ($data) {
             $offset = 0;
             $type = Request::i()->type ?: 'forums';
             $limit = Request::i()->limit ?: 10;
@@ -272,7 +272,7 @@ class _generator extends Controller
                 $club = $data['club'];
             }
 
-            $max = 1;
+            $max = 100;
 
             if ($limit < $max) {
                 $max = $limit;
@@ -338,7 +338,7 @@ class _generator extends Controller
                           ->language()
                           ->addToStack('dtcontent_completed', false, ['sprintf' => [mb_ucfirst(Request::i()->type)]]);
             Member::loggedIn()->language()->parseOutputForDisplay($lang);
-            Output::i()->redirect($url->csrf(), $lang);
+            Output::i()->redirect($url, $lang);
         });
     }
 }

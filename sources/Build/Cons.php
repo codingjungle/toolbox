@@ -101,7 +101,7 @@ class _Cons extends Singleton
 
         if ($values = $form->values()) {
             $this->save($values, $constants);
-            Output::i()->redirect(Request::i()->url()->csrf(), 'Constants.php Updated!');
+            Output::i()->redirect(Request::i()->url(), 'Constants.php Updated!');
         }
 
         return $form;
@@ -156,7 +156,7 @@ class _Cons extends Singleton
 
     public function save(array $values, array $constants)
     {
-        $toWrite = [];
+        $cons = [];
 
         foreach (Application::allExtensions('toolbox', 'constants') as $extension) {
             $extension->formateValues($values);
@@ -194,12 +194,12 @@ class _Cons extends Singleton
                 if ($key === 'CACHEBUST_KEY' || $key === 'SUITE_UNIQUE_KEY') {
                     $dataType = $data;
                 }
-                $toWrite[] = "\\define('" . $key . "'," . $dataType . ');';
+                $cons[] = "\\define('" . $key . "'," . $dataType . ');';
             }
         }
         $toWrite = 'include __DIR__.\'/applications/toolbox/sources/Debug/Helpers.php\';'."\n";
 
-        $toWrite .= implode("\n", $toWrite);
+        $toWrite .= implode("\n", $cons);
         $fileData = <<<EOF
 <?php
 {$toWrite}

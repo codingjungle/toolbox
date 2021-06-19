@@ -180,7 +180,11 @@ class _Menu extends Singleton
             'name' => 'Plugins',
             'url'  => (string)Url::internal('app=core&module=applications&controller=plugins'),
         ];
-
+		$store['sys'][] = [
+			'id' => 'api',
+			'name' => 'API',
+			'url' => (string)Url::internal('app=core&module=applications&controller=api')
+		];
         $store['sys'][] = [
             'id'   => 'logs',
             'name' => 'Logs',

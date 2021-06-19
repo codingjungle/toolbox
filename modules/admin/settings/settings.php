@@ -79,7 +79,7 @@ class _settings extends Controller
                 Output::i()->sidebar['actions']['init'] = [
                     'icon'  => 'plus',
                     'title' => 'Patch init.php',
-                    'link'  => Request::i()->url()->setQueryString(['do' => 'patchInit'])->csrf(),
+                    'link'  => Request::i()->url()->setQueryString(['do' => 'patchInit']),
 
                 ];
             }
@@ -104,7 +104,7 @@ class _settings extends Controller
                 Output::i()->sidebar['actions']['helpers'] = [
                     'icon'  => 'plus',
                     'title' => 'Patch Helpers',
-                    'link'  => Request::i()->url()->setQueryString(['do' => 'patchHelpers'])->csrf(),
+                    'link'  => Request::i()->url()->setQueryString(['do' => 'patchHelpers']),
 
                 ];
             }
@@ -132,7 +132,7 @@ class _settings extends Controller
                 }
             }
             $form->saveAsSettings($values);
-            Output::i()->redirect($this->url->setQueryString(['tab' => ''])->csrf(), 'foo');
+            Output::i()->redirect($this->url, 'foo');
         }
         Output::i()->title = 'Settings';
         Output::i()->output = $form;
