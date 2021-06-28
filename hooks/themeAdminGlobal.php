@@ -11,14 +11,16 @@ class toolbox_hook_themeAdminGlobal extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-        return array_merge_recursive(array(
-            'tabs' =>
+        if (\is_callable('parent::hookData')) {
+            return array_merge_recursive(
                 array(
-                    0 =>
+                    'tabs' =>
                         array(
-                            'selector' => 'div.acpBlock',
-                            'type'     => 'replace',
-                            'content'  => '
+                            0 =>
+                                array(
+                                    'selector' => 'div.acpBlock',
+                                    'type'     => 'replace',
+                                    'content'  => '
 {{if \IPS\Request::i()->controller === \'developer\' && !\IPS\Request::i()->isAjax()}}
 <div class="ipsColumns">
 	<div class="ipsColumn ipsColumn_wide">
@@ -56,9 +58,13 @@ class toolbox_hook_themeAdminGlobal extends _HOOK_CLASS_
 </div>
 {{endif}}
 ',
+                                ),
                         ),
                 ),
-        ), parent::hookData());
+                parent::hookData()
+            );
+        }
+        return [];
     }
     /* End Hook Data */
 

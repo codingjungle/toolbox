@@ -18,43 +18,60 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-        return parent::hookData();
+        if (\is_callable('parent::hookData')) {
+            return parent::hookData();
+        }
+        return [];
     }
 
     /* End Hook Data */
 
     public function queryLog($querylog)
     {
-        if (Dispatcher::hasInstance() && Dispatcher::i()->controllerLocation === 'admin' && Settings::i()->dtprofiler_show_admin) {
-            return;
-        }
-        $member = Member::loggedIn()->member_id;
-        $can = json_decode(Settings::i()->dtprofiler_can_use, true);
-        if (property_exists(Output::i(),
-                'dtContentType') && Output::i()->dtContentType === 'text/html' && ((!\IPS\IN_DEV && in_array($member,
-                        $can, true)) || \IPS\IN_DEV)) {
-            try {
-                return Profiler::i()->run();
-            } catch (Exception $e) {
-                throw $e;
+            if (Dispatcher::hasInstance() && Dispatcher::i()->controllerLocation === 'admin' && Settings::i(
+                )->dtprofiler_show_admin) {
+                return;
             }
-        }
+            $member = Member::loggedIn()->member_id;
+            $can = json_decode(Settings::i()->dtprofiler_can_use, true);
+            if (property_exists(
+                    Output::i(),
+                    'dtContentType'
+                ) && Output::i()->dtContentType === 'text/html' && ((!\IPS\IN_DEV && in_array(
+                            $member,
+                            $can,
+                            true
+                        )) || \IPS\IN_DEV)) {
+                try {
+                    return Profiler::i()->run();
+                } catch (Exception $e) {
+                    throw $e;
+                }
+            }
 
-        return parent::queryLog($querylog);
+            return parent::queryLog($querylog);
+
     }
 
     public function cacheLog()
     {
-        if (Dispatcher::hasInstance() && Dispatcher::i()->controllerLocation === 'admin' && Settings::i()->dtprofiler_show_admin) {
-            return;
-        }
-        $member = Member::loggedIn()->member_id;
-        $can = json_decode(Settings::i()->dtprofiler_can_use, true);
-        if (property_exists(Output::i(),
-                'dtContentType') && Output::i()->dtContentType === 'text/html' && ((!\IPS\IN_DEV && in_array($member,
-                        $can, true)) || \IPS\IN_DEV)) {
-        } else {
-            return parent::cacheLog();
-        }
+            if (Dispatcher::hasInstance() && Dispatcher::i()->controllerLocation === 'admin' && Settings::i(
+                )->dtprofiler_show_admin) {
+                return;
+            }
+            $member = Member::loggedIn()->member_id;
+            $can = json_decode(Settings::i()->dtprofiler_can_use, true);
+            if (property_exists(
+                    Output::i(),
+                    'dtContentType'
+                ) && Output::i()->dtContentType === 'text/html' && ((!\IPS\IN_DEV && in_array(
+                            $member,
+                            $can,
+                            true
+                        )) || \IPS\IN_DEV)) {
+            } else {
+                return parent::cacheLog();
+            }
+
     }
 }
