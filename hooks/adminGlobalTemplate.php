@@ -40,7 +40,6 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
     }
 
     /* End Hook Data */
-
     public function globalTemplate($title, $html, $location = [])
     {
             Output::i()->cssFiles = array_merge(
@@ -52,7 +51,6 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
 
     }
 
-    /* End Hook Data */
     public function tabs(
         $tabNames,
         $activeId,
@@ -64,11 +62,10 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
     ) {
             if (Request::i()->app === 'core' && Request::i()->module === 'applications' && Request::i(
                 )->controller === 'developer' && !Request::i()->do) {
-                $tabNames['SchemaImports'] = 'dtdevplus_schema_imports';
-//            $tabNames[ 'GitHooks' ] = 'dtdevplus_dev_git_hooks';
-
+             $tabNames['SchemaImports'] = 'dtdevplus_schema_imports';
+            }
 
             return parent::tabs($tabNames, $activeId, $defaultContent, $url, $tabParam, $tabClasses, $panelClasses);
-        }
+
     }
 }
