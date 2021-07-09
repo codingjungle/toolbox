@@ -20,6 +20,9 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
+        if (\is_callable('parent::hookData')) {
+            return parent::hookData();
+        }
         return [];
     }
 

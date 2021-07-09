@@ -16,7 +16,9 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-            return  [
+        if (\is_callable('parent::hookData')) {
+            return array_merge_recursive(
+                [
                     'globalTemplate' => [
                         0 => [
                             'selector' => '#ipsLayout_header',
@@ -31,7 +33,11 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
                             'content'  => '<!--ipsQueryLog-->',
                         ],
                     ],
-                ] ;
+                ],
+                parent::hookData()
+            );
+        }
+        return [];
     }
 
     /* End Hook Data */

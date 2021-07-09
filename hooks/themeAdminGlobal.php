@@ -11,7 +11,8 @@ class toolbox_hook_themeAdminGlobal extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-            return
+        if (\is_callable('parent::hookData')) {
+            return array_merge_recursive(
                 array(
                     'tabs' =>
                         array(
@@ -58,8 +59,12 @@ class toolbox_hook_themeAdminGlobal extends _HOOK_CLASS_
 {{endif}}
 ',
                                 ),
-                        ), 
-                );
+                        ),
+                ),
+                parent::hookData()
+            );
+        }
+        return [];
     }
     /* End Hook Data */
 
