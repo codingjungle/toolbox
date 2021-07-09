@@ -58,7 +58,7 @@ class toolbox_hook_themeAdminGlobal extends _HOOK_CLASS_
 {{endif}}
 ',
                                 ),
-                        ),
+                        ), 
                 );
     }
     /* End Hook Data */
