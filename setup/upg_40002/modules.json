@@ -1,0 +1,16 @@
+{
+    "added": [
+        "front\/generator"
+    ],
+    "edited": [
+        "admin\/build",
+        "admin\/settings",
+        "admin\/devfolder",
+        "admin\/code",
+        "admin\/content",
+        "admin\/devcenter",
+        "admin\/proxy",
+        "front\/bt"
+    ],
+    "removed": []
+}

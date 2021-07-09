@@ -8,6 +8,8 @@ use IPS\Output;
 use IPS\Settings;
 use IPS\toolbox\Profiler;
 
+use const IPS\IN_DEV;
+
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
@@ -18,9 +20,6 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-        if (\is_callable('parent::hookData')) {
-            return parent::hookData();
-        }
         return [];
     }
 
@@ -37,11 +36,11 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
             if (property_exists(
                     Output::i(),
                     'dtContentType'
-                ) && Output::i()->dtContentType === 'text/html' && ((!\IPS\IN_DEV && in_array(
+                ) && Output::i()->dtContentType === 'text/html' && ((!IN_DEV && in_array(
                             $member,
                             $can,
                             true
-                        )) || \IPS\IN_DEV)) {
+                        )) || IN_DEV)) {
                 try {
                     return Profiler::i()->run();
                 } catch (Exception $e) {
@@ -49,8 +48,10 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
                 }
             }
 
-            return parent::queryLog($querylog);
-
+        if ( \is_callable('parent::queryLog') )
+        {
+            return call_user_func_array('parent::' . __FUNCTION__, func_get_args() );
+        }
     }
 
     public function cacheLog()
@@ -64,14 +65,13 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
             if (property_exists(
                     Output::i(),
                     'dtContentType'
-                ) && Output::i()->dtContentType === 'text/html' && ((!\IPS\IN_DEV && in_array(
+                ) && Output::i()->dtContentType === 'text/html' && ((!IN_DEV && in_array(
                             $member,
                             $can,
                             true
-                        )) || \IPS\IN_DEV)) {
-            } else {
-                return parent::cacheLog();
+                        )) || IN_DEV)) {
+            } elseif (\is_callable('parent::cacheLog')) {
+                return call_user_func_array('parent::' . __FUNCTION__, func_get_args());
             }
-
     }
 }

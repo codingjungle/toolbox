@@ -23,6 +23,14 @@ use function str_replace;
 
 use const JSON_PRETTY_PRINT;
 
+use function array_shift;
+use function json_decode;
+use function json_encode;
+use function mb_strlen;
+use function mb_substr;
+use function trim;
+
+
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;

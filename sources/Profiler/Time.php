@@ -25,6 +25,10 @@ use function log;
 use function microtime;
 use function round;
 
+use function end;
+use function krsort;
+
+
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');

@@ -28,6 +28,9 @@ use function sprintf;
 use function str_replace;
 use function trim;
 
+use function hash;
+
+
 
 /**
  * Class _GeneratorAbstract

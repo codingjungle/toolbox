@@ -49,6 +49,9 @@ use function var_export;
 use const IPS\IPS_FOLDER_PERMISSION;
 use const PHP_EOL;
 
+use function method_exists;
+
+
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;

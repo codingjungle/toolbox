@@ -1,8 +1,8 @@
 <?php
 /**
  * @brief        Background Task
- * @author        <a href='https://www.invisioncommunity.com'>Invision Power Services, Inc.</a>
- * @copyright    (c) Invision Power Services, Inc.
+ * @author      -storm_author-
+ * @copyright   -storm_copyright-
  * @license        https://www.invisioncommunity.com/legal/standards/
  * @package        Invision Community
  * @subpackage    Dev Toolbox
@@ -19,6 +19,9 @@ use IPS\toolbox\Proxy\Generator\Proxy;
 use IPS\toolbox\Proxy\Proxyclass;
 
 use function defined;
+
+use function header;
+
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');

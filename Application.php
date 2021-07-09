@@ -31,6 +31,10 @@ use function str_replace;
 
 use const IPS\ROOT_PATH;
 
+use function file_get_contents;
+use function json_decode;
+
+
 
 /**
  * Dev Toolbox: Base Application Class

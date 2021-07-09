@@ -25,6 +25,9 @@ use function is_bool;
 use function is_numeric;
 use function json_decode;
 
+use function str_replace;
+
+
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;

@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * @brief       Sources Class
+ * @author      -storm_author-
+ * @copyright   -storm_copyright-
+ * @package     IPS Social Suite
+ * @subpackage  Dev Toolbox
+ * @since       4.0.1
+ * @version     -storm_version-
+ */
+
 
 namespace IPS\toolbox\modules\front\generator;
 
@@ -13,6 +23,9 @@ use IPS\Theme;
 use IPS\toolbox\DevCenter\Sources;
 
 use function defined;
+
+use function header;
+
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');

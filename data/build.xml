@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <build>
- <module key="admin/build"><![CDATA[{"default_controller":"","protected":0}]]></module>
- <module key="admin/settings"><![CDATA[{"default_controller":"","protected":0}]]></module>
- <module key="admin/devfolder"><![CDATA[{"default_controller":"","protected":0}]]></module>
- <module key="admin/code"><![CDATA[{"default_controller":"","protected":0}]]></module>
- <module key="admin/content"><![CDATA[{"default_controller":"","protected":0}]]></module>
- <module key="admin/devcenter"><![CDATA[{"default_controller":"","protected":0}]]></module>
- <module key="admin/proxy"><![CDATA[{"default_controller":"","protected":false}]]></module>
- <module key="front/bt"><![CDATA[{"default_controller":"","protected":0}]]></module>
+ <module key="admin/build"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="admin/settings"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="admin/devfolder"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="admin/code"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="admin/content"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="admin/devcenter"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="admin/proxy"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="front/bt"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
+ <module key="front/generator"><![CDATA[{"default_controller":"","protected":false,"default":null}]]></module>
  <setting key="dtdevplus_skip_dirs"><![CDATA[{"key":"dtdevplus_skip_dirs","default":""}]]></setting>
  <setting key="dtdevplus_skip_files"><![CDATA[{"key":"dtdevplus_skip_files","default":""}]]></setting>
  <setting key="dtprofiler_can_use"><![CDATA[{"key":"dtprofiler_can_use","default":""}]]></setting>
@@ -61,4 +62,6 @@
  <hook key="BuilderIterator"><![CDATA[{"type":"C","class":"\\IPS\\Application\\BuilderIterator"}]]></hook>
  <hook key="developer"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\admin\\applications\\developer"}]]></hook>
  <hook key="Hooks"><![CDATA[{"type":"C","class":"\\IPS\\Plugin\\Hook"}]]></hook>
+ <hook key="Content"><![CDATA[{"type":"C","class":"\\IPS\\Content"}]]></hook>
+ <hook key="themeAdminGlobal"><![CDATA[{"type":"S","class":"\\IPS\\Theme\\class_core_admin_global"}]]></hook>
 </build>

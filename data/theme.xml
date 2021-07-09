@@ -81,28 +81,7 @@
                 </li>
                 {{endforeach}}
             </ul>
-            {$info['adminer']|raw}
-            <a id="elProfileAppsPlugins" href="#elProfileAppsPlugins_menu" title="Apps & Plugins" class=" " data-ipstooltip data-ipsmenu>
-                3rd Party Apps & Plugins<i class="fa fa-angle-up"></i>
-            </a>
-            <ul id="elProfileAppsPlugins_menu" class="ipsMenu ipsMenu_auto ipsList_reset ipsHide">
-                {{foreach $info['apps']['app'] as $key => $val }}
-                <li class="ipsMenu_item">
-                    <a href="{$val['url']}" title="{$val['title']}" data-ipstooltip>
-                        {$key|raw}
-                        {{if $val['status'] }}
-                        <i class="fa fa-check-square-o dtprofilerEnabled fa-pull-right"></i>
-                        {{else}}
-                        <i class="fa fa-square-o dtprofilerDisabled fa-pull-right"></i>
-                        {{endif}}
-                    </a>
-                </li>
-                {{endforeach}}
 
-                <li class="ipsMenu_item">
-                    <a href="{$info['apps']['disable']}">Disable All</a>
-                </li>
-            </ul>
             <a href="{$info['cache']}">Clear Caches</a>
 
             <a href="#toolbox_snippet_menu" id="toolbox_snippet" data-ipsMenu>
@@ -120,6 +99,24 @@
                     </a>
                 </li>
             </ul>
+            <a href="#" data-ipstoolboxproxy>
+                Proxy Class
+            </a>
+
+            {{if isset( $info['sources']) }}
+            <a id="elProfileSources" href="#elProfileSources_menu" title="Sources" class=" " data-ipstooltip data-ipsmenu>
+                Sources <i class="fa fa-angle-up"></i>
+            </a>
+            <ul id="elProfileSources_menu" class="ipsMenu ipsMenu_auto ipsMenu_wide ipsList_reset ipsHide">
+                {{foreach $info['sources'] as $key => $val }}
+                <li class="ipsMenu_item">
+                     <a href="{$val['url']}" data-ipsDialog data-ipsDialog-destructOnClos="true">
+                         {$val['name']}
+                     </a>
+                </li>
+                {{endforeach}}
+            </ul>
+            {{endif}}
         </div>
         {{if settings.dtprofiler_git_data || settings.dtprofiler_show_changes}}
         <div id="el_dtProfileGit" class="dttProfilerInfoGit ipsClearfix" data-ipsdtprofilergit data-ipsdtprofilergit-url="{$info['git_url']}">
@@ -206,6 +203,167 @@
     {{endforeach}}
 </ul>
 ]]></template>
+ <template template_group="code" template_name="files" template_data="array $keys, $type, $msgType" template_location="admin" template_app="toolbox"><![CDATA[<div{{if \count($keys) }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+        {lang="{$type}" sprintf="\count($keys)"} {{if \count($keys) }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$type}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$type}">
+    <table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_files">
+        <thead>
+        <tr class="ipsAreaBackground">
+            <th>File</th>
+            <th>Key</th>
+            <th>Line</th>
+        </tr>
+        </thead>
+        <tbody data-role="tableRows">
+        {{foreach $keys as $key }}
+        <tr class="ipsClearfix">
+            <td class="ipsTable_wrap dtcode_file_name">
+                {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
+                <a href="{$key['path']|raw}">
+                    {{endif}}
+                    {$key['file']}
+                    {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
+                </a>
+                {{endif}}
+            </td>
+            <td class="ipsTable_wrap dtcode_file_key">
+                {$key['key']}
+            </td>
+            <td class="ipsTable_icon dtcode_file_line">
+                {$key['line']}
+            </td>
+        </tr>
+        {{endforeach}}
+        </tbody>
+    </table>
+</div>
+]]></template>
+ <template template_group="code" template_name="lists" template_data="array $keys, $type,$msgType" template_location="admin" template_app="toolbox"><![CDATA[<div{{if \count($keys) }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+        {lang="{$type}" sprintf="\count($keys)"} {{if \count($keys) }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$type}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$type}">
+<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_lists">
+    <tbody data-role="tableRows">
+    {{foreach $keys as $key }}
+    <tr class="ipsClearfix">
+        <td class="ipsTable_wrap ">
+            {$key}
+        </td>
+    </tr>
+    {{endforeach}}
+    </tbody>
+</table>
+</div>
+]]></template>
+ <template template_group="code" template_name="results" template_data="array $data, $lang, $tableHead=[], $warning=false" template_location="admin" template_app="toolbox"><![CDATA[{{$count = \count($data);}}
+    {{if $count }}
+        {{$msgType = 'error';}}
+        {{if $warning === true}}
+            {{$msgType = 'warning';}}
+        {{endif}}
+        {{else}}
+        {{$msgType = 'success';}}
+    {{endif}}
+<div{{if $count }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$lang}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+    {lang="{$lang}" sprintf="$count"} {{if $count }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$lang}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$lang}">
+<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_table">
+    {{if empty($tableHead) === false}}
+    <thead>
+        <tr>
+            {{foreach $tableHead as $head}}
+                <th>{lang="{$head}"}</th>
+            {{endforeach}}
+        </tr>
+    </thead>
+    {{endif}}
+    <tbody data-role="tableRows">
+    {{foreach $data as $values}}
+        {{if \is_array($values) }}
+        <tr class="ipsClearfix">
+        {{foreach $values as $key => $value}}
+            <td class="{{if $key === 'line' }}ipsTable_icon{{else}}ipsTable_wrap{{endif}}">
+                {{if \IPS\DEV_WHOOPS_EDITOR && $key === 'path'}}
+                <a href="{$value['url']}">{$value['name']}</a>
+                {{elseif $key === 'pre' }}
+                <pre>{$value|raw}</pre>
+                {{else}}
+                {$value|raw}
+                {{endif}}
+            </td>
+        {{endforeach}}
+        </tr>
+    {{else}}
+        <tr class="ipsClearfix">
+            <td class="ipsTable_wrap">
+                {$values|raw}
+            </td>
+        </tr>
+    {{endif}}
+
+    {{endforeach}}
+    </tbody>
+</table>
+</div>
+]]></template>
+ <template template_group="code" template_name="sql" template_data="array $keys" template_location="admin" template_app="toolbox"><![CDATA[<div{{if \count($keys) }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="dtcode_sql"{{endif}} class="ipsClearfix ipsMessage ipsMessage_error  dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+    {lang="dtcode_sql" sprintf="\count( array_values($keys))"} {{if \count($keys) }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="dtcode_sql_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_dtcode_sql">
+<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_files" >
+    <thead>
+    <tr >
+        <th>App</th>
+        <th>Table</th>
+        <th>Definition</th>
+    </tr>
+    </thead>
+    <tbody data-role="tableRows">
+    {{foreach $keys as $key}}
+    <tr class="ipsClearfix">
+        <td class="ipsTable_wrap dtcode_sql_name">
+            {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
+            <a href="{$key['path']|raw}">
+                {{endif}}
+                {$key['file']}
+                {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
+            </a>
+            {{endif}}
+        </td>
+        <td class="ipsTable_wrap dtcode_sql_table">
+            {$key['table']}
+        </td>
+        <td class="ipsTable_wrap dtcode_sql_params">
+            <pre>{$key['params']|raw}</pre>
+        </td>
+    </tr>
+    {{endforeach}}
+    </tbody>
+</table>
+</div>
+]]></template>
  <template template_group="database" template_name="database" template_data="$lists, $count" template_location="front" template_app="toolbox"><![CDATA[<li id="elProfileQueryLog" title="Query Log" class="isParent dtProfileFirst dtProfilerQueryLog" data-ipstooltip>
     <i class="fa fa-database"></i> Query Log ({$count}) <i class="fa fa-angle-up dtprofilearrow"></i>
 </li>
@@ -238,15 +396,20 @@
  <template template_group="devBar" template_name="li" template_data="$menu, $menus" template_location="admin" template_app="toolbox"><![CDATA[<li>
     <a href="{$menu['url']}_menu" id="{$menu['url']}" data-ipsMenu>{lang="$menu['name']"}</a>
     {{if isset( $menus[ $menu['id'] ] ) }}
-    <ul id="{$menu['url']}_menu" class="ipsMenu ipsHide  ipsClearfix">
+    <ul id="{$menu['url']}_menu" class="ipsMenu ipsHide ipsClearfix">
         {{foreach $menus[ $menu['id'] ] as $m }}
         <li class="ipsMenu_item">
+            {{if $m['id'] === 'proxy'}}
+            <a href="#" data-ipstoolboxproxy>{lang="$m['name']"}</a>
+            {{else}}
             <a href="{$m['url']}">{lang="$m['name']"}</a>
+            {{endif}}
         </li>
         {{endforeach}}
     </ul>
     {{endif}}
-</li>]]></template>
+</li>
+]]></template>
  <template template_group="dtdpmenu" template_name="menu" template_data="array $menus, $dev, $app, $controller='sources'" template_location="admin" template_app="toolbox"><![CDATA[
 <ul id="adminMenu_button_menu" class="ipsMenu ipsMenu_normal ipsHide">
     {{foreach $menus as $menu }}
@@ -307,6 +470,78 @@
  <template template_group="error" template_name="error" template_data="" template_location="admin" template_app="toolbox"><![CDATA[<div class="ipsAreaBackground_negative dtcode_error ipsPad">
     {lang="dtcode_error"}
 </div>]]></template>
+ <template template_group="generator" template_name="sources" template_data="$appKey" template_location="front" template_app="toolbox"><![CDATA[
+<div class="ipsPadding ipsClearfix">
+    <h1>
+        Sources: {$appKey}
+    </h1>
+    <div class="ipsColumn ipsColumn_medium ipsTabs" id="elTabs_sources_tabs" data-ipstabbar data-ipstabbar-contentarea="#elTabs_sources_tabs_content" data-ipstabbar-defaultTab="#elTab_sources_tab_standard">
+        <a href="#elTabs_sources_tabs" data-action="expandTabs"><i class="fa fa-caret-down"></i></a>
+        <ul role="tablist">
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=standard"}' id="elTab_sources_tab_standard" class="ipsTabs_item" role="tab">
+                    Standard
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=cinterface"}' id="elTab_sources_tab_cinterface" class="ipsTabs_item" role="tab">
+                    Interface
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=ctraits"}' id="elTab_sources_tab_traits" class="ipsTabs_item" role="tab">
+                    Trait
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=singleton"}' id="elTab_sources_tab_singleton" class="ipsTabs_item" role="tab">
+                    Singleton
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=ar"}' id="elTab_sources_tab_ar" class="ipsTabs_item" role="tab">
+                    ActiveRecord
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=api"}' id="elTab_sources_tab_api" class="ipsTabs_item" role="tab">
+                    Api
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=node"}' id="elTab_sources_tab_node" class="ipsTabs_item" role="tab">
+                    Node
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=item"}' id="elTab_sources_tab_item" class="ipsTabs_item" role="tab">
+                    Item
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=comment"}' id="elTab_sources_tab_comment" class="ipsTabs_item" role="tab">
+                    Item's Comment
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=review"}' id="elTab_sources_tab_review" class="ipsTabs_item" role="tab">
+                    Item's Review
+                </a>
+            </li>
+            <li>
+                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=debug"}' id="elTab_sources_tab_debug" class="ipsTabs_item" role="tab">
+                    Item's Review
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="ipsColumn ipsColumn_fluid" id="elTabs_sources_tabs_content">
+
+    </div>
+
+
+</div>
+]]></template>
  <template template_group="generic" template_name="anchor" template_data="$name, $url, $dialog=false" template_location="front" template_app="toolbox"><![CDATA[{{if $url}}
 <a href="{$url}" {{if $dialog}}data-ipsDialog{{endif}}>
 {{endif}}
@@ -415,55 +650,6 @@
     </div>
 </div>
 ]]></template>
- <template template_group="results" template_name="files" template_data="array $keys, $type" template_location="admin" template_app="toolbox"><![CDATA[<div data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}" class="ipsClearfix ipsClear acpWidgetToolbar dtcode_header">
-    <h1 class="dtcode_h1">{lang="{$type}" sprintf="\count($keys)"} <i class="fa fa-angle-down"></i></h1>
-    <h2>{lang="{$type}_desc"}</h2>
-</div>
-<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_files ipsHide" id="tab_{$type}">
-    <thead>
-    <tr class="ipsAreaBackground">
-        <th>File</th>
-        <th>Key</th>
-        <th>Line</th>
-    </tr>
-    </thead>
-    <tbody data-role="tableRows">
-    {{foreach $keys as $key }}
-    <tr class="ipsClearfix">
-        <td class="ipsTable_wrap dtcode_file_name">
-            {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
-            <a href="{$key['path']|raw}">
-                {{endif}}
-                {$key['file']}
-                {{if \IPS\DEV_WHOOPS_EDITOR && $key['path'] !== null}}
-            </a>
-            {{endif}}
-        </td>
-        <td class="ipsTable_wrap dtcode_file_key">
-            {$key['key']}
-        </td>
-        <td class="ipsTable_icon dtcode_file_line">
-            {$key['line']}
-        </td>
-    </tr>
-    {{endforeach}}
-    </tbody>
-</table>]]></template>
- <template template_group="results" template_name="lists" template_data="array $keys, $type" template_location="admin" template_app="toolbox"><![CDATA[<div data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}" class="ipsClearfix ipsClear acpWidgetToolbar dtcode_header">
-    <h1 class="dtcode_h1">{lang="{$type}" sprintf="\count($keys)"} <i class="fa fa-angle-down"></i></h1>
-    <h2>{lang="{$type}_desc"}</h2>
-</div>
-<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_lists ipsHide" id="tab_{$type}">
-    <tbody data-role="tableRows">
-    {{foreach $keys as $key }}
-    <tr class="ipsClearfix">
-        <td class="ipsTable_wrap ">
-            {$key}
-        </td>
-    </tr>
-    {{endforeach}}
-    </tbody>
-</table>]]></template>
  <css css_location="front" css_app="toolbox" css_attributes="" css_path="." css_name="adminer.css">/*
 FLAT UI Flavored Adminer Theme by M. Mahbubur Rahman (mahbub@mahbubblog.com)
 Screenshot : http://d.pr/i/cznH
@@ -851,7 +1037,7 @@ i {
 
 #dtDevBar > li > a {
     text-decoration: none;
-    color: rgb(var(--theme-link));
+    color: inherit;
     font-size:13px;
     font-weight:600;
 }
@@ -968,7 +1154,7 @@ i {
 }
 
 .dtProfilerBar_search_ul {
-    max-height:350px;
+    max-height:300px;
 }
 
 .dtProfilerBar_cache li,
@@ -1078,12 +1264,8 @@ i {
 .dtProfilerInfoBarPanel a {
     font-size:14px;
     display:inline-block;
-    margin-right:5px;
     padding:2px 10px;
-    border-bottom-left-radius: 25% 100%;
-    border-bottom-right-radius: 25% 100%;
-    border-top-left-radius: 25% 100%;
-    border-top-right-radius: 25% 100%;
+
 }
 
 .dtProfilerInfoBarPanel a {
@@ -1215,6 +1397,13 @@ i {
     background-color: #ccc;
     border: 0;
     height: 1px;
+}
+.dtProfilerSearch input {
+    color:#000!important;
+}
+
+#elTabs_sources_tabs li {
+    min-width:200px;
 }
 ]]></css>
 </theme>

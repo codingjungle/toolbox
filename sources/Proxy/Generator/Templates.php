@@ -38,6 +38,9 @@ use function trim;
 
 use const DIRECTORY_SEPARATOR;
 
+use function mb_strtolower;
+
+
 Application::loadAutoLoader();
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {

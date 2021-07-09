@@ -16,9 +16,7 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-        if (\is_callable('parent::hookData')) {
-            return array_merge_recursive(
-                [
+            return  [
                     'globalTemplate' => [
                         0 => [
                             'selector' => '#ipsLayout_header',
@@ -33,10 +31,7 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
                             'content'  => '<!--ipsQueryLog-->',
                         ],
                     ],
-                ],
-                parent::hookData()
-            );
-        }
+                ] ;
     }
 
     /* End Hook Data */
@@ -47,8 +42,10 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
                 Theme::i()->css('devbar.css', 'toolbox', 'admin')
             );
 
-            return parent::globalTemplate($title, $html, $location);
-
+        if ( \is_callable('parent::globalTemplate') )
+        {
+            return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
+        }
     }
 
     public function tabs(
@@ -64,8 +61,10 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
                 )->controller === 'developer' && !Request::i()->do) {
              $tabNames['SchemaImports'] = 'dtdevplus_schema_imports';
             }
-
-            return parent::tabs($tabNames, $activeId, $defaultContent, $url, $tabParam, $tabClasses, $panelClasses);
+        if ( \is_callable('parent::tabs') )
+        {
+            return \call_user_func_array( 'parent::' . __FUNCTION__, [$tabNames, $activeId, $defaultContent, $url, $tabParam, $tabClasses, $panelClasses] );
+        }
 
     }
 }

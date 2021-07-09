@@ -21,6 +21,9 @@ use function explode;
 use function header;
 use function preg_match_all;
 
+use function mb_strpos;
+
+
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;

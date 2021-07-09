@@ -20,9 +20,6 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     /* !Hook Data - DO NOT REMOVE */
     public static function hookData()
     {
-        if (\is_callable('parent::hookData')) {
-            return parent::hookData();
-        }
         return [];
     }
 
@@ -52,8 +49,10 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
                     Store::i()->dtprofiler_css = Output::i()->cssFiles;
                 }
             }
-
-            return parent::includeCSS();
+        if ( \is_callable('parent::includeCSS') )
+        {
+            return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
+        }
 
     }
 
@@ -71,7 +70,9 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
                 }
             }
 
-            return parent::includeJS();
-
+        if ( \is_callable('parent::includeJS') )
+        {
+            return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
+        }
     }
 }

@@ -37,6 +37,9 @@ use function nl2br;
 use function str_replace;
 use function time;
 
+use function log;
+
+
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');

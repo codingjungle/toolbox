@@ -46,6 +46,9 @@ use const T_STRING;
 use const T_USE;
 use const T_VARIABLE;
 
+use function hash;
+
+
 
 class _ClassBuilder
 {

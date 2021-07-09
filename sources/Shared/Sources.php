@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * @brief       Sources Class
+ * @author      -storm_author-
+ * @copyright   -storm_copyright-
+ * @package     IPS Social Suite
+ * @subpackage  Dev Toolbox
+ * @since       4.0.1
+ * @version     -storm_version-
+ */
+
 
 namespace IPS\toolbox\Shared;
 
@@ -8,6 +18,16 @@ use IPS\Http\Url;
 use IPS\Output;
 use IPS\Request;
 use IPS\toolbox\Proxy\Generator\Cache;
+
+use function array_shift;
+use function explode;
+use function implode;
+use function ltrim;
+use function mb_strtoupper;
+use function preg_grep;
+use function preg_quote;
+use function str_replace;
+
 
 trait Sources
 {

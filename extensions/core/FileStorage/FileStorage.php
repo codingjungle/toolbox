@@ -1,8 +1,8 @@
 <?php
 /**
  * @brief        File Storage Extension: FileStorage
- * @author        <a href='https://www.invisioncommunity.com'>Invision Power Services, Inc.</a>
- * @copyright    (c) Invision Power Services, Inc.
+ * @author      -storm_author-
+ * @copyright   -storm_copyright-
  * @license        https://www.invisioncommunity.com/legal/standards/
  * @package        Invision Community
  * @subpackage    Dev Toolbox
@@ -16,6 +16,10 @@ namespace IPS\toolbox\extensions\core\FileStorage;
 use UnderflowException;
 
 use function defined;
+
+use function count;
+use function header;
+
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');

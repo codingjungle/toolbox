@@ -1,0 +1,32 @@
+{
+    "normal": {
+        "added": [
+            "dtdevplus_class_extendsYN",
+            "dtdevplus_class_extendsYN_desc",
+            "dtcode_sql",
+            "dtcode_sql_desc",
+            "filestorage_check",
+            "filestorage_check_desc",
+            "dtcode_analyzer_complete",
+            "interface_occupied",
+            "interface_occupied_desc",
+            "root_path",
+            "root_path_desc"
+        ],
+        "edited": [
+            "dtcode_queue_complete",
+            "dtcode_langs_php_desc",
+            "dtcode_jslangs_php_desc",
+            "dtcode_langs_verify_desc"
+        ],
+        "removed": []
+    },
+    "js": {
+        "added": [
+            "toolbox_doing_proxies",
+            "toolbox_done_proxies"
+        ],
+        "edited": [],
+        "removed": []
+    }
+}
