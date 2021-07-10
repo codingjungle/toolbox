@@ -4,8 +4,6 @@ use IPS\Patterns\ActiveRecord;
 use ReflectionClass;
 use RuntimeException;
 
-use function func_get_args;
-
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
@@ -26,6 +24,6 @@ class toolbox_hook_ActiveRecord extends _HOOK_CLASS_
                 throw new RuntimeException('You are missing protected static $multitons=[]; property in your class ' . static::class);
             }
         }
-        parent::__construct(...func_get_args());
+        parent::__construct(...\func_get_args());
     }
 }

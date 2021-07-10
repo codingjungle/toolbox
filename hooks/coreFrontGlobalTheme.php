@@ -53,7 +53,7 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
 
         if ( \is_callable('parent::queryLog') )
         {
-            return call_user_func_array('parent::' . __FUNCTION__, func_get_args() );
+            return \call_user_func_array('parent::' . __FUNCTION__, \func_get_args() );
         }
     }
 
@@ -74,7 +74,7 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
                             true
                         )) || IN_DEV)) {
             } elseif (\is_callable('parent::cacheLog')) {
-                return call_user_func_array('parent::' . __FUNCTION__, func_get_args());
+                return \call_user_func_array('parent::' . __FUNCTION__, \func_get_args());
             }
     }
 }
