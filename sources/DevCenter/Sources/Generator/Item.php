@@ -149,7 +149,7 @@ class _Item extends GeneratorAbstract
         ];
 
         $this->generator->addProperty(
-            'application',
+            'Title',
             $this->app . '_' . $this->classname_lower . $extra,
             [
                 'static'   => true,
