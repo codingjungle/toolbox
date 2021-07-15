@@ -12,6 +12,7 @@ namespace IPS\toolbox\DevCenter;
 
 use InvalidArgumentException;
 use IPS\Application;
+use IPS\Content\Anonymous;
 use IPS\Content\ClubContainer;
 use IPS\Content\EditHistory;
 use IPS\Content\Embeddable;
@@ -26,6 +27,7 @@ use IPS\Content\Pinnable;
 use IPS\Content\Polls;
 use IPS\Content\Reactable;
 use IPS\Content\ReadMarkers;
+use IPS\Content\Recognizable;
 use IPS\Content\Reportable;
 use IPS\Content\Searchable;
 use IPS\Content\Shareable;
@@ -58,6 +60,8 @@ use function interface_exists;
 use function is_array;
 use function mb_ucfirst;
 use function trait_exists;
+
+use const IPS\Content\Anonymous;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -644,9 +648,10 @@ class _Sources
     protected function elItemTraits()
     {
         $traitsItems = [
-            Reactable::class  => Reactable::class,
-            Reportable::class => Reportable::class,
             ItemTopic::class  => ItemTopic::class,
+            Reactable::class  => Reactable::class,
+            Recognizable::class => Recognizable::class,
+            Reportable::class => Reportable::class,
             Solvable::class   => Solvable::class,
             Statistics::class => Statistics::class
         ];
@@ -666,6 +671,7 @@ class _Sources
     protected function elItemInterfaces()
     {
         $interfacesItem = [
+            Anonymous::class =>Anonymous::class,
             EditHistory::class              => EditHistory::class,
             Embeddable::class               => Embeddable::class,
             Featurable::class               => Featurable::class,
@@ -731,6 +737,7 @@ class _Sources
     protected function elCommentInterfaces()
     {
         $interfacesComment = [
+            Anonymous::class =>Anonymous::class,
             Hideable::class    => Hideable::class,
             Embeddable::class  => Embeddable::class,
             Searchable::class  => Searchable::class,

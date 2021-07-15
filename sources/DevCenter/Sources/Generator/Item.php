@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\DevCenter\Sources\Generator;
 
+use IPS\Content\Anonymous;
 use IPS\Content\EditHistory;
 use IPS\Content\Featurable;
 use IPS\Content\Hideable;
@@ -85,7 +86,7 @@ class _Item extends GeneratorAbstract
             'title',
             'start_date',
             'ip_address',
-            'seoTitle',
+            'seoTitle'
         ];
 
         $columnMap = [
@@ -290,6 +291,10 @@ class _Item extends GeneratorAbstract
     protected function buildImplementsAndTraits(&$dbColumns, &$columnMap): void
     {
         if (is_array($this->implements)) {
+            if( in_array(Anonymous::class,$this->implements,false)){
+                $dbColumns[] = 'anon';
+                $columnMap[] = 'is_anon';
+            }
             //edit history
             if (in_array(EditHistory::class, $this->implements, false)) {
                 $dbColumns[] = 'edit_time';

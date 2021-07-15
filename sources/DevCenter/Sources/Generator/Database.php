@@ -594,7 +594,7 @@ class _Database
      */
     protected function approved(): array
     {
-        $def = $this->buildDefinition('approved', 'is record approved?', 'TINYINT', 1, true, 0);
+        $def = $this->buildDefinition('approved', 'is record approved?', 'TINYINT', 1, false, 0);
         $def['index'] = $this->buildIndex('Approved Index', ['approved']);
 
         return $def;
@@ -729,4 +729,8 @@ class _Database
         return $this->buildDefinition('bitwise', 'bitwise field.', 'BIGINT', 20);
     }
 
+    protected function anon(): array
+    {
+        return $this->buildDefinition('is_anon', 'anon field.', 'TINYINT', 1,true);
+    }
 }
