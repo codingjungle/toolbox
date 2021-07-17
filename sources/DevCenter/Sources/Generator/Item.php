@@ -145,12 +145,12 @@ class _Item extends GeneratorAbstract
     protected function title($extra = '_title'): void
     {
         $doc = [
-            '@brief Title',
+            '@brief title',
             '@var string',
         ];
 
         $this->generator->addProperty(
-            'Title',
+            'title',
             $this->app . '_' . $this->classname_lower . $extra,
             [
                 'static'   => true,
