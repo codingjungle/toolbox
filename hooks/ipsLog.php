@@ -10,6 +10,9 @@ class toolbox_hook_ipsLog extends _HOOK_CLASS_
 
     public static function debug($message, $category = null)
     {
+        if($category === 'content_debug'){
+            throw $message;
+        }
         if ($category === 'request') {
             return;
         }

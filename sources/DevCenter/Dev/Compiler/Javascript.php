@@ -41,7 +41,7 @@ class _Javascript extends CompilerAbstract
                 }
             }
         } elseif ($this->type === 'controller') {
-            $module = $this->app . '.' . $this->location . '.' . $this->group . '.' . $this->filename;
+            $module = 'ips.' .$this->app . '.' . $this->location . '.' . $this->group . '.' . $this->filename;
             $fname = 'ips.' . $module;
         } elseif ($this->type === 'module') {
             $module = 'ips.' . $this->app . '.' . $this->filename;
@@ -49,7 +49,7 @@ class _Javascript extends CompilerAbstract
             $module = 'ips.templates.' . $this->filename;
             $store = [];
             foreach ($this->templateName as $name) {
-                $tsn = 'templates.' . $this->filename . '.' . $name;
+                $tsn = 'ips.templates.' . $this->filename . '.' . $name;
                 $content = $this->_getFile($this->type);
                 $store[] = $this->_replace('{tsn}', $tsn, $content);
             }

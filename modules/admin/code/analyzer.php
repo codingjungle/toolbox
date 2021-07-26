@@ -58,7 +58,10 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  */
 class _analyzer extends Controller
 {
-
+    /**
+     * @brief    Has been CSRF-protected
+     */
+    public static $csrfProtected = true;
     /**
      * @inheritdoc
      * @throws RuntimeException
@@ -130,7 +133,7 @@ class _analyzer extends Controller
                     'do'          => 'queue',
                     'application' => Request::i()->application,
                 ]
-            )->csrf(), function ($data) {
+            ), function ($data) {
             $total = 8;
             $percent = round(100 / $total);
             $app = Request::i()->application;
@@ -209,7 +212,7 @@ class _analyzer extends Controller
         }, function () {
             $url = Url::internal('app=toolbox&module=code&controller=analyzer&do=results');
             $url->setQueryString(['application' => Request::i()->application]);
-            Output::i()->redirect($url->csrf(), 'dtcode_analyzer_complete');
+            Output::i()->redirect($url, 'dtcode_analyzer_complete');
         }
         );
     }
