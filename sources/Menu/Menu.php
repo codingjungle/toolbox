@@ -63,6 +63,12 @@ class _Menu extends Singleton
             'name' => 'Proxy Class Generator',
             'url'  => (string)Url::internal('app=toolbox&module=proxy&controller=proxy'),
         ];
+
+        $store['toolbox'][] = [
+            'id'   => 'code',
+            'name' => 'Code Analyzer',
+            'url'  => (string)Url::internal('app=toolbox&module=code&controller=analyzer'),
+        ];
         /**
          * @var Application $app
          */
