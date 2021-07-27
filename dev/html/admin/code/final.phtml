@@ -1,0 +1,9 @@
+<ips:template parameters="$output, $app, $download"/>
+<div class="ipsPadding">
+    {$output|raw}
+</div>
+{{if (bool)$download === true}}
+<div class="ipsBorder_top ipsPadding ipsType_center">
+    <a href='{url="app=core&module=applications&controller=applications&appKey={$app}&do=download&analyzed=1"}' class="ipsButton ipsButton_large ipsButton_primary">Download</a>
+</div>
+{{endif}}

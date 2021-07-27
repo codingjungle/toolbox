@@ -43,6 +43,15 @@ class _toolbox
     {
         return [
             'DTBUILD'                         => [
+                'name'        => 'DT_ANALYZE',
+                'default'     => false,
+                'current'     => defined('\DT_ANALYZE') ? DTBUILD : null,
+                'description' => 'This enables an app to be analyzed before you download it.',
+                'type'        => 'boolean',
+                'tab'         => 'DevTools',
+
+            ],
+            'DTBUILD'                         => [
                 'name'        => 'DTBUILD',
                 'default'     => false,
                 'current'     => defined('\DTBUILD') ? DTBUILD : null,

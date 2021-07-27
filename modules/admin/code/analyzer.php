@@ -29,11 +29,13 @@ use IPS\Theme;
 use IPS\toolbox\Code\_ParserAbstract;
 use IPS\toolbox\Code\_Settings;
 use IPS\toolbox\Code\Db;
+use IPS\toolbox\Code\ErrorCodes;
 use IPS\toolbox\Code\FileStorage;
 use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
+use IPS\toolbox\Profiler\Debug;
 use OutOfRangeException;
 use RuntimeException;
 use UnexpectedValueException;
@@ -85,10 +87,6 @@ class _analyzer extends Controller
     protected function manage()
     {
         $form = new Form();
-        // (new Settings())->buildSettings()->verify();
-//        (new FileStorage('chrono'))->check();
-//        (new Langs('chrono'))->verify();
-        //(new Db('chrono'))->check();
         foreach (Application::applications() as $key => $val) {
             if (!defined('DTCODE_NO_SKIP') && in_array($val->directory, IPS::$ipsApps, true)) {
                 continue;
@@ -113,7 +111,7 @@ class _analyzer extends Controller
                         'do'          => 'queue',
                         'application' => $values['dtcode_app'],
                     ]
-                )->csrf()
+                )
             );
         }
 
@@ -132,9 +130,10 @@ class _analyzer extends Controller
                 [
                     'do'          => 'queue',
                     'application' => Request::i()->application,
+                    'download' => Request::i()->download ?? 0
                 ]
             ), function ($data) {
-            $total = 8;
+            $total = 10;
             $percent = round(100 / $total);
             $app = Request::i()->application;
             $complete = 0;
@@ -166,24 +165,38 @@ class _analyzer extends Controller
                     $complete = 3;
                     break;
                 case 3:
-                    $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
+                    $errorsCodes = (new ErrorCodes($app))->check();
+                    if(empty($errorsCodes['warnings'])===false){
+                        $warnings['error_codes_ips'] = $errorsCodes['warnings'];
+                    }
+                    if(empty($errorsCodes['dupes']) === false){
+                        $warnings['error_codes_dupes'] = $errorsCodes['dupes'];
+                    }
                     $complete = 4;
                     break;
                 case 4:
-                    $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
+
                     $complete = 5;
                     break;
                 case 5:
-                    $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
+                    $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
                     $complete = 6;
                     break;
                 case 6:
-                    $warnings['langs_check'] = (new Langs($app))->check();
+                    $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
                     $complete = 7;
                     break;
                 case 7:
-                    $warnings['langs_verify'] = (new Langs($app))->verify();
+                    $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
                     $complete = 8;
+                    break;
+                case 8:
+                    $warnings['langs_check'] = (new Langs($app))->check();
+                    $complete = 9;
+                    break;
+                case 9:
+                    $warnings['langs_verify'] = (new Langs($app))->verify();
+                    $complete = 10;
                     break;
             }
 
@@ -210,8 +223,8 @@ class _analyzer extends Controller
                 $percent * $complete,
             ];
         }, function () {
-            $url = Url::internal('app=toolbox&module=code&controller=analyzer&do=results');
-            $url->setQueryString(['application' => Request::i()->application]);
+            $url = Url::internal('app=toolbox&module=code&controller=analyzer&do=results')->setQueryString(['application' => Request::i()->application,
+                                  'download' => Request::i()->download ?? 0]);
             Output::i()->redirect($url, 'dtcode_analyzer_complete');
         }
         );
@@ -328,10 +341,35 @@ class _analyzer extends Controller
                             ]
                         );
                         break;
+                    case 'error_codes_ips':
+                        $output .= Theme::i()->getTemplate('code')->results(
+                            $val,
+                            'error_codes_ips',
+                            [
+                                'File',
+                                'Key',
+                                'Line'
+                            ]
+                        );
+                        break;
+                    case 'error_codes_dupes':
+                        $output .= Theme::i()->getTemplate('code')->results(
+                            $val,
+                            'error_codes_dupes',
+                            [
+                                'File',
+                                'Key',
+                                'Line'
+                            ]
+                        );
+                        break;
                 }
             }
 
-            Output::i()->output = $output;
+            Output::i()->output = Theme::i()->getTemplate('code')->final(
+                $output,
+                Request::i()->application,
+                Request::i()->download);
         }
     }
 }

@@ -37,6 +37,8 @@
                 <a href="{$value['url']}">{$value['name']}</a>
                 {{elseif $key === 'pre' }}
                 <pre>{$value|raw}</pre>
+                {{elseif \is_array($value)}}
+                {expression="implode(',',$value)"}
                 {{else}}
                 {$value|raw}
                 {{endif}}

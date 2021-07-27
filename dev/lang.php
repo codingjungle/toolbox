@@ -342,6 +342,10 @@ $lang = [
     'dtcode_analyzer_complete'                       => "Analyzing complete!",
     'interface_occupied'                             => "Interface Empty (%s)",
     'interface_occupied_desc'                        => 'The interface folder in your application isn\'t empty, the files might be in use, this makes the app incompatible with the Community in the cloud!',
-    'root_path'                                      => 'ROO_PATH Usage (%s)',
-    'root_path_desc'                                 => '\\IPS\\ROOT_PATH is no longer to be used by 3rd party dev\'s, use \\IPS\\Application::getRootPath() method instead.'
+    'root_path'                                      => 'ROOT_PATH Usage (%s)',
+    'root_path_desc'                                 => '\\IPS\\ROOT_PATH is no longer to be used by 3rd party dev\'s, use \\IPS\\Application::getRootPath() method instead.',
+    'error_codes_ips' => 'IPS Error Code Usage (%s)',
+    'error_codes_ips_desc' => 'This list error codes in use that could possibly be ones used by IPS.',
+    'error_codes_dupes' => 'Duplicate Error Codes (%s)',
+    'error_codes_dupes_desc' => 'These are duplicate errors codes used in your code.',
 ];
