@@ -53,27 +53,29 @@ class _Db extends ParserAbstract
         /** @var SplFileInfo $file */
         foreach ($this->files as $file) {
             $queries = json_decode($file->getContents(), true);
-            foreach ($queries as $query) {
-                if ($query['method'] === 'addColumn') {
-                    $params = $query['params'];
-                    $table = array_shift($params);
-                    $definition = $params;
-                    foreach ($ipsApps as $app) {
-                        $tt = mb_substr($table, 0, mb_strlen($app));
-                        if ($tt === $app) {
-                            $warning[] = [
-                                'path'  => [
-                                    'url'  => $this->buildPath($file->getPathname(), 0),
-                                    'name' => str_replace(
-                                        $this->app->getApplicationPath() . '/',
-                                        '',
-                                        $file->getPathname()
-                                    )
-                                ],
-                                'app'   => $app,
-                                'table' => $table,
-                                'pre'   => trim(json_encode($definition, JSON_PRETTY_PRINT))
-                            ];
+            if ($queries) {
+                foreach ($queries as $query) {
+                    if ($query['method'] === 'addColumn') {
+                        $params = $query['params'];
+                        $table = array_shift($params);
+                        $definition = $params;
+                        foreach ($ipsApps as $app) {
+                            $tt = mb_substr($table, 0, mb_strlen($app));
+                            if ($tt === $app) {
+                                $warning[] = [
+                                    'path'  => [
+                                        'url'  => $this->buildPath($file->getPathname(), 0),
+                                        'name' => str_replace(
+                                            $this->app->getApplicationPath() . '/',
+                                            '',
+                                            $file->getPathname()
+                                        )
+                                    ],
+                                    'app'   => $app,
+                                    'table' => $table,
+                                    'pre'   => trim(json_encode($definition, JSON_PRETTY_PRINT))
+                                ];
+                            }
                         }
                     }
                 }
