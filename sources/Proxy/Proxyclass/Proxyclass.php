@@ -407,6 +407,9 @@ class _Proxyclass extends Singleton
             $content = json_encode($jsonMeta, JSON_PRETTY_PRINT);
             $this->_writeFile('.ide-toolbox.metadata.json', $content, $this->save);
             unset(Store::i()->dt_json);
+            $content = json_encode(Store::i()->dt_error_codes2, JSON_PRETTY_PRINT);
+            $this->_writeFile('altcodes.json', $content, $this->save);
+            unset(Store::i()->dt_error_codes2);
         }
     }
 

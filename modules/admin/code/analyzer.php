@@ -342,13 +342,14 @@ class _analyzer extends Controller
                         );
                         break;
                     case 'error_codes_ips':
-                        $output .= Theme::i()->getTemplate('code')->results(
+                        $output .= Theme::i()->getTemplate('code')->resultsWithLoc(
                             $val,
                             'error_codes_ips',
                             [
                                 'File',
                                 'Key',
-                                'Line'
+                                'Line',
+                                'IPS Locations'
                             ]
                         );
                         break;

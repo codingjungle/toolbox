@@ -128,42 +128,9 @@ class _Proxy extends GeneratorAbstract
     public function create(string $content, string $originalFilePath = null)
     {
         try {
-            $proxied = Store::i()->dt_cascade_proxy ?? [];
-            $cc = $content;
-            $codes = Store::i()->dt_error_codes ?? [];
-
-            preg_replace_callback('#Output::i\(\)->error\((.*?),(.*?)[,|)](.*?)$#msu',
-                static function ($m) use (&$codes) {
-                    if (!isset($m[2])) {
-                        return;
-                    }
-
-                    $c = trim(str_replace(['"', "'"], '', trim($m[2])));
-                    $first = mb_substr($c, 0, 1);
-                    if ($c && (int)$first && mb_strpos($c, '$') === false && mb_strpos($c,
-                            '<') === false && $c != 'FALSE' && $c != 'false') {
-                        $codes[] = $c;
-                    }
-                    return null;
-                }, $cc);
-            if (Application::appIsEnabled('chrono')) {
-                preg_replace_callback('#Application::error\((.*?),(.*?)[,|)](.*?)$#msu',
-                    static function ($m) use (&$codes) {
-                        if (!isset($m[2])) {
-                            return;
-                        }
-
-                        $c = trim(str_replace(['"', "'"], '', trim($m[2])));
-                        $first = mb_substr($c, 0, 1);
-                        if ($c && (int)$first && mb_strpos($c, '$') === false && mb_strpos($c,
-                                '<') === false && $c != 'FALSE' && $c != 'false') {
-                            $codes[] = $c;
-                        }
-                        return null;
-                    }, $cc);
-            }
-            Store::i()->dt_error_codes = $codes;
             $data = Proxyclass::i()->tokenize($content);
+            $proxied = Store::i()->dt_cascade_proxy ?? [];
+
             if (isset($data['class'], $data['namespace'])) {
                 preg_match('#\$bitOptions#', $content, $bitOptions);
                 $namespace = $data['namespace'];
@@ -172,6 +139,32 @@ class _Proxy extends GeneratorAbstract
                 $app = array_shift($ns2);
                 $isApp = false;
                 $appPath = \IPS\ROOT_PATH . '/applications/' . $app;
+
+                $codes = Store::i()->dt_error_codes ?? [];
+                $altCodes = Store::i()->dt_error_codes2 ?? [];
+                $lines = explode("\n", str_replace(["\r","\r\n","n"],"\n", $content));
+                $line = 1;
+                foreach($lines as $cline){
+                    preg_replace_callback(
+                        '#[0-9]{1}([a-zA-Z]{1,})[0-9]{1,}/[a-zA-Z0-9]{1,}#msu',
+                        static function ($m) use (&$codes,&$altCodes,$app,$originalFilePath,$line) {
+                            if (!isset($m[1])) {
+                                return;
+                            }
+                            $c = trim($m[0]);
+                            $codes[] = $c;
+                            $altCodes[$c][] = [
+                                'path' => $originalFilePath,
+                                'app' => $app,
+                                'line' => $line
+                            ];
+                        },
+                        trim($cline));
+                    $line++;
+                }
+
+                Store::i()->dt_error_codes = $codes;
+                Store::i()->dt_error_codes2 = $altCodes;
                 if (isset($this->exclude[$namespace . '\\' . $data['class']])) {
                     return;
                 }

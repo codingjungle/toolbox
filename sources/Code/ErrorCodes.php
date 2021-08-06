@@ -12,11 +12,14 @@
 
 namespace IPS\toolbox\Code;
 
+use IPS\toolbox\Application;
 use Symfony\Component\Finder\SplFileInfo;
 
 use function defined;
+use function explode;
 use function header;
 use function mb_strlen;
+use function mb_strpos;
 use function mb_strtoupper;
 use function mb_substr;
 use function preg_match;
@@ -33,7 +36,7 @@ class _ErrorCodes extends ParserAbstract
 {
 
     protected $finder;
-    
+
     /**
      * @inheritdoc
      */
@@ -57,36 +60,33 @@ class _ErrorCodes extends ParserAbstract
             'X' => 1,
             'H' => 1,
             'L' => 1,
-            'S'=>1,
-            'V'=>1,
+            'S' => 1,
+            'V' => 1,
         ];
+        $altCodes = [];
+        $altCodeFile = Application::getRootPath().'/dtProxy/altcodes.json';
+        if(\file_exists($altCodeFile)){
+            $altCodes = json_decode(\file_get_contents($altCodeFile),true);
+        }
         /**
          * @var SplFileInfo $file
          */
         foreach ($this->files as $file) {
             $data = $file->getContents();
             $line = 1;
-            $lines = \explode("\n", $data);
+            $lines = explode("\n", str_replace(["\r","\r\n","n"],"\n", $data));
             $name = $file->getRealPath();
+            $foo = $this;
             foreach ($lines as $content) {
                 $path = $this->buildPath($name, $line);
-                preg_replace_callback('#Output::i\(\)->error\((.*?),(.*?)[,|)](.*?)$#msu',
-                    static function ($m) use ($reg,$line,$path,$possibleIPSCodes,&$codes,&$warning,&$dupes) {
-                        if (!isset($m[2])) {
+                preg_replace_callback(
+                    '#[0-9]{1}([a-zA-Z]{1,})[0-9]{1,}/[a-zA-Z0-9]{1,}#msu',
+                     function ($m) use ($line, $path, $possibleIPSCodes, &$codes, &$warning, &$dupes,$altCodes,$foo) {
+                        if (!isset($m[1])) {
                             return;
                         }
-
-                        $c = trim(str_replace(['"', "'"], '', trim($m[2])));
-                        $first = mb_substr($c, 0, 1);
-                        if (
-                            $c &&
-                            (int)$first &&
-                            \mb_strpos($c, '$') === false &&
-                            \mb_strpos($c,'<') === false &&
-                            $c != 'FALSE' &&
-                            $c != 'false'
-                        ) {
-                            if(isset($codes[$c])){
+                        $c = trim($m[0]);
+                            if (isset($codes[$c])) {
                                 $dupes[] = [
                                     'path' => ['url' => $path, 'name' => $c],
                                     'key'  => 'ERROR_CODES',
@@ -94,24 +94,31 @@ class _ErrorCodes extends ParserAbstract
                                 ];
                             }
                             $codes[$c] = $c;
-                            preg_match($reg, $c, $matches);
-                            if(isset($matches[2]) && mb_strlen($matches[2]) === 1){
-                               $cc = mb_strtoupper($matches[2]);
-                               if(isset($possibleIPSCodes[$cc])){
-                                   $warning[] = [
-                                       'path' => ['url' => $path, 'name' => $c],
-                                       'key'  => 'ERROR_CODES',
-                                       'line' => $line
-                                   ];
-                               }
+                            $cc = mb_strtoupper($m[1]);
+                            $loc = $altCodes[$c] ?? [];
+                            $locs = [];
+                            if(empty($loc) === false) {
+                                foreach($loc as $l){
+                                    $l['url'] = $foo->buildPath($l['path'],$l['line']);
+                                    $locs[] = $l;
+                                }
                             }
-                        }
+                            if (isset($possibleIPSCodes[$cc])) {
+                                    $warning[] = [
+                                        'path' => ['url' => $path, 'name' => $c],
+                                        'key'  => 'ERROR_CODES',
+                                        'line' => $line,
+                                        'loc' => $locs
+                                    ];
+                                }
                         return null;
-                    }, $content);
+                    },
+                    str_replace(['"',"'",','],'',trim($content))
+                );
                 $line++;
             }
         }
-        return ['warnings' => $warning,'dupes' => $dupes];
+        return ['warnings' => $warning, 'dupes' => $dupes];
     }
 
 }
