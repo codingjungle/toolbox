@@ -142,7 +142,7 @@ class _Proxy extends GeneratorAbstract
 
                 $codes = Store::i()->dt_error_codes ?? [];
                 $altCodes = Store::i()->dt_error_codes2 ?? [];
-                $lines = explode("\n", str_replace(["\r","\r\n","n"],"\n", $content));
+                $lines = preg_split("/\n|\r\n|\n/",   $content );
                 $line = 1;
                 foreach($lines as $cline){
                     preg_replace_callback(

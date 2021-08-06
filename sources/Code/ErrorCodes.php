@@ -74,7 +74,7 @@ class _ErrorCodes extends ParserAbstract
         foreach ($this->files as $file) {
             $data = $file->getContents();
             $line = 1;
-            $lines = explode("\n", str_replace(["\r","\r\n","n"],"\n", $data));
+            $lines = preg_split("/\n|\r\n|\n/",   $data );
             $name = $file->getRealPath();
             $foo = $this;
             foreach ($lines as $content) {

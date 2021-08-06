@@ -342,7 +342,7 @@ class _analyzer extends Controller
                         );
                         break;
                     case 'error_codes_ips':
-                        $output .= Theme::i()->getTemplate('code')->resultsWithLoc(
+                        $output .= Theme::i()->getTemplate('code')->results(
                             $val,
                             'error_codes_ips',
                             [

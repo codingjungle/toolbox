@@ -35,6 +35,12 @@
             <td class="{{if $key === 'line' }}ipsTable_icon{{else}}ipsTable_wrap{{endif}}">
                 {{if \IPS\DEV_WHOOPS_EDITOR && $key === 'path'}}
                 <a href="{$value['url']}">{$value['name']}</a>
+                {{elseif $key === 'loc'}}
+                {{foreach $value as $loc}}
+                <a href="{$loc['url']}">
+                    App: {$loc['app']} Line:{$loc['line']}
+                </a><br>
+                {{endforeach}}
                 {{elseif $key === 'pre' }}
                 <pre>{$value|raw}</pre>
                 {{elseif \is_array($value)}}
