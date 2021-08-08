@@ -20,6 +20,7 @@ use IPS\toolbox\Application;
 use IPS\toolbox\Generator\DTClassGenerator;
 use IPS\toolbox\Generator\DTFileGenerator;
 use IPS\toolbox\Profiler\Debug;
+use IPS\toolbox\Proxy\Helpers\HelpersAbstract;
 use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\ReservedWords;
 use IPS\toolbox\Shared\Write;
@@ -27,8 +28,12 @@ use IPS\Xml\_XMLReader;
 use ParseError;
 use ReflectionClass;
 use Zend\Code\Generator\ClassGenerator;
+use Zend\Code\Generator\DocBlock\Tag\AbstractTypeableTag;
 use Zend\Code\Generator\DocBlock\Tag\GenericTag;
+use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
+use Zend\Code\Generator\DocBlock\Tag\VarTag;
 use Zend\Code\Generator\DocBlockGenerator;
+use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 
@@ -133,6 +138,7 @@ class _Proxy extends GeneratorAbstract
 
             if (isset($data['class'], $data['namespace'])) {
                 preg_match('#\$bitOptions#', $content, $bitOptions);
+
                 $namespace = $data['namespace'];
                 $ns2 = explode('\\', $namespace);
                 array_shift($ns2);
@@ -191,6 +197,7 @@ class _Proxy extends GeneratorAbstract
 
                     $type = '';
                     $body = [];
+                    $bitty = [];
                     $classDefinition = [];
                     $classBlock = null;
                     $extraPath = $isApp ? $app : 'system';
@@ -216,14 +223,14 @@ class _Proxy extends GeneratorAbstract
 
                     $new = new ClassGenerator();
                     $new->setName($class);
-                    $f = explode("\n", $content);
+//                    $f = explode("\n", $content);
 
-                    foreach ($f as $l) {
-                        preg_match('#^use\s(.*?);$#', $l, $match);
-                        if (isset($match[1])) {
-                            // $new->addUse($match[ 1 ]);
-                        }
-                    }
+//                    foreach ($f as $l) {
+//                        preg_match('#^use\s(.*?);$#', $l, $match);
+//                        if (isset($match[1])) {
+//                            // $new->addUse($match[ 1 ]);
+//                        }
+//                    }
 
                     $new->setNamespaceName($namespace);
                     $extendedClass = $namespace . '\\' . $ipsClass;
@@ -252,15 +259,10 @@ class _Proxy extends GeneratorAbstract
 
                             if ($bits->isStatic()) {
                                 $bt = $bits->getValue();
-
                                 if (is_array($bt)) {
                                     foreach ($bt as $key => $value) {
                                         foreach ($value as $k => $v) {
-                                            $classDefinition[] = [
-                                                'pt'   => 'p',
-                                                'prop' => $k,
-                                                'type' => Bitwise::class,
-                                            ];
+                                            $bitty[$k] = $v;
                                         }
                                     }
                                 }
@@ -310,13 +312,39 @@ class _Proxy extends GeneratorAbstract
                             Debug::log($e, 'ParseError');
                             Debug::log($originalFilePath, 'ParseErrorFile');
                         }
-
                         $this->runHelperClasses($dbClass, $classDefinition, $ipsClass, $body);
 
-                        $classBlock = $this->buildClassDoc($classDefinition);
-                    }
 
-                    if (is_array($body)) {
+                        if (empty($bitty) === false) {
+                            foreach ($bitty as $k => $vs) {
+                                unset($classDefinition[$k]);
+                                $tags = 'array $' . $k . ' = [';
+                                foreach ($vs as $kk => $v) {
+                                    $tags .= "'" . $kk . "'" . ' => \'bool\',' . PHP_EOL;
+                                }
+                                $tags .= ']' . PHP_EOL;
+
+                                try {
+                                    $propertyDocBlock = new DocBlockGenerator(
+                                        'Bitwise Properties', null, [new VarTag($k, $tags)]
+                                    );
+                                    $body[] = PropertyGenerator::fromArray(
+                                        [
+                                            'name'         => $k,
+                                            'static'       => false,
+                                            'docblock'     => $propertyDocBlock,
+                                            'visibility'   => 'public',
+                                            'defaultValue' => []
+                                        ]
+                                    );
+                                } catch (InvalidArgumentException $e) {
+                                }
+                            }
+                        }
+                        $classBlock = $this->buildClassDoc($classDefinition);
+
+                    }
+                    if (empty($body) === false) {
                         $newMethods = [];
                         foreach ($body as $method) {
                             if ($method instanceof MethodGenerator) {
@@ -433,7 +461,7 @@ class _Proxy extends GeneratorAbstract
                             preg_match_all('#@return([^\n]+)?#', $doc, $match);
 
                             if (isset($match[1][0])) {
-                                $match = array_filter(explode(' ', $match[1][0]));
+                                $match = array_filter(explode(' ', str_replace(["\t"],['    '],$match[1][0])));
                                 $mtype = trim(array_shift($match));
                                 if (is_array($match) && count($match)) {
                                     $comment = implode(' ', $match);
@@ -448,7 +476,10 @@ class _Proxy extends GeneratorAbstract
                                 $return = $data[$key]['type'];
                             }
                         }
-
+                        if(mb_substr($return,0,1) === '?') {
+                            $return = str_replace(['?'], ['\\'], $return);
+                            $return .= '|null';
+                        }
                         $data[$key] = [
                             'prop'    => trim($key),
                             'pt'      => $pt,
@@ -457,13 +488,12 @@ class _Proxy extends GeneratorAbstract
                         ];
                     }
                 }
-
                 foreach ($data as $prop => $value) {
                     $classDefinition[$prop] = $value;
                 }
             }
         } catch (Exception $e) {
-            //            Debug::add( 'class', $e );
+           Debug::add( 'buildProperty', $e );
         }
     }
 
@@ -490,9 +520,7 @@ class _Proxy extends GeneratorAbstract
                         }
                     }
                 }
-
                 $this->helperClasses = $helpers;
-                //                Debug::add( 'helperClasses', $this->helperClasses, true );
             }
             if (isset($this->helperClasses[$class]) && is_array($this->helperClasses[$class])) {
                 /* @var HelpersAbstract $helperClass */
