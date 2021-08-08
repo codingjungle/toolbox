@@ -14,6 +14,7 @@ namespace IPS\toolbox\Proxy\Generator;
 use Exception;
 use IPS\Data\Store;
 use IPS\IPS;
+use IPS\Patterns\ActiveRecord;
 use IPS\Patterns\Bitwise;
 use IPS\Settings;
 use IPS\toolbox\Application;
@@ -198,6 +199,7 @@ class _Proxy extends GeneratorAbstract
                     $type = '';
                     $body = [];
                     $bitty = [];
+                    $deepAssoc = [];
                     $classDefinition = [];
                     $classBlock = null;
                     $extraPath = $isApp ? $app : 'system';
@@ -262,7 +264,12 @@ class _Proxy extends GeneratorAbstract
                                 if (is_array($bt)) {
                                     foreach ($bt as $key => $value) {
                                         foreach ($value as $k => $v) {
-                                            $bitty[$k] = $v;
+                                            $tags = 'array $' . $k . ' =['.PHP_EOL;
+                                            foreach($v as $keyed => $vvv){
+                                                    $tags .= "'" . $keyed . "'" . ' => (bool),'.PHP_EOL;
+                                            }
+                                            $tags .= ']' . PHP_EOL;
+                                            $deepAssoc[$k] = $tags;
                                         }
                                     }
                                 }
@@ -298,11 +305,11 @@ class _Proxy extends GeneratorAbstract
                                                 $key = mb_substr($key, $len);
                                             }
                                             $key = trim($key);
-                                            $this->buildHead($key, $val, $classDefinition);
+                                            $this->buildHead($key, $val, $classDefinition, $deepAssoc);
                                         }
                                     }
 
-                                    $this->buildProperty($dbClass, $classDefinition);
+                                    $this->buildProperty($dbClass, $classDefinition, $deepAssoc);
                                 }
                             }
                         } catch (Exception $e) {
@@ -315,18 +322,20 @@ class _Proxy extends GeneratorAbstract
                         $this->runHelperClasses($dbClass, $classDefinition, $ipsClass, $body);
 
 
-                        if (empty($bitty) === false) {
-                            foreach ($bitty as $k => $vs) {
+                        if (empty($deepAssoc) === false) {
+                            foreach ($deepAssoc as $k => $vs) {
                                 unset($classDefinition[$k]);
-                                $tags = 'array $' . $k . ' = [';
-                                foreach ($vs as $kk => $v) {
-                                    $tags .= "'" . $kk . "'" . ' => \'bool\',' . PHP_EOL;
-                                }
-                                $tags .= ']' . PHP_EOL;
-
                                 try {
+                                    $tags = $vs;
+                                    if(\is_array($vs)){
+                                        $tags = 'array $'.$k.' = [';
+                                        foreach($vs as $kk => $v){
+                                            $tags .= "'".$kk."'" .' => '.$v.','.PHP_EOL;
+                                        }
+                                        $tags .= ']'.PHP_EOL;
+                                    }
                                     $propertyDocBlock = new DocBlockGenerator(
-                                        'Bitwise Properties', null, [new VarTag($k, $tags)]
+                                        'Deep-assoc-completion: '.$k, null, [new VarTag($k, $tags)]
                                     );
                                     $body[] = PropertyGenerator::fromArray(
                                         [
@@ -388,7 +397,7 @@ class _Proxy extends GeneratorAbstract
      *
      * @return void
      */
-    protected function buildHead($name, $def, &$classDefinition)
+    protected function buildHead($name, $def, &$classDefinition,&$deepAssoc)
     {
         $ints = [
             'TINYINT',
@@ -420,6 +429,9 @@ class _Proxy extends GeneratorAbstract
         }
 
         $classDefinition[$name] = ['pt' => 'p', 'prop' => $name, 'type' => $type, 'comment' => $comment];
+        $check = str_replace('|null','',$type);
+
+        $deepAssoc['_data'][$name] = '('.$check.')';
     }
 
     /**
@@ -428,7 +440,7 @@ class _Proxy extends GeneratorAbstract
      * @param $class
      * @param $classDefinition
      */
-    public function buildProperty($class, &$classDefinition)
+    public function buildProperty($class, &$classDefinition,&$deepAssoc)
     {
         try {
             $data = [];
@@ -469,6 +481,7 @@ class _Proxy extends GeneratorAbstract
 
                                 $return = $mtype;
                             }
+
                         }
 
                         if (isset($data[$key])) {
@@ -489,6 +502,17 @@ class _Proxy extends GeneratorAbstract
                     }
                 }
                 foreach ($data as $prop => $value) {
+                    if(isset($classDefinition[$prop])){
+                        $tt = $value['type'];
+                        $check = str_replace('|null','',$tt);
+                        if(class_exists($check)){
+                            $check = 'new '.$check;
+                        }
+                        else{
+                            $check = '('.$check.')';
+                        }
+                        $deepAssoc['_data'][$prop] = $check;
+                    }
                     $classDefinition[$prop] = $value;
                 }
             }
