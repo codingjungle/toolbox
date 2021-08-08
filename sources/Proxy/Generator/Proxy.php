@@ -198,7 +198,6 @@ class _Proxy extends GeneratorAbstract
 
                     $type = '';
                     $body = [];
-                    $bitty = [];
                     $deepAssoc = [];
                     $classDefinition = [];
                     $classBlock = null;
@@ -320,7 +319,6 @@ class _Proxy extends GeneratorAbstract
                             Debug::log($originalFilePath, 'ParseErrorFile');
                         }
                         $this->runHelperClasses($dbClass, $classDefinition, $ipsClass, $body);
-
 
                         if (empty($deepAssoc) === false) {
                             foreach ($deepAssoc as $k => $vs) {
@@ -546,11 +544,17 @@ class _Proxy extends GeneratorAbstract
                 }
                 $this->helperClasses = $helpers;
             }
+
             if (isset($this->helperClasses[$class]) && is_array($this->helperClasses[$class])) {
                 /* @var HelpersAbstract $helperClass */
                 foreach ($this->helperClasses[$class] as $helper) {
-                    $helperClass = new $helper();
-                    $helperClass->process($class, $classDoc, $classExtends, $body);
+                    if( $helper instanceof \Closure){
+                        $helper($class,$classDoc,$classExtends,$body);
+                    }
+                    else {
+                        $helperClass = new $helper();
+                        $helperClass->process($class, $classDoc, $classExtends, $body);
+                    }
                 }
             }
         } catch (Exception $e) {
