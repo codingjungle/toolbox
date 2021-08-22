@@ -15,6 +15,7 @@ namespace IPS\toolbox\DevCenter\Sources\Generator;
 use IPS\Content\Anonymous;
 use IPS\Content\EditHistory;
 use IPS\Content\Featurable;
+use IPS\Content\FuturePublishing;
 use IPS\Content\Hideable;
 use IPS\Content\Item;
 use IPS\Content\Lockable;
@@ -379,7 +380,13 @@ class _Item extends GeneratorAbstract
                 ];
                 $this->generator->addMethod('update', '', [['name' => 'poll', 'hint' => $poll]], $doc);
             }
+            if(in_array(FuturePublishing::class,$this->implements,false)){
+                $dbColumns[] = 'is_future_entry';
+                $dbColumns[] = 'future_date';
+                $columnMap['is_future_entry'] = 'is_future_entry';
+                $columnMap['future_date'] = 'future_date';
 
+            }
             //Ratings
             if (in_array(Ratings::class, $this->implements, false)) {
                 $dbColumns[] = 'rating_average';

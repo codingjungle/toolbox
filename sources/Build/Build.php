@@ -66,7 +66,12 @@ class _Build extends Singleton
             $newShort = '1.0.0';
             $newLong = 10000;
         }
-
+        $reg = '#\sBeta\s(\d)#';
+        \preg_match($reg,$newShort,$match);
+        $beta = 1;
+        if(isset($match[1])){
+            $beta =$match[1] + 1;
+        }
         $form = Form::create();
         $form->dummy('Previous Long Version', $newLong);
         $form->dummy('Previous Short Version', $newShort);
@@ -76,8 +81,8 @@ class _Build extends Singleton
         );
         $form->add('toolbox_long_version', 'number')->label('Long Version')->required()->empty($newLong);
         $form->add('toolbox_short_version')->label('Short Version')->required()->empty($newShort);
-        $form->add('toolbox_beta', 'yn')->toggles(['toolbox_beta_version']);
-        $form->add('toolbox_beta_version', 'number')->required()->empty(1);
+        $form->add('toolbox_beta', 'yn');
+        $form->add('toolbox_beta_version', 'number')->required()->empty($beta);
 
         $form->add('toolbox_skip_dir', 'stack')->label('Skip Directories')->description(
             'Folders to skip using slasher on.'
@@ -92,7 +97,10 @@ class _Build extends Singleton
         if ($values = $form->values()) {
             $long = $values['toolbox_long_version'];
             $short = $values['toolbox_short_version'];
-            if (isset($values['toolbox_increment']) && $values['toolbox_increment']) {
+            $short = \preg_replace_callback($reg,function($m){
+                return '';
+            },$short);
+            if (!$values['toolbox_beta'] && isset($values['toolbox_increment']) && $values['toolbox_increment']) {
                 $exploded = explode('.', $short);
                 $end = $exploded[2] ?? 0;
                 $short = "{$exploded[0]}.{$exploded[1]}." . ((int)$end + 1);

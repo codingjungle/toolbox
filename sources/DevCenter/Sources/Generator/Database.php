@@ -733,4 +733,16 @@ class _Database
     {
         return $this->buildDefinition('is_anon', 'anon field.', 'TINYINT', 1,true);
     }
+
+    protected function isFutureEntry(): array
+    {
+        return $this->buildDefinition('is_future_entry', 'future field.', 'TINYINT', 1,true);
+    }
+
+    protected function futureDate(): array
+    {
+        return $this->buildDefinition('future_date', 'future date publishing.', 'INT', 12);
+    }
+
+
 }
