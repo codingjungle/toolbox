@@ -68,6 +68,8 @@ class _Request implements HelpersAbstract
         $classDoc[] = ['pt' => 'p', 'prop' => 'last', 'type' => 'int'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'enabled', 'type' => 'int'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'gitApp', 'type' => 'string'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'alpha', 'type' => 'string'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'omega', 'type' => 'int'];
 
         /* @var Application $app */
         foreach (Application::appsWithExtension('toolbox', 'ProxyHelpers') as $app) {

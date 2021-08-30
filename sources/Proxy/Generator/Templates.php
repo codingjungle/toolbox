@@ -166,6 +166,7 @@ class _Templates extends GeneratorAbstract
                                     $data['value'] = $param->getDefaultValue();
                                 } catch (Exception | ReflectionException $e) {
                                 }
+
                                 $newParams[$param->getPosition()] = $data;
                             }
                         } catch (Exception $e) {

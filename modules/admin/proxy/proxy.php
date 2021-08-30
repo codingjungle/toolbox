@@ -135,7 +135,7 @@ class _proxy extends Controller
             }
         }, function () {
             /* And redirect back to the overview screen */
-            $url = Url::internal('app=core&module=overview&controller=dashboard')->csrf();
+            $url = Url::internal('app=core&module=overview&controller=dashboard');
             Output::i()->redirect($url, 'dtproxy_done');
         }
         );

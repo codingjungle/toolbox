@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\Proxy\Helpers;
 
+use Zend\Code\Generator\DocBlock\Tag\AbstractTypeableTag;
 use Zend\Code\Generator\DocBlock\Tag\ParamTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
@@ -69,6 +70,30 @@ class _ActiveRecord implements HelpersAbstract
                         new ParameterGenerator('extraWhereClause', null, 'null', 2),
                     ],
                     'body'       => 'return parent::load($id,$idField,$extraWhereClause);',
+                    'docblock'   => $methodDocBlock,
+                    'static'     => true,
+                ]
+            );
+        } catch (InvalidArgumentException $e) {
+        }
+
+        try {
+            $methodDocBlock = new DocBlockGenerator(
+                'Construct ActiveRecord from database row', null, [
+                                 new ParamTag('data', 'array'),
+                                 new ParamTag('updateMultitonStoreIfExists', 'bool'),
+                                 new ReturnTag('static')
+
+                             ]
+            );
+            $body[] = MethodGenerator::fromArray(
+                [
+                    'name'       => 'constructFromData',
+                    'parameters' => [
+                        new ParameterGenerator('data', 'array', null, 0),
+                        new ParameterGenerator('updateMultitonStoreIfExists', 'bool', 'false', 1)
+                    ],
+                    'body'       => 'return parent::constructFromData($data,$updateMultitonStoreIfExists);',
                     'docblock'   => $methodDocBlock,
                     'static'     => true,
                 ]

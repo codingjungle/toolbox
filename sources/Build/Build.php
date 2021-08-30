@@ -83,7 +83,6 @@ class _Build extends Singleton
         $form->add('toolbox_short_version')->label('Short Version')->required()->empty($newShort);
         $form->add('toolbox_beta', 'yn');
         $form->add('toolbox_beta_version', 'number')->required()->empty($beta);
-
         $form->add('toolbox_skip_dir', 'stack')->label('Skip Directories')->description(
             'Folders to skip using slasher on.'
         )->empty(

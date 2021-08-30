@@ -50,6 +50,11 @@ class _Store implements HelpersAbstract
         $classDoc[] = ['pt' => 'p', 'prop' => 'storageConfigurations', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'themes', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'dt_cascade_proxy', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'formularize_output', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'formularize_validation', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'formularize_ra', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'formularize_folders', 'type' => 'array'];
+
         /* @var Application $app */
         foreach (Application::appsWithExtension('toolbox', 'ProxyHelpers') as $app) {
             $extensions = $app->extensions('toolbox', 'ProxyHelpers', true);

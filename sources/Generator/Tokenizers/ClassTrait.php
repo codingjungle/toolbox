@@ -152,7 +152,6 @@ trait ClassTrait
                 $visibility = 'protected';
             }
         }
-
         if (empty($params) !== true) {
             //            if ( trim( $name ) === 'featured' ) {
             //                _p( $params );

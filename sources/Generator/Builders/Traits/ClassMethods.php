@@ -155,7 +155,6 @@ trait ClassMethods
                         }
                         $hint = $this->addImport($hint);
                     } catch (Exception $e) {
-                        _p($hint);
                     }
                 }
 
@@ -172,32 +171,24 @@ trait ClassMethods
                 $val = '';
                 if ($param['value'] === '[]' || $param['value'] === 'array()' || is_array($param['value'])) {
                     $val = '[]';
-                } else {
-                    if (mb_strtolower($param['value']) === 'true' || mb_strtolower($param['value']) === 'false') {
-                        $val = mb_strtolower($param['value']);
-                    } else {
-                        if ($param['value'] === false) {
-                            $val = 'false';
-                        } else {
-                            if ($param['value'] === true) {
-                                $val = 'true';
-                            } else {
-                                if ($param['value'] === null || mb_strtolower($param['value']) === 'null') {
-                                    $val = 'null';
-                                } else {
-                                    if ($param['value'] === "''" || $param === '""') {
-                                        $val = $param['value'];
-                                    } else {
-                                        if (is_string($param['value'])) {
-                                            $val = empty($param['value']) ? "''" : $param['value'];
-                                        } else {
-                                            $val = empty($param['value']) ? "''" : $param['value'];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                } elseif (mb_strtolower($param['value']) === 'true' || mb_strtolower($param['value']) === 'false') {
+                    $val = mb_strtolower($param['value']);
+                } elseif ($param['value'] === false) {
+                    $val = 'false';
+                } elseif ($param['value'] === true) {
+                    $val = 'true';
+                } elseif ($param['value'] === null || mb_strtolower($param['value']) === 'null') {
+                    $val = 'null';
+                } elseif ($param['value'] === "''" || $param === '""') {
+                    $val = $param['value'];
+                } elseif(is_string($param['value'])){
+                    $val = "'".$param['value']."'";
+                }
+                elseif(is_numeric($param['value'])){
+                    $val = $param['value'];
+                }
+                else{
+                    $val = empty($param['value']) ? "''" : $param['value'];
                 }
                 $p .= ' = ' . $val;
             }

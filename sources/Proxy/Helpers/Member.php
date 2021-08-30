@@ -13,6 +13,7 @@
 namespace IPS\toolbox\Proxy\Helpers;
 
 use IPS\Lang;
+use Zend\Code\Generator\DocBlock\Tag\AbstractTypeableTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;
@@ -67,6 +68,26 @@ class _Member implements HelpersAbstract
                     'body'       => 'return parent::language();',
                     'docblock'   => $methodDocBlock,
                     'static'     => false,
+                ]
+            );
+        } catch (InvalidArgumentException $e) {
+        }
+
+        $methodDocBlock = new DocBlockGenerator(
+            '',
+            null, [
+                new ReturnTag('\\' . \IPS\Member::class)
+            ]
+        );
+
+        try {
+            $body[] = MethodGenerator::fromArray(
+                [
+                    'name'       => 'loggedIn',
+                    'parameters' => [],
+                    'body'       => 'return parent::loggedIn();',
+                    'docblock'   => $methodDocBlock,
+                    'static'     => true,
                 ]
             );
         } catch (InvalidArgumentException $e) {
