@@ -36,6 +36,10 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 class _cons extends Controller
 {
     /**
+     * @brief    Has been CSRF-protected
+     */
+    public static $csrfProtected = true;
+    /**
      * @inheritdoc
      */
     public function execute()

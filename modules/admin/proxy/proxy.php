@@ -39,7 +39,10 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  */
 class _proxy extends Controller
 {
-
+    /**
+     * @brief    Has been CSRF-protected
+     */
+    public static $csrfProtected = true;
     /**
      * Execute
      *

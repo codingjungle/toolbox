@@ -25,7 +25,10 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 class _sources extends Controller
 {
     use \IPS\toolbox\Shared\Sources;
-
+    /**
+     * @brief    Has been CSRF-protected
+     */
+    public static $csrfProtected = true;
     /**
      * @var Application
      */

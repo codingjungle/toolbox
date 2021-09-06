@@ -43,7 +43,10 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _applications extends Controller
 {
-
+    /**
+     * @brief    Has been CSRF-protected
+     */
+    public static $csrfProtected = true;
     /**
      * @inheritdoc
      * @throws RuntimeException
@@ -145,10 +148,11 @@ class _applications extends Controller
             $type = $values['type'];
 
             if ($type === 'all') {
-                Output::i()->redirect($this->url->setQueryString(['do' => 'queue', 'appKey' => $app])->csrf());
+                Output::i()->redirect($this->url->setQueryString(['do' => 'queue', 'appKey' => $app]));
             } else {
                 $return = (new Applications($app))->{$type}();
-                Output::i()->redirect($this->url->csrf(), $return);
+                $msg = 'Dev Folder Generated: '. $langs[$type];
+                Output::i()->redirect($this->url, $msg);
             }
         }
 
