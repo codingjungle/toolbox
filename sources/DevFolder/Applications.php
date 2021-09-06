@@ -104,7 +104,7 @@ class _Applications
             $this->app = $app;
         }
         if ($this->app->marketplace_id !== null) {
-            throw new Exception('Something has gone wrong try again!');
+            throw new Exception('This is a marketplace application and currently can not be processed.');
         }
 
         $this->dir = method_exists($this->app, 'getApplicationPath')

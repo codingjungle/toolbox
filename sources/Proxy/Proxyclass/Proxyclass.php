@@ -640,7 +640,7 @@ class _Proxyclass extends Singleton
      */
     protected function excludedDir(): array
     {
-        return [
+        $return = [
             'api',
             'interface',
             'data',
@@ -665,6 +665,13 @@ class _Proxyclass extends Singleton
             'web',
             'GraphQL',
         ];
+
+        $exd = \IPS\ROOT_PATH.'/excludedFolders.php';
+        if(file_exists($exd)){
+            require $exd;
+            $return = \array_merge($return, $excludeFolders);
+        }
+        return $return;
     }
 
     /**
@@ -674,7 +681,7 @@ class _Proxyclass extends Singleton
      */
     protected function excludedFiles(): array
     {
-        return [
+        $return = [
             '.htaccess',
             'lang.php',
             'jslang.php',
@@ -690,8 +697,15 @@ class _Proxyclass extends Singleton
             'test.php',
             'HtmlPurifierHttpsImages.php',
             'system/Output/System/Output.php'
-
         ];
+
+        $exf = \IPS\ROOT_PATH.'/excludedFiles.php';
+        if(file_exists($exf)){
+            require $exf;
+            $return = \array_merge($return,$excludeFiles);
+        }
+
+        return $return;
     }
 
     /**
