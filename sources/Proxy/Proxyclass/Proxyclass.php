@@ -666,10 +666,12 @@ class _Proxyclass extends Singleton
             'GraphQL',
         ];
 
-        $exd = \IPS\ROOT_PATH.'/excludedFolders.php';
+        $exd = \IPS\ROOT_PATH.'/excluded.php';
         if(file_exists($exd)){
             require $exd;
-            $return = \array_merge($return, $excludeFolders);
+            if(isset($excludeFolders)) {
+                $return = \array_merge($return, $excludeFolders);
+            }
         }
         return $return;
     }
@@ -699,10 +701,12 @@ class _Proxyclass extends Singleton
             'system/Output/System/Output.php'
         ];
 
-        $exf = \IPS\ROOT_PATH.'/excludedFiles.php';
+        $exf = \IPS\ROOT_PATH.'/excluded.php';
         if(file_exists($exf)){
             require $exf;
-            $return = \array_merge($return,$excludeFiles);
+            if(isset($excludeFiles)) {
+                $return = \array_merge($return, $excludeFiles);
+            }
         }
 
         return $return;
