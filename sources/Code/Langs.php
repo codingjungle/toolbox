@@ -180,6 +180,8 @@ class _Langs extends ParserAbstract
      */
     public function check(): array
     {
+        set_time_limit(0);
+
         if ($this->files === null) {
             return [];
         }
@@ -221,7 +223,7 @@ class _Langs extends ParserAbstract
         foreach ($keys as $find => $value) {
             $find = trim($find);
             preg_match_all('#[\'|"]' . $find . '[\'|"]#msu', $content, $match);
-            if (!count($match[0])) {
+            if (isset($match[0]) && !count($match[0])) {
                 $warning['langs'][$find] = $find;
             } else {
                 unset($warning['langs'][$find]);
