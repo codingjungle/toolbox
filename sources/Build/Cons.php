@@ -202,7 +202,7 @@ class _Cons extends Singleton
                         $dataType = $data;
                     }
                 }
-                //test test test
+                //test test test tst
                 $cons[] = $prefix . "\\define('" . $key . "'," . $dataType . ');';
             }
         }
