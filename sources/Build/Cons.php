@@ -82,11 +82,7 @@ class _Cons extends Singleton
                 $value['current'] = 'md5(random_int(0, 10000) . time())';
             }
 
-            if ($key === 'SUITE_UNIQUE_KEY') {
-                $toWrite = "\$versions = json_decode(file_get_contents(__DIR__ . '/applications/core/data/versions.json'), true);";
-                $toWrite .= "\nmb_substr(md5(array_pop(\$versions)), 10, 10);";
-                $value['current'] = $toWrite;
-            }
+
             $form->add($key)->label($key)->empty($value['current'])->description($value['description'] ?? '')->tab(
                 $tab
             );
@@ -163,9 +159,9 @@ class _Cons extends Singleton
         foreach (Application::allExtensions('toolbox', 'constants') as $extension) {
             $extension->formateValues($values);
         }
-
         foreach ($constants as $key => $val) {
             $data = $values[$key];
+
             switch ($val['type']) {
                 case 'integer':
                 case 'boolean':
@@ -182,21 +178,31 @@ class _Cons extends Singleton
                     }
                     break;
             }
+            if ($key === 'SUITE_UNIQUE_KEY') {
+                $check2 = "\$versions = json_decode(file_get_contents(__DIR__ . '/applications/core/data/versions.json'), true);";
+                $check2 .= "\nmb_substr(md5(array_pop(\$versions)), 10, 10)";
+            }
             if ((defined('\\IPS\\' . $key) && $check !== $check2) || in_array($key, static::$devTools, true)) {
-                $dataType = "'" . $data . "'";
+                $prefix = '';
+                if ($key === 'SUITE_UNIQUE_KEY') {
+                    $prefix = "\$versions = json_decode(file_get_contents(__DIR__ . '/applications/core/data/versions.json'), true);\n";
+                    $dataType = "mb_substr(md5(array_pop(\$versions)), 10, 10)";
+                } else {
+                    $dataType = "'" . $data . "'";
 
-                switch ($val['type']) {
-                    case 'integer':
-                        $dataType = (int)$data;
-                        break;
-                    case 'boolean':
-                        $dataType = $data ? 'true' : 'false';
-                        break;
+                    switch ($val['type']) {
+                        case 'integer':
+                            $dataType = (int)$data;
+                            break;
+                        case 'boolean':
+                            $dataType = $data ? 'true' : 'false';
+                            break;
+                    }
+                    if ($key === 'CACHEBUST_KEY' || $key === 'SUITE_UNIQUE_KEY') {
+                        $dataType = $data;
+                    }
                 }
-                if ($key === 'CACHEBUST_KEY' || $key === 'SUITE_UNIQUE_KEY') {
-                    $dataType = $data;
-                }
-                $cons[] = "\\define('" . $key . "'," . $dataType . ');';
+                $cons[] = $prefix . "\\define('" . $key . "'," . $dataType . ');';
             }
         }
         $toWrite = 'include __DIR__.\'/applications/toolbox/sources/Debug/Helpers.php\';' . "\n";
