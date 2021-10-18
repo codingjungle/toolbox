@@ -85,7 +85,7 @@ class _Cons extends Singleton
             if ($key === 'SUITE_UNIQUE_KEY') {
                 $toWrite = "\$versions = json_decode(file_get_contents(__DIR__ . '/applications/core/data/versions.json'), true);";
                 $toWrite .= "\nmb_substr(md5(array_pop(\$versions)), 10, 10);";
-                $value['current'] = 'mb_substr(md5(array_key_first(array_pop(json_decode(__DIR__ . \'/applications/core/data/versions.json\'), true))), 10, 10)';
+                $value['current'] = $toWrite;
             }
             $form->add($key)->label($key)->empty($value['current'])->description($value['description'] ?? '')->tab(
                 $tab
