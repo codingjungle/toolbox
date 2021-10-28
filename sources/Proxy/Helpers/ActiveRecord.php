@@ -21,6 +21,8 @@ use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\ParameterGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 
+use Zend\Code\Generator\ValueGenerator;
+
 use function defined;
 use function header;
 
@@ -66,8 +68,8 @@ class _ActiveRecord implements HelpersAbstract
                     'name'       => 'load',
                     'parameters' => [
                         new ParameterGenerator('id', null, null, 0),
-                        new ParameterGenerator('idField', 'string', 'null', 1),
-                        new ParameterGenerator('extraWhereClause', null, 'null', 2),
+                        new ParameterGenerator('idField', null, new ValueGenerator(null, ValueGenerator::TYPE_NULL), 1),
+                        new ParameterGenerator('extraWhereClause', null, new ValueGenerator(null, ValueGenerator::TYPE_NULL), 2),
                     ],
                     'body'       => 'return parent::load($id,$idField,$extraWhereClause);',
                     'docblock'   => $methodDocBlock,
@@ -90,8 +92,9 @@ class _ActiveRecord implements HelpersAbstract
                 [
                     'name'       => 'constructFromData',
                     'parameters' => [
-                        new ParameterGenerator('data', 'array', null, 0),
-                        new ParameterGenerator('updateMultitonStoreIfExists', 'bool', 'false', 1)
+                        new ParameterGenerator('data', null, null, 0),
+                        new ParameterGenerator('updateMultitonStoreIfExists', null, new ValueGenerator(false,
+                            ValueGenerator::TYPE_BOOL), 1)
                     ],
                     'body'       => 'return parent::constructFromData($data,$updateMultitonStoreIfExists);',
                     'docblock'   => $methodDocBlock,

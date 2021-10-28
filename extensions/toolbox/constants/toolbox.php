@@ -113,6 +113,15 @@ class _toolbox
                 'type'        => 'boolean',
                 'tab'         => 'DevTools',
 
+            ],
+            'DT_DISABLE_SERVICE_WORKERS' => [
+                'name'        => 'DT_DISABLE_SERVICE_WORKERS',
+                'default'     => 0,
+                'current'     => defined('\DT_DISABLE_SERVICE_WORKERS') ? DT_DISABLE_SERVICE_WORKERS : false,
+                'description' => 'disable the annoying service worker content in the console log.',
+                'type'        => 'boolean',
+                'tab'         => 'DevTools',
+
             ]
         ];
     }

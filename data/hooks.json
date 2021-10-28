@@ -126,5 +126,9 @@
     "FormAbstract": {
         "type": "C",
         "class": "\\IPS\\Helpers\\Form\\FormAbstract"
+    },
+    "serviceworker": {
+        "type": "C",
+        "class": "\\IPS\\core\\modules\\front\\system\\serviceworker"
     }
 }
