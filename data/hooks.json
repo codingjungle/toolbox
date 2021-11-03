@@ -39,10 +39,6 @@
         "type": "C",
         "class": "\\IPS\\Dispatcher"
     },
-    "MultiRedirect": {
-        "type": "C",
-        "class": "\\IPS\\Helpers\\MultipleRedirect"
-    },
     "Request": {
         "type": "C",
         "class": "\\IPS\\Request"
