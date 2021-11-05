@@ -454,7 +454,7 @@ class _Proxyclass extends Singleton
     }
 
     /**
-     * empties a directroy, use with caution!
+     * empties a directory, use with caution!
      *
      * @param $dir
      *

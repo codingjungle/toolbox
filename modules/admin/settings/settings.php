@@ -189,9 +189,26 @@ EOF;
             if (!is_file(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php')) {
                 file_put_contents(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
             }
-            $preg = "#public static function monkeyPatch\((.*?)public#msu";
-            $before = <<<'eof'
+            $preg = "#class IPS$#msu";
+            $content = preg_replace_callback($preg, static function ($e) {
+                return 'class IPSBU';
+            }, $content);
+            $preg = "#^IPS::init\(\);#msu";
+            $content = preg_replace_callback($preg, static function ($e) {
+                return <<<'eof'
+
+class IPS extends \IPS\IPSBU {
     public static $beenPatched = true;
+    public static function exceptionHandler( $exception )
+	{
+	    if(\IPS\IN_DEV === true){
+	        throw $exception;
+	    }
+	    else{
+	        parent::exceptionHandler($exception);
+	    }
+	}
+
     public static function monkeyPatch($namespace, $finalClass, $extraCode = '')
     {
         $realClass = "_{$finalClass}";
@@ -233,18 +250,25 @@ EOF;
         }
         
         $reflection = new \ReflectionClass("{$namespace}\\_{$finalClass}");
-        if (eval("namespace {$namespace}; " . $extraCode . ($reflection->isAbstract() ? 'abstract' : '') . " class {$finalClass} extends {$realClass} {}") === false) {
+        if (eval("namespace {$namespace}; " . $extraCode . ($reflection->isAbstract() ? 'abstract' : '') . " class {$finalClass} extends {$realClass} {}") === false)       { 
             trigger_error("There was an error initiating the class {$namespace}\\{$finalClass}.", E_USER_ERROR);
         }
     }
+}    
+IPS::init();
 eof;
-            $content = preg_replace_callback(
-                $preg,
-                function ($e) use ($before) {
-                    return $before . "\n\n  public";
-                },
-                $content
-            );
+            }, $content);
+//            $preg = "#public static function monkeyPatch\((.*?)public#msu";
+//            $before = <<<'eof'
+//
+//eof;
+//            $content = preg_replace_callback(
+//                $preg,
+//                function ($e) use ($before) {
+//                    return $before . "\n\n  public";
+//                },
+//                $content
+//            );
 
             file_put_contents($init, $content);
         }

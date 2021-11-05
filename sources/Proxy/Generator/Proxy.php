@@ -491,6 +491,9 @@ class _Proxy extends GeneratorAbstract
                             $return = str_replace(['?'], ['\\'], $return);
                             $return .= '|null';
                         }
+                        if(isset($data[$key]) && $type === 'set_'){
+                            $return = $data[$key]['type'];
+                        }
                         $data[$key] = [
                             'prop'    => trim($key),
                             'pt'      => $pt,

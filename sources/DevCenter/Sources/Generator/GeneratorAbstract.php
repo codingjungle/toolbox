@@ -296,10 +296,11 @@ abstract class _GeneratorAbstract
         $this->generator->isProxy = $this->proxy;
         $doc = [
             '@brief      ' . $this->classname . ' ' . $this->brief,
+            '@author     -storm_author-',
             '@copyright  -storm_copyright-',
             '@package    IPS Social Suite',
             '@subpackage ' . $this->app,
-            '@since      -storm_since_version-',
+            '@since      ' . $this->application->version ?? '1.0.0',
             '@version    -storm_version-',
         ];
 
