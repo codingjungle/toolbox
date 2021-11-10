@@ -147,13 +147,11 @@ class _Debug extends ActiveRecord
             $data['backtrace'] = nl2br(htmlentities($message->getTraceAsString()));
             $type = 'exception';
             $message = json_encode($data);
+        } elseif (is_array($message)) {
+            $message = json_encode($message);
+            $type = 'array';
         } else {
-            if (is_array($message)) {
-                $message = json_encode($message);
-                $type = 'array';
-            } else {
-                $type = 'string';
-            }
+            $type = 'string';
         }
 
         $debug->type = $type;
