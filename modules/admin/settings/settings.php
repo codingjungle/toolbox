@@ -103,14 +103,14 @@ class _settings extends Controller
 //                ];
 //            }
 
-            if (!function_exists('_p')) {
-                Output::i()->sidebar['actions']['helpers'] = [
-                    'icon'  => 'plus',
-                    'title' => 'Patch Helpers',
-                    'link'  => Request::i()->url()->setQueryString(['do' => 'patchHelpers']),
-
-                ];
-            }
+//            if (!function_exists('_p')) {
+//                Output::i()->sidebar['actions']['helpers'] = [
+//                    'icon'  => 'plus',
+//                    'title' => 'Patch Helpers',
+//                    'link'  => Request::i()->url()->setQueryString(['do' => 'patchHelpers']),
+//
+//                ];
+//            }
         }
 
         $form = Form::create()->object(Settings::i());
@@ -177,7 +177,7 @@ EOF;
             file_put_contents($init, $content);
         }
 
-        Output::i()->redirect($this->url->csrf(), 'init.php patched with Debug Helpers');
+        Output::i()->redirect($this->url, 'init.php patched with Debug Helpers');
     }
 
     protected function patchInit()
@@ -273,6 +273,6 @@ eof;
             file_put_contents($init, $content);
         }
 
-        Output::i()->redirect($this->url->csrf(), 'init.php patched');
+        Output::i()->redirect($this->url, 'init.php patched');
     }
 }

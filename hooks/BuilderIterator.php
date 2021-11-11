@@ -36,7 +36,7 @@ class toolbox_hook_BuilderIterator extends _HOOK_CLASS_
                 ) === false || mb_strpos($file, 'vendor') === false) && $path->getExtension() === 'php') {
                     $temporary = tempnam(TEMP_DIRECTORY, 'IPS');
                     if (mb_strpos($path->getPath(), 'hooks') !== false) {
-                        $contents = Plugin::addExceptionHandlingToHookFile($file); 
+                        $contents = Plugin::addExceptionHandlingToHookFile($file);
                     } else {
                         $contents = file_get_contents($file);
                     }
