@@ -114,7 +114,7 @@ class _toolbox
                 'tab'         => 'DevTools',
 
             ],
-            'DT_DISABLE_SERVICE_WORKERS' => [
+            'DT_DISABLE_SERVICE_WORKERS'      => [
                 'name'        => 'DT_DISABLE_SERVICE_WORKERS',
                 'default'     => 0,
                 'current'     => defined('\DT_DISABLE_SERVICE_WORKERS') ? DT_DISABLE_SERVICE_WORKERS : false,
@@ -122,6 +122,14 @@ class _toolbox
                 'type'        => 'boolean',
                 'tab'         => 'DevTools',
 
+            ],
+            'DT_ROUTE_TO_DEBUG'               => [
+                'name'        => 'DT_ROUTE_TO_DEBUG',
+                'default'     => 0,
+                'current'     => defined('\DT_ROUTE_TO_DEBUG') ? DT_ROUTE_TO_DEBUG : false,
+                'description' => 'Pushes IPS logs to the profiler debugger.',
+                'type'        => 'boolean',
+                'tab'         => 'DevTools'
             ]
         ];
     }
