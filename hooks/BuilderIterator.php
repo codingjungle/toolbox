@@ -34,30 +34,30 @@ class toolbox_hook_BuilderIterator extends _HOOK_CLASS_
                     $file,
                     '3rd_party'
                 ) === false || mb_strpos($file, 'vendor') === false) && $path->getExtension() === 'php') {
-                    $temporary = tempnam(TEMP_DIRECTORY, 'IPS');
-                    if (mb_strpos($path->getPath(), 'hooks') !== false) {
-                        $contents = Plugin::addExceptionHandlingToHookFile($file);
-                    } else {
-                        $contents = file_get_contents($file);
+            $temporary = tempnam(TEMP_DIRECTORY, 'IPS');
+            if (mb_strpos($path->getPath(), 'hooks') !== false) {
+                $contents = Plugin::addExceptionHandlingToHookFile($file);
+            } else {
+                $contents = file_get_contents($file);
+            }
+            if (\IPS\toolbox\DevCenter\Headerdoc::i()->can($this->application)) {
+                /* @var Headerdoc $class */
+                foreach ($this->application->extensions('toolbox', 'Headerdoc', true) as $class) {
+                    if (method_exists($class, 'finalize')) {
+                        $contents = $class->finalize($contents, $this->application);
                     }
-                    if (\IPS\toolbox\DevCenter\Headerdoc::i()->can($this->application)) {
-                        /* @var Headerdoc $class */
-                        foreach ($this->application->extensions('toolbox', 'Headerdoc', true) as $class) {
-                            if (method_exists($class, 'finalize')) {
-                                $contents = $class->finalize($contents, $this->application);
-                            }
-                        }
-                    }
-                    file_put_contents($temporary, $contents);
-                    register_shutdown_function(
-                        function ($temporary) {
-                            unlink($temporary);
-                        },
-                        $temporary
-                    );
-
-                    return $temporary;
                 }
+            }
+            file_put_contents($temporary, $contents);
+            register_shutdown_function(
+                function ($temporary) {
+                    unlink($temporary);
+                },
+                $temporary
+            );
+
+            return $temporary;
+        }
 
         return $file;
     }

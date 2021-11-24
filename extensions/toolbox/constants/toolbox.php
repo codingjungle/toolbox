@@ -16,6 +16,7 @@ namespace IPS\toolbox\extensions\toolbox\constants;
 use function defined;
 use function header;
 
+use const DT_ROUTE_TO_DEBUG;
 use const DT_THEME;
 use const DT_THEME_CMS_USE_DESIGNER_FILES;
 use const DT_THEME_ID;
@@ -128,6 +129,14 @@ class _toolbox
                 'default'     => 0,
                 'current'     => defined('\DT_ROUTE_TO_DEBUG') ? DT_ROUTE_TO_DEBUG : false,
                 'description' => 'Pushes IPS logs to the profiler debugger.',
+                'type'        => 'boolean',
+                'tab'         => 'DevTools'
+            ],
+            'DT_ANALYZE'               => [
+                'name'        => 'DT_ANALYZE',
+                'default'     => 0,
+                'current'     => defined('\DT_ANALYZE') ? DT_ANALYZE : false,
+                'description' => 'Runs code analyzer on export of app.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools'
             ]

@@ -277,7 +277,7 @@ class _Headerdoc extends Singleton
                     [
                         $brief,
                         $subpackage,
-                        $since,
+                        $since
                     ],
                     $replacement
                 );
