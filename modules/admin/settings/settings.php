@@ -36,6 +36,7 @@ use function str_replace;
 
 use const DIRECTORY_SEPARATOR;
 use const IPS\NO_WRITES;
+use const IPS\SITE_FILES_PATH;
 
 
 \IPS\toolbox\Application::loadAutoLoader();
@@ -217,16 +218,23 @@ class IPS extends \IPS\IPSBU {
             if (!\is_dir($path)) {
                 \mkdir($path, 0777, true);
             }
-
+            $rpath = ROOT_PATH;
+            if ( \IPS\CIC2 AND static::isThirdParty( $data['file'] ) )
+            {
+                $rpath = SITE_FILES_PATH;
+            }
+            
             $vendor = ROOT_PATH.'/applications/toolbox/sources/vendor/autoload.php';
             require $vendor;
 
             foreach (self::$hooks[ "\\{$namespace}\\{$finalClass}" ] as $id => $data) {
-                $mtime = filemtime( ROOT_PATH . '/' . $data[ 'file' ] );
+                $mtime = filemtime( $rpath . '/' . $data[ 'file' ] );
                 $name = \str_replace(["\\", '/'], '_', $namespace . $realClass . $finalClass . $data[ 'file' ]);
                 $filename = $name.'_' . $mtime . '.php';
                 
-                if (!file_exists( $path.$filename) && \file_exists(ROOT_PATH . '/' . $data[ 'file' ])) {
+                if (!file_exists( $path.$filename) && \file_exists($rpath . '/' . $data[ 'file' ]))
+                {
+
                     $fs = new \Symfony\Component\Filesystem\Filesystem();
                     $finder = new \Symfony\Component\Finder\Finder();
                     $finder->in( $path )->files()->name($name.'*.php');
@@ -235,7 +243,7 @@ class IPS extends \IPS\IPSBU {
                         $fs->remove($f->getRealPath());
                     }
                     
-                    $content = file_get_contents(ROOT_PATH . '/' . $data[ 'file' ]);
+                    $content = file_get_contents($rpath . '/' . $data[ 'file' ]);
                     $content = preg_replace('#\b(?<![\'|"])_HOOK_CLASS_\b#', $realClass, $content);
                     $content = preg_replace( '#\b(?<![\'|"])_HOOK_CLASS_'.$data['class'].'\b#', $realClass, $content);
                     $contents = "namespace {$namespace}; " . $content;
@@ -243,7 +251,10 @@ class IPS extends \IPS\IPSBU {
                         \file_put_contents($path . $filename, "<?php\n\n" . $contents);
                     }
                 }
-
+                if( static::isThirdParty( $data['file'] ) and \IPS\Dispatcher::hasInstance() )
+                {
+                    \IPS\Dispatcher::i()->loadedHooks[] = $data['file'];
+                }
                 require_once $path . $filename;
                 $realClass = $data[ 'class' ];
             }

@@ -35,10 +35,6 @@
         "type": "C",
         "class": "\\IPS\\Helpers\\Table\\Custom"
     },
-    "Dispatcher": {
-        "type": "C",
-        "class": "\\IPS\\Dispatcher"
-    },
     "Request": {
         "type": "C",
         "class": "\\IPS\\Request"
@@ -126,5 +122,9 @@
     "serviceworker": {
         "type": "C",
         "class": "\\IPS\\core\\modules\\front\\system\\serviceworker"
+    },
+    "dispatcherStandard": {
+        "type": "C",
+        "class": "\\IPS\\Dispatcher\\Standard"
     }
 }

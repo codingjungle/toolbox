@@ -43,10 +43,10 @@ class _toolbox
     public function getConstants()
     {
         return [
-            'DTBUILD'                         => [
+            'DT_ANALYZE'                         => [
                 'name'        => 'DT_ANALYZE',
                 'default'     => false,
-                'current'     => defined('\DT_ANALYZE') ? DTBUILD : null,
+                'current'     => defined('\DT_ANALYZE') ? DT_ANALYZE : null,
                 'description' => 'This enables an app to be analyzed before you download it.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools',
