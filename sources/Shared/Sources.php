@@ -64,10 +64,6 @@ trait Sources
         Output::i()->breadcrumb[] = [null, $title];
         Output::i()->title = $pageTitle;
 
-        //        $form = $this->elements->form->customTemplate( [
-        //            call_user_func( [ Theme::i(), 'getTemplate' ], 'forms', 'core', 'front' ),
-        //            'popupTemplate',
-        //        ] );
         Output::i()->output = $this->elements->form;
     }
 
@@ -78,7 +74,7 @@ trait Sources
         $url = Url::internal(
             'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
         );
-        Output::i()->redirect($url->csrf(), 'Profiler Debug Class Generated');
+        Output::i()->redirect($url, 'Profiler Debug Class Generated');
     }
 
     protected function memory()
@@ -88,7 +84,7 @@ trait Sources
         $url = Url::internal(
             'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
         );
-        Output::i()->redirect($url->csrf(), 'Profiler Memory Class Generated');
+        Output::i()->redirect($url, 'Profiler Memory Class Generated');
     }
 
     protected function form()
@@ -132,6 +128,15 @@ trait Sources
         ];
 
         $this->doOutput($config, 'singleton', 'Singleton');
+    }
+
+    protected function member(){
+        $this->elements->type = 'Member';
+        $this->elements->generate();
+        $url = Url::internal(
+            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
+        );
+        Output::i()->redirect($url, 'Member Class Generated');
     }
 
     protected function ar()

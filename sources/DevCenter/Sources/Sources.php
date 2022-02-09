@@ -43,7 +43,9 @@ use IPS\Node\Ratings;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
+use IPS\toolbox\DevCenter\Sources\Generator\Elements;
 use IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract;
+use IPS\toolbox\DevCenter\Sources\SourceBuilderException;
 use IPS\toolbox\DevCenter\Sources\SourcesFormAbstract;
 use IPS\toolbox\Form;
 use IPS\toolbox\ReservedWords;
@@ -181,9 +183,10 @@ class _Sources
             'review',
             'debug',
             'memory',
-            //            'form',
+            'member',
+            'form',
         ];
-
+        $ignored =  ['memory', 'debug', 'form','member'];
         $dev = [
             'template',
             'widget',
@@ -193,7 +196,7 @@ class _Sources
             'jsmixin',
         ];
 
-        return Theme::i()->getTemplate('dtdpmenu', 'toolbox', 'admin')->menu($types, $dev, Request::i()->appKey);
+        return Theme::i()->getTemplate('dtdpmenu', 'toolbox', 'admin')->menu($types, $dev, Request::i()->appKey, 'sources', $ignored);
     }
 
     /**
@@ -231,50 +234,60 @@ class _Sources
         }
         /* @var GeneratorAbstract $class */
         $class = 'IPS\\toolbox\DevCenter\\Sources\\Generator\\';
+        $og = $class;
         $type = $this->type;
         $values['type'] = mb_ucfirst($type);
+        try {
         switch ($type) {
             case 'Memory':
             case 'Debug':
                 $class .= 'Profiler';
-                $values['dtdevplus_class_className'] = mb_ucfirst($type);
-                $values['dtdevplus_class_namespace'] = 'Profiler';
+                $values['className'] = mb_ucfirst($type);
+                $values['namespace'] = 'Profiler';
+                break;
+            case 'Member':
+                $class .= 'Member';
+                $values['className'] = 'Member';
+                $values['namespace'] = '';
+                $values['prefix'] = $this->application->directory.'_member';
+                $values['extends'] = Member::class;
+                $values['scaffolding_create'] = true;
+                $values['scaffolding_type'] = [ 'db' ];
                 break;
             case 'Form':
                 $class .= 'Form';
-                $values['dtdevplus_class_className'] = 'Form';
-                $values['dtdevplus_class_namespace'] = '';
+                $values['className'] = 'Form';
+                $values['namespace'] = '';
+                $values['extends'] = \IPS\Helpers\Form::class;
+                $vals = [
+                    'type' => 'Element',
+                    'className' => 'Element',
+                    'namespace' => 'Form',
+                ];
+                $eclass = new Elements($vals, $this->application);
+                $eclass->process();
                 break;
             default:
                 $class .= mb_ucfirst($type);
                 break;
         }
-        $class = new $class($values, $this->application);
-        $class->process();
 
-        if ($class->error) {
+            $class = new $class($values, $this->application);
+            $class->process();
+
             $msg = Member::loggedIn()->language()->addToStack(
-                'dtdevplus_class_db_error',
-                false,
-                [
-                    'sprintf' => [
-                        'type',
-                        $class->classname,
-                        $class->database,
+                    'dtdevplus_class_created',
+                    false,
+                    [
+                        'sprintf' => [
+                            $type,
+                            $class->classname,
                     ],
                 ]
             );
-        } else {
-            $msg = Member::loggedIn()->language()->addToStack(
-                'dtdevplus_class_created',
-                false,
-                [
-                    'sprintf' => [
-                        $type,
-                        $class->classname,
-                    ],
-                ]
-            );
+        }
+        catch(SourceBuilderException $e){
+            $msg = $e->getMessage();
         }
         $url = Url::internal('app=core&module=applications&controller=developer')->setQueryString(
             ['appKey' => $this->application->directory]

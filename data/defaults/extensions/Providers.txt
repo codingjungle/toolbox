@@ -1,6 +1,7 @@
 <?php
 
 namespace IPS\{app}\extensions\toolbox\Providers;
+use IPS\toolbox\Proxy\Generator\Writer;
 
 use IPS\toolbox\Shared\Providers;
 

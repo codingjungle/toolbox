@@ -18,7 +18,10 @@ use Generator\Builders\InterfaceGenerator;
 use Generator\Builders\TraitGenerator;
 use IPS\Application;
 use IPS\Log;
+use IPS\Member;
+use IPS\toolbox\DevCenter\Sources\SourceBuilderException;
 use IPS\toolbox\Profiler\Debug;
+use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\Shared\LanguageBuilder;
 use IPS\toolbox\Shared\Magic;
 use IPS\toolbox\Shared\ModuleBuilder;
@@ -27,6 +30,7 @@ use IPS\toolbox\Shared\Write;
 
 use RuntimeException;
 
+use function _p;
 use function array_merge;
 use function array_shift;
 use function count;
@@ -96,6 +100,7 @@ abstract class _GeneratorAbstract
         'Item',
         'Comment',
         'Review',
+        'Member'
     ];
 
     /**
@@ -165,7 +170,17 @@ abstract class _GeneratorAbstract
                 $this->{$key} = null;
             }
         }
+        if ($this->className !== null) {
+            $this->classname = mb_ucfirst($this->className);
+        } elseif ($this->interfaceName !== null) {
+            $this->classname = mb_ucfirst($this->interfaceName);
+        } elseif ($this->traitName !== null) {
+            $this->classname = mb_ucfirst($this->traitName);
+        } else {
+            $this->classname = 'Forms';
+        }
 
+        $this->classname_lower = mb_strtolower($this->classname);
         if (is_array($this->ips_traits)) {
             $this->traits = is_array($this->traits) ? array_merge($this->traits, $this->ips_traits) : $this->ips_traits;
         }
@@ -181,7 +196,10 @@ abstract class _GeneratorAbstract
         $this->app = $this->application->directory;
         $this->type = mb_ucfirst($this->type);
         if (in_array($this->type, static::$arDescendent, true)) {
-            if ($this->database === null) {
+            if($this->classname_lower === 'member'){
+                $this->database = $this->app.'_members';
+            }
+            elseif ($this->database === null) {
                 $this->database = $this->app . '_' . $this->classname_lower;
             } else {
                 $this->database = $this->app . '_' . $this->database;
@@ -189,11 +207,9 @@ abstract class _GeneratorAbstract
 
             $this->database = mb_strtolower($this->database);
         }
-
         if ($this->prefix !== null) {
             $this->prefix .= '_';
         }
-
         $this->db = new Database($this->database, $this->prefix);
 
         if (!in_array($this->type, ['Traits', 'Interfacing'], true)) {
@@ -203,25 +219,16 @@ abstract class _GeneratorAbstract
         } elseif ($this->type === 'Traits') {
             $this->generator = new TraitGenerator();
         }
+        $this->generator->addHeaderCatch();
+
     }
 
     /**
      * gathers all the info neeed to begin class building.
+     * @throws SourceBuilderException
      */
     final public function process(): void
     {
-        if ($this->className !== null) {
-            $this->classname = mb_ucfirst($this->className);
-        } elseif ($this->interfaceName !== null) {
-            $this->classname = mb_ucfirst($this->interfaceName);
-        } elseif ($this->traitName !== null) {
-            $this->classname = mb_ucfirst($this->traitName);
-        } else {
-            $this->classname = 'Forms';
-        }
-
-        $this->classname_lower = mb_strtolower($this->classname);
-
         if (!in_array($this->type, ['Traits', 'Interfacing'], true)) {
             $this->_classname = '_' . $this->classname;
         } else {
@@ -278,7 +285,7 @@ abstract class _GeneratorAbstract
             }
         }
 
-        $this->mixin = $this->classname;
+        $this->mixin = $this->namespace.'\\'.$this->classname;
 
         if ($this->type === 'Api') {
             $dir = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/api/';
@@ -287,6 +294,9 @@ abstract class _GeneratorAbstract
         }
         $file = $this->classname . '.php';
         $this->proxy = true;
+        if(file_exists($dir.'/'.$file)){
+            throw new SourceBuilderException('This class already exists: '.$dir.'/'.$file);
+        }
 
         if (!in_array($this->type, ['Interface', 'Traits'])) {
             $this->proxy = false;
@@ -317,11 +327,14 @@ abstract class _GeneratorAbstract
 
         try {
             $this->generator->save();
+            Proxyclass::i()->build($this->generator->pathFileName);
             if ($this->scaffolding_create && in_array($this->type, static::$arDescendent, false)) {
                 $this->_createRelation($file, $dir, $this->database);
                 if (is_array($this->scaffolding_type) && in_array('db', $this->scaffolding_type, false)) {
                     try {
-                        $this->db->add('bitwise');
+                        if($this->classname_lower !== 'member') {
+                            $this->db->add('bitwise');
+                        }
                         $this->db->createTable()->_buildSchemaFile($this->database, $this->application);
                     } catch (Exception $e) {
                         Log::log($e, 'Devplus database');
@@ -338,13 +351,35 @@ abstract class _GeneratorAbstract
                             $this->useImports
                         );
                     } catch (Exception $e) {
-                        //@todo maybe we should add a error class?
-                        $this->error = 1;
+                        $msg = Member::loggedIn()->language()->addToStack(
+                            'dtdevplus_class_db_error',
+                            false,
+                            [
+                                'sprintf' => [
+                                    'type',
+                                    $this->classname,
+                                    $this->database,
+                                ],
+                            ]
+                        );
+                        throw new SourceBuilderException($msg);
+
                     }
                 }
             }
         } catch (RuntimeException $e) {
-            $this->error = 1;
+            $msg = Member::loggedIn()->language()->addToStack(
+                'dtdevplus_class_db_error',
+                false,
+                [
+                    'sprintf' => [
+                        'type',
+                        $this->classname,
+                        $this->database,
+                    ],
+                ]
+            );
+            throw new SourceBuilderException($msg);
             Debug::log($e);
         }
     }
@@ -369,9 +404,21 @@ abstract class _GeneratorAbstract
                 'static'     => true,
             ]
         );
-
+        $document = [
+            '@brief	[ActiveRecord] Multiton Map',
+            '@var  array',
+        ];
+        $this->generator->addProperty(
+            'multitonMap',
+            [],
+            [
+                'visibility' => T_PROTECTED,
+                'document'   => $document,
+                'static'     => true,
+            ]
+        );
         //prefix
-        if ($this->prefix) {
+        if ($this->prefix && $this->classname_lower !== 'member') {
             $this->prefix = mb_strtolower($this->prefix);
             $document = [
                 '@brief [ActiveRecord] Database Prefix',
@@ -389,29 +436,30 @@ abstract class _GeneratorAbstract
             );
         }
 
-        //databaseTable
-        $document = [
-            '@brief [ActiveRecord] Database table',
-            '@var string',
-        ];
+        if($this->classname_lower !== 'member') {
+            //databaseTable
+            $document = [
+                '@brief [ActiveRecord] Database table',
+                '@var string',
+            ];
 
-        $this->generator->addProperty(
-            'databaseTable',
-            $this->database,
-            [
-                'visibility' => T_PUBLIC,
-                'document'   => $document,
-                'static'     => true,
-            ]
-        );
+            $this->generator->addProperty(
+                'databaseTable',
+                $this->database,
+                [
+                    'visibility' => T_PUBLIC,
+                    'document'   => $document,
+                    'static'     => true,
+                ]
+            );
 
-        //bitoptions
-        $document = [
-            '@brief [ActiveRecord] Bitwise Keys',
-            '@var array',
-        ];
+            //bitoptions
+            $document = [
+                '@brief [ActiveRecord] Bitwise Keys',
+                '@var array',
+            ];
 
-        $value = <<<EOF
+            $value = <<<EOF
 array(
         'bitwise' => array(
             'bitwise' => array()
@@ -419,16 +467,17 @@ array(
     )
 EOF;
 
-        $this->generator->addProperty(
-            'bitOptions',
-            $value,
-            [
-                'visibility' => T_PUBLIC,
-                'document'   => $document,
-                'static'     => true,
-                'type'       => 'array',
-            ]
-        );
+            $this->generator->addProperty(
+                'bitOptions',
+                $value,
+                [
+                    'visibility' => T_PUBLIC,
+                    'document'   => $document,
+                    'static'     => true,
+                    'type'       => 'array',
+                ]
+            );
+        }
     }
 
     /**
@@ -447,7 +496,6 @@ EOF;
         array_shift($namespace);
         array_shift($namespace);
         $namespace = implode('/', $namespace);
-
         if (empty($namespace)) {
             return $this->classname;
         }

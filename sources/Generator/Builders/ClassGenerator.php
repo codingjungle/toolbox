@@ -33,6 +33,7 @@ use function is_string;
 use function ltrim;
 use function mb_strpos;
 use function mb_strtolower;
+use function mb_substr;
 use function md5;
 use function rand;
 use function random_int;
@@ -351,7 +352,11 @@ EOF;
             $this->addImport($extends);
             $extends = array_pop($og);
         }
-
+        else{
+            if(mb_substr($extends,0,1) !== '\\'){
+                $extends = '\\'.$extends;
+            }
+        }
         $this->extends = $extends;
     }
 

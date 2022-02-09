@@ -41,92 +41,101 @@ trait ClassMethods
      * @var array
      */
     protected $methods = [];
-
+    protected $body = [];
+    public function addClassBody($body){
+        $this->body[] = $body;
+    }
     public function writeMethods()
     {
-        foreach ($this->methods as $name => $method) {
-            if (isset($this->removeMethods[$name])) {
-                continue;
-            }
-            $this->output("\n\n");
-            if ($method['document'] && is_array($method['document'])) {
-                $this->output($this->tab . "/**\n");
-                $last = false;
-                $returned = false;
+        if(empty($this->body) === false){
+            $this->output(implode("\n", $this->body));
+        }
 
-                foreach ($method['document'] as $item) {
-                    if (mb_strpos($item, '@return') === 0) {
-                        $this->output("{$this->tab}*\n");
-                        $returned = true;
-                    }
-                    $this->output("{$this->tab}* {$item}\n");
-
-                    if ($returned === false && mb_strpos($item, '@') === false) {
-                        $this->output("{$this->tab}*\n");
-                    }
+        if(empty($this->method) === false){
+            foreach ($this->methods as $name => $method) {
+                if (isset($this->removeMethods[$name])) {
+                    continue;
                 }
-                $this->output("{$this->tab}*/\n");
-            }
+                $this->output("\n\n");
+                if ($method['document'] && is_array($method['document'])) {
+                    $this->output($this->tab . "/**\n");
+                    $last = false;
+                    $returned = false;
 
-            $final = null;
-            $static = null;
-            $abstract = null;
+                    foreach ($method['document'] as $item) {
+                        if (mb_strpos($item, '@return') === 0) {
+                            $this->output("{$this->tab}*\n");
+                            $returned = true;
+                        }
+                        $this->output("{$this->tab}* {$item}\n");
 
-            if (isset($method['abstract']) && $method['abstract'] === true) {
-                $abstract = 'abstract ';
-            }
-            if (isset($method['final']) && $method['final'] === true) {
-                $final = 'final ';
-            }
+                        if ($returned === false && mb_strpos($item, '@') === false) {
+                            $this->output("{$this->tab}*\n");
+                        }
+                    }
+                    $this->output("{$this->tab}*/\n");
+                }
 
-            if (isset($method['static']) && $method['static'] === true) {
-                $static = ' static';
-            }
+                $final = null;
+                $static = null;
+                $abstract = null;
 
-            $visibility = $method['visibility'];
+                if (isset($method['abstract']) && $method['abstract'] === true) {
+                    $abstract = 'abstract ';
+                }
+                if (isset($method['final']) && $method['final'] === true) {
+                    $final = 'final ';
+                }
 
-            if ($visibility === T_PUBLIC) {
-                $visibility = 'public';
-            } else {
-                if ($visibility === T_PROTECTED) {
-                    $visibility = 'protected';
+                if (isset($method['static']) && $method['static'] === true) {
+                    $static = ' static';
+                }
+
+                $visibility = $method['visibility'];
+
+                if ($visibility === T_PUBLIC) {
+                    $visibility = 'public';
                 } else {
-                    if ($visibility === T_PRIVATE) {
-                        $visibility = 'private';
+                    if ($visibility === T_PROTECTED) {
+                        $visibility = 'protected';
+                    } else {
+                        if ($visibility === T_PRIVATE) {
+                            $visibility = 'private';
+                        }
                     }
                 }
-            }
 
-            $this->output($this->tab . $abstract . $final . $visibility . $static . ' function ' . $name . '(');
+                $this->output($this->tab . $abstract . $final . $visibility . $static . ' function ' . $name . '(');
 
-            if (empty($method['params']) !== true && is_array($method['params'])) {
-                $this->writeParams($method['params']);
-            }
-
-            $this->output(')');
-
-            if (isset($method['returnType']) && $method['returnType']) {
-                $this->output(': ' . $method['returnType']);
-            }
-
-            $body = $this->replaceMethods[$name] ?? trim($method['body']);
-            if ($abstract === null) {
-                $wrap = false;
-                if (mb_strpos($body, '{') !== 0) {
-                    $wrap = true;
+                if (empty($method['params']) !== true && is_array($method['params'])) {
+                    $this->writeParams($method['params']);
                 }
 
-                $this->output("{\n\n{$this->tab}{$this->tab}");
-                $this->output('' . $body . '');
-                $this->output("\n{$this->tab}}");
-            } else {
-                $this->output(";");
-            }
-            if (isset($this->afterMethod[$name])) {
-                $this->output("\n");
+                $this->output(')');
 
-                foreach ($this->afterMethod[$name] as $after) {
-                    $this->output($this->tab . $this->tab2space($after) . "\n");
+                if (isset($method['returnType']) && $method['returnType']) {
+                    $this->output(': ' . $method['returnType']);
+                }
+
+                $body = $this->replaceMethods[$name] ?? trim($method['body']);
+                if ($abstract === null) {
+                    $wrap = false;
+                    if (mb_strpos($body, '{') !== 0) {
+                        $wrap = true;
+                    }
+
+                    $this->output("{\n\n{$this->tab}{$this->tab}");
+                    $this->output('' . $body . '');
+                    $this->output("\n{$this->tab}}");
+                } else {
+                    $this->output(";");
+                }
+                if (isset($this->afterMethod[$name])) {
+                    $this->output("\n");
+
+                    foreach ($this->afterMethod[$name] as $after) {
+                        $this->output($this->tab . $this->tab2space($after) . "\n");
+                    }
                 }
             }
         }

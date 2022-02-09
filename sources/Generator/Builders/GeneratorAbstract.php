@@ -141,6 +141,10 @@ abstract class GeneratorAbstract
         }
     }
 
+    public function addClassComments($comment){
+        $this->classComment[] = $comment;
+    }
+
     public function getDocumentComment()
     {
         return $this->docComment;
@@ -274,17 +278,16 @@ EOF;
         $this->afterNameSpace();
         $this->toWrite .= '#generator_token_includes#';
         $this->toWrite .= '#generator_token_imports#';
+
         if ($this->headerCatch === true) {
             $headerCatch = <<<'EOF'
-
 if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
     header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
     exit;
 }
-
 EOF;
 
-            $this->output($headerCatch);
+            $this->output("\n\n".$headerCatch);
         }
     }
 
@@ -351,15 +354,15 @@ EOF;
 
         $this->toWrite = str_replace('#generator_token_includes#', $replacement, $this->toWrite);
     }
-
+    public $pathFileName;
     protected function saveFileName()
     {
         $name = $this->fileName;
         if ($name === null) {
             $name = $this->className;
         }
-
-        return $this->path . '/' . $name . '.php';
+        $this->pathFileName = $this->path.'/'.$name.'.php';
+        return $this->pathFileName;
     }
 
     public function addFileName(string $name)

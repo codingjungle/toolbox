@@ -152,7 +152,7 @@ trait Properties
                         }
                     }
                 }
-                $this->output($visibility . ' ');
+                $this->output($visibility);
                 if (isset($property['static']) && $property['static']) {
                     $this->output('static ');
                 }
