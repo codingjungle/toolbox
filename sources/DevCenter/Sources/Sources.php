@@ -185,8 +185,9 @@ class _Sources
             'memory',
             'member',
             'form',
+            'orm'
         ];
-        $ignored =  ['memory', 'debug', 'form','member'];
+        $ignored =  ['memory', 'debug', 'form','member','orm'];
         $dev = [
             'template',
             'widget',
@@ -266,6 +267,12 @@ class _Sources
                 ];
                 $eclass = new Elements($vals, $this->application);
                 $eclass->process();
+                break;
+            case 'Orm':
+                $class .= 'Orm';
+                $values['type'] = 'Traits';
+                $values['className'] = 'Orm';
+                $values['namespace'] = 'Traits';
                 break;
             default:
                 $class .= mb_ucfirst($type);
@@ -631,6 +638,13 @@ class _Sources
         $this->form->add('implements', 'stack')->validation([$this, 'implementsCheck']);
     }
 
+    protected function arTraits($traits){
+        $trait = '\\IPS\\'.$this->application->directory.'\\Traits\Orm';
+        if(trait_exists($trait)) {
+            return array_merge([$trait=>$trait], $traits);
+        }
+        return $traits;
+    }
     /**
      * traits tab for nodes
      */
@@ -641,6 +655,7 @@ class _Sources
             Colorize::class      => Colorize::class,
         ];
 
+        $traitsNode = $this->arTraits($traitsNode);
         $this->form->tab('traits');
         $this->form->add('ips_traits', 'checkboxset')->label('ips_traits_node')->options(['options' => $traitsNode]);
 
@@ -652,6 +667,16 @@ class _Sources
      */
     protected function elTraits()
     {
+        $trait = '\\IPS\\'.$this->application->directory.'\\Traits\Orm';
+
+        if($this->type === 'activerecord' && trait_exists($trait)) {
+            $traits = [];
+            $traits = $this->arTraits($traits);
+            $this->form->add('ips_traits', 'checkboxset')
+                       ->label('ips_traits_item')
+                       ->value([])
+                       ->options(['options' => $traits]);
+        }
         $this->form->add('traits', 'stack')->validation([$this, 'traitsCheck']);
     }
 
@@ -668,7 +693,7 @@ class _Sources
             Solvable::class   => Solvable::class,
             Statistics::class => Statistics::class
         ];
-
+        $traitsItems = $this->arTraits($traitsItems);
         $this->form->tab('traits');
         $this->form->add('ips_traits', 'checkboxset')
                    ->label('ips_traits_item')

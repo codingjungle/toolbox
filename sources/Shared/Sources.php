@@ -139,6 +139,15 @@ trait Sources
         Output::i()->redirect($url, 'Member Class Generated');
     }
 
+    protected function orm(){
+        $this->elements->type = 'Orm';
+        $this->elements->generate();
+        $url = Url::internal(
+            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
+        );
+        Output::i()->redirect($url, 'ORM Trait Generated');
+    }
+
     protected function ar()
     {
         $config = [

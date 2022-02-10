@@ -94,7 +94,7 @@ abstract class _GeneratorAbstract
      *
      * @var array
      */
-    protected static $arDescendent = [
+    public static $arDescendent = [
         'Activerecord',
         'Node',
         'Item',
@@ -285,15 +285,19 @@ abstract class _GeneratorAbstract
             }
         }
 
-        $this->mixin = $this->namespace.'\\'.$this->classname;
+        if (!in_array($this->type, ['Traits', 'Interfacing'], true)) {
+            $this->mixin = $this->namespace . '\\' . $this->classname;
+        }
 
         if ($this->type === 'Api') {
             $dir = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/api/';
         } else {
             $dir = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/sources/' . $this->_getDir();
         }
+
         $file = $this->classname . '.php';
         $this->proxy = true;
+
         if(file_exists($dir.'/'.$file)){
             throw new SourceBuilderException('This class already exists: '.$dir.'/'.$file);
         }
@@ -301,6 +305,7 @@ abstract class _GeneratorAbstract
         if (!in_array($this->type, ['Interface', 'Traits'])) {
             $this->proxy = false;
         }
+
         $this->generator->addPath($dir);
         $this->generator->addFileName($file);
         $this->generator->isProxy = $this->proxy;
@@ -316,7 +321,11 @@ abstract class _GeneratorAbstract
 
         $this->generator->addDocumentComment($doc);
         $this->generator->addDocumentComment([$this->classname . ' Class'], true);
-        $this->generator->addMixin($this->mixin);
+
+        if (!in_array($this->type, ['Traits', 'Interfacing'], true)) {
+            $this->generator->addMixin($this->mixin);
+        }
+
         $this->generator->addClassName($this->_classname);
         $this->generator->addFileName($this->classname);
         $this->generator->addNameSpace($this->namespace);
@@ -327,7 +336,11 @@ abstract class _GeneratorAbstract
 
         try {
             $this->generator->save();
-            Proxyclass::i()->build($this->generator->pathFileName);
+
+            if (!in_array($this->type, ['Traits', 'Interfacing'], true)) {
+                Proxyclass::i()->build($this->generator->pathFileName);
+            }
+
             if ($this->scaffolding_create && in_array($this->type, static::$arDescendent, false)) {
                 $this->_createRelation($file, $dir, $this->database);
                 if (is_array($this->scaffolding_type) && in_array('db', $this->scaffolding_type, false)) {

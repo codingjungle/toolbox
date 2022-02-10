@@ -67,7 +67,7 @@ trait Imports
             $hash = $class;
         }
         if ($this->checkForImportFunction($class) || $this->checkForImportFunction($alias)) {
-            throw new InvalidArgumentException('This function exist as a import!');
+            throw new InvalidArgumentException('This function exist as a import! '.$class);
         }
         $this->importsFunctions[$hash] = ['class' => $import, 'alias' => $alias];
     }
@@ -119,7 +119,6 @@ trait Imports
                 $return = '\\' . $return;
             }
         }
-
         return $return;
     }
 

@@ -39,6 +39,8 @@ class TraitGenerator extends GeneratorAbstract
      */
     protected $type;
 
+    protected $doImports = true;
+
     protected function writeBody()
     {
         $this->writeConst();
@@ -50,7 +52,7 @@ class TraitGenerator extends GeneratorAbstract
     public function writeSourceType()
     {
         $this->output("\ntrait {$this->className}");
-        $this->output("\n{");
+        $this->output("\n{\n");
     }
 
 }

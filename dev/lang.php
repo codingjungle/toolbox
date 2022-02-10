@@ -355,4 +355,5 @@ $lang = [
     'dtdevplus_class_member_alt_prefix_desc' => 'the prefix of your member table.',
     'dtdevplus_class_member_alt_id' => 'Table ID Field',
     'dtdevplus_class_member_alt_id_desc' => 'The ID field of your members table.',
+    'dtdevplus_menu_title_orm' => 'Orm',
 ];
