@@ -98,8 +98,10 @@ trait ModuleBuilder
 
                 $config = [
                     'name'   => 'nodeClass',
-                    'value'  => new PropertyValueGenerator('\\' . $namespace . '\\' . $classname . '::class',
-                        PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+                    'value'  => new PropertyValueGenerator(
+                        '\\' . $namespace . '\\' . $classname . '::class',
+                        PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE
+                    ),
                     'vis'    => 'protected',
                     'doc'    => $doc,
                     'static' => false,
@@ -121,8 +123,10 @@ trait ModuleBuilder
 
                 $config = [
                     'name'   => 'contentModel',
-                    'value'  => new PropertyValueGenerator('\\' . $namespace . '\\' . $classname . '::class',
-                        PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+                    'value'  => new PropertyValueGenerator(
+                        '\\' . $namespace . '\\' . $classname . '::class',
+                        PropertyValueGenerator::TYPE_CONSTANT, PropertyValueGenerator::OUTPUT_SINGLE_LINE
+                    ),
                     'vis'    => 'protected',
                     'doc'    => $doc,
                     'static' => true,
@@ -189,15 +193,19 @@ trait ModuleBuilder
             $restrictions[$module->key][$classname]["{$classLower}_manage"] = "{$classLower}_manage";
 
             try {
-                Application::writeJson(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json",
-                    $restrictions);
+                Application::writeJson(
+                    \IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json",
+                    $restrictions
+                );
             } catch (RuntimeException $e) {
             }
             $restriction = "{$classLower}_manage";
 
             try {
-                $methodDocBlock = new DocBlockGenerator('Get the database column which stores the club ID', null,
-                    [new ReturnTag(['dataType' => 'string'])]);
+                $methodDocBlock = new DocBlockGenerator(
+                    'Get the database column which stores the club ID', null,
+                    [new ReturnTag(['dataType' => 'string'])]
+                );
                 $restrict = $restriction ? '\IPS\Dispatcher::i()->checkAcpPermission( \'' . $restriction . '\' );' : null;
                 $methods[] = MethodGenerator::fromArray([
                     'name'     => 'execute',
@@ -245,8 +253,11 @@ trait ModuleBuilder
         //        }
         //        catch( \Exception $e){}
 
-        $this->_addToLangs('menu__' . $application->directory . '_' . $module->key . '_' . $module->key, $module->key,
-            $application);
+        $this->_addToLangs(
+            'menu__' . $application->directory . '_' . $module->key . '_' . $module->key,
+            $module->key,
+            $application
+        );
 
         if ($location === 'admin') {
             /* Add to the menu */
@@ -264,8 +275,10 @@ trait ModuleBuilder
             ];
 
             try {
-                Application::writeJson(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/acpmenu.json",
-                    $menu);
+                Application::writeJson(
+                    \IPS\ROOT_PATH . "/applications/{$application->directory}/data/acpmenu.json",
+                    $menu
+                );
             } catch (RuntimeException $e) {
             }
         }

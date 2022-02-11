@@ -25,7 +25,6 @@ use IPS\Request;
 use IPS\Session;
 use IPS\Theme;
 use IPS\toolbox\Form\Element;
-
 use UnexpectedValueException;
 
 use function array_merge;
@@ -40,9 +39,6 @@ use function mb_strtolower;
 use function mb_substr;
 use function property_exists;
 use function sha1;
-
-use function header;
-
 
 
 /**
@@ -260,7 +256,7 @@ class _Form
             null,
             'ipsButton ipsButton_primary',
             [
-                'tabindex'  => '2',
+                'tabindex' => '2',
                 'accesskey' => 's',
             ]
         );

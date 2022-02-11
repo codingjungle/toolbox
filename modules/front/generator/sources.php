@@ -23,7 +23,6 @@ use IPS\Theme;
 use IPS\toolbox\DevCenter\Sources;
 
 use function defined;
-
 use function header;
 
 

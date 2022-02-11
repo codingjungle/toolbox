@@ -13,7 +13,6 @@
 namespace IPS\toolbox\Proxy\Helpers;
 
 use IPS\Application;
-
 use IPS\toolbox\Proxy\extensions\toolbox\Proxy\ProxyHelpers\ProxyHelpers;
 
 use function defined;

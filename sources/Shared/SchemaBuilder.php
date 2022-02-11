@@ -60,8 +60,11 @@ trait SchemaBuilder
             $definition = Db::i()->getTableDefinition($table);
 
             if (!is_dir($path . 'setup/upg_working/')) {
-                if (!mkdir($path . 'setup/upg_working', IPS_FOLDER_PERMISSION,
-                        true) && !is_dir($path . 'setup/upg_working')) {
+                if (!mkdir(
+                        $path . 'setup/upg_working',
+                        IPS_FOLDER_PERMISSION,
+                        true
+                    ) && !is_dir($path . 'setup/upg_working')) {
                     throw new RuntimeException(sprintf('Directory "%s" was not created', $path . 'setup/upg_working'));
                 }
                 chmod($path . 'setup/upg_working/', IPS_FOLDER_PERMISSION);

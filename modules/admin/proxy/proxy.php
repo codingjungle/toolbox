@@ -43,6 +43,7 @@ class _proxy extends Controller
      * @brief    Has been CSRF-protected
      */
     public static $csrfProtected = true;
+
     /**
      * Execute
      *

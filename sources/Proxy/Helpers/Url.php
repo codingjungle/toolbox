@@ -49,16 +49,16 @@ class _Url implements HelpersAbstract
         try {
             $body[] = MethodGenerator::fromArray(
                 [
-                    'name'       => 'request',
+                    'name' => 'request',
                     'parameters' => [
                         new ParameterGenerator('timeout', null, 'null', 0),
                         new ParameterGenerator('httpVersion', null, 'null', 1),
                         new ParameterGenerator('followRedirects', null, 'null', 2),
                         new ParameterGenerator('skipLocalhostRedirects', null, 'null', 4),
                     ],
-                    'body'       => 'return parent::request(... func_get_arguments());',
-                    'docblock'   => $methodDocBlock,
-                    'static'     => false,
+                    'body' => 'return parent::request(... func_get_arguments());',
+                    'docblock' => $methodDocBlock,
+                    'static' => false,
                 ]
             );
         } catch (InvalidArgumentException $e) {

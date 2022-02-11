@@ -42,6 +42,7 @@ use Symfony\Component\Finder\Finder;
 use Zend\Code\Generator\ClassGenerator;
 
 use function array_keys;
+use function array_merge;
 use function asort;
 use function chmod;
 use function count;
@@ -666,11 +667,11 @@ class _Proxyclass extends Singleton
             'GraphQL',
         ];
 
-        $exd = \IPS\ROOT_PATH.'/excluded.php';
-        if(file_exists($exd)){
+        $exd = \IPS\ROOT_PATH . '/excluded.php';
+        if (file_exists($exd)) {
             require $exd;
-            if(isset($excludeFolders)) {
-                $return = \array_merge($return, $excludeFolders);
+            if (isset($excludeFolders)) {
+                $return = array_merge($return, $excludeFolders);
             }
         }
         return $return;
@@ -701,11 +702,11 @@ class _Proxyclass extends Singleton
             'system/Output/System/Output.php'
         ];
 
-        $exf = \IPS\ROOT_PATH.'/excluded.php';
-        if(file_exists($exf)){
+        $exf = \IPS\ROOT_PATH . '/excluded.php';
+        if (file_exists($exf)) {
             require $exf;
-            if(isset($excludeFiles)) {
-                $return = \array_merge($return, $excludeFiles);
+            if (isset($excludeFiles)) {
+                $return = array_merge($return, $excludeFiles);
             }
         }
 

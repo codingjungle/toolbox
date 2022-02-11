@@ -23,9 +23,6 @@ use function is_array;
 use function mb_strtolower;
 use function property_exists;
 
-use function header;
-
-
 
 /**
  * Class _Element

@@ -12,7 +12,6 @@
 
 namespace IPS\toolbox\Proxy\Helpers;
 
-use Zend\Code\Generator\DocBlock\Tag\AbstractTypeableTag;
 use Zend\Code\Generator\DocBlock\Tag\ParamTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
@@ -20,7 +19,6 @@ use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\ParameterGenerator;
 use Zend\Code\Generator\PropertyGenerator;
-
 use Zend\Code\Generator\ValueGenerator;
 
 use function defined;
@@ -69,7 +67,12 @@ class _ActiveRecord implements HelpersAbstract
                     'parameters' => [
                         new ParameterGenerator('id', null, null, 0),
                         new ParameterGenerator('idField', null, new ValueGenerator(null, ValueGenerator::TYPE_NULL), 1),
-                        new ParameterGenerator('extraWhereClause', null, new ValueGenerator(null, ValueGenerator::TYPE_NULL), 2),
+                        new ParameterGenerator(
+                            'extraWhereClause',
+                            null,
+                            new ValueGenerator(null, ValueGenerator::TYPE_NULL),
+                            2
+                        ),
                     ],
                     'body'       => 'return parent::load($id,$idField,$extraWhereClause);',
                     'docblock'   => $methodDocBlock,
@@ -82,19 +85,23 @@ class _ActiveRecord implements HelpersAbstract
         try {
             $methodDocBlock = new DocBlockGenerator(
                 'Construct ActiveRecord from database row', null, [
-                                 new ParamTag('data', 'array'),
-                                 new ParamTag('updateMultitonStoreIfExists', 'bool'),
-                                 new ReturnTag('static')
+                    new ParamTag('data', 'array'),
+                    new ParamTag('updateMultitonStoreIfExists', 'bool'),
+                    new ReturnTag('static')
 
-                             ]
+                ]
             );
             $body[] = MethodGenerator::fromArray(
                 [
                     'name'       => 'constructFromData',
                     'parameters' => [
                         new ParameterGenerator('data', null, null, 0),
-                        new ParameterGenerator('updateMultitonStoreIfExists', null, new ValueGenerator(false,
-                            ValueGenerator::TYPE_BOOL), 1)
+                        new ParameterGenerator(
+                            'updateMultitonStoreIfExists', null, new ValueGenerator(
+                            false,
+                            ValueGenerator::TYPE_BOOL
+                        ), 1
+                        )
                     ],
                     'body'       => 'return parent::constructFromData($data,$updateMultitonStoreIfExists);',
                     'docblock'   => $methodDocBlock,

@@ -11,12 +11,13 @@
 
 namespace IPS\toolbox\Proxy\Generator;
 
+use Closure;
 use Exception;
 use IPS\Data\Store;
 use IPS\IPS;
 use IPS\Patterns\ActiveRecord;
-use IPS\Patterns\Bitwise;
 use IPS\Settings;
+use IPS\Theme;
 use IPS\toolbox\Application;
 use IPS\toolbox\Generator\DTClassGenerator;
 use IPS\toolbox\Generator\DTFileGenerator;
@@ -29,9 +30,7 @@ use IPS\Xml\_XMLReader;
 use ParseError;
 use ReflectionClass;
 use Zend\Code\Generator\ClassGenerator;
-use Zend\Code\Generator\DocBlock\Tag\AbstractTypeableTag;
 use Zend\Code\Generator\DocBlock\Tag\GenericTag;
-use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlock\Tag\VarTag;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;
@@ -48,6 +47,7 @@ use function defined;
 use function explode;
 use function file_exists;
 use function file_get_contents;
+use function file_put_contents;
 use function function_exists;
 use function header;
 use function implode;
@@ -68,6 +68,8 @@ use function preg_match_all;
 use function preg_replace_callback;
 use function property_exists;
 use function str_replace;
+use function strlen;
+use function substr;
 use function trim;
 use function var_export;
 
@@ -149,12 +151,12 @@ class _Proxy extends GeneratorAbstract
 
                 $codes = Store::i()->dt_error_codes ?? [];
                 $altCodes = Store::i()->dt_error_codes2 ?? [];
-                $lines = preg_split("/\n|\r\n|\n/",   $content );
+                $lines = preg_split("/\n|\r\n|\n/", $content);
                 $line = 1;
-                foreach($lines as $cline){
+                foreach ($lines as $cline) {
                     preg_replace_callback(
                         '#[0-9]{1}([a-zA-Z]{1,})[0-9]{1,}/[a-zA-Z0-9]{1,}#msu',
-                        static function ($m) use (&$codes,&$altCodes,$app,$originalFilePath,$line) {
+                        static function ($m) use (&$codes, &$altCodes, $app, $originalFilePath, $line) {
                             if (!isset($m[1])) {
                                 return;
                             }
@@ -162,11 +164,12 @@ class _Proxy extends GeneratorAbstract
                             $codes[] = $c;
                             $altCodes[$c][] = [
                                 'path' => $originalFilePath,
-                                'app' => $app,
+                                'app'  => $app,
                                 'line' => $line
                             ];
                         },
-                        trim($cline));
+                        trim($cline)
+                    );
                     $line++;
                 }
 
@@ -263,9 +266,9 @@ class _Proxy extends GeneratorAbstract
                                 if (is_array($bt)) {
                                     foreach ($bt as $key => $value) {
                                         foreach ($value as $k => $v) {
-                                            $tags = 'array $' . $k . ' =['.PHP_EOL;
-                                            foreach($v as $keyed => $vvv){
-                                                    $tags .= "'" . $keyed . "'" . ' => (bool),'.PHP_EOL;
+                                            $tags = 'array $' . $k . ' =[' . PHP_EOL;
+                                            foreach ($v as $keyed => $vvv) {
+                                                $tags .= "'" . $keyed . "'" . ' => (bool),' . PHP_EOL;
                                             }
                                             $tags .= ']' . PHP_EOL;
                                             $deepAssoc[$k] = $tags;
@@ -325,15 +328,15 @@ class _Proxy extends GeneratorAbstract
                                 unset($classDefinition[$k]);
                                 try {
                                     $tags = $vs;
-                                    if(\is_array($vs)){
-                                        $tags = 'array $'.$k.' = [';
-                                        foreach($vs as $kk => $v){
-                                            $tags .= "'".$kk."'" .' => '.$v.','.PHP_EOL;
+                                    if (is_array($vs)) {
+                                        $tags = 'array $' . $k . ' = [';
+                                        foreach ($vs as $kk => $v) {
+                                            $tags .= "'" . $kk . "'" . ' => ' . $v . ',' . PHP_EOL;
                                         }
-                                        $tags .= ']'.PHP_EOL;
+                                        $tags .= ']' . PHP_EOL;
                                     }
                                     $propertyDocBlock = new DocBlockGenerator(
-                                        'Deep-assoc-completion: '.$k, null, [new VarTag($k, $tags)]
+                                        'Deep-assoc-completion: ' . $k, null, [new VarTag($k, $tags)]
                                     );
                                     $body[] = PropertyGenerator::fromArray(
                                         [
@@ -349,7 +352,6 @@ class _Proxy extends GeneratorAbstract
                             }
                         }
                         $classBlock = $this->buildClassDoc($classDefinition);
-
                     }
                     if (empty($body) === false) {
                         $newMethods = [];
@@ -395,7 +397,7 @@ class _Proxy extends GeneratorAbstract
      *
      * @return void
      */
-    protected function buildHead($name, $def, &$classDefinition,&$deepAssoc)
+    protected function buildHead($name, $def, &$classDefinition, &$deepAssoc)
     {
         $ints = [
             'TINYINT',
@@ -427,9 +429,9 @@ class _Proxy extends GeneratorAbstract
         }
 
         $classDefinition[$name] = ['pt' => 'p', 'prop' => $name, 'type' => $type, 'comment' => $comment];
-        $check = str_replace('|null','',$type);
+        $check = str_replace('|null', '', $type);
 
-        $deepAssoc['_data'][$name] = '('.$check.')';
+        $deepAssoc['_data'][$name] = '(' . $check . ')';
     }
 
     /**
@@ -438,7 +440,7 @@ class _Proxy extends GeneratorAbstract
      * @param $class
      * @param $classDefinition
      */
-    public function buildProperty($class, &$classDefinition,&$deepAssoc)
+    public function buildProperty($class, &$classDefinition, &$deepAssoc)
     {
         try {
             $data = [];
@@ -471,7 +473,7 @@ class _Proxy extends GeneratorAbstract
                             preg_match_all('#@return([^\n]+)?#', $doc, $match);
 
                             if (isset($match[1][0])) {
-                                $match = array_filter(explode(' ', str_replace(["\t"],['    '],$match[1][0])));
+                                $match = array_filter(explode(' ', str_replace(["\t"], ['    '], $match[1][0])));
                                 $mtype = trim(array_shift($match));
                                 if (is_array($match) && count($match)) {
                                     $comment = implode(' ', $match);
@@ -479,7 +481,6 @@ class _Proxy extends GeneratorAbstract
 
                                 $return = $mtype;
                             }
-
                         }
 
                         if (isset($data[$key])) {
@@ -487,11 +488,11 @@ class _Proxy extends GeneratorAbstract
                                 $return = $data[$key]['type'];
                             }
                         }
-                        if(mb_substr($return,0,1) === '?') {
+                        if (mb_substr($return, 0, 1) === '?') {
                             $return = str_replace(['?'], ['\\'], $return);
                             $return .= '|null';
                         }
-                        if(isset($data[$key]) && $type === 'set_'){
+                        if (isset($data[$key]) && $type === 'set_') {
                             $return = $data[$key]['type'];
                         }
                         $data[$key] = [
@@ -503,14 +504,13 @@ class _Proxy extends GeneratorAbstract
                     }
                 }
                 foreach ($data as $prop => $value) {
-                    if(isset($classDefinition[$prop])){
+                    if (isset($classDefinition[$prop])) {
                         $tt = $value['type'];
-                        $check = str_replace('|null','',$tt);
-                        if(class_exists($check)){
-                            $check = 'new '.$check;
-                        }
-                        else{
-                            $check = '('.$check.')';
+                        $check = str_replace('|null', '', $tt);
+                        if (class_exists($check)) {
+                            $check = 'new ' . $check;
+                        } else {
+                            $check = '(' . $check . ')';
                         }
                         $deepAssoc['_data'][$prop] = $check;
                     }
@@ -518,7 +518,7 @@ class _Proxy extends GeneratorAbstract
                 }
             }
         } catch (Exception $e) {
-           Debug::add( 'buildProperty', $e );
+            Debug::add('buildProperty', $e);
         }
     }
 
@@ -551,10 +551,9 @@ class _Proxy extends GeneratorAbstract
             if (isset($this->helperClasses[$class]) && is_array($this->helperClasses[$class])) {
                 /* @var HelpersAbstract $helperClass */
                 foreach ($this->helperClasses[$class] as $helper) {
-                    if( $helper instanceof \Closure){
-                        $helper($class,$classDoc,$classExtends,$body);
-                    }
-                    else {
+                    if ($helper instanceof Closure) {
+                        $helper($class, $classDoc, $classExtends, $body);
+                    } else {
                         $helperClass = new $helper();
                         $helperClass->process($class, $classDoc, $classExtends, $body);
                     }
@@ -645,22 +644,22 @@ class _Proxy extends GeneratorAbstract
             $file->setFilename($this->save . '/IPS_Settings.php');
             $file->write();
 
-            if (method_exists(\IPS\Theme::i(), 'get_css_vars')) {
-                $output = array();
+            if (method_exists(Theme::i(), 'get_css_vars')) {
+                $output = [];
 
-                foreach (\IPS\Theme::i()->settings as $key => $value) {
+                foreach (Theme::i()->settings as $key => $value) {
                     if (preg_match('/^#[0-9a-fA-F]{6}$/', $value)) {
                         $value = str_replace('#', '', $value);
-                        $rgb = array();
+                        $rgb = [];
 
-                        if (\strlen($value) === 3) {
-                            $rgb[] = hexdec(\substr($value, 0, 1) . \substr($value, 0, 1));
-                            $rgb[] = hexdec(\substr($value, 1, 1) . \substr($value, 1, 1));
-                            $rgb[] = hexdec(\substr($value, 2, 1) . \substr($value, 2, 1));
+                        if (strlen($value) === 3) {
+                            $rgb[] = hexdec(substr($value, 0, 1) . substr($value, 0, 1));
+                            $rgb[] = hexdec(substr($value, 1, 1) . substr($value, 1, 1));
+                            $rgb[] = hexdec(substr($value, 2, 1) . substr($value, 2, 1));
                         } else {
-                            $rgb[] = hexdec(\substr($value, 0, 2));
-                            $rgb[] = hexdec(\substr($value, 2, 2));
-                            $rgb[] = hexdec(\substr($value, 4, 2));
+                            $rgb[] = hexdec(substr($value, 0, 2));
+                            $rgb[] = hexdec(substr($value, 2, 2));
+                            $rgb[] = hexdec(substr($value, 4, 2));
                         }
 
                         $output[] = "\t--theme-" . $key . ": rgb(" . implode(', ', $rgb) . ");";
@@ -672,13 +671,12 @@ class _Proxy extends GeneratorAbstract
 {$css}
 }
 eof;
-                \file_put_contents($this->save . '/IPSVars.css', $body);
+                file_put_contents($this->save . '/IPSVars.css', $body);
                 $file2 = new DTFileGenerator();
                 $file2->setBody($body);
                 $file2->setFilename($this->save . '/IPSVars.css');
                 $file2->write();
             }
-
         } catch (Exception $e) {
         }
     }

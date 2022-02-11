@@ -130,7 +130,8 @@ trait Sources
         $this->doOutput($config, 'singleton', 'Singleton');
     }
 
-    protected function member(){
+    protected function member()
+    {
         $this->elements->type = 'Member';
         $this->elements->generate();
         $url = Url::internal(
@@ -139,7 +140,8 @@ trait Sources
         Output::i()->redirect($url, 'Member Class Generated');
     }
 
-    protected function orm(){
+    protected function orm()
+    {
         $this->elements->type = 'Orm';
         $this->elements->generate();
         $url = Url::internal(

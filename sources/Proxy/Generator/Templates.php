@@ -29,6 +29,7 @@ use function explode;
 use function function_exists;
 use function header;
 use function ksort;
+use function mb_strtolower;
 use function md5;
 use function rand;
 use function random_int;
@@ -37,8 +38,6 @@ use function time;
 use function trim;
 
 use const DIRECTORY_SEPARATOR;
-
-use function mb_strtolower;
 
 
 Application::loadAutoLoader();
@@ -142,8 +141,10 @@ class _Templates extends GeneratorAbstract
                 ];
 
                 if (!empty($template['params'])) {
-                    $rand = trim($template['method']) . random_int(1, 20000) . random_int(1,
-                            30000) . md5(time() + rand(1, 10000));
+                    $rand = trim($template['method']) . random_int(1, 20000) . random_int(
+                            1,
+                            30000
+                        ) . md5(time() + rand(1, 10000));
                     $fun = 'function ' . $rand . '( ' . $template['params'] . ' ) {}';
                     @eval($fun);
                     if (function_exists($rand)) {
@@ -164,7 +165,7 @@ class _Templates extends GeneratorAbstract
 
                                 try {
                                     $data['value'] = $param->getDefaultValue();
-                                } catch (Exception | ReflectionException $e) {
+                                } catch (Exception|ReflectionException $e) {
                                 }
 
                                 $newParams[$param->getPosition()] = $data;

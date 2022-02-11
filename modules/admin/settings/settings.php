@@ -31,12 +31,10 @@ use function header;
 use function is_file;
 use function preg_replace_callback;
 use function property_exists;
-
 use function str_replace;
 
 use const DIRECTORY_SEPARATOR;
 use const IPS\NO_WRITES;
-use const IPS\SITE_FILES_PATH;
 
 
 \IPS\toolbox\Application::loadAutoLoader();
@@ -57,6 +55,7 @@ class _settings extends Controller
      * @brief    Has been CSRF-protected
      */
     public static $csrfProtected = true;
+
     /**
      * Execute
      *

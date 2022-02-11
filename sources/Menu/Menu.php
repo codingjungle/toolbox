@@ -106,7 +106,9 @@ class _Menu extends Singleton
             $store['apps'][$apps->directory] = [
                 'id'   => $apps->directory,
                 'name' => '__app_' . $apps->directory,
-                'url'  => (string)Url::internal('app=core&module=applications&controller=developer&appKey=' . $apps->directory),
+                'url'  => (string)Url::internal(
+                    'app=core&module=applications&controller=developer&appKey=' . $apps->directory
+                ),
             ];
         }
 
@@ -117,7 +119,9 @@ class _Menu extends Singleton
             $store['plugins'][$plugin->name] = [
                 'id'   => $plugin->name,
                 'name' => $plugin->name,
-                'url'  => (string)Url::internal('app=core&module=applications&controller=plugins&do=developer&id=' . $plugin->id),
+                'url'  => (string)Url::internal(
+                    'app=core&module=applications&controller=plugins&do=developer&id=' . $plugin->id
+                ),
             ];
         }
 
@@ -186,11 +190,11 @@ class _Menu extends Singleton
             'name' => 'Plugins',
             'url'  => (string)Url::internal('app=core&module=applications&controller=plugins'),
         ];
-		$store['sys'][] = [
-			'id' => 'api',
-			'name' => 'API',
-			'url' => (string)Url::internal('app=core&module=applications&controller=api')
-		];
+        $store['sys'][] = [
+            'id'   => 'api',
+            'name' => 'API',
+            'url'  => (string)Url::internal('app=core&module=applications&controller=api')
+        ];
         $store['sys'][] = [
             'id'   => 'logs',
             'name' => 'Logs',

@@ -24,7 +24,6 @@ use function header;
 use function is_bool;
 use function is_numeric;
 use function json_decode;
-
 use function str_replace;
 
 

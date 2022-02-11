@@ -12,16 +12,13 @@
 
 namespace IPS\toolbox\Code;
 
-use InvalidArgumentException;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 use function defined;
 use function explode;
 use function header;
-use function preg_match_all;
-
 use function mb_strpos;
+use function preg_match_all;
 
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {

@@ -26,8 +26,6 @@ use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
-use IPS\toolbox\Code\_ParserAbstract;
-use IPS\toolbox\Code\_Settings;
 use IPS\toolbox\Code\Db;
 use IPS\toolbox\Code\ErrorCodes;
 use IPS\toolbox\Code\FileStorage;
@@ -35,7 +33,6 @@ use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
-use IPS\toolbox\Profiler\Debug;
 use OutOfRangeException;
 use RuntimeException;
 use UnexpectedValueException;
@@ -64,6 +61,7 @@ class _analyzer extends Controller
      * @brief    Has been CSRF-protected
      */
     public static $csrfProtected = true;
+
     /**
      * @inheritdoc
      * @throws RuntimeException
@@ -130,7 +128,7 @@ class _analyzer extends Controller
                 [
                     'do'          => 'queue',
                     'application' => Request::i()->application,
-                    'download' => Request::i()->download ?? 0
+                    'download'    => Request::i()->download ?? 0
                 ]
             ), function ($data) {
             $total = 10;
@@ -166,10 +164,10 @@ class _analyzer extends Controller
                     break;
                 case 3:
                     $errorsCodes = (new ErrorCodes($app))->check();
-                    if(empty($errorsCodes['warnings'])===false){
+                    if (empty($errorsCodes['warnings']) === false) {
                         $warnings['error_codes_ips'] = $errorsCodes['warnings'];
                     }
-                    if(empty($errorsCodes['dupes']) === false){
+                    if (empty($errorsCodes['dupes']) === false) {
                         $warnings['error_codes_dupes'] = $errorsCodes['dupes'];
                     }
                     $complete = 4;
@@ -223,8 +221,10 @@ class _analyzer extends Controller
                 $percent * $complete,
             ];
         }, function () {
-            $url = Url::internal('app=toolbox&module=code&controller=analyzer&do=results')->setQueryString(['application' => Request::i()->application,
-                                  'download' => Request::i()->download ?? 0]);
+            $url = Url::internal('app=toolbox&module=code&controller=analyzer&do=results')->setQueryString([
+                'application' => Request::i()->application,
+                'download'    => Request::i()->download ?? 0
+            ]);
             Output::i()->redirect($url, 'dtcode_analyzer_complete');
         }
         );
@@ -370,7 +370,8 @@ class _analyzer extends Controller
             Output::i()->output = Theme::i()->getTemplate('code')->final(
                 $output,
                 Request::i()->application,
-                Request::i()->download);
+                Request::i()->download
+            );
         }
     }
 }

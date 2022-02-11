@@ -20,8 +20,6 @@ use function array_merge;
 use function defined;
 use function header;
 
-use function _;
-
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 403 Forbidden');

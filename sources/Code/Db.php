@@ -17,18 +17,17 @@ use IPS\IPS;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
+use function array_shift;
 use function defined;
 use function header;
-use function str_replace;
-
-use const JSON_PRETTY_PRINT;
-
-use function array_shift;
 use function json_decode;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
+use function str_replace;
 use function trim;
+
+use const JSON_PRETTY_PRINT;
 
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {

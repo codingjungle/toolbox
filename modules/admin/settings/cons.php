@@ -39,6 +39,7 @@ class _cons extends Controller
      * @brief    Has been CSRF-protected
      */
     public static $csrfProtected = true;
+
     /**
      * @inheritdoc
      */
@@ -46,8 +47,10 @@ class _cons extends Controller
     {
         if (NO_WRITES === true) {
             Output::i()
-                  ->error('Altering constants.php with NO_WRITES enabled, isn\'t allowed. please disable and trying again',
-                      '100foo');
+                  ->error(
+                      'Altering constants.php with NO_WRITES enabled, isn\'t allowed. please disable and trying again',
+                      '100foo'
+                  );
         }
         Dispatcher::i()->checkAcpPermission('cons_manage');
         parent::execute();

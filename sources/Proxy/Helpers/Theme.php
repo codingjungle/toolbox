@@ -41,11 +41,11 @@ class _Theme implements HelpersAbstract
         try {
             $body[] = MethodGenerator::fromArray(
                 [
-                    'name'       => 'i',
+                    'name' => 'i',
                     'parameters' => [],
-                    'body'       => 'return parent::i();',
-                    'docblock'   => $methodDocBlock,
-                    'static'     => true,
+                    'body' => 'return parent::i();',
+                    'docblock' => $methodDocBlock,
+                    'static' => true,
                 ]
             );
         } catch (InvalidArgumentException $e) {

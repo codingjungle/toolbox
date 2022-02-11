@@ -46,13 +46,13 @@ class _Widget implements HelpersAbstract
         try {
             $body[] = MethodGenerator::fromArray(
                 [
-                    'name'       => 'template',
+                    'name' => 'template',
                     'parameters' => [
                         new ParameterGenerator('callback', null, null, 0),
                     ],
-                    'body'       => 'return parent::template(... func_get_arguments());',
-                    'docblock'   => $methodDocBlock,
-                    'static'     => false,
+                    'body' => 'return parent::template(... func_get_arguments());',
+                    'docblock' => $methodDocBlock,
+                    'static' => false,
                 ]
             );
         } catch (InvalidArgumentException $e) {

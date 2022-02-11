@@ -14,7 +14,6 @@ namespace IPS\toolbox\Shared;
 use InvalidArgumentException;
 use IPS\Db;
 use IPS\Patterns\ActiveRecordIterator;
-
 use UnderflowException;
 
 use function array_key_exists;

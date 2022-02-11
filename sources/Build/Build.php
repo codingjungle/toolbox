@@ -31,6 +31,8 @@ use function chmod;
 use function explode;
 use function is_dir;
 use function mkdir;
+use function preg_match;
+use function preg_replace_callback;
 use function sprintf;
 
 use const IPS\IPS_FOLDER_PERMISSION;
@@ -67,10 +69,10 @@ class _Build extends Singleton
             $newLong = 10000;
         }
         $reg = '#\sBeta\s(\d)#';
-        \preg_match($reg,$newShort,$match);
+        preg_match($reg, $newShort, $match);
         $beta = 1;
-        if(isset($match[1])){
-            $beta =$match[1] + 1;
+        if (isset($match[1])) {
+            $beta = $match[1] + 1;
         }
         $form = Form::create();
         $form->dummy('Previous Long Version', $newLong);
@@ -96,9 +98,9 @@ class _Build extends Singleton
         if ($values = $form->values()) {
             $long = $values['toolbox_long_version'];
             $short = $values['toolbox_short_version'];
-            $short = \preg_replace_callback($reg,function($m){
+            $short = preg_replace_callback($reg, function ($m) {
                 return '';
-            },$short);
+            }, $short);
             if (!$values['toolbox_beta'] && isset($values['toolbox_increment']) && $values['toolbox_increment']) {
                 $exploded = explode('.', $short);
                 $end = $exploded[2] ?? 0;

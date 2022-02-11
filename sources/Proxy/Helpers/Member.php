@@ -13,7 +13,6 @@
 namespace IPS\toolbox\Proxy\Helpers;
 
 use IPS\Lang;
-use Zend\Code\Generator\DocBlock\Tag\AbstractTypeableTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;

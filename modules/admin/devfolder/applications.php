@@ -18,14 +18,13 @@ use IPS\Dispatcher;
 use IPS\Dispatcher\Controller;
 use IPS\Helpers\MultipleRedirect;
 use IPS\Http\Url;
+use IPS\IPS;
 use IPS\Member;
 use IPS\Output;
 use IPS\Request;
-use IPS\toolbox\DevFolder\Applications;
 use IPS\toolbox\Application;
+use IPS\toolbox\DevFolder\Applications;
 use IPS\toolbox\Form;
-use IPS\IPS;
-
 use RuntimeException;
 
 use function defined;
@@ -47,6 +46,7 @@ class _applications extends Controller
      * @brief    Has been CSRF-protected
      */
     public static $csrfProtected = true;
+
     /**
      * @inheritdoc
      * @throws RuntimeException
@@ -55,8 +55,10 @@ class _applications extends Controller
     {
         if (NO_WRITES === true) {
             Output::i()
-                  ->error('Dev Folder generator can not be used for as NO_WRITES are enabled in constants.php.',
-                      '100foo');
+                  ->error(
+                      'Dev Folder generator can not be used for as NO_WRITES are enabled in constants.php.',
+                      '100foo'
+                  );
         }
         Dispatcher\Admin::i()->checkAcpPermission('apps_manage');
         if (!Application::appIsEnabled('toolbox')) {
@@ -134,7 +136,9 @@ class _applications extends Controller
                 }
             }
 
-            if (file_exists($folders) || ($folders2 && file_exists($folders2) && $folders = $folders2) || ($folders3 && file_exists($folders3) && $folders = $folders3)) {
+            if (file_exists($folders) || ($folders2 && file_exists(
+                        $folders2
+                    ) && $folders = $folders2) || ($folders3 && file_exists($folders3) && $folders = $folders3)) {
                 $lang = Member::loggedIn()
                               ->language()
                               ->addToStack('dtdevfolder_folder_exist', false, ['sprintf' => $folders]);
@@ -151,7 +155,7 @@ class _applications extends Controller
                 Output::i()->redirect($this->url->setQueryString(['do' => 'queue', 'appKey' => $app]));
             } else {
                 $return = (new Applications($app))->{$type}();
-                $msg = 'Dev Folder Generated: '. $langs[$type];
+                $msg = 'Dev Folder Generated: ' . $langs[$type];
                 Output::i()->redirect($this->url, $msg);
             }
         }
@@ -166,62 +170,67 @@ class _applications extends Controller
 
         $app = Request::i()->appKey;
 
-        Output::i()->output = new MultipleRedirect(Url::internal('app=toolbox&module=devfolder&controller=applications&do=queue&appKey=' . $app), static function ($data) {
-            $app = Request::i()->appKey;
-            $next = null;
-            $end = false;
-            $do = $data['next'] ?? 'language';
-            $done = 0;
+        Output::i()->output = new MultipleRedirect(
+            Url::internal('app=toolbox&module=devfolder&controller=applications&do=queue&appKey=' . $app),
+            static function ($data) {
+                $app = Request::i()->appKey;
+                $next = null;
+                $end = false;
+                $do = $data['next'] ?? 'language';
+                $done = 0;
 
-            switch ($do) {
-                case 'language':
-                    (new Applications($app))->language();
-                    $done = 25;
-                    $next = 'javascript';
-                    break;
-                case 'javascript':
-                    (new Applications($app))->javascript();
-                    $done = 50;
-                    $next = 'templates';
-                    break;
-                case 'templates':
-                    (new Applications($app))->templates();
-                    $done = 75;
-                    $next = 'email';
-                    break;
-                case 'email':
-                    (new Applications($app))->email();
-                    $done = 100;
-                    $next = 'default';
-                    break;
-                default:
-                    $end = true;
-                    break;
-            }
-
-            if ($end) {
-                if ($app === 'core') {
-                    (new Applications($app))->core();
+                switch ($do) {
+                    case 'language':
+                        (new Applications($app))->language();
+                        $done = 25;
+                        $next = 'javascript';
+                        break;
+                    case 'javascript':
+                        (new Applications($app))->javascript();
+                        $done = 50;
+                        $next = 'templates';
+                        break;
+                    case 'templates':
+                        (new Applications($app))->templates();
+                        $done = 75;
+                        $next = 'email';
+                        break;
+                    case 'email':
+                        (new Applications($app))->email();
+                        $done = 100;
+                        $next = 'default';
+                        break;
+                    default:
+                        $end = true;
+                        break;
                 }
 
-                return null;
+                if ($end) {
+                    if ($app === 'core') {
+                        (new Applications($app))->core();
+                    }
+
+                    return null;
+                }
+
+                $language = Member::loggedIn()->language()->addToStack('dtdevfolder_total_done', false, [
+                    'sprintf' => [
+                        $done,
+                        100,
+                    ],
+                ]);
+
+                return [['next' => $next], $language, $done];
+            },
+            static function () {
+                $app = Request::i()->appKey;
+                $app = Member::loggedIn()->language()->addToStack("__app_{$app}");
+                $msg = Member::loggedIn()->language()->addToStack('dtdevfolder_completed', false, ['sprintf' => [$app]]
+                );
+                $url = Url::internal('app=toolbox&module=devfolder&controller=applications');
+                /* And redirect back to the overview screen */
+                Output::i()->redirect($url, $msg);
             }
-
-            $language = Member::loggedIn()->language()->addToStack('dtdevfolder_total_done', false, [
-                'sprintf' => [
-                    $done,
-                    100,
-                ],
-            ]);
-
-            return [['next' => $next], $language, $done];
-        }, static function () {
-            $app = Request::i()->appKey;
-            $app = Member::loggedIn()->language()->addToStack("__app_{$app}");
-            $msg = Member::loggedIn()->language()->addToStack('dtdevfolder_completed', false, ['sprintf' => [$app]]);
-            $url = Url::internal('app=toolbox&module=devfolder&controller=applications');
-            /* And redirect back to the overview screen */
-            Output::i()->redirect($url, $msg);
-        });
+        );
     }
 }

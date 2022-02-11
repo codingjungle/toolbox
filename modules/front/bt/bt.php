@@ -60,9 +60,6 @@ use function time;
 use const IPS\NO_WRITES;
 use const IPS\ROOT_PATH;
 
-use function log;
-
-
 
 Application::loadAutoLoader();
 
