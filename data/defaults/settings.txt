@@ -1,0 +1,87 @@
+    /**
+     * @brief an array of settings that are json_encoded strings, to decode them
+     * @var array
+     * example: [ 'settings_key' => 1 ]
+     */
+    public const ARRAYS_OR_STRINGS = [];
+
+    /**
+     * @brief an array of settings that are object ids that get loaded as an object
+     * @var array
+     * example: [ 'settings_key' => ClassToLoad::class or \\IPS\\some\\class ]
+     */
+    public const OBJECTS = [];
+
+    /**
+     * @brief an array of settings that are floats
+     * @var array
+     * example: [ 'settings_key' => 1 ]
+     */
+    public const FLOATS = [];
+
+    /**
+     * @brief an array of settings that are mixed types
+     * @var array
+     * example: [ 'settings_key' => 'int|array|bool' ]
+     */
+    public const MIXED = [];
+
+    /**
+     * @brief an array of settings that are booleans (explicitly true/false)
+     * @var array
+     * example: [ 'settings_key' => 1 ]
+     */
+    public const BOOLEANS = [];
+
+    /**
+     * @brief an array of settings that are integers
+     * @var array
+     * example: [ 'settings_key' => 1 ]
+     */
+    public const INTEGERS = [];
+
+    /**
+     * @brief an array of settings that are to be treated as strings
+     * @var array
+     * example: [ 'settings_key' => 1 ]
+     */
+    public const STRINGS = [];
+
+    protected static $instance;
+
+    public function __get($key)
+    {
+        $return = parent::__get($key);
+
+        if(isset(static::ARRAYS_OR_STRINGS[$key])){
+            $return = json_decode($return,true) ?? $return;
+            if (\is_array($return) && static::ARRAYS_OR_STRINGS[$key] === 2) {
+                return array_combine(array_values($return), array_values($return));
+            }
+
+            if(static::ARRAYS_OR_STRINGS[$key] === 3) {
+                return (int) $return;
+            }
+
+            //still here?
+            return $return;
+        }
+
+        if (isset(static::INTEGERS[$key])) {
+            return (int)$return;
+        }
+
+        if (isset(static::BOOLEANS[$key])) {
+            return (bool)$return;
+        }
+
+        if (isset(static::OBJECTS[$key])) {
+            $class = static::OBJECTS[$key];
+            try {
+                return $class::load($class);
+            } catch (UnderflowException $e) {
+            }
+        }
+
+        return $return;
+    }

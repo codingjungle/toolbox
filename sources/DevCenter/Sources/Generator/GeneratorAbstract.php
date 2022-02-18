@@ -270,7 +270,7 @@ abstract class _GeneratorAbstract
         $this->bodyGenerator();
 
         if ($this->extends !== null) {
-            $this->generator->addExtends($this->extends);
+            $this->generator->addExtends( '\\IPS\\'. $this->extends);
         }
 
         if (is_array($this->implements) && count($this->implements)) {

@@ -139,6 +139,14 @@ class _toolbox
                 'description' => 'Runs code analyzer on export of app.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools'
+            ],
+            'TOOLBOXDEV_IMMEDIATE'               => [
+                'name'        => 'TOOLBOXDEV_IMMEDIATE',
+                'default'     => 0,
+                'current'     => defined('\TOOLBOXDEV_IMMEDIATE') ? TOOLBOXDEV_IMMEDIATE : false,
+                'description' => 'sets delete to be immediate instead of going to the log. this is helpful if you are testing things.',
+                'type'        => 'boolean',
+                'tab'         => 'DevTools'
             ]
         ];
     }

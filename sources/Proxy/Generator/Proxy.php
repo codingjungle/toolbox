@@ -612,24 +612,48 @@ class _Proxy extends GeneratorAbstract
     {
         try {
             $classDoc = [];
-
+            $arrays = [];
+            $objects = [];
+            $booleans = [];
+            $integers = [];
+            $floats = [];
+            $mixed = [];
+            foreach (Application::appsWithExtension('toolbox', 'settingsClass') as $app) {
+                $extensions = $app->extensions('toolbox', 'settingsClass', true);
+                foreach ($extensions as $extension) {
+                    if (method_exists($extension, 'getSettingsClass')) {
+                        /** @var \IPS\formularize\Settings $settingsClass */
+                        $settingsClass = $extension->getSettingsClass();
+                         $arrays += $settingsClass::ARRAYS_OR_STRINGS;
+                         $objects += $settingsClass::OBJECTS;
+                         $booleans += $settingsClass::BOOLEANS;
+                         $integers += $settingsClass::INTEGERS;
+                         $mixed += $settingsClass::MIXED;
+                         $floats += $settingsClass::FLOATS;
+                    }
+                }
+            }
             /**
              * @var array $load
              */
             $load = Store::i()->settings;
             foreach ($load as $key => $val) {
-                if (is_array(Settings::i()->{$key})) {
+                if (isset($arrays[$key]) || is_array(Settings::i()->{$key})) {
                     $type = 'array';
-                } elseif (is_int(Settings::i()->{$key})) {
+                } elseif (isset($integers[$key]) || is_int(Settings::i()->{$key})) {
                     $type = 'int';
-                } elseif (is_float(Settings::i()->{$key})) {
+                } elseif (isset($floats[$key]) || is_float(Settings::i()->{$key})) {
                     $type = 'float';
-                } elseif (is_bool(Settings::i()->{$key})) {
+                } elseif ( isset($booleans[$key]) || is_bool(Settings::i()->{$key})) {
                     $type = 'bool';
+                } elseif ( isset($objects[$key])) {
+                    $type = $objects[$key];
                 } else {
                     $type = 'string';
                 }
-
+                if (isset($mixed[$key])){
+                    $type = $mixed[$key];
+                }
                 $classDoc[] = ['pt' => 'p', 'prop' => $key, 'type' => $type];
             }
 

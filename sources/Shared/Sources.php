@@ -97,6 +97,16 @@ trait Sources
         Output::i()->redirect($url->csrf(), 'Form Class Generated');
     }
 
+    protected function settings()
+    {
+        $this->elements->type = 'Settings';
+        $this->elements->generate();
+        $url = Url::internal(
+            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
+        );
+        Output::i()->redirect($url->csrf(), 'Settings Class Generated');
+    }
+
     protected function cinterface()
     {
         $config = [

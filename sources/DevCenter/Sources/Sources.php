@@ -185,9 +185,10 @@ class _Sources
             'memory',
             'member',
             'form',
-            'orm'
+            'orm',
+            'settings'
         ];
-        $ignored =  ['memory', 'debug', 'form','member','orm'];
+        $ignored =  ['memory', 'debug', 'form','member','orm','settings'];
         $dev = [
             'template',
             'widget',
@@ -273,6 +274,11 @@ class _Sources
                 $values['type'] = 'Traits';
                 $values['className'] = 'Orm';
                 $values['namespace'] = 'Traits';
+                break;
+            case 'Settings':
+                $class .= 'Settings';
+                $values['className'] = 'Settings';
+                $values['namespace'] = '';
                 break;
             default:
                 $class .= mb_ucfirst($type);
@@ -404,6 +410,8 @@ class _Sources
      */
     public function extendsCheck($data)
     {
+        $data = '\\IPS\\'.$data;
+
         if ($data && !class_exists($data, true)) {
             throw new InvalidArgumentException('dtdevplus_class_extended_class_no_exist');
         }

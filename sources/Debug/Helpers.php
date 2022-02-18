@@ -136,39 +136,31 @@ EOF;
                 if (is_array($arg) || is_object($arg)) {
                     $val = '<pre>' . print_r($arg, true);
                     $type = 'Array';
-                } else {
-                    if (is_numeric($arg)) {
-                        $val = $arg;
-                        $type = 'Int';
+                } elseif (is_numeric($arg)) {
+                    $val = $arg;
+                    $type = 'Int';
+                } elseif (is_bool($arg)) {
+                    $val = (bool)$arg;
+                    if ($val === false) {
+                        $val = 'false';
                     } else {
-                        if (is_bool($arg)) {
-                            $val = (bool)$arg;
-                            if ($val === false) {
-                                $val = 'false';
-                            } else {
-                                $val = 'true';
-                            }
+                        $val = 'true';
+                    }
 
-                            $type = 'Bool';
-                        } else {
-                            $val = '"' . $arg . '"';
-                            $type = 'String';
-                        }
-                    }
-                }
-            } else {
-                if ($func === 'var_dump') {
-                    ob_start();
-                    var_dump($arg, true);
-                    $val = ob_get_contents();
-                    ob_end_clean();
-                    $type = 'Dump';
+                    $type = 'Bool';
                 } else {
-                    if ($func === 'var_export') {
-                        $type = 'Export';
-                        $val = var_export($arg, true);
-                    }
+                    $val = '"' . $arg . '"';
+                    $type = 'String';
                 }
+            } elseif ($func === 'var_dump') {
+                ob_start();
+                var_dump($arg);
+                $val = ob_get_contents();
+                ob_end_clean();
+                $type = 'Dump';
+            } elseif ($func === 'var_export') {
+                $type = 'Export';
+                $val = var_export($arg, true);
             }
 
             $html[] = str_replace(['#row#', '#type#', '#count#'], [$val, $type, $c], $row);
