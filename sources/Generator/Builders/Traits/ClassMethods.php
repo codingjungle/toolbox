@@ -51,7 +51,7 @@ trait ClassMethods
             $this->output(implode("\n", $this->body));
         }
 
-        if(empty($this->method) === false){
+        if(empty($this->methods) === false){
             foreach ($this->methods as $name => $method) {
                 if (isset($this->removeMethods[$name])) {
                     continue;
