@@ -27,6 +27,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Singleton extends GeneratorAbstract
 {
+    protected $includeConstructor = false;
 
     /**
      * @inheritdoc

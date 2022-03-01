@@ -52,6 +52,7 @@ use IPS\toolbox\Application;
 
 class _Elements extends GeneratorAbstract
 {
+    protected $includeConstructor = false;
 
     public function bodyGenerator()
     {

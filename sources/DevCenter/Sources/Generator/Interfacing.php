@@ -22,6 +22,8 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Interfacing extends GeneratorAbstract
 {
+    protected $includeConstructor = false;
+
     /**
      * @inheritdoc
      */

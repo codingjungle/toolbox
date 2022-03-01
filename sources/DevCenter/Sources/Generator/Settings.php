@@ -19,6 +19,7 @@ use UnderflowException;
 
 class _Settings extends GeneratorAbstract
 {
+    protected $includeConstructor = false;
 
     public function bodyGenerator()
     {

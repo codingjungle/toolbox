@@ -151,6 +151,8 @@ abstract class _GeneratorAbstract
 
     protected $baseurl;
 
+    protected $includeConstructor = true;
+
     /**
      * @param array $values
      * @param Application $application
@@ -243,16 +245,9 @@ abstract class _GeneratorAbstract
                 ) : 'IPS\\' . $this->app;
         }
 
-        if ($this->type !== 'Api' && !in_array($this->type, static::$arDescendent, true) && !in_array(
-                $this->type,
-                [
-                    'Traits',
-                    'Interfacing',
-                    'Singleton',
-                    'Form',
-                ],
-                true
-            )) {
+        if ($this->type !== 'Api' && !in_array($this->type, static::$arDescendent, true) && $this->includeConstructor
+            === true
+        ) {
             $body = $this->extends ? 'parent::__construct();' : '';
             $config = [
                 'visibility' => T_PUBLIC,
@@ -270,6 +265,10 @@ abstract class _GeneratorAbstract
         $this->bodyGenerator();
 
         if ($this->extends !== null) {
+            $extends = $this->extends;
+            if(mb_strpos('IPS', $extends) === false){
+                $extends = '\\IPS\\'.$extends;
+            }
             $this->generator->addExtends( '\\IPS\\'. $this->extends);
         }
 

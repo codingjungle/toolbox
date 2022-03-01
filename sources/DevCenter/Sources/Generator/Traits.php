@@ -22,6 +22,8 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Traits extends GeneratorAbstract
 {
+    protected $includeConstructor = false;
+
     /**
      * @inheritdoc
      */

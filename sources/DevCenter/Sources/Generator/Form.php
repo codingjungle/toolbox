@@ -39,6 +39,7 @@ use function header;
 
 class _Form extends GeneratorAbstract
 {
+    protected $includeConstructor = false;
 
     public function bodyGenerator()
     {

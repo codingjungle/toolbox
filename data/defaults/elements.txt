@@ -19,7 +19,6 @@
         'dr'           => DateRange::class,
         'editor'       => Editor::class,
         'email'        => Email::class,
-        'file'         => File::class,
         'ftp'          => Ftp::class,
         'interval'     => Interval::class,
         'item'         => Item::class,
@@ -55,7 +54,7 @@
         'url'          => Url::class,
         'widthheight'  => WidthHeight::class,
         'wh'           => WidthHeight::class,
-        'yesno'        => Yn::class,
+        'yesno'        => YesNo::class,
         'yn'           => YesNo::class,
         'toggle'       => YesNo::class
     ];
