@@ -56,6 +56,7 @@ class _Form extends GeneratorAbstract
         $this->generator->addImport(Session::class);
         $this->generator->addImport(Theme::class);
         $this->generator->addImport(UnexpectedValueException::class);
+        $this->generator->addImport(Member::class);
 
         $elementClass = 'IPS\\'.$this->app.'\\'.$this->classname.'\\Element';
         $this->generator->addImport($elementClass);
@@ -75,6 +76,7 @@ class _Form extends GeneratorAbstract
         $this->generator->addImportFunction('property_exists');
         $this->generator->addImportFunction('sha1');
         $this->generator->addImportFunction('str_replace');
+        $this->generator->addImportFunction('func_get_args');
 
         $this->generator->addClassBody(\file_get_contents(Application::getRootPath('toolbox').'/applications/toolbox/data/defaults/form.txt') );
     }

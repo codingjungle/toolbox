@@ -1,9 +1,23 @@
+
+
+    /**
+     * @brief  could be an array or string or int, set value to 1 for array, 2 if you want to have keys and values
+     * match, 3 if the return is an int.
+     * @var array
+     * example: [ 'settings_key' => 1 ]
+     */
+    public const ARRAYS_OR_STRINGS = [
+    ];
+
     /**
      * @brief an array of settings that are json_encoded strings, to decode them
      * @var array
      * example: [ 'settings_key' => 1 ]
      */
-    public const ARRAYS_OR_STRINGS = [];
+    public const ARRAYS = [
+        'cjmg_menu_cache' => 1,
+        'cjmg_apps' => 1
+    ];
 
     /**
      * @brief an array of settings that are object ids that get loaded as an object
@@ -31,7 +45,14 @@
      * @var array
      * example: [ 'settings_key' => 1 ]
      */
-    public const BOOLEANS = [];
+    public const BOOLEANS = [
+        'cjmg_cache_output' => 1,
+        'cjmg_go_left' => 1,
+        'cjmg_left_of_logo' => 1,
+        'cjmg_only_mobile' => 1,
+        'cjmg_remove_primary' => 1,
+        'cjmg_use_for_mobile' => 1
+    ];
 
     /**
      * @brief an array of settings that are integers
@@ -51,37 +72,59 @@
 
     public function __get($key)
     {
-        $return = parent::__get($key);
+        try {
+            $return = parent::__get($key);
 
-        if(isset(static::ARRAYS_OR_STRINGS[$key])){
-            $return = json_decode($return,true) ?? $return;
-            if (\is_array($return) && static::ARRAYS_OR_STRINGS[$key] === 2) {
-                return array_combine(array_values($return), array_values($return));
+            if(isset(static::ARRAYS[$key])){
+                if(\is_array($return)){
+                    return $return;
+                }
+                $return = json_decode($return, true) ?? $return;
+                if (\is_array($return) && static::ARRAYS[$key] === 2) {
+                    return array_combine(array_values($return), array_values($return));
+                }
+
+                if (static::ARRAYS[$key] === 3) {
+                    return (int)$return;
+                }
+                return $return;
             }
 
-            if(static::ARRAYS_OR_STRINGS[$key] === 3) {
-                return (int) $return;
+            if (isset(static::ARRAYS_OR_STRINGS[$key])) {
+                if(\is_array($return)){
+                    return $return;
+                }
+                $return = json_decode($return, true) ?? $return;
+                if (\is_array($return) && static::ARRAYS_OR_STRINGS[$key] === 2) {
+                    return array_combine(array_values($return), array_values($return));
+                }
+
+                if (static::ARRAYS_OR_STRINGS[$key] === 3) {
+                    return (int)$return;
+                }
+
+                //still here?
+                return $return;
             }
 
-            //still here?
+            if (isset(static::INTEGERS[$key])) {
+                return (int)$return;
+            }
+
+            if (isset(static::BOOLEANS[$key])) {
+                return (bool)$return;
+            }
+
+            if (isset(static::OBJECTS[$key])) {
+                $class = static::OBJECTS[$key];
+                try {
+                    return $class::load($class);
+                } catch (UnderflowException $e) {
+                }
+            }
+
             return $return;
         }
-
-        if (isset(static::INTEGERS[$key])) {
-            return (int)$return;
+        catch(Throwable $e){
         }
-
-        if (isset(static::BOOLEANS[$key])) {
-            return (bool)$return;
-        }
-
-        if (isset(static::OBJECTS[$key])) {
-            $class = static::OBJECTS[$key];
-            try {
-                return $class::load($class);
-            } catch (UnderflowException $e) {
-            }
-        }
-
-        return $return;
     }

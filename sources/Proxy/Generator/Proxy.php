@@ -49,6 +49,7 @@ use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function function_exists;
+use function get_class;
 use function header;
 use function implode;
 use function in_array;
@@ -612,6 +613,7 @@ class _Proxy extends GeneratorAbstract
     {
         try {
             $classDoc = [];
+            $arraysOrStrings = [];
             $arrays = [];
             $objects = [];
             $booleans = [];
@@ -624,12 +626,33 @@ class _Proxy extends GeneratorAbstract
                     if (method_exists($extension, 'getSettingsClass')) {
                         /** @var \IPS\formularize\Settings $settingsClass */
                         $settingsClass = $extension->getSettingsClass();
-                         $arrays += $settingsClass::ARRAYS_OR_STRINGS;
-                         $objects += $settingsClass::OBJECTS;
-                         $booleans += $settingsClass::BOOLEANS;
-                         $integers += $settingsClass::INTEGERS;
-                         $mixed += $settingsClass::MIXED;
-                         $floats += $settingsClass::FLOATS;
+                        if(defined("$settingsClass::ARRAYS")) {
+                            $arrays += $settingsClass::ARRAYS;
+                        }
+
+                        if(defined("$settingsClass::ARRAYS_OR_STRINGS")) {
+                            $arraysOrStrings += $settingsClass::ARRAYS_OR_STRINGS;
+                        }
+
+                        if(defined("$settingsClass::OBJECTS")) {
+                            $objects += $settingsClass::OBJECTS;
+                        }
+
+                        if(defined("$settingsClass::BOOLEANS")) {
+                            $booleans += $settingsClass::BOOLEANS;
+                        }
+
+                        if(defined("$settingsClass::INTEGERS")) {
+                            $integers += $settingsClass::INTEGERS;
+                        }
+
+                        if(defined("$settingsClass::MIXED")) {
+                            $mixed += $settingsClass::MIXED;
+                        }
+
+                        if(defined("$settingsClass::FLOATS")) {
+                            $floats += $settingsClass::FLOATS;
+                        }
                     }
                 }
             }
@@ -640,6 +663,8 @@ class _Proxy extends GeneratorAbstract
             foreach ($load as $key => $val) {
                 if (isset($arrays[$key]) || is_array(Settings::i()->{$key})) {
                     $type = 'array';
+                } elseif (isset($arraysOrStrings[$key])){
+                    $type = 'mixed';
                 } elseif (isset($integers[$key]) || is_int(Settings::i()->{$key})) {
                     $type = 'int';
                 } elseif (isset($floats[$key]) || is_float(Settings::i()->{$key})) {

@@ -146,6 +146,8 @@ class _Headerdoc extends Singleton
             '3rdparty',
             '3rd_party',
             'vendor',
+            '.idea',
+            '.git',
         ];
         $files = [
             '.git',

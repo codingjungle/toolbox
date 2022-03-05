@@ -57,6 +57,7 @@ class _header extends HeaderdocAbstract
      **/
     public function dirSkip(&$skip)
     {
+
     }
 
     /**

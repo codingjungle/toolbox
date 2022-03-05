@@ -41,7 +41,10 @@ class toolbox_hook_BuilderFilter extends _HOOK_CLASS_
             if (is_array($toSKip) && count($toSKip)) {
                 $skip = $toSKip;
             }
-
+            $skip[] = '.gitignore';
+            $skip[] = 'composer.lock';
+            $skip[] = 'README.md';
+            $skip[] = 'composer.json';
             try {
                 $appKey = Request::i()->appKey;
                 $app = Application::load($appKey);
