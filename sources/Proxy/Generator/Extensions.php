@@ -66,14 +66,14 @@ class _Extensions extends GeneratorAbstract
                         $name[] = $baseName;
                         $find = [
                             '{subpackage}',
-                            '{date}',
+//                            '{date}',
                             '{app}',
                             '{class}',
                             '<?php',
                         ];
                         $replace = [
                             $key->directory,
-                            date('d M Y'),
+//                            date('d M Y'),
                             $key->directory,
                             $file->getBasename('.txt'),
                             '',
