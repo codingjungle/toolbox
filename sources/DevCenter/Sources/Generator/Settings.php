@@ -14,6 +14,7 @@ namespace IPS\toolbox\DevCenter\Sources\Generator;
 
 use IPS\Settings;
 use IPS\toolbox\Application;
+use Throwable;
 use UnderflowException;
 
 
@@ -25,7 +26,10 @@ class _Settings extends GeneratorAbstract
     {
         $this->brief = 'Class';
         $this->generator->addImport(UnderflowException::class);
+        $this->generator->addImport(Throwable::class);
         $this->generator->addImportFunction('array_combine');
+        $this->generator->addImportFunction('array_values');
+        $this->generator->addImportFunction('is_array');
         $this->generator->addImportFunction('defined');
         $this->generator->addImportFunction('header');
         $this->generator->addImportFunction('json_decode');

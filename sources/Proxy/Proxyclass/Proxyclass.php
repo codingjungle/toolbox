@@ -427,6 +427,13 @@ class _Proxyclass extends Singleton
         $finder = new Finder();
 
         $finder->in(\IPS\ROOT_PATH);
+        foreach ($this->excludedDirCss() as $dirs) {
+            $finder->exclude($dirs);
+        }
+
+        foreach ($this->excludedFilesCss() as $file) {
+            $finder->notName($file);
+        }
         $filter = function (SplFileInfo $file) {
             if (!in_array($file->getExtension(), ['css'])) {
                 return false;
@@ -674,6 +681,41 @@ class _Proxyclass extends Singleton
                 $return = array_merge($return, $excludeFolders);
             }
         }
+        return $return;
+    }
+
+    protected function excludedDirCss(): array
+    {
+        $return = [
+            '3rdparty',
+            '3rd_party',
+            'vendor',
+            'dtProxy',
+            'uploads',
+        ];
+
+        $exd = \IPS\ROOT_PATH . '/excludedCss.php';
+        if (file_exists($exd)) {
+            require $exd;
+            if (isset($excludeFolders)) {
+                $return = array_merge($return, $excludeFolders);
+            }
+        }
+        return $return;
+    }
+
+    protected function excludedFilesCss(): array
+    {
+        $return = [];
+
+        $exf = \IPS\ROOT_PATH . '/excludedCss.php';
+        if (file_exists($exf)) {
+            require $exf;
+            if (isset($excludeFiles)) {
+                $return = array_merge($return, $excludeFiles);
+            }
+        }
+
         return $return;
     }
 

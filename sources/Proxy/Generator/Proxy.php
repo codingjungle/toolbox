@@ -720,8 +720,9 @@ class _Proxy extends GeneratorAbstract
 {$css}
 }
 eof;
-                file_put_contents($this->save . '/IPSVars.css', $body);
+                //file_put_contents($this->save . '/IPSVars.css', $body);
                 $file2 = new DTFileGenerator();
+                $file->isProxy = true;
                 $file2->setBody($body);
                 $file2->setFilename($this->save . '/IPSVars.css');
                 $file2->write();
