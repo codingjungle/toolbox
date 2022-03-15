@@ -34,6 +34,7 @@ use IPS\toolbox\Proxy\Generator\Proxy;
 use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\Shared\Lorem;
 use Symfony\Component\Filesystem\Filesystem;
+use Throwable;
 use UnexpectedValueException;
 
 use function base64_decode;
@@ -383,28 +384,34 @@ class _bt extends Controller
 
     protected function proxy()
     {
-        if (NO_WRITES === true) {
-            Output::i()->error(
-                'Proxy generator can not be used atm, NO_WRITES is enabled in the constants.php.',
-                '100foo'
-            );
+        try {
+            if (NO_WRITES === true) {
+                Output::i()->error(
+                    'Proxy generator can not be used atm, NO_WRITES is enabled in the constants.php.',
+                    '100foo'
+                );
+            }
+            Proxyclass::i()->dirIterator();
+            Proxyclass::i()->buildHooks();
+            $iterator = Store::i()->dtproxy_proxy_files;
+            foreach ($iterator as $key => $file) {
+                Proxyclass::i()->build($file);
+            }
+            unset(Store::i()->dtproxy_proxy_files);
+            Proxy::i()->buildConstants();
+            $step = 1;
+            do {
+                $step = Proxyclass::i()->makeToolboxMeta($step);
+            } while ($step !== null);
+            Proxy::i()->generateSettings();
+            Proxyclass::i()->buildCss();
+            unset(Store::i()->dtproxy_proxy_files, Store::i()->dtproxy_templates);
+            Output::i()->output = '';
+        }catch( Throwable $e){
+            Debug::log($e);
+            Output::i()->json( $e->getMessage().'<br><code>'.$e->getTraceAsString().'</code>', 500 );
+
         }
-        Proxyclass::i()->dirIterator();
-        Proxyclass::i()->buildHooks();
-        $iterator = Store::i()->dtproxy_proxy_files;
-        foreach ($iterator as $key => $file) {
-            Proxyclass::i()->build($file);
-        }
-        unset(Store::i()->dtproxy_proxy_files);
-        Proxy::i()->buildConstants();
-        $step = 1;
-        do {
-            $step = Proxyclass::i()->makeToolboxMeta($step);
-        } while ($step !== null);
-        Proxy::i()->generateSettings();
-        Proxyclass::i()->buildCss();
-        unset(Store::i()->dtproxy_proxy_files, Store::i()->dtproxy_templates);
-        Output::i()->output = '';
     }
 //    protected function adminer()
 //    {

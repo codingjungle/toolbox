@@ -22,6 +22,17 @@
                     },
                     complete: function (data) {
                         ips.ui.flashMsg.show(ips.getString('toolbox_done_proxies'));
+                    },
+                    error:function(data){
+                        if( data.responseJSON ){
+                            ips.ui.alert.show({
+                                message: data.responseJSON,
+                            });
+                        } else {
+                            ips.ui.alert.show({
+                                message: ips.getString('Somethings Gone Wrong'),
+                            });
+                        }
                     }
                 });
         };
