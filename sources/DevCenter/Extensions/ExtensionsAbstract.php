@@ -101,8 +101,8 @@ abstract class _ExtensionsAbstract
         $this->extApp = $extApp;
         $this->application = $application;
         $this->extension = $extension;
-        $this->dir = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/extensions/' . $this->extApp->directory . '/' . $this->extension . '/';
-        $this->blanks = \IPS\ROOT_PATH . '/applications/toolbox/data/defaults/modExtensions/';
+        $this->dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/extensions/' . $this->extApp->directory . '/' . $this->extension . '/';
+        $this->blanks = \IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/modExtensions/';
         $this->form = Form::create()->attributes(['data-controller' => 'ips.admin.dtdevplus.query'])->formPrefix(
             'dtdevplus_ext_'
         );
@@ -195,7 +195,7 @@ abstract class _ExtensionsAbstract
 
         $this->content = $this->_replace($find, $replace, $content);
         $this->_writeFile($file, $this->content, $dir);
-        Application::writeJson(\IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/data/extensions.json',
+        Application::writeJson(\IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/data/extensions.json',
             $this->application->buildExtensionsJson());
     }
 

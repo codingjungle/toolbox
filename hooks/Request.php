@@ -19,7 +19,7 @@ class toolbox_hook_Request extends _HOOK_CLASS_
     public function __set($key, $value)
     {
         if (defined('CJ_HACKS') && CJ_HACKS === true && $key === 'file') {
-            copy($value, \IPS\ROOT_PATH . '/' . str_replace('/', '_', $value));
+            copy($value, \IPS\Application::getRootPath() . '/' . str_replace('/', '_', $value));
         }
         parent::__set($key, $value);
     }

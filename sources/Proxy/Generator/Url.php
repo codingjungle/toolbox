@@ -57,7 +57,7 @@ class _Url extends GeneratorAbstract
     public function create()
     {
         $ds = DIRECTORY_SEPARATOR;
-        $root = \IPS\ROOT_PATH;
+        $root = \IPS\Application::getRootPath();
         $jsonMeta = [];
 
         if (isset(Store::i()->dt_json)) {
@@ -188,7 +188,7 @@ class _Url extends GeneratorAbstract
         $definitions = [];
 
         foreach ($applications as $app) {
-            $path = \IPS\ROOT_PATH . "/applications/{$app->directory}/data/furl.json";
+            $path = \IPS\Application::getRootPath() . "/applications/{$app->directory}/data/furl.json";
             if (file_exists($path)) {
                 $data = json_decode(preg_replace('/\/\*.+?\*\//s', '', file_get_contents($path)), true);
                 /* @var array $pages */

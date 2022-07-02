@@ -113,7 +113,7 @@ class _Proxy extends GeneratorAbstract
         $apps = Application::applications();
         $relations = [[]];
         foreach ($apps as $app) {
-            $dir = \IPS\ROOT_PATH . '/applications/' . $app->directory . '/data/arRelations.json';
+            $dir = \IPS\Application::getRootPath() . '/applications/' . $app->directory . '/data/arRelations.json';
             if (file_exists($dir)) {
                 $relations[] = json_decode(file_get_contents($dir), true);
             }
@@ -122,7 +122,7 @@ class _Proxy extends GeneratorAbstract
         $relations = array_merge(...$relations);
 
         if (isset($relations[$table])) {
-            $class = \IPS\ROOT_PATH . '/' . $relations[$table];
+            $class = \IPS\Application::getRootPath() . '/' . $relations[$table];
 
             if (file_exists($class)) {
                 $content = file_get_contents($class);
@@ -148,7 +148,7 @@ class _Proxy extends GeneratorAbstract
                 array_shift($ns2);
                 $app = array_shift($ns2);
                 $isApp = false;
-                $appPath = \IPS\ROOT_PATH . '/applications/' . $app;
+                $appPath = \IPS\Application::getRootPath() . '/applications/' . $app;
 
                 $codes = Store::i()->dt_error_codes ?? [];
                 $altCodes = Store::i()->dt_error_codes2 ?? [];

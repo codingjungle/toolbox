@@ -214,7 +214,7 @@ class _Cons extends Singleton
 {$toWrite}
 EOF;
         if (NO_WRITES !== true) {
-            file_put_contents(\IPS\ROOT_PATH . '/constants.php', $fileData);
+            file_put_contents(\IPS\Application::getRootPath() . '/constants.php', $fileData);
             if (function_exists('opcache_reset')) {
                 opcache_reset();
             }

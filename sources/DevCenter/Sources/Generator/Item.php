@@ -41,7 +41,6 @@ use function json_decode;
 use function json_encode;
 use function mb_strtolower;
 
-use const IPS\ROOT_PATH;
 use const JSON_PRETTY_PRINT;
 
 
@@ -55,7 +54,7 @@ class _Item extends GeneratorAbstract
 
     protected function addFurl($value, $url)
     {
-        $furlFile = ROOT_PATH . '/applications/' . $this->application->directory . '/data/furl.json';
+        $furlFile = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/data/furl.json';
         if (file_exists($furlFile)) {
             $furls = json_decode(file_get_contents($furlFile), true);
         } else {

@@ -24,7 +24,7 @@ class filewatcher
 
 
         if ($hooks === 'hooks') {
-            $fnpath = \IPS\ROOT_PATH . '/dtProxy/hooked/';
+            $fnpath = \IPS\Application::getRootPath() . '/dtProxy/hooked/';
             $hookFile = $fnpath . $app . '_' . $file . '.php';
             if (!file_exists($hookFile)) {
                 if (is_dir($fnpath)) {

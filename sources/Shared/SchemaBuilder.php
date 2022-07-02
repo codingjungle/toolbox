@@ -56,7 +56,7 @@ trait SchemaBuilder
     {
         try {
             $directory = $application->directory;
-            $path = \IPS\ROOT_PATH . "/applications/{$directory}/";
+            $path = \IPS\Application::getRootPath() . "/applications/{$directory}/";
             $definition = Db::i()->getTableDefinition($table);
 
             if (!is_dir($path . 'setup/upg_working/')) {

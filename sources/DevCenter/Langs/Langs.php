@@ -46,7 +46,7 @@ class _Langs extends Singleton
      */
     public function form()
     {
-        $base = \IPS\ROOT_PATH . '/applications/' . Request::i()->appKey . '/dev/';
+        $base = \IPS\Application::getRootPath() . '/applications/' . Request::i()->appKey . '/dev/';
 
         $matrix = new Matrix();
         $matrix->columns = [
@@ -131,7 +131,7 @@ class _Langs extends Singleton
             }
             Debug::add('langs', $l);
 
-            $this->blanks = \IPS\ROOT_PATH . '/applications/dtdevplus/data/defaults/lang/';
+            $this->blanks = \IPS\Application::getRootPath() . '/applications/dtdevplus/data/defaults/lang/';
 
             $content = $this->_getFile('lang');
             $langContent = $this->_replace('{lang}', var_export($l, true), $content);

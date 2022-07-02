@@ -1,0 +1,29 @@
+{
+    "normal": {
+        "added": [
+            "error_codes_ips",
+            "error_codes_ips_desc",
+            "error_codes_dupes",
+            "error_codes_dupes_desc",
+            "dtdevplus_menu_title_member",
+            "dtdevplus_class_member_alt_table",
+            "dtdevplus_class_member_alt_table_desc",
+            "dtdevplus_class_member_alt_prefix",
+            "dtdevplus_class_member_alt_prefix_desc",
+            "dtdevplus_class_member_alt_id",
+            "dtdevplus_class_member_alt_id_desc",
+            "dtdevplus_menu_title_orm",
+            "dtdevplus_menu_title_settings",
+            "menu__toolbox_settings_adminer"
+        ],
+        "edited": [
+            "root_path"
+        ],
+        "removed": []
+    },
+    "js": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}

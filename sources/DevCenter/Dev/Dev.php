@@ -152,7 +152,7 @@ class _Dev extends Singleton
             $location = Request::i()->dtdevplus_dev_group_manual_location;
             $group = Request::i()->dtdevplus_dev_group_manual_folder;
         }
-        $dir = \IPS\ROOT_PATH . '/applications/' . $this->app . '/dev/';
+        $dir = \IPS\Application::getRootPath() . '/applications/' . $this->app . '/dev/';
         if ($this->type === 'template') {
             $dir .= 'html/';
             $file = $dir . '/' . $data;
@@ -230,7 +230,7 @@ class _Dev extends Singleton
     {
         $controllers = [];
         foreach (Application::applications() as $app) {
-            $file = \IPS\ROOT_PATH . '/applications/' . $app->directory . '/data/javascript.xml';
+            $file = \IPS\Application::getRootPath() . '/applications/' . $app->directory . '/data/javascript.xml';
             if (is_file($file)) {
                 $xml = new XMLReader();
                 $xml->open($file);
@@ -324,7 +324,7 @@ class _Dev extends Singleton
         $options = [];
 
         try {
-            $base = \IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'applications' . DIRECTORY_SEPARATOR . $this->app . DIRECTORY_SEPARATOR . 'dev' . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR;
+            $base = \IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'applications' . DIRECTORY_SEPARATOR . $this->app . DIRECTORY_SEPARATOR . 'dev' . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR;
 
             /* @var Finder $groups */
             $groups = new Finder();

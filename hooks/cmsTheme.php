@@ -14,7 +14,7 @@ class toolbox_hook_cmsTheme extends _HOOK_CLASS_
     protected static function _getHtmlPath($app, $location = null, $path = null)
     {
         if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0 && defined('DT_THEME_CMS_USE_DESIGNER_FILES') && DT_THEME_CMS_USE_DESIGNER_FILES === true) {
-            return rtrim(\IPS\ROOT_PATH . "/themes/cms/{$location}/{$path}", '/') . '/';
+            return rtrim(\IPS\Application::getRootPath() . "/themes/cms/{$location}/{$path}", '/') . '/';
         }
 
         return parent::_getHtmlPath($app, $location, $path);

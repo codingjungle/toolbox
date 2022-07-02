@@ -12,8 +12,6 @@ use IPS\toolbox\Application;
 
 use ReflectionException;
 
-use const IPS\ROOT_PATH;
-
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     class _HOOK_CLASS_ extends Hook { }
 
@@ -34,7 +32,7 @@ class toolbox_hook_Hooks extends _HOOK_CLASS_
     public static function devTable($url, $appOrPluginId, $hookDir)
     {
         Application::loadAutoLoader();
-        $dtProxyFolder = ROOT_PATH . '/dtProxy/namespace.json';
+        $dtProxyFolder = \IPS\Application::getRootPath() . '/dtProxy/namespace.json';
 
         $parent = parent::devTable($url, $appOrPluginId, $hookDir);
 

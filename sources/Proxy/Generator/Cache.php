@@ -26,7 +26,6 @@ use function is_file;
 use function json_decode;
 use function json_encode;
 
-use const IPS\ROOT_PATH;
 use const JSON_PRETTY_PRINT;
 
 /**
@@ -43,8 +42,13 @@ class _Cache extends Singleton
      * @var static
      */
     protected static $instance = null;
-    protected $path = ROOT_PATH . '/dtProxy/';
+    protected $path;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->path = \IPS\Application::getRootPath().'/dtProxy/';
+    }
 
     public function addClass($class)
     {

@@ -15,7 +15,7 @@ class toolbox_hook_cmsThemeTemplate extends _HOOK_CLASS_
     {
         parent::__construct($app, $templateLocation, $templateName);
         if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0 && defined('DT_THEME_CMS_USE_DESIGNER_FILES') && DT_THEME_CMS_USE_DESIGNER_FILES === true) {
-            $this->sourceFolder = \IPS\ROOT_PATH . "/themes/cms/{$templateLocation}/{$templateName}/";
+            $this->sourceFolder = \IPS\Application::getRootPath() . "/themes/cms/{$templateLocation}/{$templateName}/";
         }
     }
 }

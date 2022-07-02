@@ -53,7 +53,7 @@ class _Extensions extends GeneratorAbstract
         $name = [];
         $lookup = [];
         foreach (Application::roots() as $key) {
-            $path = \IPS\ROOT_PATH . '/applications/' . $key->directory . '/data/defaults/extensions/';
+            $path = \IPS\Application::getRootPath() . '/applications/' . $key->directory . '/data/defaults/extensions/';
             if (is_dir($path)) {
                 try {
                     $files = (new Finder())->in($path)->files()->name('*.txt');

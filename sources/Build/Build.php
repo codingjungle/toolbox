@@ -121,7 +121,7 @@ class _Build extends Singleton
             $application->version = $short;
             $application->save();
             unset(Store::i()->applications);
-            $path = \IPS\ROOT_PATH . '/exports/' . $application->directory . '/' . $long . '/';
+            $path = \IPS\Application::getRootPath() . '/exports/' . $application->directory . '/' . $long . '/';
 
             try {
                 if(defined('DT_SLASHER') && DT_SLASHER === true) {

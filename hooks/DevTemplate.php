@@ -21,7 +21,7 @@ class toolbox_hook_DevTemplate extends _HOOK_CLASS_
     {
         parent::__construct($app, $templateLocation, $templateName);
         if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
-            $this->sourceFolder = \IPS\ROOT_PATH . '/themes/' . Application::getThemeId() . '/html/' . $app . '/' . $templateLocation . '/' . mb_strtolower($templateName) . '/';
+            $this->sourceFolder = \IPS\Application::getRootPath() . '/themes/' . Application::getThemeId() . '/html/' . $app . '/' . $templateLocation . '/' . mb_strtolower($templateName) . '/';
         }
     }
 
@@ -32,7 +32,7 @@ class toolbox_hook_DevTemplate extends _HOOK_CLASS_
         }
         $parent = parent::__call($bit, $params);
         if (Settings::i()->dtprofiler_enabled_executions) {
-            $path = \IPS\ROOT_PATH . '/applications/' . $this->app . '/dev/html/' . $this->templateLocation . '/' . $this->templateName . '/' . $bit . '.phtml';
+            $path = \IPS\Application::getRootPath() . '/applications/' . $this->app . '/dev/html/' . $this->templateLocation . '/' . $this->templateName . '/' . $bit . '.phtml';
             $time->end($path, $path);
         }
         if (Settings::i()->dtprofiler_enabled_templates && !Request::i()

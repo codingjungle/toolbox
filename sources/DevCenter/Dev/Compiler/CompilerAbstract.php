@@ -23,8 +23,6 @@ use function is_array;
 use function str_replace;
 use function trim;
 
-use const IPS\ROOT_PATH;
-
 
 /**
  * @brief      _CompilerAbstract Class
@@ -56,7 +54,7 @@ abstract class _CompilerAbstract
     {
         $this->type = $type;
         $this->application = $application;
-        $this->blanks = ROOT_PATH . '/applications/toolbox/data/defaults/dev/';
+        $this->blanks = \IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/dev/';
         foreach ($values as $key => $val) {
             $key = str_replace('dtdevplus_dev_', '', $key);
             $val = !is_array($val) ? trim($val) : $val;
@@ -86,7 +84,7 @@ abstract class _CompilerAbstract
         $content = $this->content();
         $file = $this->filename;
 
-        $dir = ROOT_PATH . '/applications/' . $this->app . '/dev/';
+        $dir = \IPS\Application::getRootPath() . '/applications/' . $this->app . '/dev/';
         if ($this->type === 'template') {
             $dir .= 'html/';
         } else {

@@ -111,7 +111,7 @@ class _applications extends Controller
                 throw new InvalidArgumentException('form_bad_value');
             }
             $app = Request::i()->dtdevfolder_app;
-            $folders = \IPS\ROOT_PATH . "/applications/{$app}/dev";
+            $folders = \IPS\Application::getRootPath() . "/applications/{$app}/dev";
             $f = $folders;
             $folders2 = false;
             $folders3 = false;

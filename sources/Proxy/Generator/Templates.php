@@ -119,7 +119,7 @@ class _Templates extends GeneratorAbstract
         }
         if (count($templates)) {
             foreach ($templates as $key => $template) {
-                $key = str_replace(\IPS\ROOT_PATH . '/applications/', '', $key);
+                $key = str_replace(\IPS\Application::getRootPath() . '/applications/', '', $key);
                 if ($key === 'nexus/dev/html/global/forms/businessAddress.phtml' || $key === 'nexus/dev/html/global/forms/businessAddress') {
                     continue;
                 }

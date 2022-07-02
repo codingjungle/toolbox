@@ -162,12 +162,12 @@ class _settings extends Controller
     protected function patchHelpers()
     {
         if (NO_WRITES === false && !function_exists('_p')) {
-            $path = \IPS\ROOT_PATH . DIRECTORY_SEPARATOR;
+            $path = \IPS\Application::getRootPath() . DIRECTORY_SEPARATOR;
             $init = $path . 'init.php';
             $content = file_get_contents($init);
 
-            if (!is_file(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php')) {
-                file_put_contents(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
+            if (!is_file(\IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'init.bu.php')) {
+                file_put_contents(\IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
             }
             $r = <<<EOF
 require __DIR__ . '/applications/toolbox/sources/Debug/Helpers.php';
@@ -183,11 +183,11 @@ EOF;
     protected function patchInit()
     {
         if (NO_WRITES === false && !property_exists(IPS::class, 'beenPatched')) {
-            $path = \IPS\ROOT_PATH . DIRECTORY_SEPARATOR;
+            $path = \IPS\Application::getRootPath() . DIRECTORY_SEPARATOR;
             $init = $path . 'init.php';
             $content = file_get_contents($init);
-            if (!is_file(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php')) {
-                file_put_contents(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
+            if (!is_file(\IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'init.bu.php')) {
+                file_put_contents(\IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
             }
             $content = str_replace('self::monkeyPatch', 'static::monkeyPatch', $content);
             $preg = "#class IPS$#msu";

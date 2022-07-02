@@ -59,7 +59,6 @@ use function str_replace;
 use function time;
 
 use const IPS\NO_WRITES;
-use const IPS\ROOT_PATH;
 
 
 Application::loadAutoLoader();
@@ -212,7 +211,7 @@ class _bt extends Controller
 
     protected function _clearCache()
     {
-        $path = ROOT_PATH . '/hook_temp';
+        $path = \IPS\Application::getRootPath() . '/hook_temp';
 
         if (is_dir($path)) {
             Application::loadAutoLoader();
@@ -423,7 +422,7 @@ class _bt extends Controller
     //        $app = Request::i()->dir;
     //        $branch = Request::i()->branch;
     //        $redirect = \base64_decode(Request::i()->data);
-    //        $path = \IPS\ROOT_PATH.'/applications/'.$app.'/.git/';
+    //        $path = \IPS\Application::getRootPath().'/applications/'.$app.'/.git/';
     //        if( is_dir( $path ) && function_exists( 'exec' ) ){
     ////            try {
     //                $git = new GitRepository($path);
@@ -439,12 +438,12 @@ class _bt extends Controller
     //        $app = Request::i()->dir;
     //        $branch = Request::i()->branch;
     //        $redirect = \base64_decode(Request::i()->data);
-    //        $gitReposPath = \IPS\ROOT_PATH . '/git.php';
+    //        $gitReposPath = \IPS\Application::getRootPath() . '/git.php';
     //        $appRepos = [];
     //        if (file_exists($gitReposPath)) {
     //            require $gitReposPath;
     //            if( isset( $appRepos[$app] ) ){
-    //            $path = \IPS\ROOT_PATH . '/applications/' . $app . '/.git/';
+    //            $path = \IPS\Application::getRootPath() . '/applications/' . $app . '/.git/';
     //            if (is_dir($path) && function_exists('exec')) {
     //                $e[] = [
     //                    'class' => 'textarea',

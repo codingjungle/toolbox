@@ -27,7 +27,7 @@ if (strstr(Request::i()->css, ',')) {
         }
 
         $css = str_replace(array('../', '..\\'), array('&#46;&#46;/', '&#46;&#46;\\'), $css);
-        $file = file_get_contents(\IPS\ROOT_PATH . '/' . $css);
+        $file = file_get_contents(\IPS\Application::getRootPath() . '/' . $css);
         $params = processFile($file);
 
         if ($params['hidden'] === 1) {
@@ -41,7 +41,7 @@ if (strstr(Request::i()->css, ',')) {
         exit();
     }
 
-    $contents = file_get_contents(\IPS\ROOT_PATH . '/' . str_replace(array('../', '..\\'),
+    $contents = file_get_contents(\IPS\Application::getRootPath() . '/' . str_replace(array('../', '..\\'),
             array('&#46;&#46;/', '&#46;&#46;\\'), Request::i()->css));
 
     $params = processFile($contents);

@@ -4,8 +4,6 @@
 
 use function defined;
 
-use const IPS\ROOT_PATH;
-
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
@@ -19,7 +17,7 @@ class toolbox_hook_AdvancedTheme extends _HOOK_CLASS_
             $themes = [];
 
             foreach ($parent as $k => $theme) {
-                $path = ROOT_PATH . '/themes/' . $theme . '/';
+                $path = \IPS\Application::getRootPath() . '/themes/' . $theme . '/';
                 if (!file_exists($path)) {
                     $themes[] = $theme;
                 }

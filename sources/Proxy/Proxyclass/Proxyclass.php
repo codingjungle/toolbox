@@ -172,7 +172,7 @@ class _Proxyclass extends Singleton
         $this->console = $console ?? false;
 
         Application::loadAutoLoader();
-        $this->blanks = \IPS\ROOT_PATH . '/applications/toolbox/data/defaults/';
+        $this->blanks = \IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/';
         if (!Settings::i()->dtproxy_do_props) {
             $this->doProps = false;
         }
@@ -184,7 +184,7 @@ class _Proxyclass extends Singleton
         if (!Settings::i()->dtproxy_do_proxies) {
             $this->doProxies = false;
         }
-        $this->save = \IPS\ROOT_PATH . '/' . $this->save;
+        $this->save = \IPS\Application::getRootPath() . '/' . $this->save;
     }
 
     /**
@@ -341,7 +341,7 @@ class _Proxyclass extends Singleton
         if ($this->doProxies) {
             switch ($step) {
                 default:
-                    $path = \IPS\ROOT_PATH . '/applications/toolbox/data/defaults/';
+                    $path = \IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/';
                     $jsonMeta = json_decode(file_get_contents($path . 'defaults.json'), true);
                     $jsonMeta2 = json_decode(file_get_contents($path . 'defaults2.json'), true);
                     $jsonMeta += $jsonMeta2;
@@ -426,7 +426,7 @@ class _Proxyclass extends Singleton
         }
         $finder = new Finder();
 
-        $finder->in(\IPS\ROOT_PATH);
+        $finder->in(\IPS\Application::getRootPath());
         foreach ($this->excludedDirCss() as $dirs) {
             $finder->exclude($dirs);
         }
@@ -512,7 +512,7 @@ class _Proxyclass extends Singleton
         Proxy::i()->generateSettings();
         $this->console('Settings 2/10');
         if ($this->doProxies) {
-            $path = \IPS\ROOT_PATH . '/applications/toolbox/data/defaults/';
+            $path = \IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/';
             $jsonMeta = json_decode(file_get_contents($path . 'defaults.json'), true);
             $jsonMeta2 = json_decode(file_get_contents($path . 'defaults2.json'), true);
             $jsonMeta += $jsonMeta2;
@@ -557,7 +557,7 @@ class _Proxyclass extends Singleton
     public function dirIterator($dir = null, $returnIterator = false)
     {
         $ds = DIRECTORY_SEPARATOR;
-        $root = \IPS\ROOT_PATH;
+        $root = \IPS\Application::getRootPath();
         $save = $this->save . $ds;
         $finder = new Finder();
         try {
@@ -636,8 +636,8 @@ class _Proxyclass extends Singleton
         $ds = DIRECTORY_SEPARATOR;
 
         return [
-            \IPS\ROOT_PATH . $ds . 'applications',
-            \IPS\ROOT_PATH . $ds . 'system',
+            \IPS\Application::getRootPath() . $ds . 'applications',
+            \IPS\Application::getRootPath() . $ds . 'system',
         ];
     }
 
@@ -674,7 +674,7 @@ class _Proxyclass extends Singleton
             'GraphQL',
         ];
 
-        $exd = \IPS\ROOT_PATH . '/excluded.php';
+        $exd = \IPS\Application::getRootPath() . '/excluded.php';
         if (file_exists($exd)) {
             require $exd;
             if (isset($excludeFolders)) {
@@ -694,7 +694,7 @@ class _Proxyclass extends Singleton
             'uploads',
         ];
 
-        $exd = \IPS\ROOT_PATH . '/excludedCss.php';
+        $exd = \IPS\Application::getRootPath() . '/excludedCss.php';
         if (file_exists($exd)) {
             require $exd;
             if (isset($excludeFolders)) {
@@ -708,7 +708,7 @@ class _Proxyclass extends Singleton
     {
         $return = [];
 
-        $exf = \IPS\ROOT_PATH . '/excludedCss.php';
+        $exf = \IPS\Application::getRootPath() . '/excludedCss.php';
         if (file_exists($exf)) {
             require $exf;
             if (isset($excludeFiles)) {
@@ -744,7 +744,7 @@ class _Proxyclass extends Singleton
             'system/Output/System/Output.php'
         ];
 
-        $exf = \IPS\ROOT_PATH . '/excluded.php';
+        $exf = \IPS\Application::getRootPath() . '/excluded.php';
         if (file_exists($exf)) {
             require $exf;
             if (isset($excludeFiles)) {
@@ -820,7 +820,7 @@ class _Proxyclass extends Singleton
 
     protected function buildAppHooks(\IPS\Application $app)
     {
-        $appDir = \IPS\ROOT_PATH . '/applications/' . $app->directory;
+        $appDir = \IPS\Application::getRootPath() . '/applications/' . $app->directory;
         $dir = $appDir . '/data/hooks.json';
         $hooks = json_decode(file_get_contents($dir), true);
         foreach ($hooks as $file => $data) {

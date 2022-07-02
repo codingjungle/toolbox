@@ -136,7 +136,7 @@ class _Templates extends Singleton
 
         foreach ($templates as $template) {
             if ($template['app'] !== 'toolbox') {
-                $path = \IPS\ROOT_PATH . '/applications/' . $template['app'] . '/dev/html/' . $template['location'] . '/' . $template['group'] . '/' . $template['name'] . '.phtml';
+                $path = \IPS\Application::getRootPath() . '/applications/' . $template['app'] . '/dev/html/' . $template['location'] . '/' . $template['group'] . '/' . $template['name'] . '.phtml';
                 $url = (new Editor())->replace($path);
                 //$name = $template[ 'app' ] . ' -> ' . $template[ 'group' ] . ' -> ' . $template[ 'name' ];
                 $name = $path;
@@ -176,11 +176,11 @@ class _Templates extends Singleton
             if (mb_strpos($path, ',') !== false) {
                 $p = explode(',', $path);
                 foreach ($p as $pc) {
-                    $url = (new Editor())->replace(\IPS\ROOT_PATH . '/' . $pc);
+                    $url = (new Editor())->replace(\IPS\Application::getRootPath() . '/' . $pc);
                     $list[$pc] = ['url' => $url, 'name' => $pc];
                 }
             } else {
-                $url = (new Editor())->replace(\IPS\ROOT_PATH . '/' . $path);
+                $url = (new Editor())->replace(\IPS\Application::getRootPath() . '/' . $path);
                 $list[$path] = ['url' => $url, 'name' => $path];
             }
         }
@@ -214,7 +214,7 @@ class _Templates extends Singleton
 
         foreach ($js as $c) {
             $path = str_replace(Url::baseUrl(Url::PROTOCOL_RELATIVE), '', $c);
-            $url = (new Editor())->replace(\IPS\ROOT_PATH . '/' . $path);
+            $url = (new Editor())->replace(\IPS\Application::getRootPath() . '/' . $path);
             $list[$path] = ['url' => $url, 'name' => $path];
         }
 

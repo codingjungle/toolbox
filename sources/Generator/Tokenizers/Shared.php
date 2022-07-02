@@ -32,7 +32,6 @@ use function str_replace;
 use function token_get_all;
 use function trim;
 
-use const IPS\ROOT_PATH;
 use const T_ABSTRACT;
 use const T_CLASS;
 use const T_COMMENT;
@@ -74,7 +73,7 @@ trait Shared
         $this->isHook = $hook;
 
         if (!file_exists($file)) {
-            $file = ROOT_PATH . '/' . $file;
+            $file = \IPS\Application::getRootPath() . '/' . $file;
             if (!file_exists($file)) {
                 throw new InvalidArgumentException('Path is invalid: ' . $this->path);
             }
@@ -600,10 +599,10 @@ trait Shared
 
     public function backup()
     {
-        $path = ROOT_PATH . '/' . $this->path;
+        $path = \IPS\Application::getRootPath() . '/' . $this->path;
         if ($this->path !== null && file_exists($path)) {
             $contents = file_get_contents($path);
-            file_put_contents(ROOT_PATH . '/' . $this->backUpName(), $contents);
+            file_put_contents(\IPS\Application::getRootPath() . '/' . $this->backUpName(), $contents);
         }
     }
 
@@ -614,7 +613,7 @@ trait Shared
 
     public function hasBackup()
     {
-        $path = ROOT_PATH . '/' . $this->backUpName();
+        $path = \IPS\Application::getRootPath() . '/' . $this->backUpName();
 
         return file_exists($path);
     }

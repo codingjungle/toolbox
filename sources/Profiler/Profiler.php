@@ -57,7 +57,6 @@ use function round;
 use const IPS\CACHE_PAGE_TIMEOUT;
 use const IPS\CACHING_LOG;
 use const IPS\NO_WRITES;
-use const IPS\ROOT_PATH;
 use const PHP_VERSION;
 
 Application::loadAutoLoader();
@@ -480,7 +479,7 @@ class _Profiler extends Singleton
     {
         if (Settings::i()->dtprofiler_git_data) {
             $app = Request::i()->id;
-            $path = ROOT_PATH . '/applications/' . $app . '/.git/';
+            $path = \IPS\Application::getRootPath() . '/applications/' . $app . '/.git/';
             //            print_r($path);exit;
             if (is_dir($path) && function_exists('exec')) {
                 $app = Application::load($app);
@@ -527,7 +526,7 @@ class _Profiler extends Singleton
         if (function_exists('exec')) {
             /* @var Application $app */
             foreach (Application::enabledApplications() as $app) {
-                $path = ROOT_PATH . '/applications/' . $app->directory . '/.git/';
+                $path = \IPS\Application::getRootPath() . '/applications/' . $app->directory . '/.git/';
                 if (is_dir($path)) {
                     $name = $app->_title;
                     Member::loggedIn()->language()->parseOutputForDisplay($name);

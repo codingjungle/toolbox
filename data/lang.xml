@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="toolbox" version="40002">
+ <app key="toolbox" version="50000">
   <word key="__app_toolbox" js="0">Dev Toolbox</word>
   <word key="menutab__devtools" js="0">Dev Toolbox</word>
   <word key="menutab__devtools_icon" js="0">wrench</word>
@@ -342,8 +342,22 @@
   <word key="dtcode_analyzer_complete" js="0">Analyzing complete!</word>
   <word key="interface_occupied" js="0">Interface Empty (%s)</word>
   <word key="interface_occupied_desc" js="0">The interface folder in your application isn't empty, the files might be in use, this makes the app incompatible with the Community in the cloud!</word>
-  <word key="root_path" js="0">ROO_PATH Usage (%s)</word>
+  <word key="root_path" js="0">ROOT_PATH Usage (%s)</word>
   <word key="root_path_desc" js="0">\IPS\ROOT_PATH is no longer to be used by 3rd party dev's, use \IPS\Application::getRootPath() method instead.</word>
+  <word key="error_codes_ips" js="0">IPS Error Code Usage (%s)</word>
+  <word key="error_codes_ips_desc" js="0">This list error codes in use that could possibly be ones used by IPS.</word>
+  <word key="error_codes_dupes" js="0">Duplicate Error Codes (%s)</word>
+  <word key="error_codes_dupes_desc" js="0">These are duplicate errors codes used in your code.</word>
+  <word key="dtdevplus_menu_title_member" js="0">Member</word>
+  <word key="dtdevplus_class_member_alt_table" js="0">Alt Table Name</word>
+  <word key="dtdevplus_class_member_alt_table_desc" js="0">Name of your member table for your app</word>
+  <word key="dtdevplus_class_member_alt_prefix" js="0">Alt Table Prefix</word>
+  <word key="dtdevplus_class_member_alt_prefix_desc" js="0">the prefix of your member table.</word>
+  <word key="dtdevplus_class_member_alt_id" js="0">Table ID Field</word>
+  <word key="dtdevplus_class_member_alt_id_desc" js="0">The ID field of your members table.</word>
+  <word key="dtdevplus_menu_title_orm" js="0">Orm</word>
+  <word key="dtdevplus_menu_title_settings" js="0">Settings Class</word>
+  <word key="menu__toolbox_settings_adminer" js="0">Adminer</word>
   <word key="toolbox_doing_proxies" js="1">Generating Proxies</word>
   <word key="toolbox_done_proxies" js="1">Proxies Generated!</word>
  </app>

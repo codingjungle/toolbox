@@ -42,7 +42,7 @@ trait LanguageBuilder
     protected function _addToLangs($key, $value, Application $application)
     {
         $lang = [];
-        $dir = \IPS\ROOT_PATH . "/applications/{$application->directory}/dev/";
+        $dir = \IPS\Application::getRootPath() . "/applications/{$application->directory}/dev/";
         $file = $dir . 'lang.php';
 
         try {

@@ -28,7 +28,6 @@ use function md5;
 use function token_get_all;
 use function trim;
 
-use const IPS\ROOT_PATH;
 use const T_ABSTRACT;
 use const T_CLASS;
 use const T_CONSTANT_ENCAPSED_STRING;
@@ -89,7 +88,7 @@ class _ClassBuilder
 
     public static function tokenize($path)
     {
-        $fullPath = ROOT_PATH . '/' . $path;
+        $fullPath = \IPS\Application::getRootPath() . '/' . $path;
         if (file_exists($fullPath)) {
             $source = file_get_contents($fullPath);
             $tokens = token_get_all($source);
@@ -631,8 +630,7 @@ EOF;
                 $this->toWrite .= $meth;
             }
         }
-        file_put_contents(ROOT_PATH . '/foo.php', $this->toWrite);
-        _p($this->toWrite);
+        file_put_contents(\IPS\Application::getRootPath() . '/foo.php', $this->toWrite);
     }
 
     protected function hash($value)

@@ -42,8 +42,6 @@
  <hook key="DevTheme"><![CDATA[{"type":"C","class":"\\IPS\\Theme\\Dev\\Theme"}]]></hook>
  <hook key="DevTemplate"><![CDATA[{"type":"C","class":"\\IPS\\Theme\\Dev\\Template"}]]></hook>
  <hook key="HelpersTableCustom"><![CDATA[{"type":"C","class":"\\IPS\\Helpers\\Table\\Custom"}]]></hook>
- <hook key="Dispatcher"><![CDATA[{"type":"C","class":"\\IPS\\Dispatcher"}]]></hook>
- <hook key="MultiRedirect"><![CDATA[{"type":"C","class":"\\IPS\\Helpers\\MultipleRedirect"}]]></hook>
  <hook key="Request"><![CDATA[{"type":"C","class":"\\IPS\\Request"}]]></hook>
  <hook key="Singleton"><![CDATA[{"type":"C","class":"\\IPS\\Patterns\\Singleton"}]]></hook>
  <hook key="Db"><![CDATA[{"type":"C","class":"\\IPS\\Db"}]]></hook>
@@ -64,4 +62,7 @@
  <hook key="Hooks"><![CDATA[{"type":"C","class":"\\IPS\\Plugin\\Hook"}]]></hook>
  <hook key="Content"><![CDATA[{"type":"C","class":"\\IPS\\Content"}]]></hook>
  <hook key="themeAdminGlobal"><![CDATA[{"type":"S","class":"\\IPS\\Theme\\class_core_admin_global"}]]></hook>
+ <hook key="FormAbstract"><![CDATA[{"type":"C","class":"\\IPS\\Helpers\\Form\\FormAbstract"}]]></hook>
+ <hook key="serviceworker"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\front\\system\\serviceworker"}]]></hook>
+ <hook key="dispatcherStandard"><![CDATA[{"type":"C","class":"\\IPS\\Dispatcher\\Standard"}]]></hook>
 </build>

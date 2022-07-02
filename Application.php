@@ -29,8 +29,6 @@ use function ob_start;
 use function preg_replace_callback;
 use function str_replace;
 
-use const IPS\ROOT_PATH;
-
 use function file_get_contents;
 use function json_decode;
 
@@ -49,19 +47,14 @@ class _Application extends Application
         'dtprofiler',
     ];
 
-    /**
-     * @var string
-     */
-    protected static $baseDir = ROOT_PATH . '/applications/toolbox/sources/vendor/';
-
     protected static $loaded = false;
 
     public static function loadAutoLoader(): void
     {
         if (static::$loaded === false) {
             static::$loaded = true;
-            require static::$baseDir . '/autoload.php';
-            IPS::$PSR0Namespaces['Generator'] = ROOT_PATH . '/applications/toolbox/sources/Generator/';
+            require \IPS\Application::getRootPath() . '/applications/toolbox/sources/vendor/autoload.php';
+            IPS::$PSR0Namespaces['Generator'] = \IPS\Application::getRootPath() . '/applications/toolbox/sources/Generator/';
         }
     }
 
@@ -156,7 +149,7 @@ class _Application extends Application
 
         $content = '<div id="toolboxAdminer">';
         ob_start();
-        include(ROOT_PATH . '/applications/toolbox/sources/Profiler/Adminer.php');
+        include(\IPS\Application::getRootPath() . '/applications/toolbox/sources/Profiler/Adminer.php');
         $content .= ob_get_clean();
         ob_end_clean();
         $content .= "</div>";

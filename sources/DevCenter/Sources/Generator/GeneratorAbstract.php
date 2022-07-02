@@ -287,9 +287,9 @@ abstract class _GeneratorAbstract
         }
 
         if ($this->type === 'Api') {
-            $dir = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/api/';
+            $dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/api/';
         } else {
-            $dir = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/sources/' . $this->_getDir();
+            $dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/sources/' . $this->_getDir();
         }
 
         $file = $this->classname . '.php';
@@ -520,12 +520,12 @@ EOF;
      */
     protected function _createRelation($file, $dir, $database): void
     {
-        $relationFile = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/data/';
+        $relationFile = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/data/';
         $relations = [];
         if (file_exists($relationFile . '/arRelations.json')) {
             $relations = json_decode(file_get_contents($relationFile . '/arRelations.json'), true);
         }
-        $relations[$database] = str_replace(\IPS\ROOT_PATH . '/', '', $dir) . '/' . $file;
+        $relations[$database] = str_replace(\IPS\Application::getRootPath() . '/', '', $dir) . '/' . $file;
         $this->_writeFile('arRelations.json', json_encode($relations), $relationFile, false);
     }
 

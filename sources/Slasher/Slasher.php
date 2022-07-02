@@ -78,7 +78,7 @@ class _Slasher extends Singleton
         $this->getFunctions();
         $sd = array_merge($this->defaultDirectories, $skippedDirectories);
         $sf = array_merge($this->defaultFiles, $skippedFiles);
-        $dir = \IPS\ROOT_PATH . '/applications/' . $application->directory . '/';
+        $dir = \IPS\Application::getRootPath() . '/applications/' . $application->directory . '/';
         $finder = new Finder();
 
         $finder->in($dir);

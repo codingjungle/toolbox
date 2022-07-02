@@ -167,7 +167,7 @@ trait ModuleBuilder
 
         $this->_addToLangs('menu__' . $application->directory . '_' . $module->key, $module->key, $application);
         $this->_writeModules($modules, $application);
-        $targetDir = \IPS\ROOT_PATH . "/applications/{$application->directory}/modules/{$location}/{$module->key}/";
+        $targetDir = \IPS\Application::getRootPath() . "/applications/{$application->directory}/modules/{$location}/{$module->key}/";
         $fs = new Filesystem();
 
         try {
@@ -183,8 +183,8 @@ trait ModuleBuilder
         if ($location === 'admin') {
             /* Create a restriction? */
             $restrictions = [];
-            if (is_file(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json")) {
-                $file = \IPS\ROOT_PATH . '/applications/' . $application->directory . '/data/acprestrictions.json';
+            if (is_file(\IPS\Application::getRootPath() . "/applications/{$application->directory}/data/acprestrictions.json")) {
+                $file = \IPS\Application::getRootPath() . '/applications/' . $application->directory . '/data/acprestrictions.json';
                 $restrictions = [];
                 if (file_exists($file)) {
                     $restrictions = json_decode(file_get_contents($file), true);
@@ -194,7 +194,7 @@ trait ModuleBuilder
 
             try {
                 Application::writeJson(
-                    \IPS\ROOT_PATH . "/applications/{$application->directory}/data/acprestrictions.json",
+                    \IPS\Application::getRootPath() . "/applications/{$application->directory}/data/acprestrictions.json",
                     $restrictions
                 );
             } catch (RuntimeException $e) {
@@ -261,7 +261,7 @@ trait ModuleBuilder
 
         if ($location === 'admin') {
             /* Add to the menu */
-            $file = \IPS\ROOT_PATH . '/applications/' . $application->directory . '/data/acpmenu.json';
+            $file = \IPS\Application::getRootPath() . '/applications/' . $application->directory . '/data/acpmenu.json';
             $menu = [];
             if (file_exists($file)) {
                 $menu = json_decode(file_get_contents($file), true);
@@ -276,7 +276,7 @@ trait ModuleBuilder
 
             try {
                 Application::writeJson(
-                    \IPS\ROOT_PATH . "/applications/{$application->directory}/data/acpmenu.json",
+                    \IPS\Application::getRootPath() . "/applications/{$application->directory}/data/acpmenu.json",
                     $menu
                 );
             } catch (RuntimeException $e) {
@@ -313,7 +313,7 @@ trait ModuleBuilder
      */
     protected function _getModules(Application $application): array
     {
-        $file = \IPS\ROOT_PATH . "/applications/{$application->directory}/data/modules.json";
+        $file = \IPS\Application::getRootPath() . "/applications/{$application->directory}/data/modules.json";
         $json = [];
         if (file_exists($file)) {
             $json = json_decode(file_get_contents($file), true);
@@ -382,7 +382,7 @@ trait ModuleBuilder
         }
 
         try {
-            Application::writeJson(\IPS\ROOT_PATH . "/applications/{$application->directory}/data/modules.json", $json);
+            Application::writeJson(\IPS\Application::getRootPath() . "/applications/{$application->directory}/data/modules.json", $json);
         } catch (RuntimeException $e) {
         }
     }

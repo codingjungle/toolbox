@@ -28,7 +28,7 @@ class toolbox_hook_BuilderIterator extends _HOOK_CLASS_
     public function current()
     {
         $file = $this->key();
-        $file = \IPS\ROOT_PATH . '/applications/' . $this->application->directory . '/' . $file;
+        $file = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/' . $file;
         $path = new SplFileInfo($this->key());
         if (is_file($file) && (mb_strpos($file, '3rdparty') === false || mb_strpos(
                     $file,

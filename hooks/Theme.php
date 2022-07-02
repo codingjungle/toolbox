@@ -43,7 +43,7 @@ class toolbox_hook_Theme extends _HOOK_CLASS_
 
     public static function runProcessFunction($content, $functionName)
     {
-        $path = \IPS\ROOT_PATH . '/toolbox_templates/';
+        $path = \IPS\Application::getRootPath() . '/toolbox_templates/';
 
         $filename = $path . $functionName . md5($content) . '.php';
         /* If it's already been built, we don't need to do it again */

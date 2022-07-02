@@ -20,8 +20,8 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
     protected static function _getCssPath($app, $location = null, $path = null)
     {
         if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
-            //$this->sourceFolder = \IPS\ROOT_PATH . '/themes/28/html/' . $app . '/' . $templateLocation . '/' . $templateName . '/';
-            $themedir = \IPS\ROOT_PATH . '/themes/' . Application::getThemeId() . '/css/' . $app . '/' . $location . '/' . $path . '/';
+            //$this->sourceFolder = \IPS\Application::getRootPath() . '/themes/28/html/' . $app . '/' . $templateLocation . '/' . $templateName . '/';
+            $themedir = \IPS\Application::getRootPath() . '/themes/' . Application::getThemeId() . '/css/' . $app . '/' . $location . '/' . $path . '/';
             $return = rtrim($themedir, '/') . (stristr($path, '.css') ? '' : '/');
             return $return;
         }
@@ -32,8 +32,8 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
     protected static function _getHtmlPath($app, $location = null, $path = null)
     {
         if (defined('DT_THEME') && defined('DT_THEME_ID') && DT_THEME === true && DT_THEME_ID !== 0) {
-            //$this->sourceFolder = \IPS\ROOT_PATH . '/themes/28/html/' . $app . '/' . $templateLocation . '/' . $templateName . '/';
-            $themedir = \IPS\ROOT_PATH . '/themes/' . Application::getThemeId() . '/html/' . $app . '/' . $location . '/';
+            //$this->sourceFolder = \IPS\Application::getRootPath() . '/themes/28/html/' . $app . '/' . $templateLocation . '/' . $templateName . '/';
+            $themedir = \IPS\Application::getRootPath() . '/themes/' . Application::getThemeId() . '/html/' . $app . '/' . $location . '/';
 
             return rtrim($themedir, '/');
         }
@@ -46,7 +46,7 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
             if ($app == 'core' and $location == 'global' and mb_substr($path, 0, mb_strpos($path, '/')) === 'plugins') {
                 foreach (
                     new GlobIterator(
-                        \IPS\ROOT_PATH . '/plugins/*/dev/resources/' . mb_substr($path, mb_strpos($path, '/') + 1)
+                        \IPS\Application::getRootPath() . '/plugins/*/dev/resources/' . mb_substr($path, mb_strpos($path, '/') + 1)
                     ) as $file
                 ) {
                     return $file->getPathName();
@@ -54,7 +54,7 @@ class toolbox_hook_DevTheme extends _HOOK_CLASS_
             }
 
             return rtrim(
-                    \IPS\ROOT_PATH . '/themes/' . Application::getThemeId() . '/resources/' . $app . '/' . $location . '/' . $path,
+                    \IPS\Application::getRootPath() . '/themes/' . Application::getThemeId() . '/resources/' . $app . '/' . $location . '/' . $path,
                     '/'
                 ) . ((stristr($path, '.') || stristr($path, '{')) ? '' : '/');
         }

@@ -1,0 +1,12 @@
+{
+    "added": [
+        "FormAbstract",
+        "serviceworker",
+        "dispatcherStandard"
+    ],
+    "edited": [],
+    "removed": [
+        "Dispatcher",
+        "MultiRedirect"
+    ]
+}

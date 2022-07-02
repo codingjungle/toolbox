@@ -99,7 +99,7 @@ class _Headerdoc extends Singleton
 
         try {
             $finder = new Finder();
-            $dir = \IPS\ROOT_PATH . '/applications/' . $app->directory;
+            $dir = \IPS\Application::getRootPath() . '/applications/' . $app->directory;
             $filter = function (SplFileInfo $file) use ($exclude) {
                 if (!in_array($file->getExtension(), $exclude, true)) {
                     return true;
@@ -176,7 +176,7 @@ class _Headerdoc extends Singleton
         }
 
         $finder = new Finder();
-        $dir = \IPS\ROOT_PATH . '/applications/' . $app->directory;
+        $dir = \IPS\Application::getRootPath() . '/applications/' . $app->directory;
 
 
         $finder->in($dir)->name('*.php')->notName('Application.php');
@@ -273,7 +273,7 @@ class _Headerdoc extends Singleton
                     $brief = str_replace(' ', '', trim($brief[1]));
                 }
 
-                $replacement = file_get_contents(\IPS\ROOT_PATH . '/applications/toolbox/data/defaults/headerDoc.txt');
+                $replacement = file_get_contents(\IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/headerDoc.txt');
                 $replacement = str_replace(
                     ['{brief}', '{subpackage}', '{since}'],
                     [

@@ -93,7 +93,7 @@ class _build extends Controller
         if ($values = $form->values()) {
             $long = $values['long_version'];
             $short = $values['short_version'];
-            $path = \IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'devtoolbox' . DIRECTORY_SEPARATOR . $short . DIRECTORY_SEPARATOR;
+            $path = \IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'devtoolbox' . DIRECTORY_SEPARATOR . $short . DIRECTORY_SEPARATOR;
 
             if (!is_dir($path)) {
                 if (!mkdir($path, IPS_FOLDER_PERMISSION, true) && !is_dir($path)) {
@@ -102,7 +102,7 @@ class _build extends Controller
                 chmod($path, IPS_FOLDER_PERMISSION);
             }
 
-            $slasherPath = \IPS\ROOT_PATH . '/applications/toolbox/sources/vendor/slasher.php';
+            $slasherPath = \IPS\Application::getRootPath() . '/applications/toolbox/sources/vendor/slasher.php';
             require_once $slasherPath;
 
             foreach ($apps as $app) {
@@ -112,7 +112,7 @@ class _build extends Controller
                     $application->version = $short;
                     $application->save();
                     //lets slash them before we go forward
-                    $appPath = \IPS\ROOT_PATH . '/applications/' . $application->directory . '/';
+                    $appPath = \IPS\Application::getRootPath() . '/applications/' . $application->directory . '/';
                     $args = [
                         'foo.php',
                         $appPath,
@@ -144,12 +144,12 @@ class _build extends Controller
             //        $phar = new Phar($slasher );
             //        $phar->startBuffering();
             //        $phar->setStub("#!/usr/bin/env php \n".$phar::createDefaultStub('index.php'));
-            //        $phar->buildFromDirectory(\IPS\ROOT_PATH.'/applications/slasher/', '/\.php$/');
+            //        $phar->buildFromDirectory(\IPS\Application::getRootPath().'/applications/slasher/', '/\.php$/');
             //
             //        $phar->stopBuffering();
 
-            //            copy(\IPS\ROOT_PATH . '/applications/slasher/slasher.php', $path . 'slasher.php');
-            copy(\IPS\ROOT_PATH . '/applications/toolbox/data/defaults/install.txt', $path . 'install.txt');
+            //            copy(\IPS\Application::getRootPath() . '/applications/slasher/slasher.php', $path . 'slasher.php');
+            copy(\IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/install.txt', $path . 'install.txt');
 
             $files = [];
 
