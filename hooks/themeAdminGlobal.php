@@ -21,7 +21,7 @@ class toolbox_hook_themeAdminGlobal extends _HOOK_CLASS_
                                     'selector' => 'div.acpBlock',
                                     'type'     => 'replace',
                                     'content'  => '
-{{if \IPS\Request::i()->controller === \'developer\' && !\IPS\Request::i()->isAjax()}}
+{{if \IPS\Request::i()->controller === \'developer\' && \IPS\Request::i()->tab !== \'hooks\' && !\IPS\Request::i()->isAjax()}}
 <div class="ipsColumns">
 	<div class="ipsColumn ipsColumn_wide">
   	{{$sideBar = \IPS\toolbox\Application::getSidebar();}}

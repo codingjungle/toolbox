@@ -8,6 +8,8 @@ use IPS\toolbox\Proxy\Generator\Db;
 use IPS\toolbox\Proxy\Generator\Proxy;
 use IPS\toolbox\Proxy\Proxyclass;
 
+use Throwable;
+
 use function class_exists;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -85,8 +87,12 @@ class toolbox_hook_Db extends _HOOK_CLASS_
             $time = new Time();
         }
 
-        $parent = parent::query($query, $log, $read);
-
+        try {
+            $parent = parent::query($query, $log, $read);
+        }
+        catch(\Exception | Throwable $e){
+            throw new \IPS\Db\Exception( $this->error, $this->errno );
+        }
         if (\IPS\QUERY_LOG && class_exists(Memory::class, true)) {
             $final = $time->end();
             $mem = $memory->end();

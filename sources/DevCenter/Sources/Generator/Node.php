@@ -88,6 +88,12 @@ class _Node extends GeneratorAbstract
         $this->urlTemplate();
         $this->_url();
 
+        $doc = [
+            '@brief max number of results to return for form helper',
+            '@var int'
+        ];
+        $this->generator->addProperty('maxFormHelperResults', 10, ['static' => true, 'document' => $doc]);
+
         if ($this->content_item_class !== null) {
             $this->nodeItemClass();
         }

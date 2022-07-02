@@ -189,6 +189,7 @@ EOF;
             if (!is_file(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php')) {
                 file_put_contents(\IPS\ROOT_PATH . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
             }
+            $content = str_replace('self::monkeyPatch', 'static::monkeyPatch', $content);
             $preg = "#class IPS$#msu";
             $content = preg_replace_callback($preg, static function ($e) {
                 return 'class IPSBU';
@@ -285,4 +286,5 @@ eof;
 
         Output::i()->redirect($this->url, 'init.php patched');
     }
+
 }

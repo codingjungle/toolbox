@@ -147,6 +147,14 @@ class _toolbox
                 'description' => 'sets delete to be immediate instead of going to the log. this is helpful if you are testing things.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools'
+            ],
+            'DT_SLASHER' => [
+                'name' => 'DT_SLASHER',
+                'default' => 0,
+                'current' => defined('\DT_SLASHER') ? DT_SLASHER : false,
+                'description' => 'combined with DTBUILD, enables or disables the slasher routine (slasher adds in the global namespace to php functions thru imports).',
+                'type' => 'boolean',
+                'tab' => 'DevTools',
             ]
         ];
     }
@@ -159,6 +167,7 @@ class _toolbox
     public function add2Important()
     {
         return [
+            'DEV_DISABLE_ACP_SESSION_TIMEOUT',
             'BYPASS_ACP_IP_CHECK',
             'IN_DEV',
             'IN_DEV_STRICT_MODE',

@@ -407,17 +407,16 @@ class _bt extends Controller
             Proxyclass::i()->buildCss();
             unset(Store::i()->dtproxy_proxy_files, Store::i()->dtproxy_templates);
             Output::i()->output = '';
-        }catch( Throwable $e){
+        } catch (Throwable $e) {
             Debug::log($e);
-            Output::i()->json( $e->getMessage().'<br><code>'.$e->getTraceAsString().'</code>', 500 );
-
+            Output::i()->json($e->getMessage() . '<br><code>' . $e->getTraceAsString() . '</code>', 500);
         }
     }
+
 //    protected function adminer()
 //    {
 //        $url = Url::baseUrl() . '/applications/toolbox/sources/Profiler/Adminer/db.php';
-//        Output::i(
-//        )->output = '<iframe id="toolboxAdminer"  width="100%" height="600px" marginheight="0" frameborder="0" src="' . $url . '"></iframe>';
+//        Output::i()->output = '<iframe id="toolboxAdminer"  width="100%" height="600px" src="' . $url . '"></iframe>';
 //    }
 
     //    protected function checkout(){

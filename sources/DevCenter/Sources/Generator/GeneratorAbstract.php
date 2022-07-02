@@ -27,10 +27,8 @@ use IPS\toolbox\Shared\Magic;
 use IPS\toolbox\Shared\ModuleBuilder;
 use IPS\toolbox\Shared\SchemaBuilder;
 use IPS\toolbox\Shared\Write;
-
 use RuntimeException;
 
-use function _p;
 use function array_merge;
 use function array_shift;
 use function count;
@@ -269,7 +267,7 @@ abstract class _GeneratorAbstract
             if(mb_strpos('IPS', $extends) === false){
                 $extends = '\\IPS\\'.$extends;
             }
-            $this->generator->addExtends( '\\IPS\\'. $this->extends);
+            $this->generator->addExtends($this->extends);
         }
 
         if (is_array($this->implements) && count($this->implements)) {

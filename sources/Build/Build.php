@@ -28,6 +28,7 @@ use PharData;
 use RuntimeException;
 
 use function chmod;
+use function defined;
 use function explode;
 use function is_dir;
 use function mkdir;
@@ -85,16 +86,20 @@ class _Build extends Singleton
         $form->add('toolbox_short_version')->label('Short Version')->required()->empty($newShort);
         $form->add('toolbox_beta', 'yn');
         $form->add('toolbox_beta_version', 'number')->required()->empty($beta);
-        $form->add('toolbox_skip_dir', 'stack')->label('Skip Directories')->description(
-            'Folders to skip using slasher on.'
-        )->empty(
-            [
-                '3rdparty',
-                'vendor',
-            ]
-        );
-        $form->add('toolbox_skip_files', 'stack')->label('Skip Files')->description('Files to skip using slasher on.');
 
+        if(defined('DT_SLASHER') && DT_SLASHER === true) {
+            $form->add('toolbox_skip_dir', 'stack')->label('Skip Directories')->description(
+                'Folders to skip using slasher on.'
+            )->empty(
+                [
+                    '3rdparty',
+                    'vendor',
+                ]
+            );
+            $form->add('toolbox_skip_files', 'stack')->label('Skip Files')->description(
+                'Files to skip using slasher on.'
+            );
+        }
         if ($values = $form->values()) {
             $long = $values['toolbox_long_version'];
             $short = $values['toolbox_short_version'];
@@ -119,12 +124,13 @@ class _Build extends Singleton
             $path = \IPS\ROOT_PATH . '/exports/' . $application->directory . '/' . $long . '/';
 
             try {
-                Slasher::i()->start(
-                    $application,
-                    $values['toolbox_skip_files'] ?? [],
-                    $values['toolbox_skip_dir'] ?? []
-                );
-
+                if(defined('DT_SLASHER') && DT_SLASHER === true) {
+                    Slasher::i()->start(
+                        $application,
+                        $values['toolbox_skip_files'] ?? [],
+                        $values['toolbox_skip_dir'] ?? []
+                    );
+                }
                 try {
                     $application->assignNewVersion($long, $short);
                     $application->build();

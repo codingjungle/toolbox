@@ -62,6 +62,7 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     public function includeJS()
     {
         Application::addJs(['global_proxy'], 'global');
+        Output::i()->jsVars['cj_debug'] = \IPS\IN_DEV === true || \IPS\DEBUG_JS === true ? 1 : 0;
 
         if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
             Application::addJs(['front_profiler']);

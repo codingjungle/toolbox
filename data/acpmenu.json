@@ -1,40 +1,47 @@
 {
-  "settings": {
     "settings": {
-      "tab": "devtools",
-      "controller": "settings",
-      "do": "",
-      "restriction": "settings_manage"
+        "settings": {
+            "tab": "devtools",
+            "controller": "settings",
+            "do": "",
+            "restriction": "settings_manage"
+        },
+        "adminer": {
+            "tab": "devtools",
+            "controller": "adminer",
+            "do": "",
+            "restriction": "adminer_manage",
+            "subcontrollers": ""
+        },
+        "cons": {
+            "tab": "devtools",
+            "controller": "cons",
+            "do": "",
+            "restriction": "cons_manage"
+        }
     },
-    "cons": {
-      "tab": "devtools",
-      "controller": "cons",
-      "do": "",
-      "restriction": "cons_manage"
-    }
-  },
-  "devfolder": {
-    "applications": {
-      "tab": "devtools",
-      "controller": "applications",
-      "do": "",
-      "restriction": "apps_manage"
-    }
-  },
-  "code": {
-    "analyzer": {
-      "tab": "devtools",
-      "controller": "analyzer",
-      "do": "",
-      "restriction": "view_manage"
-    }
-  },
-  "content": {
+    "devfolder": {
+        "applications": {
+            "tab": "devtools",
+            "controller": "applications",
+            "do": "",
+            "restriction": "apps_manage"
+        }
+    },
+    "code": {
+        "analyzer": {
+            "tab": "devtools",
+            "controller": "analyzer",
+            "do": "",
+            "restriction": "view_manage"
+        }
+    },
     "content": {
-      "tab": "devtools",
-      "controller": "generator",
-      "do": "",
-      "restriction": "view_manage"
+        "content": {
+            "tab": "devtools",
+            "controller": "generator",
+            "do": "",
+            "restriction": "view_manage"
+        }
     }
-  }
 }

@@ -127,12 +127,19 @@ class _Menu extends Singleton
 
         if ($plugins) {
             $store['roots'][] = [
-                'id'   => 'plugins',
+                'id' => 'plugins',
                 'name' => 'Plugins',
-                'url'  => 'elDevToolsPlugins',
+                'url' => 'elDevToolsPlugins',
             ];
         }
-
+        if (\IPS\Member::loggedIn()->hasAcpRestriction('toolbox', 'settings', 'settings_adminer')) {
+            $store['roots'][] = [
+                'id' => 'adminer',
+                'name' => 'Adminer',
+                'url' => (string)Url::internal('app=toolbox&module=settings&controller=adminer'),
+                'subs' => false
+            ];
+        }
         return $store;
     }
 
@@ -226,15 +233,15 @@ class _Menu extends Singleton
         ];
 
         $store['sys'][] = [
-            'id'   => 'syscheck',
+            'id' => 'syscheck',
             'name' => 'System Check',
-            'url'  => (string)Url::internal('app=core&module=support&controller=support&do=systemCheck'),
+            'url' => (string)Url::internal('app=core&module=support&controller=support&do=systemCheck'),
         ];
 
         $store['sys'][] = [
-            'id'   => 'phpinfo',
+            'id' => 'phpinfo',
             'name' => 'PHP Info',
-            'url'  => (string)Url::internal('app=core&module=support&controller=support&do=phpinfo'),
+            'url' => (string)Url::internal('app=core&module=support&controller=support&do=phpinfo'),
         ];
     }
 }

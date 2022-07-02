@@ -9,17 +9,17 @@
 class AdminerFrames
 {
     /** @access protected */
-    public $sameOrigin;
+    var $sameOrigin;
 
     /**
      * @param bool allow running from the same origin only
      */
-    public function __construct($sameOrigin = false)
+    function __construct($sameOrigin = false)
     {
         $this->sameOrigin = $sameOrigin;
     }
 
-    public function headers()
+    function headers()
     {
         if ($this->sameOrigin) {
             header("X-Frame-Options: SameOrigin");

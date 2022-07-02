@@ -468,7 +468,7 @@ class _Proxy extends GeneratorAbstract
                         $comment = null;
                         $return = $type === 'set_' ? 'void' : 'string';
                         if ($method->hasReturnType()) {
-                            $return = (string)$method->getReturnType();
+                            $return = $method->getReturnType()->getName();
                         } else {
                             $doc = $method->getDocComment();
                             preg_match_all('#@return([^\n]+)?#', $doc, $match);

@@ -9,27 +9,9 @@
 class AdminerPlugin extends Adminer
 {
     /** @access protected */
-    public $plugins;
+    var $plugins;
 
-    /** Register plugins
-     * @param array object instances or null to register all classes starting by 'Adminer'
-     */
-    public function __construct($plugins)
-    {
-        if ($plugins === null) {
-            $plugins = array();
-            foreach (get_declared_classes() as $class) {
-                if (preg_match('~^Adminer.~i', $class) && strcasecmp($this->_findRootClass($class),
-                        'Adminer')) { //! can use interface
-                    $plugins[$class] = new $class();
-                }
-            }
-        }
-        $this->plugins = $plugins;
-        //! it is possible to use ReflectionObject to find out which plugins defines which methods at once
-    }
-
-    public function _findRootClass($class)
+    function _findRootClass($class)
     { // is_subclass_of(string, string) is available since PHP 5.0.3
         do {
             $return = $class;
@@ -37,222 +19,32 @@ class AdminerPlugin extends Adminer
         return $return;
     }
 
-    public function backwardKeys($table, $tableName)
+    /** Register plugins
+     * @param array object instances or null to register all classes starting by 'Adminer'
+     */
+    function __construct($plugins)
     {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function backwardKeysPrint($backwardKeys, $row)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function bruteForceKey()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    // appendPlugin
-
-    public function connectSsl()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function credentials()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function csp()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    // applyPlugin
-
-    public function css()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function database()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function databases($flush = true)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function databasesPrint($missing)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function dumpData($table, $style, $query)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function dumpDatabase($db)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function dumpFilename($identifier)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function dumpFormat()
-    {
-        $args = func_get_args();
-        return $this->_appendPlugin(__FUNCTION__, $args);
-    }
-
-    public function _appendPlugin($function, $args)
-    {
-        $return = $this->_callParent($function, $args);
-        foreach ($this->plugins as $plugin) {
-            if (method_exists($plugin, $function)) {
-                $value = call_user_func_array(array($plugin, $function), $args);
-                if ($value) {
-                    $return += $value;
+        if ($plugins === null) {
+            $plugins = array();
+            foreach (get_declared_classes() as $class) {
+                if (preg_match('~^Adminer.~i', $class) && strcasecmp(
+                        $this->_findRootClass($class),
+                        'Adminer'
+                    )) { //! can use interface
+                    $plugins[$class] = new $class;
                 }
             }
         }
-        return $return;
+        $this->plugins = $plugins;
+        //! it is possible to use ReflectionObject to find out which plugins defines which methods at once
     }
 
-    public function _callParent($function, $args)
+    function _callParent($function, $args)
     {
         return call_user_func_array(array('parent', $function), $args);
     }
 
-    public function dumpHeaders($identifier, $multi_table = false)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function dumpOutput()
-    {
-        $args = func_get_args();
-        return $this->_appendPlugin(__FUNCTION__, $args);
-    }
-
-    public function dumpTable($table, $style, $is_view = 0)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function editFunctions($field)
-    {
-        $args = func_get_args();
-        return $this->_appendPlugin(__FUNCTION__, $args);
-    }
-
-    public function editHint($table, $field, $value)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function editInput($table, $field, $attrs, $value)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function editVal($val, $field)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function fieldName($field, $order = 0)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function foreignKeys($table)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function head()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function headers()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function homepage()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function importServerPath()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function login($login, $password)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function loginForm()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function loginFormField($name, $heading, $value)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function messageQuery($query, $time, $failed = false)
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function name()
-    {
-        $args = func_get_args();
-        return $this->_applyPlugin(__FUNCTION__, $args);
-    }
-
-    public function _applyPlugin($function, $args)
+    function _applyPlugin($function, $args)
     {
         foreach ($this->plugins as $plugin) {
             if (method_exists($plugin, $function)) {
@@ -289,199 +81,415 @@ class AdminerPlugin extends Adminer
         return $this->_callParent($function, $args);
     }
 
-    public function navigation($missing)
+    function _appendPlugin($function, $args)
+    {
+        $return = $this->_callParent($function, $args);
+        foreach ($this->plugins as $plugin) {
+            if (method_exists($plugin, $function)) {
+                $value = call_user_func_array(array($plugin, $function), $args);
+                if ($value) {
+                    $return += $value;
+                }
+            }
+        }
+        return $return;
+    }
+
+    // appendPlugin
+
+    function dumpFormat()
+    {
+        $args = func_get_args();
+        return $this->_appendPlugin(__FUNCTION__, $args);
+    }
+
+    function dumpOutput()
+    {
+        $args = func_get_args();
+        return $this->_appendPlugin(__FUNCTION__, $args);
+    }
+
+    function editRowPrint($table, $fields, $row, $update)
+    {
+        $args = func_get_args();
+        return $this->_appendPlugin(__FUNCTION__, $args);
+    }
+
+    function editFunctions($field)
+    {
+        $args = func_get_args();
+        return $this->_appendPlugin(__FUNCTION__, $args);
+    }
+
+    // applyPlugin
+
+    function name()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function permanentLogin($create = false)
+    function credentials()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function processInput($field, $value, $function = "")
+    function connectSsl()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function queryTimeout()
+    function permanentLogin($create = false)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function rowDescription($table)
+    function bruteForceKey()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function rowDescriptions($rows, $foreignKeys)
+    function serverName($server)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function schemas()
+    function database()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectActionPrint($indexes)
+    function schemas()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectColumnsPrint($select, $columns)
+    function databases($flush = true)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectColumnsProcess($columns, $indexes)
+    function queryTimeout()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectCommandPrint()
+    function headers()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectEmailPrint($emailFields, $columns)
+    function csp()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectEmailProcess($where, $foreignKeys)
+    function head()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectImportPrint()
+    function css()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectLengthPrint($text_length)
+    function loginForm()
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectLengthProcess()
+    function loginFormField($name, $heading, $value)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectLimitPrint($limit)
+    function login($login, $password)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectLimitProcess()
+    function tableName($tableStatus)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectLink($val, $field)
+    function fieldName($field, $order = 0)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectLinks($tableStatus, $set = "")
+    function selectLinks($tableStatus, $set = "")
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectOrderPrint($order, $columns, $indexes)
+    function foreignKeys($table)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectOrderProcess($fields, $indexes)
+    function backwardKeys($table, $tableName)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectQuery($query, $start, $failed = false)
+    function backwardKeysPrint($backwardKeys, $row)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectQueryBuild($select, $where, $group, $order, $limit, $page)
+    function selectQuery($query, $start, $failed = false)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectSearchPrint($where, $columns, $indexes)
+    function sqlCommandQuery($query)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectSearchProcess($fields, $indexes)
+    function rowDescription($table)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function selectVal($val, $link, $field, $original)
+    function rowDescriptions($rows, $foreignKeys)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function serverName($server)
+    function selectLink($val, $field)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function sqlCommandQuery($query)
+    function selectVal($val, $link, $field, $original)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function tableIndexesPrint($indexes)
+    function editVal($val, $field)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function tableName($tableStatus)
+    function tableStructurePrint($fields)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function tableStructurePrint($fields)
+    function tableIndexesPrint($indexes)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
     }
 
-    public function tablesPrint($tables)
+    function selectColumnsPrint($select, $columns)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectSearchPrint($where, $columns, $indexes)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectOrderPrint($order, $columns, $indexes)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectLimitPrint($limit)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectLengthPrint($text_length)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectActionPrint($indexes)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectCommandPrint()
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectImportPrint()
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectEmailPrint($emailFields, $columns)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectColumnsProcess($columns, $indexes)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectSearchProcess($fields, $indexes)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectOrderProcess($fields, $indexes)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectLimitProcess()
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectLengthProcess()
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectEmailProcess($where, $foreignKeys)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function selectQueryBuild($select, $where, $group, $order, $limit, $page)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function messageQuery($query, $time, $failed = false)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function editInput($table, $field, $attrs, $value)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function editHint($table, $field, $value)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function processInput($field, $value, $function = "")
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function dumpDatabase($db)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function dumpTable($table, $style, $is_view = 0)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function dumpData($table, $style, $query)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function dumpFilename($identifier)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function dumpHeaders($identifier, $multi_table = false)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function importServerPath()
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function homepage()
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function navigation($missing)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function databasesPrint($missing)
+    {
+        $args = func_get_args();
+        return $this->_applyPlugin(__FUNCTION__, $args);
+    }
+
+    function tablesPrint($tables)
     {
         $args = func_get_args();
         return $this->_applyPlugin(__FUNCTION__, $args);
