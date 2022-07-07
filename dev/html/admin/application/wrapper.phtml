@@ -1,0 +1,57 @@
+<ips:template parameters="$output,$mine,$ips,$third,$un" />
+<div class="ipsMargin_vertical">
+    {$output|raw}
+</div>
+<div class="ipsTabs ipsClearfix acpFormTabBar" id="elAppTabs" data-ipstabbar  data-ipstabbar-contentarea="#elAppTabs_content">
+    <a href="#elAppTabs" data-action="expandTabs"><i class="fa fa-caret-down"></i></a>
+    <ul role="tablist">
+        {{if $mine !== null}}
+        <li>
+            <a href="#" id="elAppTabs_mine" class="ipsTabs_item ipsTabs_activeItem" role="tab">
+                My Apps
+            </a>
+        </li>
+        {{endif}}
+        <li>
+            <a href="#" id="elAppTabs_ips" class="ipsTabs_item{{if $mine === null}} ipsTabs_activeItem{{endif}}" role="tab">
+                IPS Apps
+            </a>
+        </li>
+        {{if $third !== null}}
+        <li>
+            <a href="#" id="elAppTabs_third" class="ipsTabs_item" role="tab">
+                Third Party
+            </a>
+        </li>
+        {{endif}}
+        {{if $un !== null}}
+        <li>
+            <a href="#" id="elAppTabs_un" class="ipsTabs_item" role="tab">
+                Uninstalled
+            </a>
+        </li>
+        {{endif}}
+    </ul>
+</div>
+<section id="elAppTabs_content">
+    {{if $mine !== null}}
+    <div class="ipsTabs_panel" id="ipsTabs_elAppTabs_elAppTabs_mine_panel">
+        {$mine|raw}
+    </div>
+    {{endif}}
+    <div class="ipsTabs_panel" id="ipsTabs_elAppTabs_elAppTabs_ips_panel">
+        {$ips|raw}
+    </div>
+    {{if $third !== null}}
+    <div class="ipsTabs_panel" id="ipsTabs_elAppTabs_elAppTabs_third_panel">
+        {$third|raw}
+    </div>
+    {{endif}}
+    {{if $un !== null}}
+    <div class="ipsTabs_panel" id="ipsTabs_elAppTabs_elAppTabs_un_panel">
+        {$un|raw}
+    </div>
+    {{endif}}
+
+
+</section>

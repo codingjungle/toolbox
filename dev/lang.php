@@ -357,5 +357,7 @@ $lang = [
     'dtdevplus_class_member_alt_id_desc' => 'The ID field of your members table.',
     'dtdevplus_menu_title_orm' => 'Orm',
     'dtdevplus_menu_title_settings' => "Settings Class",
-    'menu__toolbox_settings_adminer' => 'Adminer'
+    'menu__toolbox_settings_adminer' => 'Adminer',
+    'toolbox_use_tabs_applications' => 'Applications Tabbed',
+    'toolbox_use_tabs_applications_desc' => 'Use tabs on the applications page to distinquish between Your Apps (using DT_MY_APPS constant), IPS apps, third party and uninstalled apps',
 ];

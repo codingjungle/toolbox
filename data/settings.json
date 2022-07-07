@@ -94,5 +94,9 @@
     {
         "key": "toolbox_debug_templates",
         "default": "0"
+    },
+    {
+        "key": "toolbox_use_tabs_applications",
+        "default": "1"
     }
 ]

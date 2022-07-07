@@ -16,6 +16,7 @@ namespace IPS\toolbox\extensions\toolbox\constants;
 use function defined;
 use function header;
 
+use const DT_ANALYZE;
 use const DT_ROUTE_TO_DEBUG;
 use const DT_THEME;
 use const DT_THEME_CMS_USE_DESIGNER_FILES;
@@ -155,7 +156,16 @@ class _toolbox
                 'description' => 'combined with DTBUILD, enables or disables the slasher routine (slasher adds in the global namespace to php functions thru imports).',
                 'type' => 'boolean',
                 'tab' => 'DevTools',
-            ]
+            ],
+            'DT_MY_APPS'                         => [
+                'name'        => 'DT_MY_APPS',
+                'default'     => false,
+                'current'     => defined('\DT_MY_APPS') ? DT_MY_APPS : "babble,babbleadmin,babbleextra,chrono,cjcboard,cjdashboard,cjdml,cjgames,cjmember,cjmg,cjrates,cjseo,cjtrack,cjtwd,clubmenus,dgform,dplus,dwlabs,formularize,keywords,myimports,n2a,nettookit,stratagem,toolbox,toplist",
+                'description' => 'This enables an app to be analyzed before you download it.',
+                'type' => 'string',
+                'tab'         => 'DevTools',
+
+            ],
         ];
     }
 
