@@ -1,0 +1,622 @@
+
+.adminerDarkMode a {
+    color: blue;
+    text-decoration: none;
+}
+
+.adminerDarkMode a:visited {
+    color: navy;
+}
+
+.adminerDarkMode a:link:hover, .adminerDarkMode a:visited:hover {
+    color: red;
+    text-decoration: underline;
+}
+
+.adminerDarkMode a.text:hover {
+    text-decoration: none;
+}
+
+.adminerDarkMode a.jush-help:hover {
+    color: inherit;
+}
+
+.adminerDarkMode h1 {
+    font-size: 150%;
+    margin: 0;
+    padding: .8em 1em;
+    border-bottom: 1px solid #999;
+    font-weight: normal;
+    color: #777;
+    background: #eee;
+}
+
+.adminerDarkMode h2 {
+    font-size: 150%;
+    margin: 0 0 20px -18px;
+    padding: .8em 1em;
+    border-bottom: 1px solid #000;
+    color: #000;
+    font-weight: normal;
+    background: #ddf;
+}
+
+.adminerDarkMode h3 {
+    font-weight: normal;
+    font-size: 130%;
+    margin: 1em 0 0;
+}
+
+.adminerDarkMode form {
+    margin: 0;
+}
+
+.adminerDarkMode td table {
+    width: 100%;
+    margin: 0;
+}
+
+.adminerDarkMode table {
+    margin: 1em 20px 0 0;
+    border-collapse: collapse;
+    font-size: 90%;
+}
+
+.adminerDarkMode td, .adminerDarkMode th {
+    border: 1px solid #999;
+    padding: .2em .3em;
+}
+
+.adminerDarkMode th {
+    background: #eee;
+    text-align: left;
+}
+
+.adminerDarkMode thead th {
+    text-align: center;
+    padding: .2em .5em;
+}
+
+.adminerDarkMode thead td, .adminerDarkMode thead th {
+    background: #ddf;
+}
+
+.adminerDarkMode fieldset {
+    display: inline;
+    vertical-align: top;
+    padding: .5em .8em;
+    margin: .8em .5em 0 0;
+    border: 1px solid #999;
+}
+
+.adminerDarkMode p {
+    margin: .8em 20px 0 0;
+}
+
+.adminerDarkMode img {
+    vertical-align: middle;
+    border: 0;
+}
+
+.adminerDarkMode td img {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+.adminerDarkMode code {
+    background: #eee;
+}
+
+.adminerDarkMode tbody tr:hover td, .adminerDarkMode tbody tr:hover th {
+    background: #eee;
+}
+
+.adminerDarkMode pre {
+    margin: 1em 0 0;
+}
+
+.adminerDarkMode pre, .adminerDarkMode textarea {
+    font: 100%/1.25 monospace;
+}
+
+.adminerDarkMode input {
+    vertical-align: middle;
+}
+
+.adminerDarkMode input.default {
+    box-shadow: 1px 1px 1px #777;
+}
+
+.adminerDarkMode input.required {
+    box-shadow: 1px 1px 1px red;
+}
+
+.adminerDarkMode input.maxlength {
+    box-shadow: 1px 1px 1px red;
+}
+
+.adminerDarkMode input.wayoff {
+    left: -1000px;
+    position: absolute;
+}
+
+.adminerDarkMode .block {
+    display: block;
+}
+
+.adminerDarkMode .version {
+    color: #777;
+    font-size: 67%;
+}
+
+.adminerDarkMode .js .hidden, .adminerDarkMode .nojs .jsonly {
+    display: none;
+}
+
+.adminerDarkMode .js .column {
+    position: absolute;
+    background: #ddf;
+    padding: .27em 1ex .3em 0;
+    margin-top: -.27em;
+}
+
+.adminerDarkMode .nowrap td, .adminerDarkMode .nowrap th, .adminerDarkMode td.nowrap, .adminerDarkMode p.nowrap {
+    white-space: pre;
+}
+
+.adminerDarkMode .wrap td {
+    white-space: normal;
+}
+
+.adminerDarkMode .error {
+    color: red;
+    background: #fee;
+}
+
+.adminerDarkMode .error b {
+    background: #fff;
+    font-weight: normal;
+}
+
+.adminerDarkMode .message {
+    color: green;
+    background: #efe;
+}
+
+.adminerDarkMode .message table {
+    color: #000;
+    background: #fff;
+}
+
+.adminerDarkMode .error, .adminerDarkMode .message {
+    padding: .5em .8em;
+    margin: 1em 20px 0 0;
+}
+
+.adminerDarkMode .char {
+    color: #007F00;
+}
+
+.adminerDarkMode .date {
+    color: #7F007F;
+}
+
+.adminerDarkMode .enum {
+    color: #007F7F;
+}
+
+.adminerDarkMode  .binary {
+    color: red;
+}
+
+.adminerDarkMode .odd td {
+    background: #F5F5F5;
+}
+
+.adminerDarkMode .js .checkable .checked td, .adminerDarkMode .js .checkable .checked th {
+    background: #ddf;
+}
+
+.adminerDarkMode .time {
+    color: silver;
+    font-size: 70%;
+}
+
+.adminerDarkMode .function {
+    text-align: right;
+}
+
+.adminerDarkMode .number {
+    text-align: right;
+}
+
+.adminerDarkMode .datetime {
+    text-align: right;
+}
+
+.adminerDarkMode .type {
+    width: 15ex;
+    width: auto \9;
+}
+
+.adminerDarkMode .options select {
+    width: 20ex;
+    width: auto \9;
+}
+
+.adminerDarkMode .view {
+    font-style: italic;
+}
+
+.adminerDarkMode .active {
+    font-weight: bold;
+}
+
+.adminerDarkMode .sqlarea {
+    width: 98%;
+}
+
+.adminerDarkMode .icon {
+    width: 18px;
+    height: 18px;
+    background-color: navy;
+}
+
+.adminerDarkMode .icon:hover {
+    background-color: red;
+}
+
+.adminerDarkMode .size {
+    width: 6ex;
+}
+
+.adminerDarkMode .help {
+    cursor: help;
+}
+
+.adminerDarkMode .footer {
+    position: sticky;
+    bottom: 0;
+    margin-right: -20px;
+    border-top: 20px solid rgba(255, 255, 255, .7);
+    border-image: linear-gradient(rgba(255, 255, 255, .2), #fff) 100% 0;
+}
+
+.adminerDarkMode .footer > div {
+    background: #fff;
+    padding: 0 0 .5em;
+}
+
+.adminerDarkMode .footer fieldset {
+    margin-top: 0;
+}
+
+.adminerDarkMode .links a {
+    white-space: nowrap;
+    margin-right: 20px;
+}
+
+.adminerDarkMode .logout {
+    margin-top: .5em;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.adminerDarkMode .loadmore {
+    margin-left: 1ex;
+}
+
+.adminerDarkMode #menu {
+    position: absolute;
+    margin: 10px 0 0;
+    padding: 0 0 30px 0;
+    top: 2em;
+    left: 0;
+    width: 19em;
+}
+
+.adminerDarkMode #menu p, .adminerDarkMode #logins, .adminerDarkMode #tables {
+    padding: .8em 1em;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.adminerDarkMode #logins li, .adminerDarkMode #tables li {
+    list-style: none;
+}
+
+.adminerDarkMode #dbs {
+    overflow: hidden;
+}
+
+.adminerDarkMode #logins, .adminerDarkMode #tables {
+    white-space: nowrap;
+    overflow: auto;
+}
+
+.adminerDarkMode #logins a, .adminerDarkMode #tables a, .adminerDarkMode #tables span {
+    background: #fff;
+}
+
+.adminerDarkMode #content {
+    margin: 2em 0 0 21em;
+    padding: 10px 20px 20px 0;
+}
+
+.adminerDarkMode #lang {
+    position: absolute;
+    top: 0;
+    left: 0;
+    line-height: 1.8em;
+    padding: .3em 1em;
+}
+
+.adminerDarkMode #breadcrumb {
+    white-space: nowrap;
+    position: absolute;
+    top: 0;
+    left: 21em;
+    background: #eee;
+    height: 2em;
+    line-height: 1.8em;
+    padding: 0 1em;
+    margin: 0 0 0 -18px;
+}
+
+.adminerDarkMode #h1 {
+    color: #777;
+    text-decoration: none;
+    font-style: italic;
+}
+
+.adminerDarkMode #version {
+    font-size: 67%;
+    color: red;
+}
+
+.adminerDarkMode #schema {
+    margin-left: 60px;
+    position: relative;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+.adminerDarkMode #schema .table {
+    border: 1px solid silver;
+    padding: 0 2px;
+    cursor: move;
+    position: absolute;
+}
+
+.adminerDarkMode #schema .references {
+    position: absolute;
+}
+
+.adminerDarkMode #help {
+    position: absolute;
+    border: 1px solid #999;
+    background: #eee;
+    padding: 5px;
+    font-family: monospace;
+    z-index: 1;
+}
+
+.adminerDarkMode .rtl h2 {
+    margin: 0 -18px 20px 0;
+}
+
+.adminerDarkMode .rtl p, .adminerDarkMode .rtl table, .adminerDarkMode .rtl .error, .adminerDarkMode .rtl .message {
+    margin: 1em 0 0 20px;
+}
+
+.adminerDarkMode .rtl .logout {
+    left: 0;
+    right: auto;
+}
+
+.adminerDarkMode .rtl #content {
+    margin: 2em 21em 0 0;
+    padding: 10px 0 20px 20px;
+}
+
+.adminerDarkMode .rtl #breadcrumb {
+    left: auto;
+    right: 21em;
+    margin: 0 -18px 0 0;
+}
+
+.adminerDarkMode .rtl .pages {
+    left: auto;
+    right: 21em;
+}
+
+.adminerDarkMode .rtl input.wayoff {
+    left: auto;
+    right: -1000px;
+}
+
+.adminerDarkMode .rtl #lang,.adminerDarkMode  .rtl #menu {
+    left: auto;
+    right: 0;
+}
+
+@media all and (max-device-width: 880px) {
+    .adminerDarkMode .pages {
+        left: auto;
+    }
+
+    .adminerDarkMode #menu {
+        position: static;
+        width: auto;
+    }
+
+    .adminerDarkMode #content {
+        margin-left: 10px;
+    }
+
+    .adminerDarkMode #lang {
+        position: static;
+        border-top: 1px solid #999;
+    }
+
+    .adminerDarkMode #breadcrumb {
+        left: auto;
+    }
+
+    .adminerDarkMode .rtl .pages {
+        right: auto;
+    }
+
+    .adminerDarkMode .rtl #content {
+        margin-right: 10px;
+    }
+
+    .adminerDarkMode .rtl #breadcrumb {
+        right: auto;
+    }
+}
+
+@media print {
+    .adminerDarkMode #lang,.adminerDarkMode  #menu {
+        display: none;
+    }
+
+    .adminerDarkMode #content {
+        margin-left: 1em;
+    }
+
+    .adminerDarkMode #breadcrumb {
+        left: 1em;
+    }
+
+    .adminerDarkMode .nowrap td,.adminerDarkMode  .nowrap th,.adminerDarkMode  td.nowrap {
+        white-space: normal;
+    }
+}
+
+.adminerDarkMode .jush {
+    color: black;
+}
+
+.adminerDarkMode .jush-htm_com,.adminerDarkMode  .jush-com, .adminerDarkMode .jush-com_code, .adminerDarkMode .jush-one, .adminerDarkMode .jush-php_doc, .adminerDarkMode .jush-php_com, .adminerDarkMode .jush-php_one,.adminerDarkMode  .jush-js_one, .adminerDarkMode .jush-js_doc {
+    color: gray;
+}
+
+.adminerDarkMode .jush-php, .adminerDarkMode .jush-php_new, .adminerDarkMode .jush-php_fun {
+    color: #000033;
+    background-color: #FFF0F0;
+}
+
+.adminerDarkMode .jush-php_quo, .adminerDarkMode .jush-quo, .adminerDarkMode .jush-quo_one,.adminerDarkMode  .jush-php_eot, .adminerDarkMode .jush-apo, .adminerDarkMode .jush-sql_apo, .adminerDarkMode .jush-sqlite_apo,.adminerDarkMode  .jush-sql_quo,.adminerDarkMode  .jush-sql_eot {
+    color: green;
+}
+
+.adminerDarkMode .jush-php_apo {
+    color: #009F00;
+}
+
+.adminerDarkMode .jush-php_quo_var, .adminerDarkMode .jush-php_var, .adminerDarkMode .jush-sql_var {
+    font-style: italic;
+}
+
+.adminerDarkMode .jush-php_apo .jush-php_quo_var, .adminerDarkMode .jush-php_apo .jush-php_var {
+    font-style: normal;
+}
+
+.adminerDarkMode .jush-php_halt2 {
+    background-color: white;
+    color: black;
+}
+
+.adminerDarkMode .jush-tag_css, .adminerDarkMode .jush-att_css .jush-att_quo, .adminerDarkMode .jush-att_css .jush-att_apo, .adminerDarkMode .jush-att_css .jush-att_val {
+    color: black;
+    background-color: #FFFFE0;
+}
+
+.adminerDarkMode .jush-tag_js, .adminerDarkMode .jush-att_js .jush-att_quo, .adminerDarkMode .jush-att_js .jush-att_apo, .adminerDarkMode .jush-att_js .jush-att_val, .adminerDarkMode .jush-css_js {
+    color: black;
+    background-color: #F0F0FF;
+}
+
+.adminerDarkMode .jush-tag, .adminerDarkMode .jush-xml_tag {
+    color: navy;
+}
+
+.adminerDarkMode .jush-att, .adminerDarkMode .jush-xml_att, .adminerDarkMode .jush-att_js, .adminerDarkMode .jush-att_css, .adminerDarkMode .jush-att_http {
+    color: teal;
+}
+
+.adminerDarkMode .jush-att_quo, .adminerDarkMode .jush-att_apo, .adminerDarkMode .jush-att_val {
+    color: purple;
+}
+
+.adminerDarkMode .jush-ent {
+    color: purple;
+}
+
+.adminerDarkMode .jush-js_key, .adminerDarkMode .jush-js_key .jush-quo, .adminerDarkMode .jush-js_key .jush-apo {
+    color: purple;
+}
+
+.adminerDarkMode .jush-js_reg {
+    color: navy;
+}
+
+.adminerDarkMode .jush-php_sql .jush-php_quo,
+.adminerDarkMode .jush-php_sql .jush-php_apo,
+.adminerDarkMode .jush-php_sqlite .jush-php_quo,
+.adminerDarkMode .jush-php_sqlite .jush-php_apo,
+.adminerDarkMode .jush-php_pgsql .jush-php_quo,
+.adminerDarkMode .jush-php_pgsql .jush-php_apo,
+.adminerDarkMode .jush-php_mssql .jush-php_quo,
+.adminerDarkMode .jush-php_mssql .jush-php_apo,
+.adminerDarkMode .jush-php_oracle .jush-php_quo,
+.adminerDarkMode .jush-php_oracle .jush-php_apo {
+    background-color: #FFBBB0;
+}
+
+.adminerDarkMode .jush-bac, .adminerDarkMode .jush-php_bac, .adminerDarkMode .jush-bra, .adminerDarkMode .jush-mssql_bra, .adminerDarkMode .jush-sqlite_quo {
+    color: red;
+}
+
+.adminerDarkMode .jush-num, .jush-clr {
+    color: #007F7F;
+}
+
+.adminerDarkMode .jush a {
+    color: navy;
+}
+
+.adminerDarkMode .jush a.jush-help {
+    cursor: help;
+}
+
+.adminerDarkMode .jush-sql a, .adminerDarkMode .jush-sql_code a, .adminerDarkMode .jush-sqlite a, .adminerDarkMode .jush-pgsql a, .adminerDarkMode .jush-mssql a, .adminerDarkMode .jush-oracle a, .adminerDarkMode .jush-simpledb a {
+    font-weight: bold;
+}
+
+.adminerDarkMode .jush-php_sql .jush-php_quo a, .adminerDarkMode .jush-php_sql .jush-php_apo a {
+    font-weight: normal;
+}
+
+.adminerDarkMode .jush-tag a,
+.adminerDarkMode .jush-att a,
+.adminerDarkMode .jush-apo a,
+.adminerDarkMode .jush-quo a,
+.adminerDarkMode .jush-php_apo a,
+.adminerDarkMode .jush-php_quo a,
+.adminerDarkMode .jush-php_eot2 a {
+    color: inherit;
+    color: expression(parentNode.currentStyle.color);
+}
+
+.adminerDarkMode a.jush-custom:link, .adminerDarkMode a.jush-custom:visited {
+    font-weight: normal;
+    color: inherit;
+    color: expression(parentNode.currentStyle.color);
+}
+
+.adminerDarkMode .jush p {
+    margin: 0;
+}

@@ -160,7 +160,7 @@ class _toolbox
             'DT_MY_APPS'                         => [
                 'name'        => 'DT_MY_APPS',
                 'default'     => false,
-                'current'     => defined('\DT_MY_APPS') ? DT_MY_APPS : "babble,babbleadmin,babbleextra,chrono,cjcboard,cjdashboard,cjdml,cjgames,cjmember,cjmg,cjrates,cjseo,cjtrack,cjtwd,clubmenus,dgform,dplus,dwlabs,formularize,keywords,myimports,n2a,nettookit,stratagem,toolbox,toplist",
+                'current'     => defined('\DT_MY_APPS') ? DT_MY_APPS : "adminer,babble,babbleadmin,babbleextra,chrono,cjcboard,cjdashboard,cjdml,cjgames,cjmember,cjmg,cjrates,cjseo,cjtrack,cjtwd,clubmenus,dgform,dplus,dwlabs,formularize,keywords,myimports,n2a,nettookit,stratagem,toolbox,toplist",
                 'description' => 'This enables an app to be analyzed before you download it.',
                 'type' => 'string',
                 'tab'         => 'DevTools',
