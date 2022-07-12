@@ -325,13 +325,12 @@ class _bt extends Controller
     protected function lorem(): void
     {
         if (Session::i()->userAgent->browser === 'Chrome') {
-            $form = Form::create()->formPrefix('toolbox_lorem_');
+            $form = Form::create()->formPrefix('toolbox_lorem_')->submitLang('Generate');
 
-            $form->add('amount', 'number')->value(5)->options(['min' => 1]);
-            $form->add('type', 'select')->options(
+            $form->add('amount', 'number')->value(25)->options(['min' => 1]);
+            $form->add('type', 'radio')->options(
                 [
                     'options' => [
-                        0 => 'Select type',
                         1 => 'Words',
                         2 => 'Sentences',
                         3 => 'Paragraphs',
@@ -366,13 +365,17 @@ class _bt extends Controller
     {
         $start = 1;
         $values = [1];
-        $html = '<div class="ipsPad ipsClearfix">';
-        $html .= '<div class="ipsPad ipsPos_left">1 => 1</div>';
+        $html = '<div class="ipsClearfix">';
+        $html .= '<div class="ipsPadding ipsPos_left">1 => 1</div>';
         for ($i = 2; $i <= 45; $i++) {
             $start *= 2;
             $html .= '<div class="ipsPad ipsPos_left">' . $i . ' => ' . $start . '</div>';
         }
         $html .= '</div>';
+        $form = Form::create()->submitLang('Generate')->attributes(['data-ipstoyboxbitwise']);
+
+        $form->add('type','number')->value(1)->options(['min'=>1]);
+
         Output::i()->output = $html;
     }
 
@@ -408,7 +411,12 @@ class _bt extends Controller
             Output::i()->output = '';
         } catch (Throwable $e) {
             Debug::log($e);
-            Output::i()->json($e->getMessage() . '<br><code>' . $e->getTraceAsString() . '</code>', 500);
+            if(Request::i()->isAjax()) {
+                Output::i()->json($e->getMessage() . '<br><code>' . $e->getTraceAsString() . '</code>', 500);
+            }
+            else{
+                throw $e;
+            }
         }
     }
 

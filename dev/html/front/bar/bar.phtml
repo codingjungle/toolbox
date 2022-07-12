@@ -63,15 +63,10 @@
         {{if $extra }}
         {$extra|raw}
         {{endif}}
-    </ul>
-    {{if $info }}
-    <div class="dtProfilerInfoBar">
-        {{foreach $info['other'] as $key => $inf }}
-        <div>{$key} : {$inf|raw}</div>
-        {{endforeach}}
-        <div class="dtProfilerInfoBarPanel">
+
+        <li class="isParent dtProfileFirst">
             <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" class=" " data-ipstooltip data-ipsmenu>
-                System <i class="fa fa-angle-up"></i>
+                Toy Box <i class="fa fa-angle-up"></i>
             </a>
             <ul id="elProfileSystem_menu" class="ipsMenu ipsMenu_auto ipsMenu_wide ipsList_reset ipsHide">
                 {{foreach $info['server'] as $key => $val }}
@@ -79,14 +74,9 @@
                     {$val|raw}
                 </li>
                 {{endforeach}}
-            </ul>
-
-            <a href="{$info['cache']}">Clear Caches</a>
-
-            <a href="#toolbox_snippet_menu" id="toolbox_snippet" data-ipsMenu>
-                snippets
-            </a>
-            <ul id="toolbox_snippet_menu" class="ipsMenu ipsList_reset ipsHide">
+                 <li class="ipsMenu_item">
+                  <a href="{$info['cache']}">Clear Caches</a>
+                </li>
                 <li class="ipsMenu_item">
                     <a href="{url="app=toolbox&module=bt&controller=bt&do=lorem"}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsDialog-remoteSubmit="true" data-ipsdialog-title="Lorem Ipsum Generator">
                         Lorem Ipsum
@@ -97,12 +87,19 @@
                         BitWise Values
                     </a>
                 </li>
+                <li class="ipsMenu_item">
+                <a href="#" data-ipstoolboxproxy>
+                                Proxy Class
+                            </a>
+                </li>
             </ul>
-            <a href="#" data-ipstoolboxproxy>
-                Proxy Class
-            </a>
+        </li>
+
+
+
 
             {{if isset( $info['sources']) }}
+<li class="isParent dtProfileFirst">
             <a id="elProfileSources" href="#elProfileSources_menu" title="Sources" class=" " data-ipstooltip data-ipsmenu>
                 Sources <i class="fa fa-angle-up"></i>
             </a>
@@ -115,8 +112,16 @@
                 </li>
                 {{endforeach}}
             </ul>
+</li>
             {{endif}}
-        </div>
+
+    </ul>
+    {{if $info }}
+    <div class="dtProfilerInfoBar">
+        {{foreach $info['other'] as $key => $inf }}
+        <div>{$key} : {$inf|raw}</div>
+        {{endforeach}}
+
         {{if settings.dtprofiler_git_data || settings.dtprofiler_show_changes}}
         <div id="el_dtProfileGit" class="dttProfilerInfoGit ipsClearfix" data-ipsdtprofilergit data-ipsdtprofilergit-url="{$info['git_url']}">
             <div class="dttProfilerInfoGitLoading ipsLoading ipsLoading_tiny"></div>

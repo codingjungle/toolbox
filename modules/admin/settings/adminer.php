@@ -17,17 +17,12 @@ use Exception;
 use IPS\Http\Url;
 use IPS\Output;
 use IPS\Theme;
-use IPS\toolbox\Application;
-
-
-use IPS\toolbox\Proxy\Helpers\Request;
-
-use function _p;
+use IPS\toolbox\Application; 
+use IPS\Request;
+ 
 use function libxml_use_internal_errors;
-use function ob_end_clean;
-use function ob_get_clean;
-use function ob_start;
-use function pathinfo;
+use function ob_end_clean; 
+use function ob_start; 
 use function pq;
 use function preg_replace;
 use function preg_replace_callback;
@@ -72,7 +67,7 @@ class _adminer extends \IPS\Dispatcher\Controller
 
       require Application::getRootPath(
         'toolbox'
-      ) . '/applications/toolbox/sources/Profiler/Adminer/db.php';
+      ) . '/applications/toolbox/sources/Profiler/AdminerDb/db.php';
       $content = ob_get_contents();
       try {
         ob_end_clean();
@@ -164,7 +159,7 @@ class _adminer extends \IPS\Dispatcher\Controller
 
     require Application::getRootPath(
       'toolbox'
-    ) . '/applications/toolbox/sources/Profiler/Adminer/db.php';
+    ) . '/applications/toolbox/sources/Profiler/AdminerDb/db.php';
     $content = ob_get_contents();
     try {
       ob_end_clean();

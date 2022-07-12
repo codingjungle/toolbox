@@ -2,9 +2,9 @@
 
 use IPS\Settings;
 
-$path = \str_replace('/applications/toolbox/sources/Profiler/Adminer/db.php', '',
+$path = \str_replace('/applications/toolbox/sources/Profiler/AdminerDb/db.php', '',
         \str_replace('\\', '/', __FILE__)) . '/';
-$path2 = \str_replace('Adminer/db.php', '',
+$path2 = \str_replace('db.php', '',
         \str_replace('\\', '/', __FILE__)) . '/';
 require_once $path . 'init.php';
 

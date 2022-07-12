@@ -21,6 +21,7 @@ use IPS\Settings;
 use IPS\Theme;
 use IPS\toolbox\Application;
 use IPS\toolbox\Generator\DTFileGenerator;
+use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\Proxy\Generator\Applications;
 use IPS\toolbox\Proxy\Generator\Db as GeneratorDb;
 use IPS\toolbox\Proxy\Generator\Extensions;
@@ -39,6 +40,7 @@ use SplFileInfo;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Throwable;
 use Zend\Code\Generator\ClassGenerator;
 
 use function array_keys;
@@ -444,20 +446,28 @@ class _Proxyclass extends Singleton
 
         /** @var \Symfony\Component\Finder\SplFileInfo $css */
         foreach ($finder->filter($filter)->files() as $css) {
-            $functionName = 'css_' . mt_rand();
-            $contents = str_replace('\\', '\\\\', $css->getContents());
-            /* If we have something like `{expression="\IPS\SOME_CONSTANT"}` we cannot double escape it, however we do need to escape font icons and similar. */
-            $contents = preg_replace_callback("/{expression=\"(.+?)\"}/ms", function ($matches) {
-                return '{expression="' . str_replace('\\\\', '\\', $matches[1]) . '"}';
-            }, $contents);
-            Theme::makeProcessFunction($contents, $functionName);
-            $functionName = "IPS\Theme\\{$functionName}";
-            if (!is_dir($save . $css->getRelativePath() . $ds)) {
-                mkdir($save . $css->getRelativePath() . $ds, 0777, true);
-                chmod($save . $css->getRelativePath() . $ds, 0777);
+            try {
+                $functionName = 'css_' . mt_rand();
+                $contents = str_replace('\\', '\\\\', $css->getContents());
+                /* If we have something like `{expression="\IPS\SOME_CONSTANT"}` we cannot double escape it, however we do need to escape font icons and similar. */
+                $contents = preg_replace_callback("/{expression=\"(.+?)\"}/ms", function ($matches) {
+                    return '{expression="' . str_replace('\\\\', '\\', $matches[1]) . '"}';
+                }, $contents);
+                Theme::makeProcessFunction($contents, $functionName);
+                $functionName = "IPS\Theme\\{$functionName}";
+                if (!is_dir($save . $css->getRelativePath() . $ds)) {
+                    mkdir($save . $css->getRelativePath() . $ds, 0777, true);
+                    chmod($save . $css->getRelativePath() . $ds, 0777);
+                }
+                //_p( $css->getRelativePath(), $css->getBasename(),$functionName());
+                file_put_contents($save . $css->getRelativePath() . $ds . $css->getBasename(), $functionName());
             }
-            //_p( $css->getRelativePath(), $css->getBasename(),$functionName());
-            file_put_contents($save . $css->getRelativePath() . $ds . $css->getBasename(), $functionName());
+            catch(Throwable $e){
+                Debug::log($e);
+                Debug::log($css->getFilename());
+                Debug::log($css->getRelativePath());
+                continue;
+            }
         }
     }
 
@@ -672,6 +682,7 @@ class _Proxyclass extends Singleton
             'app',
             'web',
             'GraphQL',
+            'AdminerDb',
         ];
 
         $exd = \IPS\Application::getRootPath() . '/excluded.php';
@@ -692,6 +703,7 @@ class _Proxyclass extends Singleton
             'vendor',
             'dtProxy',
             'uploads',
+            'AdminerDb',
         ];
 
         $exd = \IPS\Application::getRootPath() . '/excludedCss.php';

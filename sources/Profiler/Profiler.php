@@ -233,17 +233,17 @@ class _Profiler extends Singleton
             'id' => $app,
         ]);
 
-        $sources = [];
-        foreach ($this->apps(false) as $app) {
-            $title = $app->_title;
-            Member::loggedIn()->language()->parseOutputForDisplay($title);
+        // $sources = [];
+        // foreach ($this->apps(false) as $app) {
+        //     $title = $app->_title;
+        //     Member::loggedIn()->language()->parseOutputForDisplay($title);
 
-            $sources[] = [
-                'url'  => Url::internal('app=toolbox&module=generator&controller=sources')
-                             ->setQueryString(['appKey' => $app->directory]),
-                'name' => $title
-            ];
-        }
+        //     $sources[] = [
+        //         'url'  => Url::internal('app=toolbox&module=generator&controller=sources')
+        //                      ->setQueryString(['appKey' => $app->directory]),
+        //         'name' => $title
+        //     ];
+        // }
         // $info['sources'] = $sources;
         return $info;
     }

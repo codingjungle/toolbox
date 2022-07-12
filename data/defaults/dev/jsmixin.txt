@@ -1,4 +1,4 @@
 ;( function($, _, undefined){
     "use strict";
-    ips.controller.mixin('{module}', '{controller}', true, function () {});
+    ips.controller.mixin('{module}', '{controller}', true, () => {});
 }(jQuery, _));

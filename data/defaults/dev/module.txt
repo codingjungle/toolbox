@@ -1,8 +1,8 @@
 ;( function($, _, undefined){
     "use strict";
-    ips.createModule('{module}', function () {
+    ips.createModule('{module}', () => {
         // Functions that become public methods
-        var init = function () {};
+        var init = () => {};
 
         // Expose public methods
         return {

@@ -12,7 +12,7 @@ use IPS\toolbox\Profiler\Debug;
 use IPS\Dispatcher\Build;
 use IPS\Session\Front;
 
-$ipsPath = \str_replace('/applications/toolbox/sources/Profiler/Custom/adminer.php', '',
+$ipsPath = \str_replace('/applications/toolbox/sources/Profiler/AdminerDb/Custom/adminer.php', '',
         \str_replace('\\', '/', __FILE__)) . '/';
 
 require_once $ipsPath . 'init.php';
