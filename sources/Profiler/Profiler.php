@@ -166,9 +166,9 @@ class _Profiler extends Singleton
         ]);
         $info = [];
         $info['server'] = [
-            '<a>IPS ' . Application::load('core')->version . '</a>',
-            '<a href="' . (string)$url->setQueryString(['do' => 'phpinfo']) . '" data-ipsDialog data-ipsDialog-title="phpinfo()">PHP: ' . PHP_VERSION . '</a>',
-            '<a>MySQL: ' . Db::i()->server_info . '</a>',
+            'IPS' => Application::load('core')->version,
+            'PHP'=>'<a href="' . (string)$url->setQueryString(['do' => 'phpinfo']) . '" data-ipsDialog data-ipsDialog-title="phpinfo()"><i class="fa">🅟🅗🅟</i><br>' . PHP_VERSION . '</a>',
+            'MySql' => Db::i()->server_info,
 
         ];
         $info['adminer'] = '<a href="' . (string)Url::internal('app=toolbox&module=bt&controller=bt&do=adminer') . '" data-ipsdialog data-ipsdialog-title="Adminer">Adminer</a>';

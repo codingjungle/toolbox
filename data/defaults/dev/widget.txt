@@ -9,10 +9,10 @@
          * @param   {event}     e           if lazyload, event that is fire
          * @returns {void}
          */
-         var respond = (elem, options, e) => {
+         const respond = (elem, options, e) => {
             let el = $(elem);
             if (!el.data('_loaded{fn}')) {
-                var mobject = new _object{fn}(el, options);
+                let mobject = _object{fn}(el, options);
                 mobject.init();
                 el.data('_loaded{fn}', mobject);
             }
@@ -40,8 +40,8 @@
             getObj: getObj
         };
     });
-    var _object{fn} = (elem, options) => {
-        var init = () => {
+    const _object{fn} = function(elem, options) {
+        let init = () => {
         };
         return {
             init: init

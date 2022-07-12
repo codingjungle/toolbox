@@ -1,0 +1,25 @@
+<ips:template parameters="$decoded,$encoded"/>
+<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxhtml>
+
+    <h4>Decoded</h4>
+    <div class="ipsClearfix">
+        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elDecodedContainer">X</button>
+        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elDecodedContainer">
+            <i class="fa fa-copy ipsCursor_pointer"></i>
+        </button>
+    </div>
+    <div class="ipsMargin_top">
+        <textarea id="elDecodedContainer">{$decoded|raw}</textarea>
+    </div>
+
+    <h4>Encoded</h4>
+    <div class="ipsClearfix">
+        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elEncodedContainer">X</button>
+        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elEncodedContainer">
+            <i class="fa fa-copy ipsCursor_pointer"></i>
+        </button>
+    </div>
+    <div class="ipsMargin_top">
+        <textarea id="elEncodedContainer">{$encoded|raw}</textarea>
+    </div>
+</div>

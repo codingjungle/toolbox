@@ -1,6 +1,7 @@
 <ips:template parameters="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions"/>
 <div id="dtProfilerBarContainer" class="dtProfilerBar">
     <ul class="ipsList_reset dtProfilerBar_list ipsClearfix" data-ipsdtprofiler{{if settings.dtprofiler_enable_debug && settings.dtprofiler_enable_debug_ajax }} data-ipsdtprofilerdebug data-url="{url='app=toolbox&module=bt&controller=bt' base='front'}"{{endif}}>
+
         {{if $time }}
         <li id="elProfileTimeLog" title="total time" class="isParent dtProfileFirst dtProfilerTime" data-ipstooltip>
             <i class="fa fa-server"></i> {$time['total']}ms <i class="fa fa-angle-up dtprofilearrow"></i>
@@ -64,39 +65,6 @@
         {$extra|raw}
         {{endif}}
 
-        <li class="isParent dtProfileFirst">
-            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" class=" " data-ipstooltip data-ipsmenu>
-                Toy Box <i class="fa fa-angle-up"></i>
-            </a>
-            <ul id="elProfileSystem_menu" class="ipsMenu ipsMenu_auto ipsMenu_wide ipsList_reset ipsHide">
-                {{foreach $info['server'] as $key => $val }}
-                <li class="ipsMenu_item">
-                    {$val|raw}
-                </li>
-                {{endforeach}}
-                 <li class="ipsMenu_item">
-                  <a href="{$info['cache']}">Clear Caches</a>
-                </li>
-                <li class="ipsMenu_item">
-                    <a href="{url="app=toolbox&module=bt&controller=bt&do=lorem"}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsDialog-remoteSubmit="true" data-ipsdialog-title="Lorem Ipsum Generator">
-                        Lorem Ipsum
-                    </a>
-                </li>
-                <li class="ipsMenu_item">
-                    <a href="{url="app=toolbox&module=bt&controller=bt&do=bitwiseValues"}" data-ipsDialog data-ipsdialog-title="BitWise Values">
-                        BitWise Values
-                    </a>
-                </li>
-                <li class="ipsMenu_item">
-                <a href="#" data-ipstoolboxproxy>
-                                Proxy Class
-                            </a>
-                </li>
-            </ul>
-        </li>
-
-
-
 
             {{if isset( $info['sources']) }}
 <li class="isParent dtProfileFirst">
@@ -114,6 +82,112 @@
             </ul>
 </li>
             {{endif}}
+        <li class="isParent dtProfileFirst">
+            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu>
+                Toy Box <i class="fa fa-angle-up"></i>
+            </a>
+            <div id="elProfileSystem_menu" class="ipsMenu ipsMenu_wide ipsHide">
+                <div class="ipsMenu_title">
+                    Generators
+                </div>
+                <div class="ipsMenu_innerContent">
+                    <div class="ipsGrid">
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=lorem'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Lorem Ipsum Generator">
+                                <i class="fa fa-language"></i>
+                                <br>
+                                Lorem Ipsum
+                            </a>
+                        </div>
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=bitwiseValues'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="BitWise Generator">
+                                <i class="fa">♾️</i>
+                                <br>
+                                BitWise
+                            </a>
+                        </div>
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=hash'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Hash Generator">
+                                <i class="fa fa-hashtag"></i>
+                                <br>
+                                Hash
+                            </a>
+                        </div>
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=uuid'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="UUID Generator">
+                                <i class="fa">✳️</i>
+                                <br>
+                                UUID
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ipsMenu_title">
+                    Encoders/Decoders
+                </div>
+                <div class="ipsMenu_innerContent">
+                    <div class="ipsGrid">
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=html'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="HTML Encoder/Decoder">
+                                <i class="fa fa-html5"></i>
+                                <br>
+                                Html
+                            </a>
+                        </div>
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=base'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Base64 Encoder/Decoder">
+                                <i class="fa">6️⃣4️⃣</i>
+                                <br>
+                                Base64
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ipsMenu_title">
+                    System
+                </div>
+                <div class="ipsMenu_innerContent">
+                    <div class="ipsGrid">
+                        {{foreach $info['server'] as $key => $val }}
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            {{if $key === 'IPS'}}
+                            <i class="fa">🅘🅟🅢</i>
+                            <br>
+                            {{elseif $key === 'MySql'}}
+                            <i class="fa">🅜🅨🅢🅠🅛</i>
+                            <br>
+                            {{endif}}
+                            {$val|raw}
+                        </div>
+                        {{endforeach}}
+                    </div>
+                </div>
+
+                <div class="ipsMenu_title">
+                    Other
+                </div>
+                <div class="ipsMenu_innerContent">
+                    <div class="ipsGrid">
+
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{$info['cache']}">
+                                <i class="fa fa-remove"></i>
+                                <br>
+                                Clear Caches
+                            </a>
+                        </div>
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="#" data-ipstoolboxproxy>
+                                <i class="fa">🔃</i>
+                                <br>
+                                Proxy Class
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
 
     </ul>
     {{if $info }}

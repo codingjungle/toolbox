@@ -1,6 +1,6 @@
 ;( function($, _, undefined){
     "use strict";
-    ips.createModule('ips.ui.toolbox.toyboxbitwise', ()=>{
+    ips.createModule('ips.ui.toolbox.toyboxbitwise', () => {
         /**
          * Respond to a dialog trigger
          *
@@ -9,10 +9,10 @@
          * @param   {event}     e           if lazyload, event that is fire
          * @returns {void}
          */
-         var respond =  (elem, options, e) => {
+         var respond =  function(elem, options, e)  {
             let el = $(elem);
             if (!el.data('_loadedToyboxbitwise')) {
-                var mobject = new _objectToyboxbitwise(el, options);
+                let mobject =  new _objectToybox(el, options);
                 mobject.init();
                 el.data('_loadedToyboxbitwise', mobject);
             }
@@ -32,7 +32,7 @@
 
         // Register this module as a widget to enable the data API and
         // jQuery plugin functionality
-        ips.ui.registerWidget( 'toolboxtoyboxbitwise', ips.ui.toolbox.toyboxbitwise, [] );
+        ips.ui.registerWidget( 'toolboxtoyboxbitwise', ips.ui.toolbox.toyboxbitwise);
 
         // Expose public methods
         return {
@@ -40,13 +40,30 @@
             getObj: getObj
         };
     });
-    var _objectToyboxbitwise = (elem, options) => {
-        var init = () => {
-            elem.on('submit',_submit);
+    const _objectToybox = function(elem, options) {
+        let init = () => {
+                console.log('foobjkl');
+                elem.on('submit',_submit);
+                elem.on('change','[name="position"]',_position);
         },
-        _submit = () => {
-
-        };
+            _submit = e => {
+                e.preventDefault();
+            },
+            _position = (e) => {
+            e.preventDefault();
+            let el = elem.find('[name="position"]'),
+                value = el.val(),
+                action = ips.getSetting('baseURL')+'?app=toolbox&module=bt&controller=bt&do=bitwiseValues&position='+value;
+             ajax({
+                type: "GET",
+                url: action,
+                bypassRedirect: true,
+                success: function (data) {
+                  $('#elBitWiseBox').replaceWith($(data));
+                }
+            });
+        },
+            ajax = ips.getAjax();
         return {
             init: init
         }

@@ -167,6 +167,12 @@ class _Form
         return $this;
     }
 
+    public function noSubmit(){
+        $this->form->ajaxOutput = true;
+
+        return $this;
+    }
+
     /**
      * @param $prefix
      *
@@ -250,16 +256,21 @@ class _Form
      */
     public function submitLang($langKey): self
     {
-        $this->form->actionButtons[0] = Theme::i()->getTemplate('forms', 'core', 'global')->button(
-            $langKey,
-            'submit',
-            null,
-            'ipsButton ipsButton_primary',
-            [
-                'tabindex' => '2',
-                'accesskey' => 's',
-            ]
-        );
+        if($langKey !== null) {
+            $this->form->actionButtons[0] = Theme::i()->getTemplate('forms', 'core', 'global')->button(
+                $langKey,
+                'submit',
+                null,
+                'ipsButton ipsButton_primary',
+                [
+                    'tabindex' => '2',
+                    'accesskey' => 's',
+                ]
+            );
+        }
+        else{
+            $this->form->actionButtons = [];
+        }
 
         return $this;
     }

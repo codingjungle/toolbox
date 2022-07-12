@@ -33,6 +33,7 @@ use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\Proxy\Generator\Proxy;
 use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\Shared\Lorem;
+use IPS\toolbox\Shared\Uuid;
 use Symfony\Component\Filesystem\Filesystem;
 use Throwable;
 use UnexpectedValueException;
@@ -41,10 +42,14 @@ use function base64_decode;
 use function count;
 use function defined;
 use function header;
+use function html_entity_decode;
 use function htmlentities;
+use function implode;
 use function ini_get;
 use function is_array;
 use function is_dir;
+use function mb_strtolower;
+use function mb_strtoupper;
 use function md5;
 use function microtime;
 use function mt_rand;
@@ -53,11 +58,14 @@ use function ob_end_clean;
 use function ob_get_clean;
 use function ob_start;
 use function phpinfo;
+use function pow;
 use function preg_replace;
 use function sleep;
 use function str_replace;
 use function time;
 
+use const ENT_DISALLOWED;
+use const ENT_QUOTES;
 use const IPS\NO_WRITES;
 
 
@@ -324,11 +332,12 @@ class _bt extends Controller
 
     protected function lorem(): void
     {
-        if (Session::i()->userAgent->browser === 'Chrome') {
-            $form = Form::create()->formPrefix('toolbox_lorem_')->submitLang('Generate');
+        $form = Form::create()->formPrefix('toolbox_lorem_')->submitLang(null)->attributes(['data-ipstoolboxtoyboxlorem' => 1]);
 
-            $form->add('amount', 'number')->value(25)->options(['min' => 1]);
-            $form->add('type', 'radio')->options(
+            $form->add('amount', 'number')->value(4)->options(['min' => 1]);
+            $form->add('type', 'radio')
+                ->value(3)
+                ->options(
                 [
                     'options' => [
                         1 => 'Words',
@@ -346,38 +355,110 @@ class _bt extends Controller
                         $return = Lorem::i()->words($amount);
                         break;
                     case 2:
-                        $return = Lorem::i()->sentences($amount);
+                        $return = Lorem::i()->sentences($amount,['p']);
                         break;
                     case 3:
-                        $return = Lorem::i()->paragraphs($amount);
+                        $return = Lorem::i()->paragraphs($amount,['p']);
                         break;
                 }
 
-                Output::i()->json(['text' => $return, 'type' => 'toolboxClipBoard']);
+                Output::i()->json(['html' => $return, 'type' => 'toolboxClipBoard']);
             }
-            Output::i()->output = $form->dialogForm();
-        } else {
-            Output::i()->output = '<div class="ipsPad">' . nl2br(Lorem::i()->paragraphs(8)) . '</div>';
-        }
+        $form->dialogForm();
+        Output::i()->output = Theme::i()->getTemplate('bar','toolbox','front')->lorem($form, Lorem::i()->paragraphs(4,['p']));
+
+    }
+
+    protected function base(){
+        Output::i()->output = Theme::i()->getTemplate('bar','toolbox','front')->base();
     }
 
     protected function bitwiseValues()
     {
-        $start = 1;
-        $values = [1];
-        $html = '<div class="ipsClearfix">';
-        $html .= '<div class="ipsPadding ipsPos_left">1 => 1</div>';
-        for ($i = 2; $i <= 45; $i++) {
-            $start *= 2;
-            $html .= '<div class="ipsPad ipsPos_left">' . $i . ' => ' . $start . '</div>';
+        $position = Request::i()->position ?? 15;
+        $form = '';
+        $html = '<div class="ipsPadding ipsClearfix" id="elBitWiseBox"><div class="ipsPos_left ipsMargin_right">';
+//        $html .= '<div>1 => 1,</div>';
+        for ($i = 1; $i <= $position; $i++) {
+            $start = pow(2, $i-1);
+            if(($i-1) % 15 === 0){
+                $html .= '</div><div class="ipsPos_left ipsMargin_right">';
+            }
+            $html .= '<div>' . $i . ' => ' . $start . ',</div>';
         }
-        $html .= '</div>';
-        $form = Form::create()->submitLang('Generate')->attributes(['data-ipstoyboxbitwise']);
+        $html .= '</div></div>';
 
-        $form->add('type','number')->value(1)->options(['min'=>1]);
-
-        Output::i()->output = $html;
+        if(!Request::i()->position) {
+            $form = Form::create()->submitLang(null)->attributes(['data-ipstoolboxtoyboxbitwise' => 1]);
+            $form->add('position', 'number')->value(15)->options(['min' => 15]);
+        }
+        Output::i()->output = $form.$html;
     }
+
+    protected function hash(){
+        $html = '';
+        if(!Request::i()->hash){
+            $html .= '<div class="ipsPadding"><textarea>Hello World</textarea></div>';
+        }
+        $html .= '<div class="ipsPadding" id="elHashWindow">';
+        $hash = Request::i()->hash ?? 'Hello World';
+        $md5 = md5($hash);
+        $sha1 = sha1($hash);
+        $sha256 = hash('sha256',$hash);
+        $sha512 = hash('sha512',$hash);
+        Output::i()->output = Theme::i()->getTemplate('bar','toolbox','front')->hash($hash, $md5, $sha1, $sha256,$sha512);
+    }
+
+    protected function uuid(){
+        $count = Request::i()->count ?? 3;
+        $hyphens = Request::i()->hyphens ?? true;
+        $lowercase = Request::i()->lowercase ?? false;
+        $html = [];
+
+
+        $form = Form::create()->attributes(['data-ipstoolboxtoyboxuuid' => null])->submitLang(null);
+        $form->add('count','number')->value(3)->options(['min'=>1]);
+        $form->add('hyphens','yesno')->value(1);
+        $form->add('lowercase','yesno');
+        if($values = $form->values()){
+            $form = '';
+            $count = (int) $values['count'];
+            $hyphens = (bool) $values['hyphens'];
+            $lowercase = (bool) $values['lowercase'];
+        }
+
+        for($i=1;$i <= $count;$i++){
+            $hash = Uuid::v4();
+            if($hyphens === false){
+                $hash = str_replace('-','',$hash);
+            }
+            if($lowercase === true){
+                $hash = mb_strtolower($hash);
+            }
+            else{
+                $hash = mb_strtoupper($hash);
+            }
+            $html[] = $hash;
+        }
+
+        if( $form instanceof Form) {
+            Output::i()->output = Theme::i()->getTemplate('bar', 'toolbox', 'front')->uuid(
+                $form,
+                implode('<br>', $html)
+            );
+        }
+        else{
+            Output::i()->output = '<br>'.implode('<br>',$html);
+        }
+    }
+
+    protected function html(){
+        $encoded = $decoded = '<a href="#foo">link</a>';
+
+        Output::i()->output = Theme::i()->getTemplate('bar','toolbox','front')->html($decoded,$encoded);
+
+    }
+
 
     protected function clearAjax()
     {
