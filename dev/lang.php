@@ -360,4 +360,5 @@ $lang = [
     'menu__toolbox_settings_adminer' => 'Adminer',
     'toolbox_use_tabs_applications' => 'Applications Tabbed',
     'toolbox_use_tabs_applications_desc' => 'Use tabs on the applications page to distinquish between Your Apps (using DT_MY_APPS constant), IPS apps, third party and uninstalled apps',
+    'dtdevplus_open_in_adminer' => 'Adminer'
 ];

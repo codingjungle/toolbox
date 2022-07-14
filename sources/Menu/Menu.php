@@ -16,8 +16,14 @@ use IPS\Application;
 use IPS\Http\Url;
 use IPS\Patterns\Singleton;
 use IPS\Plugin;
+use IPS\Request;
+use IPS\Settings;
 use IPS\Theme;
 use UnexpectedValueException;
+
+use function _p;
+
+use const DT_MY_APPS;
 
 class _Menu extends Singleton
 {
@@ -99,19 +105,80 @@ class _Menu extends Singleton
             'url'  => 'elDevToolBoxApps',
         ];
 
-        /**
-         * @var $apps Application
-         */
-        foreach (Application::applications() as $apps) {
-            $store['apps'][$apps->directory] = [
-                'id'   => $apps->directory,
-                'name' => '__app_' . $apps->directory,
-                'url'  => (string)Url::internal(
-                    'app=core&module=applications&controller=developer&appKey=' . $apps->directory
-                ),
-            ];
+        $applications = Application::applications();
+        if( !Settings::i()->toolbox_use_tabs_applications ){
+            foreach ($applications as $app) {
+                $store['apps'][$app->directory] = [
+                    'id' => $app->directory,
+                    'name' => '__app_' . $app->directory,
+                    'url' => (string)Url::internal(
+                        'app=core&module=applications&controller=developer&appKey=' . $app->directory
+                    ),
+                ];
+            }
         }
+        else {
+            $myapps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
+            if (empty($myapps) === false) {
+                $store['apps']['myapps'] = [
+                    'label' => 1,
+                    'title' => 'My Apps',
+                    'id' => 'myapps2'
+                ];
+                foreach ($myapps as $app) {
+                    if (isset($applications[$app])) {
+                        $app = $applications[$app];
+                        $store['subs']['myapps2'][$app->directory] = [
+                            'id' => $app->directory,
+                            'name' => '__app_' . $app->directory,
+                            'url' => (string)Url::internal(
+                                'app=core&module=applications&controller=developer&appKey=' . $app->directory
+                            ),
+                        ];
+                        unset($applications[$app->directory]);
+                    }
+                }
+            }
 
+            $store['apps']['core_sys'] = [
+                'label' => 1,
+                'title' => 'IPS Apps',
+                'id' => 'core_sys2'
+            ];
+            foreach (\IPS\IPS::$ipsApps as $app) {
+                if (isset($applications[$app])) {
+                    $app = $applications[$app];
+                    $store['subs']['core_sys2'][$app->directory] = [
+                        'id' => $app->directory,
+                        'name' => '__app_' . $app->directory,
+                        'url' => (string)Url::internal(
+                            'app=core&module=applications&controller=developer&appKey=' . $app->directory
+                        ),
+                    ];
+                    unset($applications[$app->directory]);
+                }
+            }
+
+            if (empty($applications) === false) {
+                $store['apps']['3p'] = [
+                    'label' => 1,
+                    'title' => '3rd Party Apps',
+                    'id' => '3p2'
+                ];
+                /**
+                 * @var $apps Application
+                 */
+                foreach ($applications as $app) {
+                    $store['subs']['3p2'][$app->directory] = [
+                        'id' => $app->directory,
+                        'name' => '__app_' . $app->directory,
+                        'url' => (string)Url::internal(
+                            'app=core&module=applications&controller=developer&appKey=' . $app->directory
+                        ),
+                    ];
+                }
+            }
+        }
         $plugins = false;
 
         foreach (Plugin::plugins() as $plugin) {

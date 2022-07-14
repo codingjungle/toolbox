@@ -164,7 +164,12 @@ class _Sources
                 'ipsMenu' => 1,
             ],
         ];
-
+        Output::i()->sidebar['actions']['Adminer'] = [
+            'icon'  => 'database',
+            'title' => 'dtdevplus_open_in_adminer',
+            'link'  => (string) Url::internal('app=toolbox&module=settings&controller=adminer&dbApp='.Request::i()->appKey),
+            'id'    => 'adminMenuAdminer_button',
+        ];
         Output::i()->sidebar['mobilenav'] = static::subMenus();
     }
 
