@@ -60,10 +60,24 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
 
     protected function manage()
     {
+
+        Output::i()->sidebar['actions']['cv'] = array(
+            'icon' => 'exchange',
+            'link' => \IPS\Http\Url::internal(
+                'app=core&module=applications&controller=applications&cv=1'
+            ),
+            'title' => !Settings::i()->toolbox_use_tabs_applications ? 'Classic View' : 'Tabbed View',
+        );
+        if(isset(Request::i()->cv)){
+            Settings::i()->changeValues([
+                    'toolbox_use_tabs_applications' => Settings::i()->toolbox_use_tabs_applications ? 0 : 1
+            ]);
+        }
         if( !Settings::i()->toolbox_use_tabs_applications ||  Request::i()->isAjax()){
             parent::manage();;
         }
         else {
+
             $output = '';
             if (!\IPS\Request::i()->isAjax()) {
                 if (\IPS\IPS::canManageResources()) {
@@ -87,6 +101,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
             );
 
             /* Check for updates button */
+
             Output::i()->sidebar['actions']['settings'] = array(
                 'icon' => 'refresh',
                 'link' => \IPS\Http\Url::internal(
