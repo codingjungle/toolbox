@@ -8,12 +8,23 @@
                 if ( !elem.data( '_respond' ) ) {
                     let h = elem.parent().outerHeight();
                     $( '.dtProfilerPlaceHolder' ).css( 'height', h );
+                    if($('#elHideMenu').length !== 0){
+                        $('#elHideMenu').css({bottom:h});
+                    }
+                    if($('#elReorderAppMenu').length !== 0){
+                        $('#elReorderAppMenu').css({bottom:h});
+                    }
                     $( window ).on( 'resize', function() {
                         let h = elem.parent().outerHeight();
                         $( '.dtProfilerPlaceHolder' ).css( 'height', h );
+                        if($('#elHideMenu').length !== 0){
+                            $('#elHideMenu').css({bottom:h});
+                        }
+                        if($('#elReorderAppMenu').length !== 0){
+                            $('#elReorderAppMenu').css({bottom:h});
+                        }
                     } );
 
-                    console.log(Date.parse("1970-01-01T00:00:00Z"));
                     // $(document).on('hideDialog', function () {
                     //     dialogId = null;
                     // });

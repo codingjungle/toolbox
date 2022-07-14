@@ -61,7 +61,7 @@ class _Club extends Generator
              * @var DateTime $joined
              */
             $joined = $member->joined;
-            $time = $this->getTime($joined->getTimestamp());
+            $time = $this->getTime();
             if (is_array($availableTypes) && count($availableTypes)) {
                 $type = array_rand($availableTypes);
                 $type = $availableTypes[$type];

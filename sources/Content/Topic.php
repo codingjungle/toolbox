@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\Content;
 
+use DateInterval;
 use Exception;
 use IPS\DateTime;
 use IPS\Db;
@@ -49,10 +50,7 @@ class _Topic extends Generator
     public static function get(): Topic
     {
         try {
-            $dbFirst = Db::i()->select('*', 'forums_topics', [], 'id ASC')->first();
-            $dbLast = Db::i()->select('*', 'forums_topics', [], 'id DESC')->first();
-            $range = random_int($dbFirst['id'], $dbLast['id']);
-            $db = Db::i()->select('*', 'forums_topics', ['id = ?', $range], 'id DESC')->first();
+            $db = Db::i()->select('*', 'forums_topics', ['id<=?', 1], 'id DESC')->first();
         } catch (Exception $e) {
             $db = Db::i()->select('*', 'forums_topics', [], 'RAND()')->first();
         }
@@ -79,37 +77,27 @@ class _Topic extends Generator
         $rand2 = array_rand(Data::$noun, 1);
         $name = str_replace('_', ' ', Data::$adjective[$rand] . ' ' . Data::$noun[$rand2]);
         $name = mb_ucfirst(mb_strtolower($name));
-        $start = $this->start;
-        $end = $this->end ?? time();
-
-        try {
-            $sql = Db::i()->select('*', 'forums_posts', [], 'post_date DESC')->first();
-            $time = $sql['post_date'] + 60;
-        } catch (UnderflowException $e) {
-            $time = $start;
-            /**
-             * @var DateTime $joined
-             */
-            $joined = $member->joined;
-            if ($time > $joined->getTimestamp()) {
-                $time = $joined->getTimestamp();
-            }
-        }
-
-        $topic = Topic::createItem($member, $member->ip_address, DateTime::ts($time), $forum);
+        $start = $this->getTime();
+        $topic = Topic::createItem($member, $member->ip_address, DateTime::ts($start), $forum,false);
         $topic->title = $name;
         $topic->save();
         $post = (new Post())->build($topic, $member, true);
         $topic->topic_firstpost = $post->pid;
         $topic->save();
-
         $this->type = 'topic';
         $this->gid = $topic->tid;
         $this->save();
-        $rand = random_int(1, 30);
-        for ($i = 0; $i < $rand; $i++) {
-            (new Post())->build($topic);
-        }
+
     }
 
+    public function getTime()
+    {
+        require( \IPS\SITE_FILES_PATH . '/conf_global.php' );
+        $start = \IPS\Data\Store::i()->toolbox_times ?? null;
+        $time = $start ?
+            DateTime::ts($start)->add(new DateInterval('PT'.random_int(1,20).'M'))->getTimestamp() :
+            DateTime::create()->sub(new DateInterval('P2Y'))->getTimestamp();
+        \IPS\Data\Store::i()->toolbox_times = $time;
+        return $time;
+    }
 }

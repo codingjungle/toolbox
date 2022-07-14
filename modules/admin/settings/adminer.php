@@ -132,8 +132,11 @@ class _adminer extends \IPS\Dispatcher\Controller
       }
 
 
-      $url2 = (string)Url::internal('app=toolbox&module=settings&controller=adminer');
-
+      $url2 = Url::internal('app=toolbox&module=settings&controller=adminer');
+      if(Request::i()->dbApp){
+          $url2 = $url2->setQueryString(['dbApp'=>Request::i()->dbApp]);
+      }
+      $url2 = (string) $url2;
       foreach ($phpQuery->find('a') as $a) {
         $a = pq($a);
         $ref = $a->attr('href');

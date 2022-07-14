@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\Content;
 
+use DateInterval;
 use Exception;
 use IPS\DateTime;
 use IPS\forums\Topic\Post;
@@ -20,6 +21,7 @@ use function array_rand;
 use function defined;
 use function header;
 use function is_int;
+use function random_int;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -59,40 +61,18 @@ class _Post extends Generator
             $member = Member::get();
         }
 
-        if (!$topic) {
-            $topic = Topic::get();
-            /* @var Post $comment */
+        $topic = $topic ?? $topic = Topic::get();
+        if($first === false) {
+            /** @var Post $comment */
             $comment = $topic->comments(1, 0, 'date', 'desc');
             $time = $comment->post_date;
-
-            /**
-             * @var DateTime $joined
-             */
-            $joined = $member->joined;
-            if ($time > $joined->getTimestamp()) {
-                $time = $joined->getTimestamp();
-            }
-
-            $time = $this->getTime($time);
-        } else {
-            $time = $topic->start_date;
-            if (!$first) {
-                $time = $topic->last_post;
-
-                /**
-                 * @var DateTime $joined
-                 */
-                $joined = $member->joined;
-                if ($time > $joined->getTimestamp()) {
-                    $time = $joined->getTimestamp();
-                }
-
-                $time = $this->getTime($time);
-            }
         }
-
+        else{
+            $time = $topic->start_date;
+        }
+        $time = DateTime::ts($time)->add(new DateInterval('PT'.random_int(1,20).'M'))->getTimestamp();
         /* @var Post $post */
-        $post = Post::create($topic, $content, $first, null, true, $member, DateTime::ts($time));
+        $post = Post::create($topic, $content, $first, null, true, $member, DateTime::ts($time),null,0);
 
         $this->type = 'post';
         $this->gid = $post->pid;
@@ -104,5 +84,6 @@ class _Post extends Generator
 
         return null;
     }
+
 
 }

@@ -84,7 +84,8 @@ class _Forum extends Generator
                 $parent = Db::i()->select('*', 'forums_forums', [], 'RAND()')->first();
                 $parent = IPSForum::constructFromData($parent);
                 try {
-                    $rand = random_int(1, 10);
+                    $total = Db::i()->select('COUNT(*)', 'forums_forums')->first();
+                    $rand = random_int(1, $total);
                     if (Db::i()->select('*', 'forums_forums', ['parent_id = ?', $parent->id])->count() > $rand) {
                         throw new InvalidArgumentException();
                     }
@@ -105,7 +106,7 @@ class _Forum extends Generator
         $name = str_replace('_', ' ', Data::$adjective[$rand] . ' ' . Data::$noun[$rand2]);
         $name = mb_ucfirst(mb_strtolower($name));
         $desc = Data::$adjectiveGloss[$rand] . '; ' . Data::$nounGloss[$rand2];
-        $findType = ($rand + $rand2) / random_int(1, 20);
+        $findType =  random_int(1, 1340);
         $type = 'normal';
 
         if (!$category) {
@@ -118,7 +119,7 @@ class _Forum extends Generator
             }
 
             $parent = $parent->id;
-            if (is_int($findType)) {
+            if ($findType % 15 === 0) {
                 $type = 'qa';
             }
         } else {

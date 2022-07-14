@@ -16,7 +16,8 @@ $ipsPath = \str_replace('/applications/toolbox/sources/Profiler/AdminerDb/Custom
         \str_replace('\\', '/', __FILE__)) . '/';
 
 require_once $ipsPath . 'init.php';
-
+Build::i();
+Front::i();
 $auth = [
     'driver' => 'server',
     'server' => Settings::i()->getFromConfGlobal('sql_host'),
@@ -30,9 +31,13 @@ $sql='mysql';
 function ipsDebug($message){
     Debug::log($message);
 };
-
-Build::i();
-Front::i();
+function ipsUrl(){
+    $url = (string) '&app=toolbox&module=settings&controller=adminer';
+    if(isset($_GET['dbApp'])){
+        $url .= '&dbApp='.$_GET['dbApp'];
+    }
+    return $url;
+}
 
 include "./include/bootstrap.inc.php";
 include "./include/tmpfile.inc.php";

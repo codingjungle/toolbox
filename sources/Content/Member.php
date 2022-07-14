@@ -188,20 +188,15 @@ class _Member extends Generator
                 $this->pass = $this->user;
             }
 
-            $start = $this->start;
-            $end = $this->end ?? time();
 
             try {
                 $where = [];
-                if ($start !== null) {
-                    $where = ['joined >= ?', $start];
-                }
                 $sql = Db::i()->select('*', 'core_members', $where, 'joined DESC')->first();
                 $start = $sql['joined'] + 60;
             } catch (UnderflowException $e) {
             }
 
-            $time = $this->getTime($start, $end);
+            $time = $this->getTime();
             $member = new Member();
             $member->name = $this->user;
             $member->member_group_id = $group;

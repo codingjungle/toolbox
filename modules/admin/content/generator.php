@@ -33,6 +33,8 @@ use IPS\toolbox\Content\Post;
 use IPS\toolbox\Content\Topic;
 use IPS\toolbox\Form;
 
+use IPS\toolbox\Proxy\Helpers\Store;
+
 use function defined;
 use function header;
 use function time;
@@ -89,11 +91,11 @@ class _generator extends Controller
                 'group',
                 'club',
                 'rangeStart',
-                'rangeEnd',
+//                'rangeEnd',
             ],
             'topic'  => [
                 'rangeStart',
-                'rangeEnd',
+//                'rangeEnd',
             ],
         ])->validation(static function ($data) {
             if ($data === 'none') {
@@ -102,7 +104,7 @@ class _generator extends Controller
         });
         $form->add('limit', 'number')->empty(50)->options(['min' => 1]);
         $form->add('rangeStart', 'date')->empty(Settings::i()->getFromConfGlobal('board_start'));
-        $form->add('rangeEnd', 'date')->empty(time());
+//        $form->add('rangeEnd', 'date')->empty(time());
         $form->add('passwords', 'yn');
         $form->add('club', 'yn')->options(['disabled' => !Settings::i()->clubs]);
         $form->add('group', 'select')
@@ -121,15 +123,9 @@ class _generator extends Controller
                 $query['group'] = $values['group'];
                 $query['club'] = $values['club'];
             }
-
-            if ($values['type'] === 'topic') {
-                /* @var DateTime $start */
-                $start = $values['rangeStart'];
-                /* @var DateTime $end */
-                $end = $values['rangeEnd'];
-                $query['start'] = $start->getTimestamp();
-                $query['end'] = $end->getTimestamp();
-            }
+            /* @var DateTime $start */
+            $start = $values['rangeStart'];
+            \IPS\Data\Store::i()->toolbox_times = $start instanceof \DateTime ? $start->getTimestamp() : 0;
 
             $query['do'] = 'queue';
             Output::i()->redirect($url->setQueryString($query)->csrf());
@@ -146,7 +142,7 @@ class _generator extends Controller
     {
         Output::i()->title = 'Delete Content';
 
-        $url = $this->url->setQueryString(['do' => 'delete', 'oldDo' => Request::i()->oldDo])->csrf();
+        $url = $this->url->setQueryString(['do' => 'delete', 'oldDo' => Request::i()->oldDo]);
         Output::i()->output = new MultipleRedirect($url, static function ($data) {
             $offset = 0;
             if (isset($data['offset'])) {
@@ -197,7 +193,7 @@ class _generator extends Controller
         }, function () {
             /* And redirect back to the overview screen */
             $url = Url::internal('app=toolbox&module=content&controller=generator');
-            Output::i()->redirect($url->csrf(), 'dtcontent_generation_delete_done');
+            Output::i()->redirect($url, 'dtcontent_generation_delete_done');
         });
     }
 
@@ -229,24 +225,6 @@ class _generator extends Controller
             $password = Request::i()->password ?: null;
             $group = Request::i()->group ?: null;
             $club = Request::i()->club ?: null;
-            $start = Request::i()->start ?: null;
-            $end = Request::i()->end ?: null;
-
-            if (isset($data['start'])) {
-                $start = $data['start'];
-            } else {
-                if ($start === null) {
-                    $start = Settings::i()->getFromConfGlobal('board_start');
-                }
-            }
-
-            if (isset($data['end'])) {
-                $end = $data['end'];
-            } else {
-                if ($end === null) {
-                    $end = time();
-                }
-            }
 
             if (isset($data['offset'])) {
                 $offset = $data['offset'];
@@ -272,7 +250,11 @@ class _generator extends Controller
                 $club = $data['club'];
             }
 
-            $max = 100;
+            $max = 200;
+
+            if($offset === 0){
+                $max = 1;
+            }
 
             if ($limit < $max) {
                 $max = $limit;
@@ -286,8 +268,6 @@ class _generator extends Controller
                 switch ($type) {
                     case 'member':
                         $member = new Dtmember();
-                        $member->start = $start;
-                        $member->end = $end;
                         $member->build($password, $group);
                         break;
                     case 'forum':
@@ -295,8 +275,6 @@ class _generator extends Controller
                         break;
                     case 'topic':
                         $topic = new Topic();
-                        $topic->start = $start;
-                        $topic->end = $end;
                         $topic->build();
                         break;
                     case 'post':
@@ -325,9 +303,7 @@ class _generator extends Controller
                     'offset'   => $offset,
                     'password' => $password,
                     'group'    => $group,
-                    'club'     => $club,
-                    'start'    => $start,
-                    'end'      => $end,
+                    'club'     => $club
                 ],
                 $language,
                 $progress,
