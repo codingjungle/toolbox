@@ -1,6 +1,8 @@
 <ips:template parameters="$menu, $menus"/>
 <li>
-    <a href="{$menu['url']}{{if !isset($menu['subs']) }}_menu" id="{$menu['url']}" data-ipsMenu{{else}}"{{endif}}>{lang="$menu['name']"}</a>
+    <a href="{$menu['url']}{{if !isset($menu['subs']) }}_menu" id="{$menu['url']}" data-ipsMenu{{else}}"{{endif}}>
+    {lang="$menu['name']"} {{if isset($menus[$menu['id']])}} <i class="fa fa-chevron-down"></i>{{endif}}
+    </a>
     {{if isset( $menus[ $menu['id'] ] ) }}
     <ul id="{$menu['url']}_menu" class="ipsMenu ipsHide ipsClearfix">
 

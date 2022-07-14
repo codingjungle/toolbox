@@ -2,6 +2,8 @@
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
+use IPS\Lang;
+use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
@@ -43,7 +45,10 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
     /* End Hook Data */
     public function globalTemplate($title, $html, $location = [])
     {
-            Output::i()->cssFiles = array_merge(
+        Member::loggedIn()->language()->words['support'] = '';
+        Member::loggedIn()->language()->words['site'] = '';
+
+        Output::i()->cssFiles = array_merge(
                 Output::i()->cssFiles,
                 Theme::i()->css('devbar.css', 'toolbox', 'admin')
             );

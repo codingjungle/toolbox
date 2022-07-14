@@ -1,12 +1,25 @@
 #dtDevBar {
     font-size: 14px;
-    padding: 10px 5px;
+    padding: 5px 5px;
     width: 75%;
 }
 
 #dtDevBar > li > a {
     text-decoration: none;
     color: inherit;
-    font-size:13px;
     font-weight:600;
+}
+#elAdminControls .acpHighlightLink_wrap {
+    display: none;
+}
+
+#elAdminControls a {
+    padding:0;
+}
+.cAcpNotifications{
+    font-size: 14px;
+}
+.acpSearch,
+#acpSearchKeyword{
+    max-width:250px;
 }

@@ -120,14 +120,14 @@ class _Menu extends Singleton
         else {
             $myapps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
             if (empty($myapps) === false) {
+                $myapps = array_combine(array_values($myapps),array_values($myapps));
                 $store['apps']['myapps'] = [
                     'label' => 1,
                     'title' => 'My Apps',
                     'id' => 'myapps2'
                 ];
-                foreach ($myapps as $app) {
-                    if (isset($applications[$app])) {
-                        $app = $applications[$app];
+                foreach ($applications as $app) {
+                    if (isset($myapps[$app->directory])) {
                         $store['subs']['myapps2'][$app->directory] = [
                             'id' => $app->directory,
                             'name' => '__app_' . $app->directory,
