@@ -282,12 +282,6 @@ class _Menu extends Singleton
         ];
 
         $store['sys'][] = [
-            'id'   => 'sql',
-            'name' => 'SQL Toolbox',
-            'url'  => (string)Url::internal('app=core&module=support&controller=sql'),
-        ];
-
-        $store['sys'][] = [
             'id'   => 'support',
             'name' => 'Support',
             'url'  => (string)Url::internal('app=core&module=support&controller=support'),
@@ -308,7 +302,7 @@ class _Menu extends Singleton
         $store['sys'][] = [
             'id' => 'phpinfo',
             'name' => 'PHP Info',
-            'url' => (string)Url::internal('app=core&module=support&controller=support&do=phpinfo'),
+            'url' => (string)Url::internal('app=core&module=support&controller=phpinfo'),
         ];
     }
 }

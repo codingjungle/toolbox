@@ -126,5 +126,9 @@
     "dispatcherStandard": {
         "type": "C",
         "class": "\\IPS\\Dispatcher\\Standard"
+    },
+    "phpinfo": {
+        "type": "C",
+        "class": "\\IPS\\core\\modules\\admin\\support\\phpinfo"
     }
 }
