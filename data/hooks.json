@@ -130,5 +130,9 @@
     "phpinfo": {
         "type": "C",
         "class": "\\IPS\\core\\modules\\admin\\support\\phpinfo"
+    },
+    "Session": {
+        "type": "C",
+        "class": "\\IPS\\Session"
     }
 }
