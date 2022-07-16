@@ -19,6 +19,7 @@ use IPS\Patterns\ActiveRecord;
 use IPS\Settings;
 use IPS\Theme;
 use IPS\toolbox\Editor;
+use IPS\toolbox\Proxy\Helpers\Request;
 use SplFileInfo;
 use UnexpectedValueException;
 
@@ -32,8 +33,10 @@ use function is_array;
 use function json_decode;
 use function json_encode;
 use function mb_substr;
+use function md5;
 use function method_exists;
 use function nl2br;
+use function rand;
 use function str_replace;
 use function time;
 
@@ -157,7 +160,20 @@ class _Debug extends ActiveRecord
         $debug->type = $type;
         $debug->log = $message;
         $debug->time = time();
-        $debug->save();
+
+        if(defined('DT_NODE') && DT_NODE){
+            $return = [
+                'count' => 1,
+                'to' => 'debug',
+                'loc' => \IPS\SUITE_UNIQUE_KEY,
+                'items' => Theme::i()->getTemplate('generic', 'toolbox', 'front')->li($debug->body())
+            ];
+            Sockets::i()->post($return);
+        }
+        else {
+            $debug->save();
+        }
+
     }
 
     public function save()
@@ -236,7 +252,8 @@ class _Debug extends ActiveRecord
      */
     public function get_name(): string
     {
-        return '#' . $this->_data['id'] . ' ' . $this->_data['key'];
+        $id = $this->_data['id'] ?? md5(rand(1,1000000));
+        return '#' . $id . ' ' . $this->_data['key'];
     }
 
     public function url()

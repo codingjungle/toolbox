@@ -17,6 +17,7 @@ use function defined;
 use function header;
 
 use const DT_ANALYZE;
+use const DT_MY_APPS;
 use const DT_ROUTE_TO_DEBUG;
 use const DT_THEME;
 use const DT_THEME_CMS_USE_DESIGNER_FILES;
@@ -163,6 +164,24 @@ class _toolbox
                 'current'     => defined('\DT_MY_APPS') ? DT_MY_APPS : "adminer,babble,babbleadmin,babbleextra,chrono,cjcboard,cjdashboard,cjdml,cjgames,cjmember,cjmg,cjrates,cjseo,cjtrack,cjtwd,clubmenus,dgform,dplus,dwlabs,formularize,keywords,myimports,n2a,nettookit,stratagem,toolbox,toplist",
                 'description' => 'This enables an app to be analyzed before you download it.',
                 'type' => 'string',
+                'tab'         => 'DevTools',
+
+            ],
+            'DT_NODE'                         => [
+                'name'        => 'DT_NODE',
+                'default'     => false,
+                'current'     => defined('\DT_NODE') ? DT_NODE : false,
+                'description' => 'Enable debug to use node.js instead of long polling.',
+                'type' => 'boolean',
+                'tab'         => 'DevTools',
+
+            ],
+            'DT_NODE_URL'                         => [
+                'name'        => 'DT_NODE_URL',
+                'default'     => false,
+                'current'     => defined('\DT_NODE_URL') ? DT_NODE_URL : 'http://localhost:3010',
+                'description' => 'Url with port for node.js',
+                'type' => 'url',
                 'tab'         => 'DevTools',
 
             ],

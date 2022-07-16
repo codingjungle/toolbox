@@ -19,12 +19,13 @@
         };
     } );
     var _debugObj = function() {
-        var ajax = null;
-        var current = null;
-        var aurl;
-        var burl;
-        var el;
-        var init = function( url, elem ) {
+        var ajax = null,
+            current = null,
+            aurl,
+            burl,
+            el,
+            socket= null,
+            init = function( url, elem ) {
             burl = url;
             aurl = burl + '&do=debug';
             el = elem;
@@ -48,46 +49,80 @@
                     find( 'i.dtprofilearrow' ).
                     removeClass( 'fa-rotate-180' );
             } );
-        };
-        var _clear = function() {
+        },
+            _clear = function() {
             ajax( {
                 type: 'GET',
                 url: burl + '&do=clearAjax',
                 bypassRedirect: true,
             } );
-        };
-        var abort = function() {
+        }, abort = function() {
             current.abort();
-        };
-        var _debug = function() {
-            current = ajax( {
-                type: 'POST',
-                data: 'last=' + $( '#elProfiledebug', el ).attr( 'data-last' ),
-                url: aurl,
-                dataType: 'json',
-                bypassRedirect: true,
-                success: function( data ) {
-                    var countEl = el.find( '#elProfiledebug' ).find( '.dtprofilerCount' );
+        },
+        _sockets = function() {
+            if (socket === null || !socket.connected) {
+                socket = io(
+                    ips.getSetting('cj_debug_sockets_url'),
+                    {
+                        timeout: 20000,
+                        reconnectionDelay: 2000,
+                        reconnectionDelayMax: 20000,
+                        reconnectionAttempts: 10,
+                        cookie: false,
+                    },
+                );
+            }
+        },
+            getSocket = function() {
+                if (socket === null) {
+                    _sockets();
+                }
 
-                    if ( !data.hasOwnProperty( 'error' ) ) {
-                        $( '#elProfiledebug_list', el ).append( data.items );
-                        var count = Number( countEl.attr( 'data-count' ) );
-                        count = Number( data.count ) + count;
-                        countEl.html( count ).attr( 'data-count', count );
-                        countEl.parent().addClass( 'dtprofilerFlash' );
-                        $( '#elProfiledebug', el ).attr( 'data-last', data.last );
-                        if ( $( '#elProfiledebug', el ).hasClass( 'ipsHide' ) ) {
-                            $( '#elProfiledebug', el ).removeClass( 'ipsHide' );
-                        }
-                        countEl.parent().addClass( 'dtprofilerFlash' );
-                    }
-                },
-                complete: function( data ) {
-                    _debug();
-                },
-                error: function( data ) {
-                },
-            } );
+                return socket;
+            },
+         _debug = () => {
+            if(ips.getSetting('cj_debug_sockets')){
+                getSocket().emit('join', ips.getSetting('cj_debug_key'));
+                getSocket().on('debug', function(data) {
+                    console.log(90909)
+                    _process(data);
+                });
+            }
+            else {
+                // current = ajax({
+                //     type: 'POST',
+                //     data: 'last=' + $('#elProfiledebug', el).attr('data-last'),
+                //     url: aurl,
+                //     dataType: 'json',
+                //     bypassRedirect: true,
+                //     success: function(data) {
+                //        _process(data);
+                //     },
+                //     complete: function(data) {
+                //         _debug();
+                //     },
+                //     error: function(data) {
+                //     },
+                // });
+            }
+        },
+        _process = (data)=>{
+            var countEl = el.find('#elProfiledebug').
+                find('.dtprofilerCount');
+
+            if (!data.hasOwnProperty('error')) {
+                $('#elProfiledebug_list', el).append(data.items);
+                var count = Number(countEl.attr('data-count'));
+                count = Number(data.count) + count;
+                countEl.html(count).attr('data-count', count);
+                countEl.parent().addClass('dtprofilerFlash');
+                $('#elProfiledebug', el).
+                    attr('data-last', data.last);
+                if ($('#elProfiledebug', el).hasClass('ipsHide')) {
+                    $('#elProfiledebug', el).removeClass('ipsHide');
+                }
+                countEl.parent().addClass('dtprofilerFlash');
+            }
         };
 
         return {

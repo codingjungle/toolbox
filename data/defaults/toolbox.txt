@@ -1,0 +1,69 @@
+"use strict";
+/**
+ * The port node.js will list for request/responses. Only change this if this port can't be opened, or used by another
+ * application. You will need to update the Node URL in your acp if you do change this.
+ * @type {string}
+ */
+var port = #port#;
+
+/**
+ * if you are running ssl, please fill in the information below. This needs to be complete and absolute paths to both.
+ */
+var sslPrivateKey = '#sslkey#';
+var sslCertificate = '#sslcert#';
+
+/**
+ * this isn't always required
+ */
+var sslBundle = '#sslbundle#';
+
+/**
+ * Don't change anything below this, if you do you might void your warranty!
+ */
+let express = require('express')(),
+    http = null,
+    fs = require( 'fs' ),
+    webserver,
+    io,
+    options = {};
+
+if ( sslPrivateKey && sslCertificate ) {
+    options = {
+        key: fs.readFileSync( sslPrivateKey ),
+        cert: fs.readFileSync( sslCertificate ),
+        requestCert: false,
+        rejectUnauthorized: false,
+    };
+
+    if ( sslBundle ) {
+        options.ca = fs.readFileSync( sslBundle );
+    }
+
+    http = require( 'https' );
+    webserver = http.createServer( options, express ).listen( port );
+} else {
+    http = require( 'http' );
+    webserver = http.createServer( express ).listen( port );
+}
+
+ io = require( 'socket.io' )(
+    webserver,
+    {
+        serveClient: false,
+        pingInterval: 30000,
+        pingTimeout: 5000,
+        cors: {origin:'*'}
+    }
+);
+
+io.on('connection', socket => {
+  socket.on('join', room => {
+    socket.join(room);
+  });
+  socket.on('leave', room => {
+    socket.leave(room);
+  });
+  socket.on('notify', data => {
+      socket.in(data.loc).emit(data.to, data);
+  });
+});

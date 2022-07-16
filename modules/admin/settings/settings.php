@@ -15,6 +15,7 @@ namespace IPS\toolbox\modules\admin\settings;
 use IPS\Application;
 use IPS\Dispatcher;
 use IPS\Dispatcher\Controller;
+use IPS\File;
 use IPS\IPS;
 use IPS\Output;
 use IPS\Request;
@@ -23,15 +24,23 @@ use IPS\toolbox\Form;
 use IPS\toolbox\GitHooks;
 use RuntimeException;
 
+use function _p;
+use function array_merge;
 use function defined;
+use function explode;
 use function file_get_contents;
 use function file_put_contents;
 use function function_exists;
 use function header;
+use function implode;
 use function is_file;
 use function preg_replace_callback;
 use function property_exists;
+use function random_int;
+use function sha1;
 use function str_replace;
+
+use function time;
 
 use const DIRECTORY_SEPARATOR;
 use const IPS\NO_WRITES;
@@ -287,4 +296,149 @@ eof;
         Output::i()->redirect($this->url, 'init.php patched');
     }
 
+    public function package()
+    {
+        $package = <<<EOF
+{
+  "name": "toolbox.js",
+  "version": "#version#",
+  "description": "the nodejs modules for toolbox",
+  "main": "toolbox.js",
+  "author": "codingjungle.com",
+  "dependencies": {
+    "express": "^4.14.0", 
+    "socket.io": "^4.5.1"
+  }
+}
+EOF;
+        $find = ['#version#'];
+        $replace = [$this->buildVersion(Application::load('toolbox')->version)];
+        $package = str_replace($find, $replace, $package);
+        $headers = array_merge(
+            Output::getCacheHeaders(time(), 360),
+            [
+                'Content-Disposition'    => Output::getContentDisposition('attachment', 'package.json'),
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+
+        /* Send headers and print file */
+        Output::i()->sendStatusCodeHeader(200);
+        Output::i()->sendHeader('Content-type: ' . File::getMimeType('package.json') . ';charset=UTF-8');
+
+        foreach ($headers as $key => $header) {
+            Output::i()->sendHeader($key . ': ' . $header);
+        }
+
+        Output::i()->sendHeader('Content-Length: ' . \strlen($package));
+
+        print $package;
+        exit;
+    }
+    /**
+     * for segver compatibility
+     *
+     * @param $version
+     *
+     * @return string
+     */
+    public function buildVersion($version): string
+    {
+        $ver = explode('.', $version);
+        $return = [];
+
+        if (isset($ver[0])) {
+            $return[] = $ver[0];
+        }
+
+        if (isset($ver[1])) {
+            $return[] = $ver[1];
+        } else {
+            $return[] = 0;
+        }
+
+        if (isset($ver[2])) {
+            $return[] = $ver[2];
+        } else {
+            $return[] = 0;
+        }
+
+        return implode('.', $return);
+    }
+    /**
+     * builds the toolbox.js to download
+     */
+    protected function toolbox($values)
+    {
+        $url = DT_NODE_URL;
+        preg_match('#\:[0-9]*$#',$url,$match);
+        $toolbox = file_get_contents(\IPS\babble\Application::getRootPath('toolbox') . '/applications/toolbox/data/defaults/toolbox.txt');
+
+        $find = [
+            '#port#',
+            '#sslkey#',
+            '#sslcert#',
+            '#sslbundle#',
+        ];
+
+        $replace = [
+            str_replace(':','',$match[0]),
+            $values['sslPrivateKey'],
+            $values['sslCertificate'],
+            $values['sslBundle'],
+        ];
+
+        $toolbox = str_replace($find, $replace, $toolbox);
+
+        $headers = array_merge(
+            Output::getCacheHeaders(time(), 360),
+            [
+                'Content-Disposition'    => Output::getContentDisposition('attachment', 'toolbox.js'),
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+
+        /* Send headers and print file */
+        Output::i()->sendStatusCodeHeader(200);
+        Output::i()->sendHeader('Content-type: ' . File::getMimeType('toolbox.js') . ';charset=UTF-8');
+
+        foreach ($headers as $key => $header) {
+            Output::i()->sendHeader($key . ': ' . $header);
+        }
+
+        Output::i()->sendHeader('Content-Length: ' . \strlen($toolbox));
+
+        print $toolbox;
+        exit;
+    }
+
+    public function toolboxForm(){
+        $form = Form::create();
+        $form->add('sslPrivateKey')->label('SSL Private Key Path');
+        $form->add('sslCertificate')->label('SSL Certificate');
+        $form->add('sslBundle')->label('SSL Bundle');
+
+        if($values = $form->values()){
+            $this->toolbox($values);
+        }
+
+        Output::i()->output = $form;
+    }
+
+
+    public function node(){
+
+        \IPS\Output::i()->sidebar['actions']['package'] = array(
+            'icon' => '',
+            'title'	=> 'Package.json',
+            'link'	=> \IPS\Http\Url::internal( 'app=toolbox&module=settings&controller=settings&do=package' )
+        );
+
+        \IPS\Output::i()->sidebar['actions']['app'] = array(
+            'icon' => '',
+            'title'	=> 'Toolbox.js',
+            'link'	=> \IPS\Http\Url::internal( 'app=toolbox&module=settings&controller=settings&do=toolboxForm' ),
+            'data' => ['data-ipsDialog'=>1]
+        );
+    }
 }

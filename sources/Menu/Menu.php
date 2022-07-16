@@ -97,6 +97,14 @@ class _Menu extends Singleton
             'url'  => (string)Url::internal('app=toolbox&module=devfolder&controller=applications'),
         ];
 
+        if(defined('DT_NODE') && DT_NODE) {
+            $store['toolbox'][] = [
+                'id' => 'Node',
+                'name' => 'Node App',
+                'url' => (string)Url::internal('app=toolbox&module=settings&controller=settings&do=node')
+            ];
+        }
+
         $this->menu($store);
 
         $store['roots'][] = [

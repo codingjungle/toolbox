@@ -63,15 +63,21 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     {
         Application::addJs(['global_proxy'], 'global');
         Output::i()->jsVars['cj_debug'] = \IPS\IN_DEV === true || \IPS\DEBUG_JS === true ? 1 : 0;
-
         if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
             Application::addJs(['front_profiler']);
+            if(defined('DT_NODE') && DT_NODE) {
+                Application::addJs(['front_socket'],'front');
+                Output::i()->jsVars['cj_debug_key'] = \IPS\SUITE_UNIQUE_KEY;
+                Output::i()->jsVars['cj_debug_sockets'] = defined('DT_NODE') && DT_NODE ? 1 : 0;
+                Output::i()->jsVars['cj_debug_sockets_url'] = defined('DT_NODE_URL') && DT_NODE ? DT_NODE_URL : '';
+            }
             if (Settings::i()->dtprofiler_enabled_js) {
                 Store::i()->dtprofiler_js = Output::i()->jsFiles;
             }
             if (Settings::i()->dtprofiler_enabled_jsvars) {
                 Store::i()->dtprofiler_js_vars = Output::i()->jsVars;
             }
+
         }
 
         if ( \is_callable('parent::includeJS') )

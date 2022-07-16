@@ -94,6 +94,9 @@ class _Cons extends Singleton
                 case 'int':
                     $form->element($key)->changeType('number');
                     break;
+                case 'url':
+                    $form->element($key)->changeType('url');
+                    break;
             }
         }
 
