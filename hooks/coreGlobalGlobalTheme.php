@@ -31,7 +31,6 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     public function includeCSS()
     {
             $css = Output::i()->cssFiles;
-
             $caching = Theme::i()->css('styles/caching_log.css', 'core', 'front');
             $cachingCss = array_pop($caching);
             if (CACHING_LOG && $key = array_search($cachingCss, $css)) {
@@ -61,16 +60,43 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
 
     public function includeJS()
     {
+        $data = '';
+        if (!Request::i()->isAjax()) {
+            $debugjs = Output::i()->js('global_debug.js', 'toolbox', 'global');
+            $js = '';
+            foreach($debugjs as $j){
+                $js .= '<script type="text/javascript" src="'.$j.'?v='.\IPS\Output\Javascript::javascriptCacheBustKey().'" data-ips></script>';
+            }
+            $canUse = Settings::i()->dtprofiler_use_console ? 1 : 0;
+            $canUse = \IPS\QUERY_LOG ? $canUse : 0;
+            $canReplace = Settings::i()->dtprofiler_use_console ? 1 : 0;
+            $cjEditor = \IPS\DEV_WHOOPS_EDITOR;
+            $cjBaseUrl = \IPS\Settings::i()->base_url;
+            $cjAppPath = Application::getRootPath('toolbox');
+            $cjDebug = \IPS\IN_DEV === true || \IPS\DEBUG_JS === true ? 1 : 0;
+
+            $data = <<<EOF
+<script type="text/javascript">
+    var dtProfilerUseConsole = {$canUse};
+    var dtProfilerEditor = '{$cjEditor}';
+    var dtProfilerReplaceConsole = {$canReplace};
+    var dtProfilerBaseUrl = '{$cjBaseUrl}';
+    var dtProfilerAppPath = '{$cjAppPath}';
+    var dtProfilerDebug = '{$cjDebug}'; 
+</script>
+{$js}
+EOF;
+
+            if (defined('DT_NODE') && DT_NODE) {
+                Application::addJs(['front_socket']);
+
+            }
+        }
+        Application::addJs(['global_main'],'global');
         Application::addJs(['global_proxy'], 'global');
-        Output::i()->jsVars['cj_debug'] = \IPS\IN_DEV === true || \IPS\DEBUG_JS === true ? 1 : 0;
+
         if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
             Application::addJs(['front_profiler']);
-            if(defined('DT_NODE') && DT_NODE) {
-                Application::addJs(['front_socket'],'front');
-                Output::i()->jsVars['cj_debug_key'] = \IPS\SUITE_UNIQUE_KEY;
-                Output::i()->jsVars['cj_debug_sockets'] = defined('DT_NODE') && DT_NODE ? 1 : 0;
-                Output::i()->jsVars['cj_debug_sockets_url'] = defined('DT_NODE_URL') && DT_NODE ? DT_NODE_URL : '';
-            }
             if (Settings::i()->dtprofiler_enabled_js) {
                 Store::i()->dtprofiler_js = Output::i()->jsFiles;
             }
@@ -82,7 +108,8 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
 
         if ( \is_callable('parent::includeJS') )
         {
-            return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
+            $data .= \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
+            return $data;
         }
     }
 }

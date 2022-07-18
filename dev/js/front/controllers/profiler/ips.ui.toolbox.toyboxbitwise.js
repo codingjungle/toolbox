@@ -42,7 +42,10 @@
     });
     const _objectToybox = function(elem, options) {
         let init = () => {
-                console.log('foobjkl');
+              let obj = {};
+              obj.one = 1;
+              obj.two = 2;
+              console.log(obj,8,9);
                 elem.on('submit',_submit);
                 elem.on('change','[name="position"]',_position);
         },

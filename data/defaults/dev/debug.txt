@@ -1,0 +1,430 @@
+var _p = _p || {};
+;( function($, _, undefined){
+  "use strict";
+    var timers = {},
+        cCount = 1,
+        getStackTrace =  (type='log',min = 5,linkify=true) => {
+
+      let file,
+          other,
+          line,
+          path,
+          url,
+          matches,
+          main,
+          error = new Error(),
+          stack = error.stack || '';
+
+      stack = stack.split('\n').map(function (line) { return line.trim(); });
+      stack = stack.splice(stack[0] === 'Error' ? min : 1);
+      main = stack[0];
+      //http://codingjungle.test/dev/applications/toolbox/dev/js/global/controllers/main/ips.toolbox.main.js?v=022c8961120a686efa330e667336b7cd1657607257:6:23)
+      matches = main.match(/\bhttps?:\/\/\S+/gi);
+      if(linkify && ips.getSetting('cj_editor')){
+          url = matches[0].replace(')','').split('/');
+          path = matches[0];
+          path = path.replace(ips.getSetting('cj_base_url'),'');
+          path = path.split('?');
+          other = path[1].split(':');
+          line = other[1];
+          path = path[0];
+          file = url[url.length-1];
+          return '<div><a href="' +ips.getSetting('cj_editor') + '://open?file=' +ips.getSetting('cj_app_path') +'/' +path+'&line='+line+'">in '+path+':'+line+' via console.'+type+'()</a></div>';
+      }
+
+      return 'in '+matches[0].replace(')','')+' via console.'+type+'()';
+    };
+    _p = function(){
+      var adapters,
+          _process = (html,count= 1, type = 'log') => {
+            var el = $('#elProfileConsoleLog'),
+                container = $('#elProfileConsoleLog_list'),
+                last = container.find('li:last-child').find('div.dtProfilerGroup'),
+                countEl = el.find('.dtprofilerCount');
+              if(last.length !== 0 && type !== 'groupEnd'){
+                  last.find('ul:first').append(html);
+              }
+              else {
+                container.append(html);
+              }
+              var cc = Number(countEl.attr('data-count'));
+              cc = Number(count) + cc;
+              countEl.html(cc).attr('data-count', cc);
+              el.addClass('dtprofilerFlash');
+              container.trigger('contentChange',[container.parent()]);
+          },
+          _buildTable = (table, headers=['Index','Values'])=>{
+            let tables = '<table class="ipsTable">';
+            if(headers){
+              tables += '<tr>';
+              $.each(headers, function(index,name){
+                tables += '<th>'+name+'</th>';
+              });
+              tables += '<tr>';
+            }
+            $.each(table, function(index,value){
+              if(_.isObject(value) || _.isArray(value)){
+                tables += '<tr><td>' + index + '</td><td>' + value +_buildTable(value,['Index','Values'])+
+                    '</td></tr>'
+
+              }
+              else {
+                tables += '<tr><td>' + index + '</td><td>' + value +
+                    '</td></tr>';
+              }
+            });
+            tables +='</table>';
+
+            return tables;
+          },
+          _send = (data, type)=>{
+            let li = $('<li></li>'),
+                container = $('<div></div>');
+            li.addClass("ipsPad_half dtProfilerSearch dtProfilerType"+type);
+            if(type !== 'groupEnd') {
+              li.append(getStackTrace(type));
+            }
+            else{
+              li.removeClass("ipsPad_half dtProfilerSearch");
+            }
+            li.append(data);
+            container.html(li);
+            _process(container.html(), 1, type);
+          },
+          newLog = (u, type='log', classes=null) => {
+            let  nv = '',
+                includeIndex = u.length > 1;
+            $.each(u, (index,value)=>{
+              if(_.isObject(value)){
+                value = _buildTable(value);
+              }
+              nv += '<div';
+              if(!_.isNull(classes)){
+                nv += ' class="'+classes+'"';
+              }
+              nv += '>'
+              if(includeIndex) {
+                nv += index+': ';
+              }
+              nv += value+'</div>';
+            });
+            _send(nv,type);
+          },
+          newTimeEnd = (label) => {
+              let args = [],
+                  time = null;
+              if(timers.hasOwnProperty(label)) {
+                time = Date.now() - timers[label];
+                args.push(label + ': ' + time + ' ms');
+                newLog(args, 'timeEnd');
+              }
+              else{
+                args.push('There are no timers for '+label);
+                newLog(args,'timeEnd','warning');
+              }
+          },
+          newGroupEnd = () => {
+            _send(' ', 'groupEnd');
+          },
+          newGroup = (label, collapsed = false) => {
+              let group = '<div class="dtProfilerGroup">';
+
+              if(label) {
+                group += '<h3>'+label+'</h3>';
+              }
+            if(collapsed){
+              group += '<i class="fa fa-chevron-circle-right" data-ipstoolboxcollapsed></i>';
+            }
+            else{
+              group += '<i class="fa fa-chevron-circle-right fa-rotate-90" data-ipstoolboxcollapsed></i>';
+            }
+              group += '<ul class="ipsList_reset';
+            if(collapsed){
+              group += ' closed ipsHide'
+            }
+            group += '"></ul></div>';
+            _send(group,collapsed ? 'groupCollapsed' : 'group');
+          },
+          newTable = (obj, headers, type='table') => {
+              let tables = _buildTable(obj, headers);
+              _send(tables,type);
+          },
+          newCount = (label='default') => {
+            let list = label + ': '+ cCount;
+            _send(list,'count');
+            cCount++;
+          },
+          newClear = ()=>{
+            let $this = $('#elProfileConsoleLog_list'),
+                parent = $this.closest('ul.ipsList_reset');
+            parent.find('li:not(.notme)').each(function(){
+              $(this).remove();
+            });
+            parent.prev().find('.dtprofilerCount').html(0);
+          },
+          write = function(type,message,other=null, trace=false){
+            if (parseInt(ips.getSetting('cj_debug')) === 1) {
+              adapters.write(type, message, other,trace);
+            }
+
+            return _p;
+          },
+          l = function(){
+            let args = Array.from(arguments);
+            if(ips.getSetting('cj_use_profiler_console')) {
+               newLog(args);
+              return _p;
+            }
+            else{
+              return write('log',args,null,true);
+            }
+          },
+          t = function(){
+            let args = Array.from(arguments),
+                msg = args[0],
+                headers = args[1] ?? ['Index','Values'];
+
+            if(ips.getSetting('cj_use_profiler_console')) {
+              if(_.isObject(msg) || _.isArray(msg)) {
+                newTable(msg, headers);
+              }
+              else{
+                newLog(args, 'table');
+              }
+              return _p;
+            }
+            else{
+              return write('table', msg, headers,true);
+            }
+          },
+          a = function(assertion,msg){
+            if(ips.getSetting('cj_use_profiler_console')){
+                if(assertion){
+                  let args = [];
+                  args.push(msg);
+                  newLog(args,'assert')
+                }
+              return _p;
+            }
+            else {
+              return write('a', true, msg, assertion);
+            }
+          },
+          c = function(){
+            if(ips.getSetting('cj_use_profiler_console')){
+              newClear();
+              return _p;
+            }
+            else {
+              return write('c');
+            }
+          },
+          cc = function(label){
+            if(ips.getSetting('cj_use_profiler_console')){
+                newCount(label)
+              return _p;
+
+            }
+            else {
+              return write('cc',  label,null,true);
+            }
+
+          },
+          e = function(msg){
+            if(ips.getSetting('cj_use_profiler_console')){
+                let args = [];
+                args.push(msg);
+                newLog(args,'error')
+              return _p;
+            }
+            else {
+              return write('e', msg,null,true);
+            }
+          },
+          g = function(label){
+            if(ips.getSetting('cj_use_profiler_console')){
+              let args = [];
+              args.push(label);
+              newGroup(args)
+              return _p;
+            }
+            else {
+              return write('g',label);
+            }
+          },
+          gc = function(label){
+            if(ips.getSetting('cj_use_profiler_console')){
+              let args = [];
+              args.push(label);
+              newGroup(args,true)
+              return _p;
+            }
+            else {
+              return write('gc',label);
+            }
+            },
+          ge = function(){
+            if(ips.getSetting('cj_use_profiler_console')){
+              newGroupEnd()
+              return _p;
+            }
+            else {
+              return write('ge');
+            }
+          },
+          i = function(){
+            let args = Array.from(arguments);
+            if(ips.getSetting('cj_use_profiler_console')) {
+              newLog(args,'info');
+              return _p;
+            }
+            else{
+              return write('i',args,null,true);
+            }          },
+          time = function(label){
+              if(ips.getSetting('cj_use_profiler_console')) {
+                if (_.isUndefined(label) || _.isNull(label) ||
+                    _.isEmpty(label)) {
+                  label = 'default;'
+                }
+                timers[label] = Date.now();
+              }
+              else{
+                return write('time',label);
+              }
+          },
+          timeEnd = function(label){
+            if(ips.getSetting('cj_use_profiler_console')) {
+              if (_.isUndefined(label) || _.isNull(label) ||
+                  _.isEmpty(label)) {
+                label = 'default;'
+              }
+                newTimeEnd(label);
+            }
+            else {
+              return write('timeEnd', label, null,true);
+            }
+          },
+          trace = function(){
+
+            if(ips.getSetting('cj_use_profiler_console')) {
+              let args = [],
+                  error = new Error();
+              args.push(error.stack);
+              newLog(args,'trace');
+            }
+            else {
+              return write('trace');
+            }
+          },
+          w = function(){
+            let args = Array.from(arguments);
+            if(ips.getSetting('cj_use_profiler_console')) {
+              newLog(args,'warn');
+              return _p;
+            }
+            else{
+              return write('w',args,null,true);
+            }
+          },
+          addAdapter = function(adapter){
+            adapters = adapter;
+            return _p;
+          }
+      return {
+        l:  l,
+        log:  l,
+        t:t,
+        table:t,
+        a:a,
+        assert:a,
+        c:c,
+        clear:c,
+        cc:cc,
+        count:cc,
+        e:e,
+        error:e,
+        g:g,
+        group:g,
+        gc:gc,
+        groupCollapsed:gc,
+        ge:ge,
+        groupEnd:ge,
+        i:i,
+        info:i,
+        time:time,
+        timeEnd:timeEnd,
+        trace:trace,
+        warn:w,
+        w:w,
+        addAdapter:addAdapter,
+      }
+    }();
+    var Console = function() {};
+
+    Console.prototype.write = function ( type, msg, other,trace ){
+      if( window.console ){
+        switch( type ){
+          case 'l':
+          case 'log':
+            console.log(...msg );
+            break;
+          case 't':
+          case 'table':
+              console.table( msg, other );
+            break;
+          case 'a':
+          case 'assert':
+            console.assert( other, msg );
+            break;
+          case 'c':
+          case 'clear':
+            console.clear();
+            break;
+          case 'cc':
+          case 'count':
+            console.count(msg);
+            break;
+          case 'e':
+          case 'error':
+            console.error(msg);
+            break;
+          case 'g':
+          case 'group':
+            console.group(msg);
+            break;
+          case 'gc':
+          case 'groupCollapsed':
+            console.groupCollapsed(msg);
+            break;
+          case 'ge':
+          case 'groupend':
+            console.groupEnd();
+            break;
+          case 'i':
+          case 'info':
+            console.info(msg);
+            break;
+          case 'time':
+            console.time(msg);
+            break;
+          case 'timeEnd':
+            console.timeEnd(msg);
+            break;
+          case 'trace':
+            console.trace();
+            break;
+          case 'w':
+          case 'warn':
+            console.warn(msg);
+            break;
+        }
+        if(trace === true){
+          console.log(getStackTrace(type,6,false));
+        }
+      }
+    };
+    _p.addAdapter( new Console );
+
+
+}(jQuery, _));

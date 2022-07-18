@@ -4,7 +4,7 @@
 
 use function defined;
 
-use const TOOLBOXDEV;
+use const TOOLBOXDEV_IMMEDIATE;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;

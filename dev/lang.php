@@ -360,5 +360,9 @@ $lang = [
     'menu__toolbox_settings_adminer' => 'Adminer',
     'toolbox_use_tabs_applications' => 'Applications Tabbed',
     'toolbox_use_tabs_applications_desc' => 'Use tabs on the applications page to distinquish between Your Apps (using DT_MY_APPS constant), IPS apps, third party and uninstalled apps',
-    'dtdevplus_open_in_adminer' => 'Adminer'
+    'dtdevplus_open_in_adminer' => 'Adminer',
+    'dtprofiler_use_console' => 'Use Console',
+    'dtprofiler_use_console_desc' => 'Uses the profiler console for the special debug javascript file that is available to to generate for your app create asset options in the dev center.',
+    'dtprofiler_replace_console' => 'Replace Console',
+    'dtprofiler_replace_console_desc' => 'This will replace the standard console object, like console.log, with ones that will use special debug javascript file that is available to generate for your app in the create asset options in the dev center.',
 ];

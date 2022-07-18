@@ -56,7 +56,7 @@
 .dtProfilerlogs {
     background: #990033;
 }
-
+.celProfileSystem,
 .dtProfilerenvironment{
     background: #ff8000;
 }
@@ -196,7 +196,7 @@
     50% { opacity: .1; }
     100% { opacity: 1; }
 }
-
+.dtProfilerClearConsoleLog,
 .dtProfilerClear span {
     display:block;
     cursor:pointer;
@@ -204,9 +204,10 @@
     font-weight: bold;
     color: #fff;
     background: #ff0000;
+}
+.dtProfilerClear span {
     padding:10px 0;
 }
-
 .dtprofilerEnabled {
     color: #00ff00;
     padding-left:10px;
@@ -278,7 +279,7 @@
     word-wrap: normal;
     word-break: break-word;
 }
-
+#elProfileConsoleLog_list li:not(.notme),
 .dtProfilerBar_search_ul > li,
 #elProfilelogs_list > li {
     border-bottom: #fff 1px solid;
@@ -359,4 +360,66 @@
 
 #elTabs_sources_tabs li {
     min-width:200px;
+}
+.dtProfileMinHeight {
+    min-height:400px;
+}
+#elProfileConsoleLog_list {
+    border-color: #fff;
+}
+
+#elProfileConsoleLog_list .ipsTable th {
+   background:transparent;
+    color:inherit;
+    border: 1px solid;
+}
+
+#elProfileConsoleLog_list .dtProfilerTypetable
+{
+    background:rgba(189, 189, 189,0.6);
+}
+
+#elProfileConsoleLog_list .dtProfilerTypeassert
+{
+    background:rgba(211, 88, 247,0.6);
+}
+
+#elProfileConsoleLog_list .dtProfilerTypecount
+{
+    background:rgba(88, 250, 244,0.6);
+}
+
+#elProfileConsoleLog_list .dtProfilerTypeerror
+{
+    background:rgba(250, 88, 88,0.6);
+}
+#elProfileConsoleLog_list .dtProfilerTypegroupCollapsed,
+#elProfileConsoleLog_list .dtProfilerTypegroup
+{
+    background:rgba(88, 250, 88,0.6);
+}
+
+#elProfileConsoleLog_list .dtProfilerTypeinfo
+{
+    background:rgba(88, 172, 250,0.6);
+}
+
+#elProfileConsoleLog_list .dtProfilerTypetimeEnd
+{
+    background:rgba(4, 95, 180,0.6);
+}
+
+#elProfileConsoleLog_list .dtProfilerTypetrace
+{
+    background:rgba(4, 180, 4,0.6);
+}
+
+#elProfileConsoleLog_list .dtProfilerTypetimeEnd .warning {
+    padding:5px;
+}
+
+#elProfileConsoleLog_list .dtProfilerTypetimeEnd .warning,
+#elProfileConsoleLog_list .dtProfilerTypewarn
+{
+    background:rgba(180, 4, 4,0.6);
 }

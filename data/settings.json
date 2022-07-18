@@ -72,12 +72,20 @@
         "default": "25"
     },
     {
+        "key": "dtprofiler_replace_console",
+        "default": "1"
+    },
+    {
         "key": "dtprofiler_show_admin",
         "default": "0"
     },
     {
         "key": "dtprofiler_show_changes",
         "default": "0"
+    },
+    {
+        "key": "dtprofiler_use_console",
+        "default": "1"
     },
     {
         "key": "dtproxy_do_constants",

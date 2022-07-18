@@ -67,6 +67,8 @@ class _profiler
         $form->add('dtprofiler_logs_amount', '#');
         $form->add('dtprofiler_git_data', 'yn');
         $form->add('dtprofiler_show_changes', 'yn');
+        $form->add('dtprofiler_use_console','yn');
+        $form->add('dtprofiler_replace_console','yn');
     }
 
     /**

@@ -57,13 +57,7 @@
         {$logs|raw}
         {{endif}}
 
-        {{if $debug }}
-        {$debug|raw}
-        {{endif}}
 
-        {{if $extra }}
-        {$extra|raw}
-        {{endif}}
 
 
             {{if isset( $info['sources']) }}
@@ -82,9 +76,9 @@
             </ul>
 </li>
             {{endif}}
-        <li class="isParent dtProfileFirst">
+        <li class="isParent dtProfileFirst celProfileSystem">
             <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu>
-                Toy Box <i class="fa fa-angle-up"></i>
+                <i class="fa fa-smile-o"></i> Toy Box <i class="fa fa-angle-up"></i>
             </a>
             <div id="elProfileSystem_menu" class="ipsMenu ipsMenu_wide ipsHide">
                 <div class="ipsMenu_title">
@@ -188,7 +182,25 @@
                 </div>
             </div>
         </li>
+        {{if \IPS\Settings::i()->dtprofiler_use_console }}
+        <li id="elProfileConsoleLog" class="isParent dtProfileFirst dtProfilerConsole">
+            <i class="fa fa-terminal"></i> Console
+            (<span class="dtprofilerCount" data-count="0">0</span>)
+            <i class="fa fa-angle-up dtprofilearrow"></i>
+        </li>
+        <ul id="elProfileConsoleLog_list" class="ipsList_reset ipsHide dtProfilerBar_generic dtProfilerMaxWidth">
+            <li class="notme ipsClearfix">
+                Console Log <div class="dtProfilerClearConsoleLog ipsCursor_default ipsPos_right" data-clear> Clear </div>
+            </li>
+        </ul>
+        {{endif}}
+        {{if $debug }}
+        {$debug|raw}
+        {{endif}}
 
+        {{if $extra }}
+        {$extra|raw}
+        {{endif}}
     </ul>
     {{if $info }}
     <div class="dtProfilerInfoBar">

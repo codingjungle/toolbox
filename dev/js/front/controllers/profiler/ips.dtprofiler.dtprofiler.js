@@ -2,7 +2,7 @@
     'use strict';
     ips.createModule( 'ips.dtprofiler.dtprofiler', function() {
         // Functions that become public methods
-        let dialogId = null,
+        var dialogId = null,
             respond = function( elements ) {
                 let elem = $( elements );
                 if ( !elem.data( '_respond' ) ) {
@@ -50,13 +50,20 @@
                         }
                     } );
 
+                    elem.find('[data-clear]').on('click',function(){
+                       let $this = $(this),
+                            parent = $this.closest('ul.ipsList_reset');
+                       parent.find('li:not(.notme)').each(function(){
+                           $(this).remove();
+                       });
+                       parent.prev().find('.dtprofilerCount').html(0);
+                    });
                     elem.find( '> li.isParent' ).on( 'click', function() {
                         closeDialog();
                         let el = $( this );
                         if ( el.is( 'i' ) ) {
                             el = el.parent( 'li' );
                         }
-
                         el.removeClass( 'dtprofilerFlash' );
                         let bottom = $( '#dtProfilerBarContainer' ).outerHeight(),
                             id = el.attr( 'id' ) + '_list',
@@ -82,10 +89,12 @@
                                 find( 'i.dtprofilearrow' ).
                                 removeClass( 'fa-rotate-180' );
                             child.css( 'left', left ).css( 'bottom', bottom );
-                            child.addClass( 'isOpen' ).slideDown();
+                            child.addClass( 'isOpen' ).slideDown().promise().done(function(){
+                                child.addClass('dtProfileMinHeight');
+                            });
                             el.find( 'i.dtprofilearrow' ).addClass( 'fa-rotate-180' );
                         } else {
-                            child.removeClass( 'isOpen' );
+                            child.removeClass( 'isOpen' ).removeClass('dtProfileMinHeight');
                             child.slideUp();
                             el.find( 'i.dtprofilearrow' ).removeClass( 'fa-rotate-180' );
                         }

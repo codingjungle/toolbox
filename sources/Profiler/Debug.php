@@ -21,6 +21,7 @@ use IPS\Theme;
 use IPS\toolbox\Editor;
 use IPS\toolbox\Proxy\Helpers\Request;
 use SplFileInfo;
+use Throwable;
 use UnexpectedValueException;
 
 use function count;
@@ -162,13 +163,17 @@ class _Debug extends ActiveRecord
         $debug->time = time();
 
         if(defined('DT_NODE') && DT_NODE){
-            $return = [
-                'count' => 1,
-                'to' => 'debug',
-                'loc' => \IPS\SUITE_UNIQUE_KEY,
-                'items' => Theme::i()->getTemplate('generic', 'toolbox', 'front')->li($debug->body())
-            ];
-            Sockets::i()->post($return);
+            try {
+                $return = [
+                    'count' => 1,
+                    'to' => 'debug',
+                    'loc' => \IPS\SUITE_UNIQUE_KEY,
+                    'items' => Theme::i()->getTemplate('generic', 'toolbox', 'front')->li($debug->body())
+                ];
+                Sockets::i()->post($return);
+            }catch(\Exception | Throwable $e){
+                $debug->save();
+            }
         }
         else {
             $debug->save();

@@ -49,7 +49,6 @@ class _Sockets extends Singleton
      */
     public function post($message, $multi = false)
     {
-        try {
             $client = $this->ioClient();
             $client->initialize();
 
@@ -61,8 +60,6 @@ class _Sockets extends Singleton
                 }
             }
             $client->close();
-        } catch (Exception $e) {
-        }
     }
 
     /**

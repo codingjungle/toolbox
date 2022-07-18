@@ -50,6 +50,38 @@
                     removeClass( 'fa-rotate-180' );
             } );
         },
+            _socket = () => {
+                try {
+                    ips.toolbox.main.getSocket().on('debug', function(data) {
+                        console.log(90909)
+                        _process(data);
+                    });
+                    setTimeout(function(){
+                        if(!ips.toolbox.main.getSocket().connected){
+                            throw new Error('no sockets');
+                        }
+                    },20000);
+                }catch(error){
+                    _ajax();
+                }
+            },
+            _ajax = () => {
+                current = ajax({
+                    type: 'POST',
+                    data: 'last=' + $('#elProfiledebug', el).attr('data-last'),
+                    url: aurl,
+                    dataType: 'json',
+                    bypassRedirect: true,
+                    success: function(data) {
+                        _process(data);
+                    },
+                    complete: function(data) {
+                        _debug();
+                    },
+                    error: function(data) {
+                    },
+                });
+            },
             _clear = function() {
             ajax( {
                 type: 'GET',
@@ -59,52 +91,18 @@
         }, abort = function() {
             current.abort();
         },
-        _sockets = function() {
-            if (socket === null || !socket.connected) {
-                socket = io(
-                    ips.getSetting('cj_debug_sockets_url'),
-                    {
-                        timeout: 20000,
-                        reconnectionDelay: 2000,
-                        reconnectionDelayMax: 20000,
-                        reconnectionAttempts: 10,
-                        cookie: false,
-                    },
-                );
-            }
-        },
-            getSocket = function() {
-                if (socket === null) {
-                    _sockets();
-                }
-
-                return socket;
-            },
          _debug = () => {
-            if(ips.getSetting('cj_debug_sockets')){
-                getSocket().emit('join', ips.getSetting('cj_debug_key'));
-                getSocket().on('debug', function(data) {
-                    console.log(90909)
-                    _process(data);
-                });
+
+            try{
+                if(!ips.getSetting('cj_debug_sockets')){
+                    throw new Error('Sockets Disabled!');
+                }
+                _socket();
             }
-            else {
-                // current = ajax({
-                //     type: 'POST',
-                //     data: 'last=' + $('#elProfiledebug', el).attr('data-last'),
-                //     url: aurl,
-                //     dataType: 'json',
-                //     bypassRedirect: true,
-                //     success: function(data) {
-                //        _process(data);
-                //     },
-                //     complete: function(data) {
-                //         _debug();
-                //     },
-                //     error: function(data) {
-                //     },
-                // });
+            catch(error){
+                _ajax();
             }
+
         },
         _process = (data)=>{
             var countEl = el.find('#elProfiledebug').

@@ -17,7 +17,9 @@ use function defined;
 use function header;
 
 use const DT_ANALYZE;
+use const DT_DISABLE_SERVICE_WORKERS;
 use const DT_MY_APPS;
+use const DT_NODE_URL;
 use const DT_ROUTE_TO_DEBUG;
 use const DT_THEME;
 use const DT_THEME_CMS_USE_DESIGNER_FILES;
@@ -26,6 +28,7 @@ use const DT_THEME_ID_ADMIN;
 use const DTBUILD;
 use const DTPROFILER;
 use const TOOLBOXDEV;
+use const TOOLBOXDEV_IMMEDIATE;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -59,24 +62,6 @@ class _toolbox
                 'default'     => false,
                 'current'     => defined('\DTBUILD') ? DTBUILD : null,
                 'description' => 'This enables special app build features for toolbox, use with caution.',
-                'type'        => 'boolean',
-                'tab'         => 'DevTools',
-
-            ],
-            'DTPROFILER'                      => [
-                'name'        => 'DTPROFILER',
-                'default'     => false,
-                'current'     => defined('\DTPROFILER') ? DTPROFILER : null,
-                'description' => 'this will enable/disable extra features for the profiler.',
-                'type'        => 'boolean',
-                'tab'         => 'DevTools',
-
-            ],
-            'TOOLBOXDEV'                      => [
-                'name'        => 'TOOLBOXDEV',
-                'default'     => false,
-                'current'     => defined('\TOOLBOXDEV') ? TOOLBOXDEV : false,
-                'description' => 'this will enable/disable extra features for toolbox..',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools',
 
@@ -117,36 +102,11 @@ class _toolbox
                 'tab'         => 'DevTools',
 
             ],
-            'DT_DISABLE_SERVICE_WORKERS'      => [
-                'name'        => 'DT_DISABLE_SERVICE_WORKERS',
-                'default'     => 0,
-                'current'     => defined('\DT_DISABLE_SERVICE_WORKERS') ? DT_DISABLE_SERVICE_WORKERS : false,
-                'description' => 'disable the annoying service worker content in the console log.',
-                'type'        => 'boolean',
-                'tab'         => 'DevTools',
-
-            ],
-            'DT_ROUTE_TO_DEBUG'               => [
-                'name'        => 'DT_ROUTE_TO_DEBUG',
-                'default'     => 0,
-                'current'     => defined('\DT_ROUTE_TO_DEBUG') ? DT_ROUTE_TO_DEBUG : false,
-                'description' => 'Pushes IPS logs to the profiler debugger.',
-                'type'        => 'boolean',
-                'tab'         => 'DevTools'
-            ],
             'DT_ANALYZE'               => [
                 'name'        => 'DT_ANALYZE',
                 'default'     => 0,
                 'current'     => defined('\DT_ANALYZE') ? DT_ANALYZE : false,
                 'description' => 'Runs code analyzer on export of app.',
-                'type'        => 'boolean',
-                'tab'         => 'DevTools'
-            ],
-            'TOOLBOXDEV_IMMEDIATE'               => [
-                'name'        => 'TOOLBOXDEV_IMMEDIATE',
-                'default'     => 0,
-                'current'     => defined('\TOOLBOXDEV_IMMEDIATE') ? TOOLBOXDEV_IMMEDIATE : false,
-                'description' => 'sets delete to be immediate instead of going to the log. this is helpful if you are testing things.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools'
             ],
@@ -167,13 +127,58 @@ class _toolbox
                 'tab'         => 'DevTools',
 
             ],
+
+
+            'TOOLBOXDEV_IMMEDIATE'               => [
+                'name'        => 'TOOLBOXDEV_IMMEDIATE',
+                'default'     => 0,
+                'current'     => defined('\TOOLBOXDEV_IMMEDIATE') ? TOOLBOXDEV_IMMEDIATE : false,
+                'description' => 'sets delete to be immediate instead of going to the log. this is helpful if you are testing things.',
+                'type'        => 'boolean',
+                'tab'         => 'Debug'
+            ],
+            'DTPROFILER'                      => [
+                'name'        => 'DTPROFILER',
+                'default'     => false,
+                'current'     => defined('\DTPROFILER') ? DTPROFILER : null,
+                'description' => 'this will enable/disable any profiler debug/time class to use the debug/time features of profiler.',
+                'type'        => 'boolean',
+                'tab'         => 'Debug',
+
+            ],
+            'TOOLBOXDEV'                      => [
+                'name'        => 'TOOLBOXDEV',
+                'default'     => false,
+                'current'     => defined('\TOOLBOXDEV') ? TOOLBOXDEV : false,
+                'description' => 'this will enable/disable extra features for toolbox..',
+                'type'        => 'boolean',
+                'tab'         => 'Debug',
+
+            ],
+            'DT_DISABLE_SERVICE_WORKERS'      => [
+                'name'        => 'DT_DISABLE_SERVICE_WORKERS',
+                'default'     => 0,
+                'current'     => defined('\DT_DISABLE_SERVICE_WORKERS') ? DT_DISABLE_SERVICE_WORKERS : false,
+                'description' => 'disable the annoying service worker content in the console log.',
+                'type'        => 'boolean',
+                'tab'         => 'Debug',
+
+            ],
+            'DT_ROUTE_TO_DEBUG'               => [
+                'name'        => 'DT_ROUTE_TO_DEBUG',
+                'default'     => 0,
+                'current'     => defined('\DT_ROUTE_TO_DEBUG') ? DT_ROUTE_TO_DEBUG : false,
+                'description' => 'Pushes IPS logs to the profiler debugger.',
+                'type'        => 'boolean',
+                'tab'         => 'Debug'
+            ],
             'DT_NODE'                         => [
                 'name'        => 'DT_NODE',
                 'default'     => false,
                 'current'     => defined('\DT_NODE') ? DT_NODE : false,
                 'description' => 'Enable debug to use node.js instead of long polling.',
                 'type' => 'boolean',
-                'tab'         => 'DevTools',
+                'tab'         => 'Debug',
 
             ],
             'DT_NODE_URL'                         => [
@@ -182,7 +187,7 @@ class _toolbox
                 'current'     => defined('\DT_NODE_URL') ? DT_NODE_URL : 'http://localhost:3010',
                 'description' => 'Url with port for node.js',
                 'type' => 'url',
-                'tab'         => 'DevTools',
+                'tab'         => 'Debug',
 
             ],
         ];
