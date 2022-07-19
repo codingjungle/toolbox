@@ -14,6 +14,8 @@
 namespace IPS\toolbox\modules\front\bt;
 
 use Exception;
+use http\Exception\InvalidArgumentException;
+use IPS\calendar\Date;
 use IPS\Data\Store;
 use IPS\DateTime;
 use IPS\Db;
@@ -459,6 +461,37 @@ class _bt extends Controller
 
     }
 
+    protected function numbers(){
+        $number = Request::i()->number ?? 3456;
+        $type = Request::i()->type ?? 'decimal';
+        try {
+            $output = Profiler\Numbers::i()->{$type}($number);
+        }
+        catch(\InvalidArgumentException $e){
+            $output = [
+                $type => $number,
+                'error' => $e->getMessage()
+            ];
+        }
+        if(isset(Request::i()->type)){
+            Output::i()->json($output);
+        }
+        else{
+            Output::i()->output = Theme::i()->getTemplate('bar','toolbox','front')->numbers($output);
+        }
+    }
+    
+    public function dates(){
+        $time = Request::i()->time ?? Date::create()->getTimestamp();
+        $type = Request::i()->type ?? 'unix';
+        $dates = Profiler\Dates::i()->{$type}($time);
+        if(isset(Request::i()->time)){
+            Output::i()->json($dates);
+        }
+        else {
+            Output::i()->output = Theme::i()->getTemplate('bar', 'toolbox', 'front')->dates($dates);
+        }
+    }
 
     protected function clearAjax()
     {

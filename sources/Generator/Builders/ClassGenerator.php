@@ -352,11 +352,6 @@ EOF;
             $this->addImport($extends);
             $extends = array_pop($og);
         }
-        else{
-            if(mb_substr($extends,0,1) !== '\\'){
-                $extends = '\\'.$extends;
-            }
-        }
         $this->extends = $extends;
     }
 

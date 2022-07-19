@@ -1,0 +1,24 @@
+<ips:template parameters="$dates"/>
+<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxdates >
+
+    <h4>Date</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="date" type="datetime-local" value="{$dates['date']}" data-input="dates">
+        </label>
+    </div>
+
+    <h4>Unix</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="unix" type="number" value="{$dates['unix']}" data-input="unix">
+        </label>
+    </div>
+
+    <h4>ISO 8601</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="iso" type="text" value="{$dates['iso']}" data-input="iso">
+        </label>
+    </div>
+</div>

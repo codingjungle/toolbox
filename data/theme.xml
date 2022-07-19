@@ -204,7 +204,27 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="ipsMenu_title">
+                    Converters
+                </div>
+                <div class="ipsMenu_innerContent">
+                    <div class="ipsGrid">
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Numbers Converters">
+                                <i class="fa fa-calculator"></i>
+                                <br>
+                                Numbers
+                            </a>
+                        </div>
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Dates Converters">
+                                <i class="fa fa-calendar"></i>
+                                <br>
+                                Dates
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <div class="ipsMenu_title">
                     System
                 </div>
@@ -308,6 +328,29 @@
     </div>
     <div class="ipsMargin_top">
         <textarea id="elEncodedContainer">SGVsbG8gV29ybGQhISEhIQ==</textarea>
+    </div>
+</div>]]></template>
+ <template template_group="bar" template_name="dates" template_data="$dates" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxdates >
+
+    <h4>Date</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="date" type="datetime-local" value="{$dates['date']}" data-input="dates">
+        </label>
+    </div>
+
+    <h4>Unix</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="unix" type="number" value="{$dates['unix']}" data-input="unix">
+        </label>
+    </div>
+
+    <h4>ISO 8601</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="iso" type="text" value="{$dates['iso']}" data-input="iso">
+        </label>
     </div>
 </div>]]></template>
  <template template_group="bar" template_name="git" template_data="$info=null" template_location="front" template_app="toolbox"><![CDATA[{{if isset( $info['app'] ) }}
@@ -437,6 +480,40 @@
     <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-generate>Generate</button>
     </div>
     <div class="ipsMargin_top" id="elLoremContainer">{$lorem|raw}</div>
+</div>]]></template>
+ <template template_group="bar" template_name="numbers" template_data="$output" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxnumbers>
+    <div id="error" class="ipsMessage ipsMessage_error{{if !isset($output['error']) }} ipsHide{{endif}}">
+        {{$error = $output['error'] ?? '';}}
+        {$error|raw}
+    </div>
+    <h4>Decimal</h4>
+    <div class="ipsMargin_top">
+        {{$dec = $output['decimal'] ?? 0;}}
+        <label>
+            <input id="decimal" type="number" value="{$dec}" data-input="decimal">
+        </label>
+    </div>
+    <h4>Hexadecimal</h4>
+    <div class="ipsMargin_top">
+        {{$hexa = $output['hexa'] ?? 0;}}
+        <label>
+            <input id="hexa" type="text" value="{$hexa}" data-input="hexa">
+        </label>
+    </div>
+    <h4>Ocatal</h4>
+    <div class="ipsMargin_top">
+        <label>
+            {{$octal = $output['octal'] ?? 0;}}
+            <input id="octal" type="number" value="{$octal}" data-input="octal">
+        </label>
+    </div>
+    <h4>Binary</h4>
+    <div class="ipsMargin_top">
+        <label>
+            {{$binary = $output['binary'] ?? 0;}}
+            <input id="binary" type="text" value="{$binary}" data-input="binary">
+        </label>
+    </div>
 </div>]]></template>
  <template template_group="bar" template_name="uuid" template_data="$form,$uuid" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxuuid>
     {$form|raw}
