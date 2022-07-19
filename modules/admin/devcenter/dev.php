@@ -73,7 +73,7 @@ class _dev extends Controller
         $url = (string)Url::internal(
             'app=core&module=applications&controller=developer&appKey=' . Request::i()->appKey
         )->csrf();
-        Output::i()->breadcrumb[] = [$url, 'Developer Ceneter'];
+        Output::i()->breadcrumb[] = [$url, 'Developer Center'];
         Output::i()->breadcrumb[] = [$url, $this->application->directory];
         Output::i()->breadcrumb[] = [null, $title];
         Output::i()->title = mb_strtoupper($this->application->directory) . ': ' . $title;
@@ -98,6 +98,14 @@ class _dev extends Controller
         ];
 
         $this->doOutput($config, 'module', 'Module');
+    }
+
+    protected function debugger(){
+        $config = [
+            'name',
+            'group'
+        ];
+        $this->doOutput($config,'debugger','Debugger');
     }
 
     protected function widget()

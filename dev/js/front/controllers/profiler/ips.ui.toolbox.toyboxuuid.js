@@ -50,7 +50,6 @@
                 let form = elem.find('form:first'),
                     values = form.serialize(),
                     action = ips.getSetting('baseURL')+'?app=toolbox&module=bt&controller=bt&do=uuid';
-                console.log(action+'&'+values);
                 ajax({
                     type: "POST",
                     url: action,
@@ -62,8 +61,6 @@
                 });
             },
         _clear = e => {
-            console.log('_clear')
-
             let target = $(e.currentTarget);
             $('#elUuidContainer').html('');
         };

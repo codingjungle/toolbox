@@ -54,7 +54,7 @@ abstract class _CompilerAbstract
     {
         $this->type = $type;
         $this->application = $application;
-        $this->blanks = \IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/dev/';
+        $this->blanks = \IPS\Application::getRootPath('toolbox') . '/applications/toolbox/data/defaults/dev/';
         foreach ($values as $key => $val) {
             $key = str_replace('dtdevplus_dev_', '', $key);
             $val = !is_array($val) ? trim($val) : $val;

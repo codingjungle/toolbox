@@ -218,7 +218,7 @@ class _Debug extends ActiveRecord
         return Theme::i()
                     ->getTemplate('generic', 'toolbox', 'front')
                     ->button('Debug', 'debug', 'List of debug messages', $list, $count, 'bug', true,
-                        $count ? false : true, $last, true);
+                       false, $last, true);
     }
 
     /**

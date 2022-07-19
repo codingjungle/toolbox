@@ -1,8 +1,8 @@
 <?php
 /**
  * @brief		sendNotifications Task
- * @author		<a href='https://www.invisioncommunity.com'>Invision Power Services, Inc.</a>
- * @copyright	(c) Invision Power Services, Inc.
+ * @author      -storm_author-
+ * @copyright   -storm_copyright-
  * @license		https://www.invisioncommunity.com/legal/standards/
  * @package		Invision Community
  * @subpackage	toolbox
@@ -12,6 +12,11 @@
 namespace IPS\toolbox\tasks;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
+
+use IPS\Dispatcher\Build;
+use IPS\Session\Admin;
+use IPS\Settings;
+
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
 	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
@@ -37,6 +42,12 @@ class _sendNotifications extends \IPS\Task
 	public function execute()
 	{
         if(\IPS\DEV_DISABLE_ACP_SESSION_TIMEOUT) {
+            $_SERVER[ 'HTTP_HOST' ] = Settings::i()->base_url;
+            $_SERVER[ 'QUERY_STRING' ] = '';
+            $_SERVER[ 'REQUEST_URI' ] = '';
+            $_SERVER[ 'REQUEST_METHOD' ] = 'POST';
+            Build::i();
+            Admin::i();
             \IPS\core\extensions\core\AdminNotifications\ConfigurationError::runChecksAndSendNotifications();
         }
         return NULL;

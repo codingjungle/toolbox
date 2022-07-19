@@ -5,7 +5,6 @@
             this.on('change', '[id="elSelect_js_dtdevplus_ext_table"]', this._getFields);
         },
         _getFields: function(e){
-            console.debug('yes');
             var url = ips.getSetting('dtdevplus_table_url');
             var ajax = ips.getAjax();
             ajax( {

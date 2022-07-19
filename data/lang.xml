@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="toolbox" version="50000">
+ <app key="toolbox" version="50001">
   <word key="__app_toolbox" js="0">Dev Toolbox</word>
   <word key="menutab__devtools" js="0">Dev Toolbox</word>
   <word key="menutab__devtools_icon" js="0">wrench</word>
@@ -358,6 +358,14 @@
   <word key="dtdevplus_menu_title_orm" js="0">Orm</word>
   <word key="dtdevplus_menu_title_settings" js="0">Settings Class</word>
   <word key="menu__toolbox_settings_adminer" js="0">Adminer</word>
+  <word key="toolbox_use_tabs_applications" js="0">Applications Tabbed</word>
+  <word key="toolbox_use_tabs_applications_desc" js="0">Use tabs on the applications page to distinquish between Your Apps (using DT_MY_APPS constant), IPS apps, third party and uninstalled apps</word>
+  <word key="dtdevplus_open_in_adminer" js="0">Adminer</word>
+  <word key="dtprofiler_use_console" js="0">Use Console</word>
+  <word key="dtprofiler_use_console_desc" js="0">Uses the profiler console for the special debug javascript file that is available to to generate for your app create asset options in the dev center.</word>
+  <word key="dtprofiler_replace_console" js="0">Replace Console</word>
+  <word key="dtprofiler_replace_console_desc" js="0">This will replace the standard console object, like console.log, with ones that will use special debug javascript file that is available to generate for your app in the create asset options in the dev center.</word>
+  <word key="dtdevplus_menu_title_debugger" js="0">Debug</word>
   <word key="toolbox_doing_proxies" js="1">Generating Proxies</word>
   <word key="toolbox_done_proxies" js="1">Proxies Generated!</word>
  </app>

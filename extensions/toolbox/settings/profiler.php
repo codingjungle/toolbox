@@ -16,6 +16,7 @@ use IPS\Member;
 use IPS\Settings;
 use IPS\toolbox\Form;
 
+use function _p;
 use function defined;
 use function header;
 use function json_decode;
@@ -68,7 +69,26 @@ class _profiler
         $form->add('dtprofiler_git_data', 'yn');
         $form->add('dtprofiler_show_changes', 'yn');
         $form->add('dtprofiler_use_console','yn');
-        $form->add('dtprofiler_replace_console','yn');
+        $form->add('dtprofiler_replace_console','yn')->toggles(['dtprofiler_console_replacements']);
+        $data = [
+            'log',
+            'table',
+            'assert',
+            'clear',
+            'count',
+            'error',
+            'group',
+            'groupCollapsed',
+            'groupEnd',
+            'info',
+            'time',
+            'timeEnd',
+            'trace',
+            'warn'
+        ];
+         $vals = json_decode(Settings::i()->dtprofiler_console_replacements,true);
+        $options = array_combine(array_values($data),array_values($data));
+        $form->add('dtprofiler_console_replacements','cbs')->options(['options' => $options])->value($vals);
     }
 
     /**
@@ -90,6 +110,14 @@ class _profiler
         } else {
             $values['dtprofiler_can_use'] = null;
         }
+
+        if(empty($values['dtprofiler_console_replacements']) === false){
+            $values['dtprofiler_console_replacements'] = json_encode($values['dtprofiler_console_replacements']);
+        }
+        else{
+            $values['dtprofiler_console_replacements'] = null;
+        }
+
     }
 
 }

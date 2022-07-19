@@ -1,0 +1,21 @@
+{
+    "normal": {
+        "added": [
+            "toolbox_use_tabs_applications",
+            "toolbox_use_tabs_applications_desc",
+            "dtdevplus_open_in_adminer",
+            "dtprofiler_use_console",
+            "dtprofiler_use_console_desc",
+            "dtprofiler_replace_console",
+            "dtprofiler_replace_console_desc",
+            "dtdevplus_menu_title_debugger"
+        ],
+        "edited": [],
+        "removed": []
+    },
+    "js": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}

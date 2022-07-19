@@ -201,6 +201,7 @@ class _Sources
             'controller',
             'jstemplate',
             'jsmixin',
+            'debugger'
         ];
 
         return Theme::i()->getTemplate('dtdpmenu', 'toolbox', 'admin')->menu($types, $dev, Request::i()->appKey, 'sources', $ignored);

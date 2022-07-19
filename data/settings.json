@@ -12,6 +12,10 @@
         "default": ""
     },
     {
+        "key": "dtprofiler_console_replacements",
+        "default": "[\"log\",\"table\",\"assert\",\"clear\",\"count\",\"error\",\"group\",\"groupCollapsed\",\"groupEnd\",\"info\",\"time\",\"timeEnd\",\"trace\",\"warn\"]"
+    },
+    {
         "key": "dtprofiler_enable_debug",
         "default": ""
     },

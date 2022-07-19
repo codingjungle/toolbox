@@ -32,19 +32,18 @@ class _Javascript extends CompilerAbstract
         $options = [];
         $data = $this->_getFile($this->type);
         $fn = mb_ucfirst(mb_strtolower($this->filename));
-        $widgetName = $this->app . $this->widgetname;
+        $widgetName = $this->application->directory . $this->widgetname;
         if ($this->type === 'widget') {
-            $module = 'ips.ui.' . $this->app . '.' . $this->filename;
+            $module = 'ips.ui.' . $this->application->directory . '.' . $this->filename;
             if (empty($this->options) !== true) {
                 foreach ($this->options as $option) {
                     $options[] = $option;
                 }
             }
         } elseif ($this->type === 'controller') {
-            $module = 'ips.' .$this->app . '.' . $this->location . '.' . $this->group . '.' . $this->filename;
-            $fname = 'ips.' . $module;
+            $fname = $module = 'ips.' .$this->application->directory . '.' . $this->location . '.' . $this->group . '.' . $this->filename;
         } elseif ($this->type === 'module') {
-            $module = 'ips.' . $this->app . '.' . $this->filename;
+            $module = 'ips.' . $this->application->directory . '.' . $this->filename;
         } elseif ($this->type === 'jstemplate') {
             $module = 'ips.templates.' . $this->filename;
             $store = [];
@@ -57,8 +56,11 @@ class _Javascript extends CompilerAbstract
             $replace = false;
             $data = implode("\n", $store);
         } elseif ($this->type === 'jsmixin') {
-            $module = $this->app . '.' . $this->filename;
+            $module = $this->application->directory . '.' . $this->filename;
             $fname = 'ips.' . $module;
+        }
+        elseif($this->type === 'debugger'){
+            $module = 'ips.'.$this->application->directory.'.debugger.' . $this->filename;
         }
 
         if ($fname === null) {
@@ -71,7 +73,7 @@ class _Javascript extends CompilerAbstract
             $type = 'templates';
         } elseif ($this->type === 'jsmixin') {
             $type = 'mixin';
-        } else {
+        }  else {
             $type = 'controllers';
         }
         $this->location .= '/' . $type;
@@ -83,7 +85,8 @@ class _Javascript extends CompilerAbstract
                 '{tsn}',
                 '{controller}',
                 '{fn}',
-                '{options}'
+                '{options}',
+                '{app}'
             ];
             $replace = [
                 $module,
@@ -91,7 +94,8 @@ class _Javascript extends CompilerAbstract
                 $tsn,
                 $this->mixin,
                 $fn,
-                $options
+                $options,
+                $this->application->directory
             ];
 
             return $this->_replace($find, $replace, $data);

@@ -1,6 +1,16 @@
 <?php
 
-//https://github.com/abmmhasan/UUID
+/**
+ * @brief       Uuid Class
+ * @author      -storm_author-
+ * @copyright   -storm_copyright-
+ * @package     IPS Social Suite
+ * @subpackage  Dev Toolbox
+ * @since       5.0.1
+ * @version     -storm_version-
+ */
+
+
 namespace IPS\toolbox\Shared;
 
 use Exception;

@@ -1,5 +1,5 @@
 'use strict';
-var _p = _p || {},
+var _cjProfilerP = _cjProfilerP || {},
     ogLog = console.log,
     ogTable = console.table,
     ogAssert = console.assert,
@@ -14,20 +14,21 @@ var _p = _p || {},
     ogTimeEnd = console.timeEnd,
     ogTrace = console.trace,
     ogWarn = console.warn,
-    que = null,
-    queue = {},
-    timers = {},
-    cCount = 1,
-    pIndex = 1,
-    qIndex = 0,
+    _cjProfilerQue = null,
+    _cjProfilerQueue = {},
+    _cjProfilerTimers = {},
+    _cjProfilerCount = 1,
+    _cjProfilerPindex = 1,
+    _cjProfilerQindex = 0,
+    _cjProfilerMin = 5,
     _addToQueue = (html,count,type) => {
-      pIndex++;
-      queue[pIndex] = {
+      _cjProfilerPindex++;
+      _cjProfilerQueue[_cjProfilerPindex] = {
         count: count,
         html: html,
         type:type
       };
-      qIndex = 0;
+      _cjProfilerQindex = 0;
     },
     _process = (html, count = 1, type = 'log') => {
       var el = $('#elProfileConsoleLog'),
@@ -53,9 +54,7 @@ var _p = _p || {},
   return Object.keys(obj).length === 0;
 },
     getStackTrace = (type = 'log', min = 5, linkify = true) => {
-      if (type === 'timeEnd') {
-        min = 6;
-      }
+
       let file,
           other,
           line = 0,
@@ -96,22 +95,23 @@ var _p = _p || {},
           '()';
     };
 
-que = setInterval(()=>{
-  qIndex++;
-  if(!isEmpty(queue)){
-      $.each(queue, function(index,obj){
+_cjProfilerQue = setInterval(()=>{
+  _cjProfilerQindex++;
+  if(!isEmpty(_cjProfilerQueue)){
+      $.each(_cjProfilerQueue, function(index,obj){
         if(obj.hasOwnProperty('count')){
           _process(obj.html,obj.count,obj.type);
-          delete queue[index];
+          delete _cjProfilerQueue[index];
         }
       });
   }
-  if(qIndex > 100 && Object.keys(queue).length === 0){
-      clearInterval(que);
+  if(_cjProfilerQindex > 100 && Object.keys(_cjProfilerQueue).length === 0){
+      clearInterval(_cjProfilerQue);
   }
 },10);
-_p = function() {
+_cjProfilerP = function() {
   var adapters,
+      _minNum = 5,
       _buildTable = (table, headers = ['Index', 'Values']) => {
         let tables = '<table class="ipsTable">';
         if (headers) {
@@ -136,12 +136,12 @@ _p = function() {
 
         return tables;
       },
-      _send = (data, type) => {
+      _send = (data, type ) => {
         let li = $('<li></li>'),
             container = $('<div></div>');
         li.addClass('ipsPad_half dtProfilerSearch dtProfilerType' + type);
         if (type !== 'groupEnd') {
-          li.append(getStackTrace(type));
+          li.append(getStackTrace(type,getMinNum()));
         } else {
           li.removeClass('ipsPad_half dtProfilerSearch');
         }
@@ -149,7 +149,7 @@ _p = function() {
         container.html(li);
         _process(container.html(), 1, type);
       },
-      newLog = (u, type = 'log', classes = null) => {
+      newLog = (u, type = 'log', classes = null ) => {
         let nv = '',
             includeIndex = u.length > 1;
         $.each(u, (index, value) => {
@@ -171,8 +171,8 @@ _p = function() {
       newTimeEnd = (label) => {
         let args = [],
             time = null;
-        if (timers.hasOwnProperty(label)) {
-          time = Date.now() - timers[label];
+        if (_cjProfilerTimers.hasOwnProperty(label)) {
+          time = Date.now() - _cjProfilerTimers[label];
           args.push(label + ': ' + time + ' ms');
           newLog(args, 'timeEnd');
         } else {
@@ -206,9 +206,9 @@ _p = function() {
         _send(tables, type);
       },
       newCount = (label = 'default') => {
-        let list = label + ': ' + cCount;
+        let list = label + ': ' + _cjProfilerCount;
         _send(list, 'count');
-        cCount++;
+        _cjProfilerCount++;
       },
       newClear = () => {
         let $this = $('#elProfileConsoleLog_list'),
@@ -223,13 +223,13 @@ _p = function() {
           adapters.write(type, message, other, trace);
         }
 
-        return _p;
+        return _cjProfilerP;
       },
       l = function() {
         let args = Array.from(arguments);
         if (dtProfilerUseConsole) {
           newLog(args);
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('log', args, null, true);
         }
@@ -245,7 +245,7 @@ _p = function() {
           } else {
             newLog(args, 'table');
           }
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('table', msg, headers, true);
         }
@@ -257,7 +257,7 @@ _p = function() {
             args.push(msg);
             newLog(args, 'assert');
           }
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('a', true, msg, assertion);
         }
@@ -265,7 +265,7 @@ _p = function() {
       c = function() {
         if (dtProfilerUseConsole) {
           newClear();
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('c');
         }
@@ -273,7 +273,7 @@ _p = function() {
       cc = function(label) {
         if (dtProfilerUseConsole) {
           newCount(label);
-          return _p;
+          return _cjProfilerP;
 
         } else {
           return write('cc', label, null, true);
@@ -285,7 +285,7 @@ _p = function() {
           let args = [];
           args.push(msg);
           newLog(args, 'error');
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('e', msg, null, true);
         }
@@ -295,7 +295,7 @@ _p = function() {
           let args = [];
           args.push(label);
           newGroup(args);
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('g', label);
         }
@@ -305,7 +305,7 @@ _p = function() {
           let args = [];
           args.push(label);
           newGroup(args, true);
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('gc', label);
         }
@@ -313,7 +313,7 @@ _p = function() {
       ge = function() {
         if (dtProfilerUseConsole) {
           newGroupEnd();
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('ge');
         }
@@ -322,7 +322,7 @@ _p = function() {
         let args = Array.from(arguments);
         if (dtProfilerUseConsole) {
           newLog(args, 'info');
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('i', args, null, true);
         }
@@ -333,18 +333,20 @@ _p = function() {
               _.isEmpty(label)) {
             label = 'default;';
           }
-          timers[label] = Date.now();
+          _cjProfilerTimers[label] = Date.now();
         } else {
           return write('time', label);
         }
       },
       timeEnd = function(label) {
         if (dtProfilerUseConsole) {
+          minNumb(6);
           if (_.isUndefined(label) || _.isNull(label) ||
               _.isEmpty(label)) {
             label = 'default;';
           }
           newTimeEnd(label);
+          minNumb(5);
         } else {
           return write('timeEnd', label, null, true);
         }
@@ -364,16 +366,24 @@ _p = function() {
         let args = Array.from(arguments);
         if (dtProfilerUseConsole) {
           newLog(args, 'warn');
-          return _p;
+          return _cjProfilerP;
         } else {
           return write('w', args, null, true);
         }
       },
       addAdapter = function(adapter) {
         adapters = adapter;
-        return _p;
+        return _cjProfilerP;
+      },
+      minNumb = function(min){
+        _minNum = min;
+      },
+      getMinNum = ()=>{
+        return _minNum;
       };
   return {
+    minNumb:minNumb,
+    getMinNum:getMinNum,
     l: l,
     log: l,
     t: t,
@@ -402,9 +412,9 @@ _p = function() {
     addAdapter: addAdapter,
   };
 }();
-var Console = function() {
+var ConsoleCjProfiler = function() {
 };
-Console.prototype.write = function(type, msg, other, trace) {
+ConsoleCjProfiler.prototype.write = function(type, msg, other, trace) {
   if (window.console) {
     switch (type) {
       case 'l':
@@ -445,7 +455,7 @@ Console.prototype.write = function(type, msg, other, trace) {
         break;
       case 'i':
       case 'info':
-        ogInfo(msg);
+        ogInfo(...msg);
         break;
       case 'time':
         ogTime(msg);
@@ -462,24 +472,65 @@ Console.prototype.write = function(type, msg, other, trace) {
         break;
     }
     if (trace === true) {
-      ogLog(getStackTrace(type, 6, false));
+      ogLog(getStackTrace(type, _cjProfilerP.getMinNum()+1, false));
     }
   }
 };
-_p.addAdapter(new Console);
+_cjProfilerP.addAdapter(new ConsoleCjProfiler);
 if (dtProfilerReplaceConsole) {
-  console.log = _p.l;
-  console.table = _p.t;
-  console.assert = _p.a;
-  console.clear = _p.c;
-  console.count = _p.cc;
-  console.error = _p.e;
-  console.group = _p.g;
-  console.groupCollapsed = _p.gc;
-  console.groupEnd = _p.ge;
-  console.info = _p.i;
-  console.time = _p.time;
-  console.timeEnd = _p.timeEnd;
-  console.trace = _p.trace;
-  console.warn = _p.w;
+  if(dtProfilerReplacements.hasOwnProperty('log')) {
+    console.log = _cjProfilerP.l;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('table')) {
+    console.table = _cjProfilerP.t;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('assert')) {
+    console.assert = _cjProfilerP.a;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('clear')) {
+    console.clear = _cjProfilerP.c;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('count')) {
+    console.count = _cjProfilerP.cc;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('error')) {
+    console.error = _cjProfilerP.e;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('group')) {
+    console.group = _cjProfilerP.g;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('groupCollapsed')) {
+    console.groupCollapsed = _cjProfilerP.gc;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('groupEnd')) {
+    console.groupEnd = _cjProfilerP.ge;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('info')) {
+    console.info = _cjProfilerP.i;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('time')) {
+    console.time = _cjProfilerP.time;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('timeEnd')) {
+    console.timeEnd = _cjProfilerP.timeEnd;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('trace')) {
+    console.trace = _cjProfilerP.trace;
+  }
+
+  if(dtProfilerReplacements.hasOwnProperty('warn')) {
+    console.warn = _cjProfilerP.w;
+  }
 }

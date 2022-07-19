@@ -9,9 +9,11 @@
  <module key="admin/proxy"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
  <module key="front/bt"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
  <module key="front/generator"><![CDATA[{"default_controller":"","protected":false,"default":null}]]></module>
+ <task frequency="P0Y0M0DT1H0M0S">sendNotifications</task>
  <setting key="dtdevplus_skip_dirs"><![CDATA[{"key":"dtdevplus_skip_dirs","default":""}]]></setting>
  <setting key="dtdevplus_skip_files"><![CDATA[{"key":"dtdevplus_skip_files","default":""}]]></setting>
  <setting key="dtprofiler_can_use"><![CDATA[{"key":"dtprofiler_can_use","default":""}]]></setting>
+ <setting key="dtprofiler_console_replacements"><![CDATA[{"key":"dtprofiler_console_replacements","default":"[\"log\",\"table\",\"assert\",\"clear\",\"count\",\"error\",\"group\",\"groupCollapsed\",\"groupEnd\",\"info\",\"time\",\"timeEnd\",\"trace\",\"warn\"]"}]]></setting>
  <setting key="dtprofiler_enable_debug"><![CDATA[{"key":"dtprofiler_enable_debug","default":""}]]></setting>
  <setting key="dtprofiler_enable_debug_ajax"><![CDATA[{"key":"dtprofiler_enable_debug_ajax","default":"1"}]]></setting>
  <setting key="dtprofiler_enabled_css"><![CDATA[{"key":"dtprofiler_enabled_css","default":"1"}]]></setting>
@@ -27,12 +29,15 @@
  <setting key="dtprofiler_enabled_templates"><![CDATA[{"key":"dtprofiler_enabled_templates","default":"1"}]]></setting>
  <setting key="dtprofiler_git_data"><![CDATA[{"key":"dtprofiler_git_data","default":"1"}]]></setting>
  <setting key="dtprofiler_logs_amount"><![CDATA[{"key":"dtprofiler_logs_amount","default":"25"}]]></setting>
+ <setting key="dtprofiler_replace_console"><![CDATA[{"key":"dtprofiler_replace_console","default":"1"}]]></setting>
  <setting key="dtprofiler_show_admin"><![CDATA[{"key":"dtprofiler_show_admin","default":"0"}]]></setting>
  <setting key="dtprofiler_show_changes"><![CDATA[{"key":"dtprofiler_show_changes","default":"0"}]]></setting>
+ <setting key="dtprofiler_use_console"><![CDATA[{"key":"dtprofiler_use_console","default":"1"}]]></setting>
  <setting key="dtproxy_do_constants"><![CDATA[{"key":"dtproxy_do_constants","default":"1"}]]></setting>
  <setting key="dtproxy_do_props"><![CDATA[{"key":"dtproxy_do_props","default":"1"}]]></setting>
  <setting key="dtproxy_do_proxies"><![CDATA[{"key":"dtproxy_do_proxies","default":"0"}]]></setting>
  <setting key="toolbox_debug_templates"><![CDATA[{"key":"toolbox_debug_templates","default":"0"}]]></setting>
+ <setting key="toolbox_use_tabs_applications"><![CDATA[{"key":"toolbox_use_tabs_applications","default":"1"}]]></setting>
  <hook key="cmsDesignerMode"><![CDATA[{"type":"C","class":"\\IPS\\cms\\extensions\\core\\DesignersMode\\Cms"}]]></hook>
  <hook key="cmsTheme"><![CDATA[{"type":"C","class":"\\IPS\\cms\\Theme"}]]></hook>
  <hook key="cmsThemeTemplate"><![CDATA[{"type":"C","class":"\\IPS\\cms\\Theme\\Template"}]]></hook>
@@ -65,4 +70,6 @@
  <hook key="FormAbstract"><![CDATA[{"type":"C","class":"\\IPS\\Helpers\\Form\\FormAbstract"}]]></hook>
  <hook key="serviceworker"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\front\\system\\serviceworker"}]]></hook>
  <hook key="dispatcherStandard"><![CDATA[{"type":"C","class":"\\IPS\\Dispatcher\\Standard"}]]></hook>
+ <hook key="phpinfo"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\admin\\support\\phpinfo"}]]></hook>
+ <hook key="Session"><![CDATA[{"type":"C","class":"\\IPS\\Session"}]]></hook>
 </build>

@@ -1,0 +1,60 @@
+{
+    "html": {
+        "added": [
+            "admin\/adminer\/iframe",
+            "admin\/application\/wrapper",
+            "front\/bar\/base",
+            "front\/bar\/hash",
+            "front\/bar\/html",
+            "front\/bar\/lorem",
+            "front\/bar\/uuid",
+            "admin\/other\/phpinfo"
+        ],
+        "edited": [
+            "admin\/adminer\/adminer",
+            "front\/bar\/bar",
+            "front\/bar\/git",
+            "front\/bt\/phpinfo",
+            "front\/caching\/caching",
+            "admin\/code\/files",
+            "admin\/code\/final",
+            "admin\/code\/lists",
+            "admin\/code\/results",
+            "admin\/code\/sql",
+            "front\/database\/database",
+            "admin\/devBar\/devBar",
+            "admin\/devBar\/li",
+            "admin\/dtdpmenu\/menu",
+            "front\/dtpsearch\/button",
+            "front\/dtpsearch\/keyvalue",
+            "admin\/error\/error",
+            "front\/generic\/anchor",
+            "front\/generic\/button",
+            "front\/generic\/genericVal",
+            "front\/generic\/keyvalue",
+            "front\/generic\/keyvalueDebug",
+            "front\/generic\/li",
+            "front\/generic\/plain",
+            "front\/generic\/string",
+            "front\/generic\/stringDebug"
+        ],
+        "removed": []
+    },
+    "css": {
+        "added": [
+            "admin\/phpinfo.css",
+            "admin\/test.css"
+        ],
+        "edited": [
+            "admin\/adminer.css",
+            "admin\/devbar.css",
+            "front\/profiler.css"
+        ],
+        "removed": []
+    },
+    "resources": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}

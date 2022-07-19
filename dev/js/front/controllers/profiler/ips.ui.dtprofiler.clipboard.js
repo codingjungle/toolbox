@@ -46,7 +46,6 @@
                 textArea.select();
                 var successful = document.execCommand( 'copy' );
                 document.body.removeChild( textArea );
-                console.log( successful );
                 if ( successful ) {
                     ips.ui.flashMsg.show( message );
                 }

@@ -3,12 +3,6 @@
     ips.createModule('ips.toolbox.main', function() {
         var socket = null,
             init = function() {
-              let x = 5,y = 7,obj = {};
-              obj.one = 1;
-              obj.two = 2;
-              obj.three = 3;
-              obj.four = ["bar",'k','h','u'];
-              console.table(obj)
               getSocket().emit('join', ips.getSetting('cj_debug_key'));
             },
             sockets = function() {

@@ -53,7 +53,6 @@
             _socket = () => {
                 try {
                     ips.toolbox.main.getSocket().on('debug', function(data) {
-                        console.log(90909)
                         _process(data);
                     });
                     setTimeout(function(){

@@ -67,6 +67,8 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
             foreach($debugjs as $j){
                 $js .= '<script type="text/javascript" src="'.$j.'?v='.\IPS\Output\Javascript::javascriptCacheBustKey().'" data-ips></script>';
             }
+            $vals = json_decode(Settings::i()->dtprofiler_console_replacements,true);
+            $replacements = json_encode(array_combine(array_values($vals),array_values($vals)));
             $canUse = Settings::i()->dtprofiler_use_console ? 1 : 0;
             $canUse = \IPS\QUERY_LOG ? $canUse : 0;
             $canReplace = Settings::i()->dtprofiler_use_console ? 1 : 0;
@@ -83,6 +85,8 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     var dtProfilerBaseUrl = '{$cjBaseUrl}';
     var dtProfilerAppPath = '{$cjAppPath}';
     var dtProfilerDebug = '{$cjDebug}'; 
+    var dtProfilerReplacements = {$replacements};
+    
 </script>
 {$js}
 EOF;

@@ -283,7 +283,7 @@ class _Dev extends Singleton
             }
         }
 
-        if (in_array($this->type, ['controller', 'module', 'widget'])) {
+        if (in_array($this->type, ['controller', 'module', 'widget','debugger'])) {
             try {
                 $this->_getGroups('js');
                 $groupManual = false;
