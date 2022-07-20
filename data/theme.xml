@@ -223,6 +223,13 @@
                                 Dates
                             </a>
                         </div>
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=images'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Image Converter">
+                                <i class="fa fa-image"></i>
+                                <br>
+                                Images
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="ipsMenu_title">
@@ -250,7 +257,13 @@
                 </div>
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
-
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
+                                <i class="fa fa-compass"></i>
+                                <br>
+                                Diffs
+                            </a>
+                        </div>
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
                             <a href="{$info['cache']}">
                                 <i class="fa fa-remove"></i>
@@ -265,6 +278,7 @@
                                 Proxy Class
                             </a>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -352,6 +366,29 @@
             <input id="iso" type="text" value="{$dates['iso']}" data-input="iso">
         </label>
     </div>
+
+    <div class="ipsMessage ipsMessage_info">
+        All times are in UTC Timezone.
+    </div>
+</div>]]></template>
+ <template template_group="bar" template_name="diffs" template_data="" template_location="front" template_app="toolbox"><![CDATA[<div id="elDtProfilerDiffs" class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxdiffs>
+
+    <div class="ipsGrid">
+        <div class="ipsGrid_span6">
+            <h4>Source 1</h4>
+            <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="#source1">X</button>
+            <textarea id="source1" class="text">Hello World!
+foobar!</textarea>
+        </div>
+        <div class="ipsGrid_span6">
+            <h4>Source 2</h4>
+            <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="#source2">X</button>
+            <textarea id="source2">Whatever World!
+foobar!</textarea>
+        </div>
+    </div>
+    <h4>Diffs</h4>
+    <div id="diffs"></div>
 </div>]]></template>
  <template template_group="bar" template_name="git" template_data="$info=null" template_location="front" template_app="toolbox"><![CDATA[{{if isset( $info['app'] ) }}
     <div title="Application" data-ipsTooltip>{$info['app']}</div>
@@ -469,6 +506,17 @@
     </div>
     <div class="ipsMargin_top">
         <textarea id="elEncodedContainer">{$encoded|raw}</textarea>
+    </div>
+</div>]]></template>
+ <template template_group="bar" template_name="images" template_data="$form" template_location="front" template_app="toolbox"><![CDATA[<div id="elDtProfilerDiffs" class="ipsPadding ipsClearfix" data-ipstoolboxtoyboximages>
+    <h2>Image</h2>
+    {$form|raw}
+    <button class="ipsButton ipsButton_primary ipsButton_verySmall ipsPos_right ipsMargin_bottom:half" data-convert>Convert</button>
+    <div id="dl" class="ipsHide ipsType_center">
+        <div>
+        <a class="ipsButton ipsButton_primary ipsButton_verySmall ipsMargin_bottom:half">Download</a>
+        </div>
+        <img class="ipsImage ipsImage_thumb">
     </div>
 </div>]]></template>
  <template template_group="bar" template_name="lorem" template_data="$form,$lorem" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxlorem>
@@ -2712,6 +2760,23 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 #elProfileConsoleLog_list .dtProfilerTypewarn
 {
     background:rgba(180, 4, 4,0.6);
+}
+
+.dtProfilerAdded {
+    background: #c1eab9;
+    color: #124d06;
+}
+.dtProfilerRemoved {
+    background: #f2acac;
+    text-ecoration: none;
+    color: #5c1414;
+}
+
+#elDtProfilerDiffs .ipsPos_right {
+    margin-bottom:5px;
+}
+#elDtProfilerDiffs textarea {
+    height:400px;
 }]]></css>
  <css css_location="admin" css_app="toolbox" css_attributes="" css_path="." css_name="test.css"><![CDATA[
 .adminerDarkMode a {

@@ -7,66 +7,64 @@ if(!_.isNull(_cjProfilerP)){
   "use strict";
     _{app} = function(){
       var adapters,
-          write = function(type,message,other=null, trace=false){
+          write = (type,message,other=null, trace=false) => {
             if (parseInt(ips.getSetting('cj_debug')) === 1) {
               adapters.write(type, message, other,trace);
             }
 
             return _{app};
           },
-          l = function(){
+          l = () => {
             let args = Array.from(arguments);
               return write('log',args,null,true);
           },
-          t = function(){
+          t = () => {
             let args = Array.from(arguments),
                 msg = args[0],
                 headers = args[1] ?? ['Index','Values'];
               return write('table', msg, headers,true);
 
           },
-          a = function(assertion,msg){
+          a = (assertion,msg) => {
               return write('a', true, msg, assertion);
 
           },
-          c = function(){
+          c = () => {
               return write('c');
           },
-          cc = function(label){
+          cc = (label) => {
               return write('cc',  label,null,true);
           },
-          e = function(msg){
+          e = (msg) => {
               return write('e', msg,null,true);
           },
-          g = function(label){
+          g = (label) => {
               return write('g',label);
           },
-          gc = function(label){
+          gc = (label) => {
               return write('gc',label);
           },
-          ge = function(){
+          ge = () => {
               return write('ge');
           },
-          i = function(){
+          i = () => {
             let args = Array.from(arguments);
               return write('i',args,null,true);
-
-              },
-          time = function(label){
+          },
+          time = (label) => {
                 return write('time',label);
           },
-          timeEnd = function(label){
-
+          timeEnd = (label) => {
               return write('timeEnd', label, null,true);
           },
-          trace = function(){
+          trace = () => {
               return write('trace');
           },
-          w = function(){
+          w = () => {
             let args = Array.from(arguments);
               return write('w',args,null,true);
           },
-          addAdapter = function(adapter){
+          addAdapter = (adapter) => {
             adapters = adapter;
             return _{app};
           }

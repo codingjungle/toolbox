@@ -12,8 +12,8 @@
 
 namespace IPS\toolbox\Proxy\Helpers;
 
-use Zend\Code\Generator\Exception\InvalidArgumentException;
-use Zend\Code\Generator\PropertyGenerator;
+use Laminas\Code\Generator\Exception\InvalidArgumentException;
+use Laminas\Code\Generator\PropertyGenerator;
 
 use function defined;
 use function header;

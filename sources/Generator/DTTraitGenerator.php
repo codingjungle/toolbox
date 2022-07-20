@@ -19,7 +19,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 
 use IPS\toolbox\Application;
-use Zend\Code\Generator\TraitGenerator;
+use Laminas\Code\Generator\TraitGenerator;
 
 use function defined;
 use function header;

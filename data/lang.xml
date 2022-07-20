@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="toolbox" version="50003">
+ <app key="toolbox" version="50004">
   <word key="__app_toolbox" js="0">Dev Toolbox</word>
   <word key="menutab__devtools" js="0">Dev Toolbox</word>
   <word key="menutab__devtools_icon" js="0">wrench</word>
@@ -366,6 +366,8 @@
   <word key="dtprofiler_replace_console" js="0">Replace Console</word>
   <word key="dtprofiler_replace_console_desc" js="0">This will replace the standard console object, like console.log, with ones that will use special debug javascript file that is available to generate for your app in the create asset options in the dev center.</word>
   <word key="dtdevplus_menu_title_debugger" js="0">Debug</word>
+  <word key="dtprofilerImagesConverter_images" js="0">Image</word>
+  <word key="dtprofilerImagesConverter_to" js="0">Format</word>
   <word key="toolbox_doing_proxies" js="1">Generating Proxies</word>
   <word key="toolbox_done_proxies" js="1">Proxies Generated!</word>
  </app>

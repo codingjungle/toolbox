@@ -1,0 +1,11 @@
+{
+    "require": {
+        "intervention/image": "^2.7",
+        "laminas/laminas-code": "^4.5",
+        "laminas/laminas-stdlib": "^3.10",
+        "laminas/laminas-eventmanager": "^3.5",
+        "symfony/filesystem": "^6.0",
+        "symfony/finder": "^6.0",
+        "symfony/var-dumper": "^6.0"
+    }
+}

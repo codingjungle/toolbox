@@ -16,8 +16,8 @@ use Exception;
 use IPS\toolbox\Application;
 use IPS\toolbox\Proxy\Proxyclass;
 use Symfony\Component\Filesystem\Filesystem;
-use Zend\Code\Generator\Exception\RuntimeException;
-use Zend\Code\Generator\FileGenerator;
+use Laminas\Code\Generator\Exception\RuntimeException;
+use Laminas\Code\Generator\FileGenerator;
 
 use function defined;
 use function header;

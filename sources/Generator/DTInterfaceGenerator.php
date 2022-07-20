@@ -19,7 +19,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 
 use IPS\toolbox\Application;
-use Zend\Code\Generator\InterfaceGenerator;
+use Laminas\Code\Generator\InterfaceGenerator;
 
 use function defined;
 use function header;

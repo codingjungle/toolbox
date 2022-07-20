@@ -1,7 +1,7 @@
 ;( function($, _, undefined){
     "use strict";
     ips.controller.register('{module}', {
-        initialize:  () => {
+        initialize: () => {
             // Controller events are initialized here
         }
     });

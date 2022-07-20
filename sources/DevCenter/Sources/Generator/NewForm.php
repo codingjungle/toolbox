@@ -17,11 +17,11 @@ namespace IPS\toolbox\DevCenter\Sources\Generator;
 use IPS\Helpers\Form;
 use IPS\Lang;
 use IPS\Member;
-use Zend\Code\Generator\DocBlock\Tag\ParamTag;
-use Zend\Code\Generator\DocBlockGenerator;
-use Zend\Code\Generator\MethodGenerator;
-use Zend\Code\Generator\ParameterGenerator;
-use Zend\Code\Generator\PropertyValueGenerator;
+use Laminas\Code\Generator\DocBlock\Tag\ParamTag;
+use Laminas\Code\Generator\DocBlockGenerator;
+use Laminas\Code\Generator\MethodGenerator;
+use Laminas\Code\Generator\ParameterGenerator;
+use Laminas\Code\Generator\PropertyValueGenerator;
 
 class _NewForm extends GeneratorAbstract
 {

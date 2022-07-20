@@ -15,11 +15,14 @@ namespace IPS\toolbox\modules\front\bt;
 
 use Exception;
 use http\Exception\InvalidArgumentException;
+use Intervention\Image\ImageManager;
 use IPS\calendar\Date;
 use IPS\Data\Store;
 use IPS\DateTime;
 use IPS\Db;
 use IPS\Dispatcher\Controller;
+use IPS\File;
+use IPS\Http\Url;
 use IPS\Log;
 use IPS\Member;
 use IPS\Output;
@@ -59,12 +62,15 @@ use function nl2br;
 use function ob_end_clean;
 use function ob_get_clean;
 use function ob_start;
+use function pathinfo;
 use function phpinfo;
 use function pow;
 use function preg_replace;
 use function sleep;
 use function str_replace;
 use function time;
+
+use function uniqid;
 
 use const ENT_DISALLOWED;
 use const ENT_QUOTES;
@@ -491,6 +497,68 @@ class _bt extends Controller
         else {
             Output::i()->output = Theme::i()->getTemplate('bar', 'toolbox', 'front')->dates($dates);
         }
+    }
+
+    protected function diffs(){
+        Output::i()->output = Theme::i()->getTemplate('bar','toolbox','front')->diffs();
+    }
+
+    protected function images(){
+        $form = Form::create()->formPrefix('dtprofilerImagesConverter_')->submitLang(null);
+        $options = [
+            'storageExtension' => 'toolbox_FileStorage',
+            'storageContainer' => 'toolboxConverter',
+            'allowedFileTypes'	=> array( 'jpg','jpeg','png','gif','webp','heic' ),
+        ];
+        $form->add('images', 'upload')->options($options)->required();
+        $options = ['jpg'=>'jpg','png'=>'png','gif'=>'gif','tif'=>'tif','bmp'=>'bmp','ico' => 'ico','psd'=>'psd', 'webp'=>'webp'];
+        ksort($options);
+        $form->add('to','select')->options(['options'=>$options])->value('png');
+
+        if($values = $form->values()){
+            Application::loadAutoLoader();
+            $config = [
+                'driver' => \extension_loaded('imagick') ? 'imagick' : 'gd'
+            ];
+            $manager = new ImageManager($config);
+            /** @var \IPS\File $file */
+            $file = $values['images'];
+            $img = (string) $manager->make($file->url)->encode($values['to']);
+
+            $newFile = File::create(
+                'toolbox_FileStorage',
+                'imageConverted-'.$values['to'].'-'.uniqid().'.'.$values['to'],
+                $img,
+                'toolboxConverter',
+                true
+            );
+            $file->delete();
+            $newFile->save();
+            Output::i()->json(['path' => (string) $newFile,'url' => $newFile->url]);
+         }
+
+        $form->dialogForm();
+        Output::i()->output = Theme::i()->getTemplate('bar','toolbox','front')->images($form);
+    }
+
+    protected function download(){
+        $path = Request::i()->path;
+        $info = pathinfo($path);
+        $file = File::get('toolbox_FileStorage', $path);
+        $contents = $file->contents(true);
+        $name = $file->originalFilename;
+        $file->delete();
+        Output::i()->sendOutput(
+            $contents,
+            200,
+            'image/'.$info['extension'],
+            [
+                'Content-Disposition' => Output::getContentDisposition(
+                    'attachment',
+                    $name
+                ),
+            ]
+        );
     }
 
     protected function clearAjax()

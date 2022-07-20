@@ -1,10 +1,16 @@
-ips.debug.js
+diff.js
+ips.dtprofiler.debug.js
 ips.dtprofiler.dtprofiler.js
 ips.dtprofiler.dtproilergit.js
 ips.dtprofiler.search.js
 ips.ui.dtprofiler.clipboard.js
+ips.ui.dtprofiler.collapsed.js
 ips.ui.dtprofiler.hash.js
+ips.ui.dtprofiler.toyboxdiffs.js
+ips.ui.dtprofiler.toyboxbase.js
 ips.ui.dtprofiler.toyboxbitwise.js
+ips.ui.dtprofiler.toyboxdates.js
 ips.ui.dtprofiler.toyboxhtml.js
 ips.ui.dtprofiler.toyboxlorem.js
+ips.ui.dtprofiler.toyboxnumbers.js
 ips.ui.dtprofiler.toyboxuuid.js

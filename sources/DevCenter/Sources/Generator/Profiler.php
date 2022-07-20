@@ -17,10 +17,6 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
 }
 
-use IPS\toolbox\Text;
-
-use Zend\Code\Generator\Exception\InvalidArgumentException;
-
 use function defined;
 use function header;
 use function mb_strtolower;
@@ -28,9 +24,6 @@ use function mb_strtolower;
 class _Profiler extends GeneratorAbstract
 {
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function bodyGenerator()
     {
         $this->brief = 'Class';

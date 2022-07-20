@@ -15,11 +15,11 @@ namespace IPS\toolbox\Generator;
 use IPS\toolbox\Application;
 use ReflectionClassConstant;
 use ReflectionException;
-use Zend\Code\Generator\ClassGenerator;
-use Zend\Code\Generator\DocBlockGenerator;
-use Zend\Code\Generator\MethodGenerator;
-use Zend\Code\Generator\PropertyGenerator;
-use Zend\Code\Reflection\ClassReflection;
+use Laminas\Code\Generator\ClassGenerator;
+use Laminas\Code\Generator\DocBlockGenerator;
+use Laminas\Code\Generator\MethodGenerator;
+use Laminas\Code\Generator\PropertyGenerator;
+use Laminas\Code\Reflection\ClassReflection;
 
 use function array_diff;
 use function defined;

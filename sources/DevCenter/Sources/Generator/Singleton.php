@@ -15,8 +15,6 @@ namespace IPS\toolbox\DevCenter\Sources\Generator;
 use Exception;
 use IPS\Patterns\Singleton;
 
-use Zend\Code\Exception\InvalidArgumentException;
-
 use function defined;
 use function header;
 
@@ -31,7 +29,6 @@ class _Singleton extends GeneratorAbstract
 
     /**
      * @inheritdoc
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     protected function bodyGenerator()

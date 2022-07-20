@@ -37,7 +37,7 @@ class _Dates extends Singleton
     public function dates($date = null){
 
             $time = strtotime($date);
-            $date = DateTime::ts($time,false);
+            $date = DateTime::ts($time,true);
 
         return [
             'date' => $date->format('Y-m-d\TH:i'),
@@ -47,7 +47,7 @@ class _Dates extends Singleton
     }
 
     public function unix($int){
-        $date = DateTime::ts($int,false);
+        $date = DateTime::ts($int,true);
 
         return [
             'date' => $date->format('Y-m-d\TH:i'),

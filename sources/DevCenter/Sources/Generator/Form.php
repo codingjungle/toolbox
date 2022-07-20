@@ -26,12 +26,6 @@ use IPS\Session;
 use IPS\Theme;
 use IPS\toolbox\Application;
 use UnexpectedValueException;
-use Zend\Code\Generator\DocBlock\Tag\ParamTag;
-use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
-use Zend\Code\Generator\DocBlockGenerator;
-use Zend\Code\Generator\MethodGenerator;
-use Zend\Code\Generator\ParameterGenerator;
-use Zend\Code\Generator\PropertyValueGenerator;
 
 use function header;
 

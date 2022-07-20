@@ -19,9 +19,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 use IPS\Db;
 use IPS\Db\Select;
-use IPS\toolbox\Text;
 
-use Zend\Code\Generator\Exception\InvalidArgumentException;
 
 use function array_merge;
 use function defined;

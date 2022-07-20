@@ -423,3 +423,20 @@
 {
     background:rgba(180, 4, 4,0.6);
 }
+
+.dtProfilerAdded {
+    background: #c1eab9;
+    color: #124d06;
+}
+.dtProfilerRemoved {
+    background: #f2acac;
+    text-ecoration: none;
+    color: #5c1414;
+}
+
+#elDtProfilerDiffs .ipsPos_right {
+    margin-bottom:5px;
+}
+#elDtProfilerDiffs textarea {
+    height:400px;
+}

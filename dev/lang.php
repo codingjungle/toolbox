@@ -366,4 +366,6 @@ $lang = [
     'dtprofiler_replace_console' => 'Replace Console',
     'dtprofiler_replace_console_desc' => 'This will replace the standard console object, like console.log, with ones that will use special debug javascript file that is available to generate for your app in the create asset options in the dev center.',
     'dtdevplus_menu_title_debugger' => 'Debug',
+    'dtprofilerImagesConverter_images' => 'Image',
+    'dtprofilerImagesConverter_to' => 'Format'
 ];
