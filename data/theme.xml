@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <theme name="Default" author_name="Invision Power Services, Inc" author_url="https://www.invisioncommunity.com">
  <template template_group="adminer" template_name="adminer" template_data="$content" template_location="admin" template_app="toolbox"><![CDATA[
-<div id="elAdminer" class="ipsClearfix {{if isset(\IPS\Request::i()->cookie['acptheme']) AND \IPS\Request::i()->cookie['acptheme'] == 'dark'}} adminerDarkMode{{elseif !isset(\IPS\Request::i()->cookie['acptheme']) AND isset(\IPS\Request::i()->cookie['acpthemedefault']) AND \IPS\Request::i()->cookie['acpthemedefault'] == 'dark'}} adminerDarkMode{{else}} adminerLightMode{{endif}}"  data-ipsadminerclick>
+<div id="elAdminer" class="ipsClearfix dtAdminer{{if isset(\IPS\Request::i()->cookie['acptheme']) AND \IPS\Request::i()->cookie['acptheme'] == 'dark'}} adminerDarkMode{{elseif !isset(\IPS\Request::i()->cookie['acptheme']) AND isset(\IPS\Request::i()->cookie['acpthemedefault']) AND \IPS\Request::i()->cookie['acpthemedefault'] == 'dark'}} adminerDarkMode{{else}} adminerLightMode{{endif}}"  data-ipsadminerclick>
     <div class="ltr js">
     {$content|raw}
     </div>
@@ -154,28 +154,28 @@
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=lorem'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Lorem Ipsum Generator">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=lorem' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Lorem Ipsum Generator">
                                 <i class="fa fa-language"></i>
                                 <br>
                                 Lorem Ipsum
                             </a>
                         </div>
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=bitwiseValues'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="BitWise Generator">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=bitwiseValues' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="BitWise Generator">
                                 <i class="fa">♾️</i>
                                 <br>
                                 BitWise
                             </a>
                         </div>
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=hash'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Hash Generator">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=hash' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Hash Generator">
                                 <i class="fa fa-hashtag"></i>
                                 <br>
                                 Hash
                             </a>
                         </div>
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=uuid'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="UUID Generator">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=uuid' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="UUID Generator">
                                 <i class="fa">✳️</i>
                                 <br>
                                 UUID
@@ -189,14 +189,14 @@
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=html'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="HTML Encoder/Decoder">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=html' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="HTML Encoder/Decoder">
                                 <i class="fa fa-html5"></i>
                                 <br>
                                 Html
                             </a>
                         </div>
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=base'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Base64 Encoder/Decoder">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=base' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Base64 Encoder/Decoder">
                                 <i class="fa">6️⃣4️⃣</i>
                                 <br>
                                 Base64
@@ -210,21 +210,21 @@
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Numbers Converters">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Numbers Converters">
                                 <i class="fa fa-calculator"></i>
                                 <br>
                                 Numbers
                             </a>
                         </div>
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=dates'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Dates Converters">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=dates' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Dates Converters">
                                 <i class="fa fa-calendar"></i>
                                 <br>
                                 Dates
                             </a>
                         </div>
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=images'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Image Converter">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=images' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Image Converter">
                                 <i class="fa fa-image"></i>
                                 <br>
                                 Images
@@ -258,7 +258,7 @@
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
                                 <i class="fa fa-compass"></i>
                                 <br>
                                 Diffs
@@ -1331,8 +1331,7 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 }
 
 .adminerLightMode #breadcrumb {
-  position: fixed;
-  top: 60px;
+
   background: #48A5BF;
   z-index: 2;
   width: 100%;
@@ -1340,7 +1339,6 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
   padding: 10px;
   font-size: 15px;
   font-weight: bold;
-  margin-left: -30px;
 }
 
 .adminerLightMode #breadcrumb a {
@@ -1352,14 +1350,16 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 .adminerLightMode #menu {
   background: #34495e;
   position: fixed;
-  top: 30px;
   color: #FFF;
-  padding: 20px;
-  padding-top: 40px;
   bottom: 0px;
   overflow: auto;
-  width: 347px;
   border-right: 2px solid #34495e;
+  padding:5px;
+}
+.adminerLightMode #menu label {
+  color:#fff;
+  margin-right:5px;
+  margin-left:5px;
 }
 
 .adminerLightMode #menu p,
@@ -1370,6 +1370,10 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 
 .adminerLightMode #menu a {
   color: #FFF;
+}
+
+.adminerLightMode #menu .ipsMargin_bottom\:half{
+  padding-top:10px;
 }
 
 .adminerLightMode #schema .table {
@@ -2235,7 +2239,30 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
   background: var(--color-darkBackground);
   padding: 0 0 .5em;
 }
-]]></css>
+.adminerDarkMode .hidden {
+  display: none
+}
+
+
+/*customizations*/
+
+.ipsApp .dtAdminer select{
+    /*padding:0;*/
+}
+.dtAdminer input:not([type="submit"]) {
+  min-width: unset!important;
+  /*padding:0!important;*/
+}
+.dtAdminer #menu {
+  width:100%;
+  bottom:unset!important;
+}
+.logout {
+  display:none;
+}
+.dtAdminer #content{
+  margin-left:unset;
+}]]></css>
  <css css_location="admin" css_app="toolbox" css_attributes="" css_path="." css_name="devbar.css"><![CDATA[#dtDevBar {
     font-size: 14px;
     padding: 5px 5px;

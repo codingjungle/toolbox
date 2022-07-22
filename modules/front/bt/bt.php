@@ -392,7 +392,8 @@ class _bt extends Controller
             if(($i-1) % 15 === 0){
                 $html .= '</div><div class="ipsPos_left ipsMargin_right">';
             }
-            $html .= '<div>' . $i . ' => ' . $start . ',</div>';
+            $f = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
+            $html .= '<div>\'' . $f->format($i) . '\' => ' . $start . ',</div>';
         }
         $html .= '</div></div>';
 

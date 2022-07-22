@@ -28,10 +28,12 @@ if ($row["auto_increment_col"]) {
 }
 
 if ($_POST) {
+
 	set_adminer_settings(array("comments" => $_POST["comments"], "defaults" => $_POST["defaults"]));
 }
 
 if ($_POST && !process_fields($row["fields"]) && !$error) {
+
 	if ($_POST["drop"]) {
 		queries_redirect(substr(ME, 0, -1), lang('Table has been dropped.'), drop_tables(array($TABLE)));
 	} else {

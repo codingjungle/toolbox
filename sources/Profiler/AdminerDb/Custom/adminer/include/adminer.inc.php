@@ -1,10 +1,6 @@
 <?php
 // any method change in this file should be transferred to editor/include/adminer.inc.php and plugins/plugin.php
 
-use IPS\Application;
-use IPS\Member;
-use IPS\Request;
-
 class Adminer {
 	/** @var array operators used in select, null for all operators */
 	var $operators;
@@ -1002,7 +998,7 @@ bodyLoad('<?php echo (is_object($connection) ? preg_replace('~^(\d\.?\d).*~s', '
 				}
 			}
 		}
-        $url = \IPS\Request::i()->url()->stripQueryString(['dbApp']);
+        $url = \IPS\Request::i()->url()->stripQueryString(['dbApp','select','create','edit','table']);
 
         $opts = [
             0 => '<option value="'.$url.'">Select App...</option>'
@@ -1027,17 +1023,22 @@ bodyLoad('<?php echo (is_object($connection) ? preg_replace('~^(\d\.?\d).*~s', '
         ksort($opts);
         $options = implode('',$opts);
         $body = <<<EOF
+<label for="limitDb">Select App</label>
 <select id="limitDb">
 {$options}
 </select>
-
+</div>
 <script> 
     $(document).ready(function(){ 
-        $('p.links').css({"margin-top":$('#ipsLayout_header').outerHeight()})
+        $('#menu').css({"top":$('#ipsLayout_header').outerHeight()})
         $('#limitDb').on('change', function(){
             let app = $(this).val();
             location.assign(app);
-        })
+        });
+        $('#selectRow').on('change', function(){
+            let app = $(this).val();
+            location.assign(app);
+        });
     })
 </script>
 EOF;
@@ -1087,24 +1088,24 @@ EOF;
 	* @return null
 	*/
 	function tablesPrint($tables) {
+        $url = \IPS\Request::i()->url()->stripQueryString(['select','create','edit','table']);
 
-		echo "<ul id='tables'>" . script("mixin(qs('#tables'), {onmouseover: menuOver, onmouseout: menuOut});");
-		foreach ($tables as $table => $status) {
-			$name = $this->tableName($status);
-			if ($name != "") {
-				echo '<li><a href="' . h(ME) . 'select=' . urlencode($table) . '"'
-					. bold($_GET["select"] == $table || $_GET["edit"] == $table, "select")
-					. " title='" . lang('Select data') . "'>" . lang('select') . "</a> "
-				;
-				echo (support("table") || support("indexes")
-					? '<a href="' . h(ME) . 'table=' . urlencode($table) . '"'
-						. bold(in_array($table, array($_GET["table"], $_GET["create"], $_GET["indexes"], $_GET["foreign"], $_GET["trigger"])), (is_view($status) ? "view" : "structure"))
-						. " title='" . lang('Show structure') . "'>$name</a>"
-					: "<span>$name</span>"
-				) . "\n";
-			}
-		}
-		echo "</ul>\n";
+        $html = '<div class="ipsMargin_bottom:half"><label for="selectRow">Select Table</label>';
+        $html .= '<select id="selectRow">';
+        $html .= '<option value="'.$url.'">Select Table</option>';
+        foreach ($tables as $table => $status) {
+            $name = $this->tableName($status);
+            if($name !== ''){
+                $extra = '';
+                if (\IPS\Request::i()->select === $name) {
+                    $extra = ' selected';
+                }
+                $html .= '<option value="'.$url.'&select='.urlencode($table).'"'.$extra.'>'.$name.'</option>';
+            }
+        }
+        $html .= '</select>';
+
+        echo $html;
 	}
 
 }

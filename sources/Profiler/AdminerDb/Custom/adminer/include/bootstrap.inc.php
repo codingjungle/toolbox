@@ -6,7 +6,7 @@
  * @copyright   -storm_copyright-
  * @package     IPS Social Suite
  * @subpackage  Dev Toolbox
- * @since       5.0.1
+ * @since       5.0.6
  * @version     -storm_version-
  */
 

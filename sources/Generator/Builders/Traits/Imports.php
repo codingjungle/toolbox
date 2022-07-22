@@ -17,6 +17,7 @@ use Exception;
 
 use InvalidArgumentException;
 
+use function _p;
 use function array_pop;
 use function class_exists;
 use function count;
@@ -109,6 +110,9 @@ trait Imports
             $continue = false;
         }
         $return = $this->canMakeImport($import);
+        if($continue === true && (class_exists($import) || class_exists('\\'.$import)) && $this->checkForImport($class) === false && $this->checkForImport($alias) === false){
+            $this->imports[$hash] = ['class' => $import, 'alias' => $alias];
+        }
         if ($continue === true && $return !== $import && $this->checkForImport($class) === false && $this->checkForImport($alias) === false) {
             $this->imports[$hash] = ['class' => $import, 'alias' => $alias];
         }

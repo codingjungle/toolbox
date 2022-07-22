@@ -6,31 +6,26 @@
 * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
 * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
 */
-
-use IPS\Settings;
-use IPS\toolbox\Profiler\Debug;
-use IPS\Dispatcher\Build;
-use IPS\Session\Front;
-
 $ipsPath = \str_replace('/applications/toolbox/sources/Profiler/AdminerDb/Custom/adminer.php', '',
         \str_replace('\\', '/', __FILE__)) . '/';
 
 require_once $ipsPath . 'init.php';
-Build::i();
-Front::i();
+\IPS\Dispatcher\Build::i();
+\IPS\Session\Front::i();
 $auth = [
     'driver' => 'server',
-    'server' => Settings::i()->getFromConfGlobal('sql_host'),
-    'username' => Settings::i()->getFromConfGlobal('sql_user'),
-    'password' => Settings::i()->getFromConfGlobal('sql_pass'),
-    'db' => Settings::i()->getFromConfGlobal('sql_database'),
+    'server' => \IPS\Settings::i()->getFromConfGlobal('sql_host'),
+    'username' => \IPS\Settings::i()->getFromConfGlobal('sql_user'),
+    'password' => \IPS\Settings::i()->getFromConfGlobal('sql_pass'),
+    'db' => \IPS\Settings::i()->getFromConfGlobal('sql_database'),
     'permanent' => true,
 ];
 //seems to be cause the adminer devs are stupid?
 $sql='mysql';
 function ipsDebug($message){
-    Debug::log($message);
+    \IPS\toolbox\Profiler\Debug::log($message);
 };
+
 function ipsUrl(){
     $url = (string) '&app=toolbox&module=settings&controller=adminer';
     if(isset($_GET['dbApp'])){

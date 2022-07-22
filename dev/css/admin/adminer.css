@@ -250,8 +250,7 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 }
 
 .adminerLightMode #breadcrumb {
-  position: fixed;
-  top: 60px;
+
   background: #48A5BF;
   z-index: 2;
   width: 100%;
@@ -259,7 +258,6 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
   padding: 10px;
   font-size: 15px;
   font-weight: bold;
-  margin-left: -30px;
 }
 
 .adminerLightMode #breadcrumb a {
@@ -271,14 +269,16 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 .adminerLightMode #menu {
   background: #34495e;
   position: fixed;
-  top: 30px;
   color: #FFF;
-  padding: 20px;
-  padding-top: 40px;
   bottom: 0px;
   overflow: auto;
-  width: 347px;
   border-right: 2px solid #34495e;
+  padding:5px;
+}
+.adminerLightMode #menu label {
+  color:#fff;
+  margin-right:5px;
+  margin-left:5px;
 }
 
 .adminerLightMode #menu p,
@@ -289,6 +289,10 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 
 .adminerLightMode #menu a {
   color: #FFF;
+}
+
+.adminerLightMode #menu .ipsMargin_bottom\:half{
+  padding-top:10px;
 }
 
 .adminerLightMode #schema .table {
@@ -1153,4 +1157,28 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 .adminerDarkMode .footer>div {
   background: var(--color-darkBackground);
   padding: 0 0 .5em;
+}
+.adminerDarkMode .hidden {
+  display: none
+}
+
+
+/*customizations*/
+
+.ipsApp .dtAdminer select{
+    /*padding:0;*/
+}
+.dtAdminer input:not([type="submit"]) {
+  min-width: unset!important;
+  /*padding:0!important;*/
+}
+.dtAdminer #menu {
+  width:100%;
+  bottom:unset!important;
+}
+.logout {
+  display:none;
+}
+.dtAdminer #content{
+  margin-left:unset;
 }

@@ -17,6 +17,12 @@ use function defined;
 use function header;
 
 use const DT_ANALYZE;
+use const DT_BETA_AUTHOR;
+use const DT_BETA_CATEGORY;
+use const DT_BETA_CLIENT_ID;
+use const DT_BETA_CLIENT_SECRET;
+use const DT_BETA_UPLOAD;
+use const DT_BETA_URL;
 use const DT_DISABLE_SERVICE_WORKERS;
 use const DT_MY_APPS;
 use const DT_NODE_URL;
@@ -189,6 +195,74 @@ class _toolbox
                 'type' => 'url',
                 'tab'         => 'Debug',
 
+            ],
+
+
+
+            'DT_BETA_UPLOAD'                         => [
+                'name'        => 'DT_BETA_UPLOAD',
+                'default'     => false,
+                'current'     => defined('\DT_BETA_UPLOAD') ? DT_BETA_UPLOAD : FALSE,
+                'description' => 'Special task to upload files when DTBUILDS is used.',
+                'type' => 'boolean',
+                'tab'         => 'Beta',
+            ],
+            'DT_BETA_CATEGORY'                         => [
+                'name'        => 'DT_BETA_CATEGORY',
+                'default'     => 0,
+                'current'     => defined('\DT_BETA_CATEGORY') ? DT_BETA_CATEGORY : 1,
+                'description' => 'Category ID to use.',
+                'type' => 'int',
+                'tab'         => 'Beta',
+            ],
+            'DT_BETA_AUTHOR'                         => [
+                'name'        => 'DT_BETA_AUTHOR',
+                'default'     => 0,
+                'current'     => defined('\DT_BETA_AUTHOR') ? DT_BETA_AUTHOR : 1,
+                'description' => 'Member ID to use.',
+                'type' => 'int',
+                'tab'         => 'Beta',
+            ],
+            'DT_BETA_URL'                         => [
+                'name'        => 'DT_BETA_URL',
+                'default'     => 0,
+                'current'     => defined('\DT_BETA_URL') ? DT_BETA_URL : null,
+                'description' => 'url to use.',
+                'type' => 'url',
+                'tab'         => 'Beta',
+            ],
+            'DT_BETA_CLIENT_ID'                         => [
+                'name'        => 'DT_BETA_CLIENT_ID',
+                'default'     => 0,
+                'current'     => defined('\DT_BETA_CLIENT_ID') ? DT_BETA_CLIENT_ID : null,
+                'description' => 'OAUTH client id.',
+                'type' => 'string',
+                'tab'         => 'Beta',
+            ],
+
+            'DT_BETA_CLIENT_SECRET'                         => [
+                'name'        => 'DT_BETA_CLIENT_SECRET',
+                'default'     => 0,
+                'current'     => defined('\DT_BETA_CLIENT_SECRET') ? DT_BETA_CLIENT_SECRET : null,
+                'description' => 'OAUTH client secret.',
+                'type' => 'string',
+                'tab'         => 'Beta',
+            ],
+            'DT_BETA_ALLOWED'                         => [
+                'name'        => 'DT_BETA_ALLOWED',
+                'default'     => 0,
+                'current'     => defined('\DT_BETA_ALLOWED') ? DT_BETA_ALLOWED : null,
+                'description' => 'A comma separated list of app directory names to allow to be uploaded if they don\'t have beta/rc as apart of their name.',
+                'type' => 'string',
+                'tab'         => 'Beta',
+            ],
+            'DT_BETA_DISALLOWED'                         => [
+                'name'        => 'DT_BETA_DISALLOWED',
+                'default'     => 0,
+                'current'     => defined('\DT_BETA_DISALLOWED') ? DT_BETA_DISALLOWED : null,
+                'description' => 'List of app directory names to completely ignore and not upload',
+                'type' => 'string',
+                'tab'         => 'Beta',
             ],
         ];
     }
