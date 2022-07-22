@@ -72,6 +72,7 @@ use function time;
 
 use function uniqid;
 
+use const DT_MY_APPS;
 use const ENT_DISALLOWED;
 use const ENT_QUOTES;
 use const IPS\NO_WRITES;
@@ -601,6 +602,58 @@ class _bt extends Controller
                 throw $e;
             }
         }
+    }
+
+    protected function build(){
+        $form = Form::create()->submitLang('Build');
+        $myApps = \defined('DT_MY_APPS') ? explode(',',DT_MY_APPS) : [];
+        if(empty($myApps) === false){
+            $myApps = array_combine(array_values($myApps), array_values($myApps));
+            $i = 0;
+            foreach($myApps as $app){
+//                $form->html('<h3>'.\mb_strtoupper($app).'</h3>');
+                Member::loggedIn()->language()->words[$app.'_header'] = \mb_strtoupper($app);
+                $form->header($app);
+                $form
+                    ->add('build_app_'.$app,'yn')
+                    ->toggles(
+                        [
+                            'version_type_'.$app,
+                            'beta_'.$app,
+                            'rc_'.$app
+                        ]
+                    )->label('Build App');
+                $form->add('version_type_'.$app,'radio')
+                    ->options(
+                        [
+                            'options' => [
+                            'major' => 'Major',
+                            'minor' => 'Minor',
+                            'patch' => 'Patch',
+                            'build' => 'Build'
+                            ]
+                        ]
+                    )
+                    ->label('Version Bump')
+                    ->description('Version Bumping, Major: bumps 1st version number, Minor: Bumps 2nd version number, Patch: Bumps 3rd version Number, Build: bumps or adds 4th version number.');
+
+                $form
+                    ->add('beta_'.$app,'yn')
+                    ->label('Beta')
+                    ->toggles(['rc_'.$app],true)
+                    ->description('If selected will bump long version and add "Beta" to version, if major/minor/patch/build selected, will also do a long and version bump but add Beta to version.');
+                $form
+                    ->add('rc_'.$app,'yn')
+                    ->label('Release Candidate')
+                    ->description('If selected will bump long version and add "RC" to version, if major/minor/patch/build selected, will also do a long and version bump but add RC to version.');
+                $form->separator();
+            }
+//            $form->add('apps','cbs')->options(['options'=>$myApps])->value(0);
+//            $form->add('beta','yn')->toggles(['rc'],true);
+//            $form->add('rc','yn');
+        }
+        $form->dialogForm();
+        Output::i()->output = $form;
     }
 
 //    protected function adminer()

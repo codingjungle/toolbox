@@ -61,7 +61,6 @@ class _toolbox
                 'description' => 'This enables an app to be analyzed before you download it.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools',
-
             ],
             'DTBUILD'                         => [
                 'name'        => 'DTBUILD',
@@ -70,7 +69,6 @@ class _toolbox
                 'description' => 'This enables special app build features for toolbox, use with caution.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools',
-
             ],
             'DT_THEME'                        => [
                 'name'        => 'DT_THEME',
@@ -79,7 +77,6 @@ class _toolbox
                 'description' => 'this will enable/disable designer mode templates to be used with IN_DEV. check out the HowToUseDesignerDevMode.txt.',
                 'type'        => 'boolean',
                 'tab'         => 'DevTools',
-
             ],
             'DT_THEME_ID'                     => [
                 'name'        => 'DT_THEME_ID',
@@ -88,7 +85,6 @@ class _toolbox
                 'description' => 'enter the theme ID number to use.',
                 'type'        => 'int',
                 'tab'         => 'DevTools',
-
             ],
             'DT_THEME_ID_ADMIN'               => [
                 'name'        => 'DT_THEME_ID_ADMIN',
@@ -97,7 +93,6 @@ class _toolbox
                 'description' => 'if you want to use a different theme for the ACP than on the front end, enter theme ID number here, leave 0 to keep disabled.',
                 'type'        => 'int',
                 'tab'         => 'DevTools',
-
             ],
             'DT_THEME_CMS_USE_DESIGNER_FILES' => [
                 'name'        => 'DT_THEME_CMS_USE_DESIGNER_FILES',
@@ -131,10 +126,7 @@ class _toolbox
                 'description' => 'This enables an app to be analyzed before you download it.',
                 'type' => 'string',
                 'tab'         => 'DevTools',
-
             ],
-
-
             'TOOLBOXDEV_IMMEDIATE'               => [
                 'name'        => 'TOOLBOXDEV_IMMEDIATE',
                 'default'     => 0,
@@ -150,7 +142,6 @@ class _toolbox
                 'description' => 'this will enable/disable any profiler debug/time class to use the debug/time features of profiler.',
                 'type'        => 'boolean',
                 'tab'         => 'Debug',
-
             ],
             'TOOLBOXDEV'                      => [
                 'name'        => 'TOOLBOXDEV',
@@ -168,7 +159,6 @@ class _toolbox
                 'description' => 'disable the annoying service worker content in the console log.',
                 'type'        => 'boolean',
                 'tab'         => 'Debug',
-
             ],
             'DT_ROUTE_TO_DEBUG'               => [
                 'name'        => 'DT_ROUTE_TO_DEBUG',
@@ -185,7 +175,6 @@ class _toolbox
                 'description' => 'Enable debug to use node.js instead of long polling.',
                 'type' => 'boolean',
                 'tab'         => 'Debug',
-
             ],
             'DT_NODE_URL'                         => [
                 'name'        => 'DT_NODE_URL',
@@ -194,11 +183,7 @@ class _toolbox
                 'description' => 'Url with port for node.js',
                 'type' => 'url',
                 'tab'         => 'Debug',
-
             ],
-
-
-
             'DT_BETA_UPLOAD'                         => [
                 'name'        => 'DT_BETA_UPLOAD',
                 'default'     => false,

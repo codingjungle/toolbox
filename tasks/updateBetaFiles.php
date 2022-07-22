@@ -73,7 +73,7 @@ class _updateBetaFiles extends \IPS\Task
 
             $at = Application::getRootPath('core').'/at.json';
             if(file_exists($at)){
-                $credentials = json_decode(\file_get_contents($at),true);
+                $credentials = \json_decode(\file_get_contents($at),true);
             }
             else {
                 $clientId = DT_BETA_CLIENT_ID;
@@ -87,7 +87,7 @@ class _updateBetaFiles extends \IPS\Task
                         'scope' => 'profile'
                     ]);
                 $credentials = $authorization->decodeJson();
-                file_put_contents($at, json_encode($credentials, JSON_PRETTY_PRINT));
+                \file_put_contents($at, \json_encode($credentials, JSON_PRETTY_PRINT));
             }
             $accessToken = $credentials['access_token'];
             $headers = [
@@ -105,7 +105,7 @@ class _updateBetaFiles extends \IPS\Task
                 foreach($results['results'] as $result){
                     $existing[$result['title']] = [
                         'id' => $result['id'],
-                        'time' => strtotime($result['date'])
+                        'time' => \strtotime($result['date'])
                     ];
                 }
 
@@ -113,7 +113,7 @@ class _updateBetaFiles extends \IPS\Task
             $finder = new Finder();
             $finder->in(\IPS\Application::getRootPath('core').'/exports/');
             $filter = function (\SplFileInfo $file) {
-                if (!in_array($file->getExtension(), ['tar'])) {
+                if (!\in_array($file->getExtension(), ['tar'])) {
                     return false;
                 }
                 return true;
@@ -127,12 +127,12 @@ class _updateBetaFiles extends \IPS\Task
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             foreach($files as $file){
                 $ft = $file->getFilename();
-                preg_match('#^(.*?)-(.*?).tar$#',$ft,$match);
+                \preg_match('#^(.*?)-(.*?).tar$#',$ft,$match);
                 $name = \trim(\mb_strtolower($match[1]));
                 if(
                     !\in_array($name,$skip) &&
-                    !str_contains(mb_strtolower($ft),'beta') &&
-                    !str_contains(mb_strtolower($ft), 'rc')
+                    !\str_contains(\mb_strtolower($ft),'beta') &&
+                    !\str_contains(\mb_strtolower($ft), 'rc')
                 ){
                     continue;
                 }
@@ -141,7 +141,7 @@ class _updateBetaFiles extends \IPS\Task
                     continue;
                 }
 
-                $version = trim($match[2]);
+                $version = \trim($match[2]);
                 $continue = true;
                 $time = $file->getMTime();
 
@@ -242,7 +242,7 @@ class _updateBetaFiles extends \IPS\Task
             }
 
             if(empty($errors) === false){
-                Log::log(json_encode($errors),'Beta Uploader');
+                Log::log(\json_encode($errors),'Beta Uploader');
             }
         }
 		return NULL;

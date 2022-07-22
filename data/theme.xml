@@ -68,7 +68,6 @@
 </section>]]></template>
  <template template_group="bar" template_name="bar" template_data="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions" template_location="front" template_app="toolbox"><![CDATA[<div id="dtProfilerBarContainer" class="dtProfilerBar">
     <ul class="ipsList_reset dtProfilerBar_list ipsClearfix" data-ipsdtprofiler{{if settings.dtprofiler_enable_debug && settings.dtprofiler_enable_debug_ajax }} data-ipsdtprofilerdebug data-url="{url='app=toolbox&module=bt&controller=bt' base='front'}"{{endif}}>
-
         {{if $time }}
         <li id="elProfileTimeLog" title="total time" class="isParent dtProfileFirst dtProfilerTime" data-ipstooltip>
             <i class="fa fa-server"></i> {$time['total']}ms <i class="fa fa-angle-up dtprofilearrow"></i>
@@ -143,6 +142,7 @@
             </ul>
 </li>
             {{endif}}
+
         <li class="isParent dtProfileFirst celProfileSystem">
             <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu>
                 <i class="fa fa-smile-o"></i> Toy Box <i class="fa fa-angle-up"></i>
@@ -257,6 +257,17 @@
                 </div>
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
+
+                        {{$myApps = \defined('DT_MY_APPS') ? explode(',',DT_MY_APPS) : [];}}
+                        {{if empty($myApps) === false}}
+                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=build' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Build My Apps">
+                                <i class="fa fa-compass"></i>
+                                <br>
+                                Build My Apps
+                            </a>
+                        </div>
+                        {{endif}}
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
                             <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
                                 <i class="fa fa-compass"></i>
