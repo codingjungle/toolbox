@@ -204,12 +204,12 @@ class _Dev extends Singleton
 
     protected function elName()
     {
-        $this->form->add('filename')->required()->validation([$this, 'validateFilename']);
+        $this->form->addElement('filename')->required()->validation([$this, 'validateFilename']);
     }
 
     protected function eltemplateName()
     {
-        $this->form->add('templateName', 'stack')->required();
+        $this->form->addElement('templateName', 'stack')->required();
     }
 
     protected function elArguments()
@@ -218,12 +218,12 @@ class _Dev extends Singleton
             'name'  => 'arguments',
             'class' => 'stack',
         ];
-        $this->form->add('arguments', 'stack');
+        $this->form->addElement('arguments', 'stack');
     }
 
     protected function elWidgetName()
     {
-        $this->form->add('widgetname')->prefix($this->app);
+        $this->form->addElement('widgetname')->prefix($this->app);
     }
 
     protected function elMixin()
@@ -254,7 +254,7 @@ class _Dev extends Singleton
         }
         $this->ksortRecursive($controllers);
 
-        $this->form->add('mixin', 'select')->options(['options' => $controllers]);
+        $this->form->addElement('mixin', 'select')->options(['options' => $controllers]);
     }
 
     protected function ksortRecursive(&$array, $sort_flags = SORT_REGULAR)
@@ -298,17 +298,17 @@ class _Dev extends Singleton
             } catch (Exception $e) {
             }
         }
-        $this->form->add('group_manual', 'yn')->value($groupManual)->toggles(
+        $this->form->addElement('group_manual', 'yn')->value($groupManual)->toggles(
             [
                 'group_manual_location',
                 'group_manual_folder',
             ]
         )->toggles(['_group'], true);
 
-        $this->form->add('group_manual_location', 'select')->options(
+        $this->form->addElement('group_manual_location', 'select')->options(
             ['options' => ['admin' => 'admin', 'front' => 'front', 'global' => 'global']]
         );
-        $this->form->add('group_manual_folder')->required();
+        $this->form->addElement('group_manual_folder')->required();
     }
 
     /**
@@ -372,11 +372,11 @@ class _Dev extends Singleton
                 'options' => $options,
             ],
         ];
-        $this->form->add('_group', 'select')->options(['options' => $options]);
+        $this->form->addElement('_group', 'select')->options(['options' => $options]);
     }
 
     protected function elOptions()
     {
-        $this->form->add('options', 'stack');
+        $this->form->addElement('options', 'stack');
     }
 }

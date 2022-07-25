@@ -66,7 +66,7 @@
 
 
 </section>]]></template>
- <template template_group="bar" template_name="bar" template_data="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions" template_location="front" template_app="toolbox"><![CDATA[<div id="dtProfilerBarContainer" class="dtProfilerBar">
+ <template template_group="bar" template_name="bar" template_data="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions,$myApps" template_location="front" template_app="toolbox"><![CDATA[<div id="dtProfilerBarContainer" class="dtProfilerBar">
     <ul class="ipsList_reset dtProfilerBar_list ipsClearfix" data-ipsdtprofiler{{if settings.dtprofiler_enable_debug && settings.dtprofiler_enable_debug_ajax }} data-ipsdtprofilerdebug data-url="{url='app=toolbox&module=bt&controller=bt' base='front'}"{{endif}}>
         {{if $time }}
         <li id="elProfileTimeLog" title="total time" class="isParent dtProfileFirst dtProfilerTime" data-ipstooltip>
@@ -123,11 +123,8 @@
         {$logs|raw}
         {{endif}}
 
-
-
-
-            {{if isset( $info['sources']) }}
-<li class="isParent dtProfileFirst">
+        {{if isset( $info['sources']) }}
+        <li class="isParent dtProfileFirst">
             <a id="elProfileSources" href="#elProfileSources_menu" title="Sources" class=" " data-ipstooltip data-ipsmenu>
                 Sources <i class="fa fa-angle-up"></i>
             </a>
@@ -140,11 +137,36 @@
                 </li>
                 {{endforeach}}
             </ul>
-</li>
-            {{endif}}
+        </li>
+        {{endif}}
+
+        {{if empty($myApps) === false}}
+        <li class="isParent dtProfileFirst celProfileMyapps">
+            <a href="#apps_myapps_menu" id="apps_myapps" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
+                <i class="fa fa-compass"></i>
+                Build My Apps <i class="fa fa-angle-up"></i>
+            </a>
+            <div id="apps_myapps_menu" class="ipsMenu ipsMenu_wide ipsHide">
+                <div class="ipsMenu_innerContent ipsGrid">
+                    {{$i=0;}}
+                {{foreach $myApps as $mm}}
+                    {{$i++;}}
+                    {{if $i===4}}
+                </div>
+                    <div class="ipsMenu_innerContent ipsGrid">
+                        {{$i=1;}}
+                    {{endif}}
+                    <div class="ipsGrid_span4 ipsType_center ipsType_bold ipsPadding:half">
+                        <a href="{$mm['url']}">{$mm['name']|raw}</a>
+                    </div>
+                {{endforeach}}
+                </div>
+            </div>
+        </li>
+        {{endif}}
 
         <li class="isParent dtProfileFirst celProfileSystem">
-            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu>
+            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
                 <i class="fa fa-smile-o"></i> Toy Box <i class="fa fa-angle-up"></i>
             </a>
             <div id="elProfileSystem_menu" class="ipsMenu ipsMenu_wide ipsHide">
@@ -257,17 +279,6 @@
                 </div>
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
-
-                        {{$myApps = \defined('DT_MY_APPS') ? explode(',',DT_MY_APPS) : [];}}
-                        {{if empty($myApps) === false}}
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=build' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Build My Apps">
-                                <i class="fa fa-compass"></i>
-                                <br>
-                                Build My Apps
-                            </a>
-                        </div>
-                        {{endif}}
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
                             <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
                                 <i class="fa fa-compass"></i>
@@ -582,6 +593,16 @@ foobar!</textarea>
         {$uuid|raw}
     </div>
 </div>]]></template>
+ <template template_group="bt" template_name="downloadInfo" template_data="$path, $error,$app" template_location="front" template_app="toolbox"><![CDATA[{{if $error !== null}}
+<div class="ipsMessage ipsMessage_error">
+    <p>There was an error. Please check the system log for more details.</p>
+    <p>{$error|raw}</p>
+</div>
+{{else}}
+<div class="ipsMessage ipsMessage_info">
+    Exporting was succesful for {$app}. the files can be found in {$path}.
+</div>
+{{endif}}]]></template>
  <template template_group="bt" template_name="phpinfo" template_data="$info" template_location="front" template_app="toolbox"><![CDATA[<div class="toolboxPhpInfo ipsPad">
     {$info|raw}
 </div>
@@ -643,16 +664,16 @@ foobar!</textarea>
     </table>
 </div>
 ]]></template>
- <template template_group="code" template_name="final" template_data="$output, $app, $download" template_location="admin" template_app="toolbox"><![CDATA[<div class="ipsPadding">
+ <template template_group="code" template_name="final" template_data="$output,bool $show=false, ?\IPS\Http\Url $download = null, ?\IPS\Http\Url $analyze=null" template_location="admin" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsBox">
     {$output|raw}
+    {{if $show}}
+    <div class="ipsBorder_top ipsPadding ipsType_center">
+        <a href='{$analyze}' class="ipsButton ipsButton_large ipsButton_primary">Reanalyze</a>
+        <a href='{$download}' class="ipsButton ipsButton_large ipsButton_primary">Download</a>
+    </div>
+    {{endif}}
 </div>
-{{if (bool)$download === true}}
-{{$app = \IPS\Request::i()->application;}}
-<div class="ipsBorder_top ipsPadding ipsType_center">
-    <a href='{url="app=toolbox&module=code&controller=analyzer&do=queue&download=1&application={$app}"}' class="ipsButton ipsButton_large ipsButton_primary">Reanalyze</a>
-    <a href='{url="app=core&module=applications&controller=applications&appKey={$app}&do=download&analyzed=1"}' class="ipsButton ipsButton_large ipsButton_primary">Download</a>
-</div>
-{{endif}}
+
 ]]></template>
  <template template_group="code" template_name="lists" template_data="array $keys, $type,$msgType" template_location="admin" template_app="toolbox"><![CDATA[<div{{if \count($keys) }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
     <div class="ipsType_large ipsType_bold ipsClearfix">
@@ -2428,7 +2449,9 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 .dtProfilerCacheLog {
     background:  #cc9900;
 }
-
+.celProfileMyapps{
+    background: #3A01DF;
+}
 .dtProfilerlogs {
     background: #990033;
 }
@@ -2647,6 +2670,7 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
     padding-left:10px;
 }
 
+.dtProfilerBar .ipsMenu_innerContent,
 .dtProfileExtra {
     color:#fff !important;
 }
@@ -2815,6 +2839,13 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 }
 #elDtProfilerDiffs textarea {
     height:400px;
+}
+
+.PopUpForm {
+    padding: 0 var(--sp-4) var(--sp-4) var(--sp-4);
+}
+.PopUpForm [type="submit"] {
+    float:right;
 }]]></css>
  <css css_location="admin" css_app="toolbox" css_attributes="" css_path="." css_name="test.css"><![CDATA[
 .adminerDarkMode a {

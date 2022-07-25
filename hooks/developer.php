@@ -176,7 +176,7 @@ class toolbox_hook_developer extends _HOOK_CLASS_
                 'values',
             ],
         ];
-        $form->add('select', 'select')->options($opts)->toggles($toggles)->required();
+        $form->addElement('select', 'select')->options($opts)->toggles($toggles)->required();
         $val = static function ($val) {
             /* Check it starts with \IPS\Db::i()-> */
             $val = trim($val);
@@ -213,11 +213,11 @@ class toolbox_hook_developer extends _HOOK_CLASS_
                 }
             }
         };
-        $form->add('code', 'TextArea')->value('\IPS\Db::i()->')->required()->options(['size' => 45])->validation($val);
+        $form->addElement('code', 'TextArea')->value('\IPS\Db::i()->')->required()->options(['size' => 45])->validation($val);
 
         if (!isset(Request::i()->dtdevplus_code) || Request::i()->dtdevplus_code !== 'code') {
-            $form->add('ext_table', 'select')->required()->options(['options' => $t, 'parse' => 'raw']);
-            $form->add('ext_field', 'select')->options(['options' => [], 'userSuppliedInput' => true]);
+            $form->addElement('ext_table', 'select')->required()->options(['options' => $t, 'parse' => 'raw']);
+            $form->addElement('ext_field', 'select')->options(['options' => [], 'userSuppliedInput' => true]);
 
             $ints = [
                 'add_column',
@@ -321,18 +321,18 @@ class toolbox_hook_developer extends _HOOK_CLASS_
                 'SET'        => $enum,
 
             ];
-            $form->add('type', 'select')->options(['options' => Db::$dataTypes])->toggles($toggles);
-            $form->add('add_column')->required();
-            $form->add('length', 'number')->value(255);
-            $form->add('allow_null', 'yn');
-            $form->add('decimals', 'number');
-            $form->add('default', 'TextArea');
-            $form->add('comment', 'TextArea');
-            $form->add('sunsigned', 'yn');
-            $form->add('zerofill', 'yn');
-            $form->add('auto_increment', 'yn');
-            $form->add('binary', 'yn');
-            $form->add('values', 'stack');
+            $form->addElement('type', 'select')->options(['options' => Db::$dataTypes])->toggles($toggles);
+            $form->addElement('add_column')->required();
+            $form->addElement('length', 'number')->value(255);
+            $form->addElement('allow_null', 'yn');
+            $form->addElement('decimals', 'number');
+            $form->addElement('default', 'TextArea');
+            $form->addElement('comment', 'TextArea');
+            $form->addElement('sunsigned', 'yn');
+            $form->addElement('zerofill', 'yn');
+            $form->addElement('auto_increment', 'yn');
+            $form->addElement('binary', 'yn');
+            $form->addElement('values', 'stack');
         }
 
         /* If submitted, add to json file */

@@ -87,8 +87,8 @@ class _build extends Controller
         $human = "{$exploded[0]}.{$exploded[1]}." . ((int)$exploded[2] + 1);
         $long = (int)$application->long_version + 1;
         $form = Form::create();
-        $form->add('long_version', 'number')->label('Long Version')->required()->empty($long);
-        $form->add('short_version')->label('Short Version')->required()->empty($human);
+        $form->addElement('long_version', 'number')->label('Long Version')->required()->empty($long);
+        $form->addElement('short_version')->label('Short Version')->required()->empty($human);
 
         if ($values = $form->values()) {
             $long = $values['long_version'];

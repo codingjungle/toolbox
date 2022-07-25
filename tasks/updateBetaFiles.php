@@ -22,6 +22,7 @@ use IPS\toolbox\Application;
 use Symfony\Component\Finder\Finder;
 
 use function _p;
+use function explode;
 use function file_exists;
 use function json_decode;
 use function json_encode;
@@ -30,6 +31,13 @@ use function str_contains;
 use function strtotime;
 use function trim;
 
+use const DT_BETA_ALLOWED;
+use const DT_BETA_AUTHOR;
+use const DT_BETA_CATEGORY;
+use const DT_BETA_CLIENT_ID;
+use const DT_BETA_CLIENT_SECRET;
+use const DT_BETA_DISALLOWED;
+use const DT_BETA_URL;
 use const JSON_PRETTY_PRINT;
 
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
@@ -105,10 +113,9 @@ class _updateBetaFiles extends \IPS\Task
                 foreach($results['results'] as $result){
                     $existing[$result['title']] = [
                         'id' => $result['id'],
-                        'time' => \strtotime($result['date'])
+                        'time' => \strtotime($result['updated'] ?? $result['date'])
                     ];
                 }
-
             }
             $finder = new Finder();
             $finder->in(\IPS\Application::getRootPath('core').'/exports/');
@@ -205,17 +212,17 @@ class _updateBetaFiles extends \IPS\Task
                     ];
                 }
             }
-
             $errors = [];
             foreach($update as $key => $data){
                 $endpoint = '/downloads/files/'.$data['id'].'/history';
-                unset($data['time'],$data['id']);
+                unset($data['time']);
                 $response = Url::external($communityUrl . '/api/' . $endpoint)
                     ->request()
                     ->setHeaders($headers)
                     ->post($data);
 
                 if(!$response->isSuccessful()){
+                    _p($response);
                     $errors[] = [
                         'file' => $data['title'],
                         'error' => $response->decodeJson(),

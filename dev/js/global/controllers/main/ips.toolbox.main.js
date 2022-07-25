@@ -3,20 +3,24 @@
     ips.createModule('ips.toolbox.main', function() {
         var socket = null,
             init = function() {
-              getSocket().emit('join', ips.getSetting('cj_debug_key'));
+                if(ips.getSetting('cj_debug_sockets')) {
+                    getSocket().emit('join', ips.getSetting('cj_debug_key'));
+                }
             },
             sockets = function() {
-                if (socket === null || !socket.connected) {
-                    socket = io(
-                        ips.getSetting('cj_debug_sockets_url'),
-                        {
-                            timeout: 20000,
-                            reconnectionDelay: 2000,
-                            reconnectionDelayMax: 20000,
-                            reconnectionAttempts: 1,
-                            cookie: false,
-                        },
-                    );
+                if(ips.getSetting('cj_debug_sockets')) {
+                    if (socket === null || !socket.connected) {
+                        socket = io(
+                            ips.getSetting('cj_debug_sockets_url'),
+                            {
+                                timeout: 20000,
+                                reconnectionDelay: 2000,
+                                reconnectionDelayMax: 20000,
+                                reconnectionAttempts: 1,
+                                cookie: false,
+                            },
+                        );
+                    }
                 }
             },
             getSocket = function() {

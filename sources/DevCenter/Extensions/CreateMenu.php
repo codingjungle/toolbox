@@ -47,9 +47,9 @@ class _CreateMenu extends ExtensionsAbstract
     public function elements()
     {
         $this->form->element('use_default')->toggles(['key', 'link', 'seo', 'seoTitle'], true);
-        $this->form->add('key')->required();
-        $this->form->add('link')->required()->prefix('app=' . $this->application->directory . '&');
-        $this->form->add('seo');
-        $this->form->add('seoTitle');
+        $this->form->addElement('key')->required();
+        $this->form->addElement('link')->required()->prefix('app=' . $this->application->directory . '&');
+        $this->form->addElement('seo');
+        $this->form->addElement('seoTitle');
     }
 }

@@ -49,27 +49,27 @@ class _profiler
             }
         }
         $form->tab('dtprofiler');
-        $form->add('dtprofiler_can_use', 'member')->value($members)->options(['multiple' => 10]);
-        $form->add('dtprofiler_show_admin', 'yn');
+        $form->addElement('dtprofiler_can_use', 'member')->value($members)->options(['multiple' => 10]);
+        $form->addElement('dtprofiler_show_admin', 'yn');
         $form->header('dtprofiler_profiler_tabs');
-        $form->add('dtprofiler_enabled_execution', 'yn');
-        $form->add('dtprofiler_enabled_executions', 'yn');
-        $form->add('dtprofiler_enabled_memory', 'yn');
-        $form->add('dtprofiler_enabled_memory_summary', 'yn');
-        $form->add('dtprofiler_enabled_files', 'yn');
-        $form->add('dtprofiler_enabled_enivro', 'yn');
-        $form->add('dtprofiler_enabled_templates', 'yn');
-        $form->add('dtprofiler_enabled_css', 'yn');
-        $form->add('dtprofiler_enabled_js', 'yn');
-        $form->add('dtprofiler_enabled_jsvars', 'yn');
-        $form->add('dtprofiler_enable_debug', 'yn')->toggles(['dtprofiler_enable_debug_ajax']);
-        $form->add('dtprofiler_enable_debug_ajax', 'yn');
-        $form->add('dtprofiler_enabled_logs', 'yn');
-        $form->add('dtprofiler_logs_amount', '#');
-        $form->add('dtprofiler_git_data', 'yn');
-        $form->add('dtprofiler_show_changes', 'yn');
-        $form->add('dtprofiler_use_console','yn');
-        $form->add('dtprofiler_replace_console','yn')->toggles(['dtprofiler_console_replacements']);
+        $form->addElement('dtprofiler_enabled_execution', 'yn');
+        $form->addElement('dtprofiler_enabled_executions', 'yn');
+        $form->addElement('dtprofiler_enabled_memory', 'yn');
+        $form->addElement('dtprofiler_enabled_memory_summary', 'yn');
+        $form->addElement('dtprofiler_enabled_files', 'yn');
+        $form->addElement('dtprofiler_enabled_enivro', 'yn');
+        $form->addElement('dtprofiler_enabled_templates', 'yn');
+        $form->addElement('dtprofiler_enabled_css', 'yn');
+        $form->addElement('dtprofiler_enabled_js', 'yn');
+        $form->addElement('dtprofiler_enabled_jsvars', 'yn');
+        $form->addElement('dtprofiler_enable_debug', 'yn')->toggles(['dtprofiler_enable_debug_ajax']);
+        $form->addElement('dtprofiler_enable_debug_ajax', 'yn');
+        $form->addElement('dtprofiler_enabled_logs', 'yn');
+        $form->addElement('dtprofiler_logs_amount', '#');
+        $form->addElement('dtprofiler_git_data', 'yn');
+        $form->addElement('dtprofiler_show_changes', 'yn');
+        $form->addElement('dtprofiler_use_console','yn');
+        $form->addElement('dtprofiler_replace_console','yn')->toggles(['dtprofiler_console_replacements']);
         $data = [
             'log',
             'table',
@@ -88,7 +88,7 @@ class _profiler
         ];
          $vals = json_decode(Settings::i()->dtprofiler_console_replacements,true);
         $options = array_combine(array_values($data),array_values($data));
-        $form->add('dtprofiler_console_replacements','cbs')->options(['options' => $options])->value($vals);
+        $form->addElement('dtprofiler_console_replacements','cbs')->options(['options' => $options])->value($vals);
     }
 
     /**

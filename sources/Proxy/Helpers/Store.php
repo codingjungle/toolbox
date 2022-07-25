@@ -30,6 +30,8 @@ class _Store implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
+        $classDoc[] = ['pt' => 'p', 'prop' => 'download', 'type' => 'int'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dtversions', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'acpBulletin', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'administrators', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'applications', 'type' => 'array'];

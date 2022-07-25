@@ -52,7 +52,9 @@
 .dtProfilerCacheLog {
     background:  #cc9900;
 }
-
+.celProfileMyapps{
+    background: #3A01DF;
+}
 .dtProfilerlogs {
     background: #990033;
 }
@@ -271,6 +273,7 @@
     padding-left:10px;
 }
 
+.dtProfilerBar .ipsMenu_innerContent,
 .dtProfileExtra {
     color:#fff !important;
 }
@@ -439,4 +442,11 @@
 }
 #elDtProfilerDiffs textarea {
     height:400px;
+}
+
+.PopUpForm {
+    padding: 0 var(--sp-4) var(--sp-4) var(--sp-4);
+}
+.PopUpForm [type="submit"] {
+    float:right;
 }

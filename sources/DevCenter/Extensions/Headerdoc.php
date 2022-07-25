@@ -86,11 +86,11 @@ class _Headerdoc extends ExtensionsAbstract
     public function elements()
     {
         $this->form->element('use_default')->toggles(['table', 'field'], true);
-        $this->form->add('enabled', 'yn');
-        $this->form->add('indexEnabled', 'yn');
-        $this->form->add('dirSkip', 'stack');
-        $this->form->add('fileSkip', 'stack');
-        $this->form->add('exclude', 'stack');
+        $this->form->addElement('enabled', 'yn');
+        $this->form->addElement('indexEnabled', 'yn');
+        $this->form->addElement('dirSkip', 'stack');
+        $this->form->addElement('fileSkip', 'stack');
+        $this->form->addElement('exclude', 'stack');
         return $this->elements;
     }
 }

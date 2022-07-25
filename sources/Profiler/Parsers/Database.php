@@ -23,10 +23,15 @@ use UnexpectedValueException;
 use function count;
 use function defined;
 use function header;
+use function htmlentities;
+use function htmlspecialchars;
 use function md5;
 use function round;
 use function sha1;
 use function time;
+
+use const ENT_DISALLOWED;
+use const ENT_QUOTES;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -89,11 +94,9 @@ class _Database extends Singleton
                 if (static::$slowest === null) {
                     static::$slowest = $time;
                     static::$slowestLink = $url;
-                } else {
-                    if ($time > static::$slowest) {
-                        static::$slowest = $time;
-                        static::$slowestLink = $url;
-                    }
+                } elseif ($time > static::$slowest) {
+                    static::$slowest = $time;
+                    static::$slowestLink = $url;
                 }
             }
 
@@ -101,10 +104,10 @@ class _Database extends Singleton
             if (isset($db['mem'])) {
                 $mem = $db['mem'];
             }
-
+            $query = htmlspecialchars( $db['query'], ENT_DISALLOWED| ENT_QUOTES, 'UTF-8', true );
             $list[] = [
                 'server' => $db['server'] ?? null,
-                'query'  => $db['query'],
+                'query'  => $query,
                 'url'    => $url,
                 'time'   => $time,
                 'mem'    => $mem,

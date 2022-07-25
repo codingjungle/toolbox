@@ -32,6 +32,7 @@ class _Request implements HelpersAbstract
      */
     public function process($class, &$classDoc, &$classExtends, &$body)
     {
+        $classDoc[] = ['pt' => 'p', 'prop' => 'myApp', 'type' => 'string'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'app', 'type' => 'string'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'module', 'type' => 'string'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'controller', 'type' => 'string'];

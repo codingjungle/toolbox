@@ -1,4 +1,4 @@
-<ips:template parameters="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions"/>
+<ips:template parameters="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions,$myApps"/>
 <div id="dtProfilerBarContainer" class="dtProfilerBar">
     <ul class="ipsList_reset dtProfilerBar_list ipsClearfix" data-ipsdtprofiler{{if settings.dtprofiler_enable_debug && settings.dtprofiler_enable_debug_ajax }} data-ipsdtprofilerdebug data-url="{url='app=toolbox&module=bt&controller=bt' base='front'}"{{endif}}>
         {{if $time }}
@@ -56,11 +56,8 @@
         {$logs|raw}
         {{endif}}
 
-
-
-
-            {{if isset( $info['sources']) }}
-<li class="isParent dtProfileFirst">
+        {{if isset( $info['sources']) }}
+        <li class="isParent dtProfileFirst">
             <a id="elProfileSources" href="#elProfileSources_menu" title="Sources" class=" " data-ipstooltip data-ipsmenu>
                 Sources <i class="fa fa-angle-up"></i>
             </a>
@@ -73,11 +70,36 @@
                 </li>
                 {{endforeach}}
             </ul>
-</li>
-            {{endif}}
+        </li>
+        {{endif}}
+
+        {{if empty($myApps) === false}}
+        <li class="isParent dtProfileFirst celProfileMyapps">
+            <a href="#apps_myapps_menu" id="apps_myapps" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
+                <i class="fa fa-compass"></i>
+                Build My Apps <i class="fa fa-angle-up"></i>
+            </a>
+            <div id="apps_myapps_menu" class="ipsMenu ipsMenu_wide ipsHide">
+                <div class="ipsMenu_innerContent ipsGrid">
+                    {{$i=0;}}
+                {{foreach $myApps as $mm}}
+                    {{$i++;}}
+                    {{if $i===4}}
+                </div>
+                    <div class="ipsMenu_innerContent ipsGrid">
+                        {{$i=1;}}
+                    {{endif}}
+                    <div class="ipsGrid_span4 ipsType_center ipsType_bold ipsPadding:half">
+                        <a href="{$mm['url']}">{$mm['name']|raw}</a>
+                    </div>
+                {{endforeach}}
+                </div>
+            </div>
+        </li>
+        {{endif}}
 
         <li class="isParent dtProfileFirst celProfileSystem">
-            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu>
+            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
                 <i class="fa fa-smile-o"></i> Toy Box <i class="fa fa-angle-up"></i>
             </a>
             <div id="elProfileSystem_menu" class="ipsMenu ipsMenu_wide ipsHide">
@@ -190,17 +212,6 @@
                 </div>
                 <div class="ipsMenu_innerContent">
                     <div class="ipsGrid">
-
-                        {{$myApps = \defined('DT_MY_APPS') ? explode(',',DT_MY_APPS) : [];}}
-                        {{if empty($myApps) === false}}
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=build' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Build My Apps">
-                                <i class="fa fa-compass"></i>
-                                <br>
-                                Build My Apps
-                            </a>
-                        </div>
-                        {{endif}}
                         <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
                             <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
                                 <i class="fa fa-compass"></i>

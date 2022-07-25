@@ -1,11 +1,11 @@
-<ips:template parameters="$output, $app, $download"/>
-<div class="ipsPadding">
+<ips:template parameters="$output,bool $show=false, ?\IPS\Http\Url $download = null, ?\IPS\Http\Url $analyze=null"/>
+<div class="ipsPadding ipsBox">
     {$output|raw}
+    {{if $show}}
+    <div class="ipsBorder_top ipsPadding ipsType_center">
+        <a href='{$analyze}' class="ipsButton ipsButton_large ipsButton_primary">Reanalyze</a>
+        <a href='{$download}' class="ipsButton ipsButton_large ipsButton_primary">Download</a>
+    </div>
+    {{endif}}
 </div>
-{{if (bool)$download === true}}
-{{$app = \IPS\Request::i()->application;}}
-<div class="ipsBorder_top ipsPadding ipsType_center">
-    <a href='{url="app=toolbox&module=code&controller=analyzer&do=queue&download=1&application={$app}"}' class="ipsButton ipsButton_large ipsButton_primary">Reanalyze</a>
-    <a href='{url="app=core&module=applications&controller=applications&appKey={$app}&do=download&analyzed=1"}' class="ipsButton ipsButton_large ipsButton_primary">Download</a>
-</div>
-{{endif}}
+

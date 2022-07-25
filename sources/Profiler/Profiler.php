@@ -131,11 +131,44 @@ class _Profiler extends Singleton
                     'profiler'  => $profileTime,
                 ];
             }
+             $myApps = \defined('DT_MY_APPS') ? explode(',',DT_MY_APPS) : [];
+            if(empty($myApps) === false){
+                $newMyApps = [];
+                foreach($myApps as $app){
+                    $app = trim($app);
+                    if(Member::loggedIn()->language()->checkKeyExists('__app_'.$app)) {
+                        $name = Member::loggedIn()->language()->addToStack('__app_' . $app);
+                        Member::loggedIn()->language()->parseOutputForDisplay($name);
+                    }
+                    else{
+                        $name = $app;
+                    }
+                    $newMyApps[] = [
+                        'name' => $name,
+                        'app' => $app,
+                        'url' => (string) Url::internal('app=toolbox&module=bt&controller=bt&do=build&appToBuild='.$app, 'front')
+                    ];
+                }
+                $myApps = $newMyApps;
+            }
 
             return Theme::i()
                         ->getTemplate('bar', 'toolbox', 'front')
-                        ->bar($time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment,
-                            $debug, $executions);
+                        ->bar(
+                            $time,
+                            $memory,
+                            $files,
+                            $templates,
+                            $database,
+                            $cache,
+                            $logs,
+                            $extra,
+                            $info,
+                            $environment,
+                            $debug,
+                            $executions,
+                            $myApps
+                        );
         }
 
         return null;

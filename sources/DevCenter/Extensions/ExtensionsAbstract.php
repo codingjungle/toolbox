@@ -107,8 +107,8 @@ abstract class _ExtensionsAbstract
             'dtdevplus_ext_'
         );
         $this->form->header('title_' . $extension);
-        $this->form->add('class')->value($this->getName());
-        $this->form->add('use_default', 'yn');
+        $this->form->addElement('class')->value($this->getName());
+        $this->form->addElement('use_default', 'yn');
     }
 
     protected function getName()

@@ -1,0 +1,11 @@
+<ips:template parameters="$path, $error,$app"/>
+{{if $error !== null}}
+<div class="ipsMessage ipsMessage_error">
+    <p>There was an error. Please check the system log for more details.</p>
+    <p>{$error|raw}</p>
+</div>
+{{else}}
+<div class="ipsMessage ipsMessage_info">
+    Exporting was succesful for {$app}. the files can be found in {$path}.
+</div>
+{{endif}}

@@ -515,7 +515,7 @@ class _Sources
             'placeholder'  => 'Namespace',
             'autocomplete' => $this->findNameSpace,
         ];
-        $this->form->add('namespace')->options($options)->prefix("IPS\\{$this->application->directory}\\");
+        $this->form->addElement('namespace')->options($options)->prefix("IPS\\{$this->application->directory}\\");
     }
 
     /**
@@ -539,7 +539,7 @@ class _Sources
             $prefix = '_';
         }
 
-        $this->form->add($name)->options(['placeHolder' => $placeholder])->prefix($prefix)->validation($validate);
+        $this->form->addElement($name)->options(['placeHolder' => $placeholder])->prefix($prefix)->validation($validate);
     }
 
     /**
@@ -547,7 +547,7 @@ class _Sources
      */
     protected function elAbstract()
     {
-        $this->form->add('abstract', 'yn');
+        $this->form->addElement('abstract', 'yn');
     }
 
     /**
@@ -558,8 +558,8 @@ class _Sources
         $options = [
             'autocomplete' => $this->findClass,
         ];
-        $this->form->add('extendsYN', 'yn')->toggles(['extends']);
-        $this->form->add('extends')->options($options)->validation([$this, 'extendsCheck'])->prefix('IPS\\');
+        $this->form->addElement('extendsYN', 'yn')->toggles(['extends']);
+        $this->form->addElement('extends')->options($options)->validation([$this, 'extendsCheck'])->prefix('IPS\\');
     }
 
     /**
@@ -576,7 +576,7 @@ class _Sources
      */
     protected function elDatabase()
     {
-        $this->form->add('database')->prefix($this->application->directory . '_');
+        $this->form->addElement('database')->prefix($this->application->directory . '_');
     }
 
     /**
@@ -584,7 +584,7 @@ class _Sources
      */
     protected function elPrefix()
     {
-        $this->form->add('prefix')->suffix('_');
+        $this->form->addElement('prefix')->suffix('_');
     }
 
     /**
@@ -592,7 +592,7 @@ class _Sources
      */
     protected function elScaffolding()
     {
-        $this->form->add('scaffolding_create', 'yn')->empty(true)->toggles(['scaffolding_type']);
+        $this->form->addElement('scaffolding_create', 'yn')->empty(true)->toggles(['scaffolding_type']);
 
         $sc['db'] = 'Database';
 
@@ -600,7 +600,7 @@ class _Sources
             $sc['modules'] = 'Module';
         }
 
-        $this->form->add('scaffolding_type', 'checkboxset')->value(array_keys($sc))->options(['options' => $sc]);
+        $this->form->addElement('scaffolding_type', 'checkboxset')->value(array_keys($sc))->options(['options' => $sc]);
     }
 
     /**
@@ -608,11 +608,11 @@ class _Sources
      */
     protected function elSubNode()
     {
-        $this->form->add('subnode', 'yn')->toggles(['subnode_class'])->toggles(['parentnode_class'], true);
-        $this->form->add('parentnode_class')->prefix('\\IPS\\' . $this->application->directory . '\\')->options(
+        $this->form->addElement('subnode', 'yn')->toggles(['subnode_class'])->toggles(['parentnode_class'], true);
+        $this->form->addElement('parentnode_class')->prefix('\\IPS\\' . $this->application->directory . '\\')->options(
             ['autocomplete' => $this->findClassWithApp]
         );
-        $this->form->add('subnode_class')->prefix('\\IPS\\' . $this->application->directory . '\\')->options(
+        $this->form->addElement('subnode_class')->prefix('\\IPS\\' . $this->application->directory . '\\')->options(
             ['autocomplete' => $this->findClassWithApp]
         );
     }
@@ -622,7 +622,7 @@ class _Sources
      */
     protected function elItemClass()
     {
-        $this->form->add('item_class')->prefix('IPS\\' . $this->application->directory)->options(
+        $this->form->addElement('item_class')->prefix('IPS\\' . $this->application->directory)->options(
             ['autocomplete' => $this->findClassWithApp]
         );
     }
@@ -638,7 +638,7 @@ class _Sources
         ];
 
         $this->form->tab('interfaces');
-        $this->form->add('ips_implements', 'checkboxset')
+        $this->form->addElement('ips_implements', 'checkboxset')
                    ->label('interface_implements_node')
                    ->options(['options' => $interfacesNode]);
         $this->elInterfaces();
@@ -649,7 +649,7 @@ class _Sources
      */
     protected function elInterfaces()
     {
-        $this->form->add('implements', 'stack')->validation([$this, 'implementsCheck']);
+        $this->form->addElement('implements', 'stack')->validation([$this, 'implementsCheck']);
     }
 
     protected function arTraits($traits){
@@ -671,7 +671,7 @@ class _Sources
 
         $traitsNode = $this->arTraits($traitsNode);
         $this->form->tab('traits');
-        $this->form->add('ips_traits', 'checkboxset')->label('ips_traits_node')->options(['options' => $traitsNode]);
+        $this->form->addElement('ips_traits', 'checkboxset')->label('ips_traits_node')->options(['options' => $traitsNode]);
 
         $this->elTraits();
     }
@@ -686,12 +686,12 @@ class _Sources
         if($this->type === 'activerecord' && trait_exists($trait)) {
             $traits = [];
             $traits = $this->arTraits($traits);
-            $this->form->add('ips_traits', 'checkboxset')
+            $this->form->addElement('ips_traits', 'checkboxset')
                        ->label('ips_traits_item')
                        ->value([])
                        ->options(['options' => $traits]);
         }
-        $this->form->add('traits', 'stack')->validation([$this, 'traitsCheck']);
+        $this->form->addElement('traits', 'stack')->validation([$this, 'traitsCheck']);
     }
 
     /**
@@ -709,7 +709,7 @@ class _Sources
         ];
         $traitsItems = $this->arTraits($traitsItems);
         $this->form->tab('traits');
-        $this->form->add('ips_traits', 'checkboxset')
+        $this->form->addElement('ips_traits', 'checkboxset')
                    ->label('ips_traits_item')
                    ->value([])
                    ->options(['options' => $traitsItems]);
@@ -745,7 +745,7 @@ class _Sources
         ];
 
         $this->form->tab('interfaces');
-        $this->form->add('ips_implements', 'checkboxset')
+        $this->form->addElement('ips_implements', 'checkboxset')
                    ->label('interface_implements_item')
                    ->value([])
                    ->options(['options' => $interfacesItem]);
@@ -758,7 +758,7 @@ class _Sources
      */
     protected function elItemNodeClass()
     {
-        $this->form->add('item_node_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
+        $this->form->addElement('item_node_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
             ['autocomplete' => $this->findClassWithApp]
         );
     }
@@ -768,7 +768,7 @@ class _Sources
      */
     protected function elItemCommentClass()
     {
-        $this->form->add('comment_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
+        $this->form->addElement('comment_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
             ['autocomplete' => $this->findClassWithApp]
         );
     }
@@ -778,7 +778,7 @@ class _Sources
      */
     protected function elItemReviewClass()
     {
-        $this->form->add('review_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
+        $this->form->addElement('review_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
             ['autocomplete' => $this->findClassWithApp]
         );
     }
@@ -797,7 +797,7 @@ class _Sources
             EditHistory::class => EditHistory::class,
         ];
         $this->form->tab('interfaces');
-        $this->form->add('interface_implements_comment', 'checkboxset')->empty(array_keys($interfacesComment))->options(
+        $this->form->addElement('interface_implements_comment', 'checkboxset')->empty(array_keys($interfacesComment))->options(
             ['options' => $interfacesComment]
         );
 
@@ -809,14 +809,14 @@ class _Sources
      */
     protected function elContentItemClass()
     {
-        $this->form->add('content_item_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
+        $this->form->addElement('content_item_class')->prefix('IPS\\' . $this->application->directory . '\\')->options(
             ['autocomplete' => $this->findClassWithApp]
         );
     }
 
     protected function elApiType()
     {
-        $this->form->add('apiType', 'select')->options(
+        $this->form->addElement('apiType', 'select')->options(
             [
                 'options' => [
                     's' => 'Standard',

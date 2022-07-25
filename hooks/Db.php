@@ -11,6 +11,7 @@ use IPS\toolbox\Proxy\Proxyclass;
 use Throwable;
 
 use function class_exists;
+use function str_contains;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -51,8 +52,9 @@ class toolbox_hook_Db extends _HOOK_CLASS_
      */
     protected function log($query, $server = null)
     {
-        $this->dtkey++;
-        parent::log($query, $server);
+
+            $this->dtkey++;
+            parent::log($query, $server);
     }
 
     /**

@@ -56,7 +56,7 @@ class _ContentRouter extends ExtensionsAbstract
     public function elements()
     {
         $this->form->element('use_default')->toggles(['module', 'classRouter'], true);
-        $this->form->add('module')->required();
-        $this->form->add('classRouter', 'stack')->prefix('\\IPS\\' . $this->application->directory . '\\')->required();
+        $this->form->addElement('module')->required();
+        $this->form->addElement('classRouter', 'stack')->prefix('\\IPS\\' . $this->application->directory . '\\')->required();
     }
 }

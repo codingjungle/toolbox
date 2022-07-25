@@ -83,7 +83,7 @@ class _Cons extends Singleton
             }
 
 
-            $form->add($key)->label($key)->empty($value['current'])->description($value['description'] ?? '')->tab(
+            $form->addElement($key)->label($key)->empty($value['current'])->description($value['description'] ?? '')->tab(
                 $tab
             );
 

@@ -1,3 +1,4 @@
+
     /**
      * @var
      */
@@ -13,6 +14,12 @@
      */
     public $id = 'default';
     public $activeTab;
+    public $builder = false;
+    public $item = null;
+    public $container = null;
+    public $hasSense = false;
+    public $threshold = false;
+    public $includeItem = false;
     /**
      * @var array
      */
@@ -74,6 +81,9 @@
     protected $buildElsStore = [];
     protected $on = [];
     protected $off = [];
+    protected $wizard = false;
+    protected $wizardEdit = false;
+    protected $random = false;
 
     /**
      * Form constructor.
@@ -90,7 +100,7 @@
         parent::__construct($id, $submitLang, $action, $attributes);
         if ($form === null) {
             $this->form = new \IPS\Helpers\Form();
-        } else {
+        } elseif ($form instanceof \IPS\Helpers\Form) {
             $this->form = $form;
         }
     }
@@ -110,27 +120,49 @@
         return new static($id, $submitLang, $action, $attributes, $form);
     }
 
-    public function clearBaseClass(): self
+    public function clearBaseClass()
     {
         $this->baseClass = '';
         return $this;
     }
 
-    public function tabsToHeaders(bool $tabsToHeaders = true): void
+    public function makeWizard(bool $wizard)
+    {
+        $this->wizard = $wizard;
+        return $this;
+    }
+
+    public function editWizard(bool $edit)
+    {
+        $this->wizardEdit = $edit;
+        return $this;
+    }
+
+    public function builder()
+    {
+        $this->prefixHeaders = false;
+        $this->prefixTabs = false;
+        $this->createLangs = true;
+        $this->togglesAppending = false;
+        return $this;
+    }
+
+    public function tabsToHeaders(bool $tabsToHeaders = true)
     {
         $this->tabsToHeaders = $tabsToHeaders;
     }
 
-    public function dialogForm(): self
+    public function dialogForm()
     {
-        $this->formClass('formularizePopUpForm');
+        //$this->dialogForm = true;
+        $this->formClass('stratagemPopUpForm ipsClearfix');
         return $this;
     }
 
     /**
      * @param $class
      *
-     * @return self
+     * @return \IPS\formularize\_Form
      */
     public function formClass($class): self
     {
@@ -220,9 +252,9 @@
 
     /**
      * @param $langKey
-     * @param bool $disabled
-     * @param null $id
+     *
      * @return self
+     * @throws UnexpectedValueException
      */
     public function submitLang($langKey, $disabled = false, $id = null): self
     {
@@ -263,7 +295,7 @@
         return $this;
     }
 
-    public function noSuffix(): self
+    public function noSuffix()
     {
         $this->suffix = false;
 
@@ -302,14 +334,17 @@
         /** @var Element $el */
         foreach ($this->elementStore as $el) {
             if ($el instanceof FormAbstract) {
-                $this->form->add($el);
+                $this->form->addElement($el);
                 continue;
             }
-            if (is_array($el) && isset($el['matrix'])) {
+            if (is_array($el) && isset($el['matrix']))
+            {
                 $type = 'matrix';
-            } elseif (!($el instanceof Element)) {
+            }
+            elseif (!($el instanceof Element)) {
                 continue;
-            } else {
+            }
+            else {
                 $type = $el->type ?? 'helper';
                 $name = null;
                 $plain = '';
@@ -343,8 +378,12 @@
                         if ($this->tabsToHeaders === false) {
                             $this->form->addTab($tab);
                         } else {
-                            $this->form->addHeader($tab);
-                        }
+                            $this->form->_insert(
+                                Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                                    $tab,
+                                    "{$this->form->id}_header_{$tab}"
+                                )
+                            );                        }
                     }
                 }
 
@@ -360,7 +399,7 @@
                             $header = $key;
                         }
                         $this->form->_insert(
-                            Theme::i()->getTemplate('fforms', 'formularize')->header(
+                            Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
                                 $header,
                                 "{$this->form->id}_header_{$key}"
                             )
@@ -377,6 +416,7 @@
                     $this->form->addSidebar($sideBar);
                 }
             }
+
             switch ($type) {
                 case 'tab':
                     $suffix = $this->suffix === true ? '_tab' : '';
@@ -391,11 +431,12 @@
                             $tab = $key;
                         }
                         if ($this->tabsToHeaders === false) {
-                            $this->form->addTab($tab);
+                            $this->form->addTab($tab, $el->options['icon'] ?? null, null,
+                                $el->options['css'] ?? null );
                         } else {
                             $this->form->_insert(
-                                Theme::i()->getTemplate('fforms', 'formularize')->header(
-                                    $header,
+                                Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                                    $tab,
                                     "{$this->form->id}_header_{$tab}"
                                 )
                             );
@@ -414,7 +455,7 @@
                             $header = $key;
                         }
                         $this->form->_insert(
-                            Theme::i()->getTemplate('fforms', 'formularize')->header(
+                            Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
                                 $header,
                                 "{$this->form->id}_header_{$header}",
                                 implode(' ', $el->rowClasses)
@@ -450,7 +491,7 @@
                     }
                     $class = $el->class;
                     if ($class instanceof FormAbstract) {
-                        $this->form->add($class);
+                        $this->form->addElement($class);
                         break;
                     }
 
@@ -465,6 +506,7 @@
                     $prefix = $el->prefix;
                     $suffix = $el->suffix;
                     $toggles = $el->toggles;
+
                     if ($default === null) {
                         $obj = $this->object;
                         $prop = $plain;
@@ -490,11 +532,14 @@
                             }
                         }
                     }
+
                     if (!isset($options['zeroVal']) && empty($default) === true && $el->empty !== null) {
                         $default = $el->empty;
-                    } elseif (isset($options['zeroVal']) && $default === 0) {
+                    }
+                    elseif (isset($options['zeroVal']) && $default === 0) {
                         $default = 0;
                     }
+
                     /* @var array $toggles */
                     if (empty($toggles) !== true) {
                         foreach ($toggles as $toggle) {
@@ -536,6 +581,7 @@
                             }
                         }
                     }
+
                     if (
                         is_array($options) &&
                         isset($options['options']) &&
@@ -550,19 +596,24 @@
                         }
                         $options['options'] = $langs;
                     }
+
                     if ($el->append !== null) {
                         $id .= $el->append;
                     }
+
                     if ($suffix && Member::loggedIn()->language()->checkKeyExists($suffix) === true) {
                         $suffix = Member::loggedIn()->language()->addToStack($suffix);
                     }
+
                     if ($prefix && Member::loggedIn()->language()->checkKeyExists($prefix) === true) {
                         $prefix = Member::loggedIn()->language()->addToStack($prefix);
                     }
-                    if ((int)Request::i()->timed === 1) {
-                        $required = false;
-                        $validation = null;
-                    }
+
+//                    if ((int)Request::i()->timed === 1 || (int) Request::i()->refresh === 1) {
+//                        $required = false;
+//                        $validation = null;
+//                    }
+
                     $element = new $class($name, $default, $required, $options, $validation, $prefix, $suffix, $id);
 
                     $element->rowClasses = $el->rowClasses;
@@ -708,42 +759,115 @@
             $this->form->activeTab = $this->activeTab;
         }
 
+//        if (empty($this->matrix) === false) {
+//            foreach ($this->matrix as $matrix) {
+//
+//            }
+//        }
         if ($this->dialogForm === true) {
-            $this->customTemplateData = [
+            $this->customTemplateData =
                 [
                     Theme::i()->getTemplate('forms', 'core'),
                     'popupTemplate'
-                ]
-            ];
+                ];
         }
 
         if ($this->customTemplateData !== null) {
             $data = $this->customTemplateData;
+            if ($this->includeItem) {
+                $data = array_merge($this->customTemplateData, [$this->item]);
+            }
+            if ($this->builder === true) {
+                $data = array_merge($this->customTemplateData, [$this->item], [$this->container]);
+            }
+
             return $this->form->customTemplate(...$data);
+        }
+        if ($this->random === true) {
+            $this->randomize();
         }
         return $this->form;
     }
 
+    protected function randomize()
+    {
+        $elements = $this->form->elements;
+        $count = count($elements);
+        if ($count >= 2) {
+            $this->shuffleAssoc($elements);
+        } else {
+            $noTabs = $elements[null];
+            $this->shuffleAssoc($noTabs, false);
+            $elements = [null => $noTabs];
+        }
+        $this->form->elements = $elements;
+    }
+
+    protected function shuffleAssoc(&$list, bool $includeValues = true)
+    {
+        $random = $list;
+        $list = [];
+        $keys = array_keys($random);
+        if ($this->wizard === false) {
+            shuffle($keys);
+        }
+        foreach ($keys as $key) {
+            $values = $random[$key];
+            if ($includeValues === true) {
+                $this->shuffleAssoc($values, false);
+            }
+            $list[$key] = $values;
+        }
+    }
+
+    public function randomOrder($rand)
+    {
+        $this->random = (bool)$rand;
+        return $this;
+    }
 
     /**
-     * @param $name
+     * @param string $name
      * @param string $type
-     * @param string $custom
+     * @param array $extra
      *
      * @return Element
      */
-    public function addElement($name, $type = 'text', string $custom = ''): Element
+    public function addElement($name, $type = 'text', string $custom = '', ?array $placement = null): Element
     {
         $n = $name;
         if ($name instanceof FormAbstract) {
             $n = $name->name;
         }
-        $this->elementStore[$n] = new Element($name, $type, $custom);
-
+        $element = new Element($name,$type,$custom);
+        if(empty($placement) === false){
+            $this->insertElement($placement['type'],$placement['element'], $n, $element);
+        }
+        else {
+            $this->elementStore[$n] = $element;
+        }
         return $this->elementStore[$n];
     }
 
-    public function replaceElement($name, Element $element): void
+    protected function insertElement($type,$index, $newKey, $element) {
+        $store = $this->elementStore;
+        if (!array_key_exists($index, $store)) {
+            throw new \Exception("Index, {$index}, not found");
+        }
+        $tmpArray = array();
+        foreach ($store as $key => $value) {
+            if ($type === 'before' && $key === $index) {
+                $tmpArray[$newKey] = $element;
+            }
+            $tmpArray[$key] = $value;
+            if ($type === 'after' && $key === $index) {
+                $tmpArray[$newKey] = $element;
+            }
+        }
+        $this->elementStore = $tmpArray;
+    }
+
+    public function replaceElement($name, Element $element)
     {
         $n = $name;
         if ($name instanceof FormAbstract) {
@@ -752,7 +876,7 @@
         $this->elementStore[$n] = $element;
     }
 
-    public function addHelpers(FormAbstract $element): self
+    public function addHelpers(FormAbstract $element)
     {
         $this->elementStore[$element->name] = $element;
 
@@ -766,7 +890,12 @@
         return $this->elementStore[$header];
     }
 
-    public function separator(): self
+    public function removeHeader($header){
+        unset($this->elementStore[$header]);
+        return $this;
+    }
+
+    public function separator()
     {
         $name = 'separator_' . (count($this->elementStore) + 1);
         $this->elementStore[$name] = new Element($name, 'separator');
@@ -774,7 +903,7 @@
         return $this;
     }
 
-    public function message(string $name, $css = '', array $sprintf = [], bool $first = false): self
+    public function message(string $name, $css = '', array $sprintf = [], bool $first = false)
     {
         $key = $name . '_message';
         if ($first === true) {
@@ -788,7 +917,7 @@
         return $this;
     }
 
-    public function dummy(string $name, $value, ?string $label = null, ?string $desc = null, array $warning = []): self
+    public function dummy(string $name, $value, ?string $label = null, ?string $desc = null, array $warning = [])
     {
         $key = $name . '_dummy';
         $this->elementStore[$key] = (new Element(
@@ -821,32 +950,28 @@
         throw new InvalidArgumentException('element ' . $name . ' doesn\'t exist');
     }
 
-    public function dbPrefix(bool $prefix = true): self
+    public function dbPrefix(bool $prefix = true)
     {
         $this->dbPrefix = $prefix;
 
         return $this;
     }
 
-    public function noBitWise(): self
+    public function noBitWise()
     {
         $this->doBitWise = false;
 
         return $this;
     }
 
-    public function removePrefix(bool $strip = false): self
+    public function removePrefix(bool $strip = false)
     {
         $this->stripPrefix = $strip;
 
         return $this;
     }
 
-    /**
-     * @param $tab
-     * @return $this
-     */
-    public function activeTab($tab): self
+    public function activeTab($tab)
     {
         $this->activeTab = $this->formPrefix . $tab . '_tab';
 
@@ -858,14 +983,22 @@
         return $this->elementStore;
     }
 
-    public function tab($name): self
+    public function tab($name, $icon=null, $blurbLang=null, $css=null )
     {
         $key = $name . '_tab';
-        $this->elementStore[$key] = new Element($name, 'tab');
+        $tab = new Element($name, 'tab');
+        $tab->options(['icon' => $icon, 'blurb' => $blurbLang, 'css' => $css]);
+        $this->elementStore[$key] = $tab;
         return $this;
     }
 
-    public function clearPrevious($tab, $header): self
+    public function removeTab($name){
+        $key = $name.'_tab';
+        unset($this->elementStore[$key]);
+        return $this;
+    }
+
+    public function clearPrevious($tab, $header)
     {
         $key = $tab . '_tab';
         unset($this->elementStore[$key]);
@@ -875,7 +1008,7 @@
         return $this;
     }
 
-    public function html($html): self
+    public function html($html)
     {
         $name = sha1($html);
         $this->elementStore[$name] = (new Element($name, 'html'))->value($html);
@@ -883,7 +1016,7 @@
         return $this;
     }
 
-    public function createMatrix(string $name, Matrix $matrix, $after = null, $tab = null): self
+    public function createMatrix(string $name, Matrix $matrix, $after = null, $tab = null)
     {
         $n = $name;
         if ($name instanceof FormAbstract) {
@@ -899,7 +1032,7 @@
         return $this;
     }
 
-    public function hidden(string $name, $value, bool $suffix = true): self
+    public function hidden(string $name, $value, bool $suffix = true)
     {
         if ($suffix === true) {
             $key = $name . '_hidden';
@@ -911,7 +1044,7 @@
         return $this;
     }
 
-    public function sideBar($content, $prefix = true): self
+    public function sideBar($content, $prefix = true)
     {
         $name = sha1($content);
         $this->elementStore[$name] = new Element($content, 'sidebar');
@@ -922,7 +1055,7 @@
         return $this;
     }
 
-    public function removeClass(string $class): self
+    public function removeClass(string $class)
     {
         $classes = $this->form->class;
         $this->baseClass = str_replace($class, '', $this->baseClass);
@@ -930,16 +1063,18 @@
         return $this;
     }
 
-    public function saveAndReload(bool $reload = true): self
+    public function saveAndReload(bool $reload = true)
     {
         $this->form->canSaveAndReload = $reload;
-        $this->addButton(
-            'save_and_reload',
-            'submit',
-            null,
-            'ipsButton ipsButton_primary',
-            ['name' => 'save_and_reload', 'value' => 1]
-        );
+        if ($this->builder === true) {
+            $this->addButton(
+                'save_and_reload',
+                'submit',
+                null,
+                'ipsButton ipsButton_primary',
+                ['name' => 'save_and_reload', 'value' => 1]
+            );
+        }
         return $this;
     }
 
@@ -1035,7 +1170,7 @@
         return $key;
     }
 
-    public function rebuild(): self
+    public function rebuild()
     {
         $this->built = false;
         $this->tabStore = [];
@@ -1044,22 +1179,11 @@
         return $this;
     }
 
-    public function getValuesForValidation($fields): array
-    {
-        $name = "{$this->form->id}_submitted";
-        $newValues = [];
-        /* Did we submit the form? */
-        if (isset(Request::i()->{$name}) && Login::compareHashes(
-                (string)Session::i()->csrfKey,
-                (string)Request::i()->csrfKey
-            )) {
-            /** @var Fields $field */
-            foreach ($fields as $field) {
-                if (isset(Request::i()->{$field->name})) {
-                    $newValues[$field->name] = Request::i()->{$field->name};
-                }
-            }
+    public function removeFromStore($name){
+        $n = $name;
+        if ($name instanceof FormAbstract) {
+            $n = $name->name;
         }
-
-        return $newValues;
+        unset($this->elementStore[$n]);
+        return $this;
     }

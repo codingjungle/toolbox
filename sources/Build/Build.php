@@ -78,17 +78,17 @@ class _Build extends Singleton
         $form = Form::create();
         $form->dummy('Previous Long Version', $newLong);
         $form->dummy('Previous Short Version', $newShort);
-        $form->add('toolbox_increment', 'yn')->value(1)->toggles(
+        $form->addElement('toolbox_increment', 'yn')->value(1)->toggles(
             ['toolbox_long_version', 'toolbox_short_version'],
             true
         );
-        $form->add('toolbox_long_version', 'number')->label('Long Version')->required()->empty($newLong);
-        $form->add('toolbox_short_version')->label('Short Version')->required()->empty($newShort);
-        $form->add('toolbox_beta', 'yn');
-        $form->add('toolbox_beta_version', 'number')->required()->empty($beta);
+        $form->addElement('toolbox_long_version', 'number')->label('Long Version')->required()->empty($newLong);
+        $form->addElement('toolbox_short_version')->label('Short Version')->required()->empty($newShort);
+        $form->addElement('toolbox_beta', 'yn');
+        $form->addElement('toolbox_beta_version', 'number')->required()->empty($beta);
 
         if(defined('DT_SLASHER') && DT_SLASHER === true) {
-            $form->add('toolbox_skip_dir', 'stack')->label('Skip Directories')->description(
+            $form->addElement('toolbox_skip_dir', 'stack')->label('Skip Directories')->description(
                 'Folders to skip using slasher on.'
             )->empty(
                 [
@@ -96,7 +96,7 @@ class _Build extends Singleton
                     'vendor',
                 ]
             );
-            $form->add('toolbox_skip_files', 'stack')->label('Skip Files')->description(
+            $form->addElement('toolbox_skip_files', 'stack')->label('Skip Files')->description(
                 'Files to skip using slasher on.'
             );
         }
@@ -159,4 +159,6 @@ class _Build extends Singleton
         Output::i()->title = 'Build ' . $application->_title;
         Output::i()->output = $form;
     }
+
+
 }

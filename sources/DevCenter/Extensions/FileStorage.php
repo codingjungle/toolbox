@@ -70,7 +70,7 @@ class _FileStorage extends ExtensionsAbstract
                 throw new InvalidArgumentException('must select table!');
             }
         };
-        $this->form->add('table', 'select')->options(
+        $this->form->addElement('table', 'select')->options(
             [
                 'options' => $tables,
                 'parse'   => 'raw',
@@ -85,7 +85,7 @@ class _FileStorage extends ExtensionsAbstract
         if (Request::i()->dtdevplus_ext_table !== null) {
             $options = $this->getFields(Request::i()->dtdevplus_ext_table);
         }
-        $this->form->add('field', 'select')->options(['options' => $options])->validation(
+        $this->form->addElement('field', 'select')->options(['options' => $options])->validation(
             $fieldValidate
         )->appearRequired();
 

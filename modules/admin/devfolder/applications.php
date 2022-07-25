@@ -101,7 +101,7 @@ class _applications extends Controller
                 throw new InvalidArgumentException('form_bad_value');
             }
         };
-        $form->add('app', 'select')
+        $form->addElement('app', 'select')
              ->options(['options' => $groups])
              ->appearRequired()
              ->validation($validate)
@@ -145,7 +145,7 @@ class _applications extends Controller
                 throw new InvalidArgumentException($lang);
             }
         };
-        $form->add('type', 'select')->options(['options' => $langs])->validation($validation)->appearRequired();
+        $form->addElement('type', 'select')->options(['options' => $langs])->validation($validation)->appearRequired();
 
         if ($values = $form->values()) {
             $app = $values['app'];

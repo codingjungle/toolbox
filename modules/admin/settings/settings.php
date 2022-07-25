@@ -124,8 +124,8 @@ class _settings extends Controller
 
         $form = Form::create()->object(Settings::i());
         $form->tab('toolbox');
-        $form->add('toolbox_debug_templates', 'yn');
-        $form->add('toolbox_use_tabs_applications','yn');
+        $form->addElement('toolbox_debug_templates', 'yn');
+        $form->addElement('toolbox_use_tabs_applications','yn');
         /* @var \IPS\toolbox\extensions\toolbox\Settings\settings $extension */
         foreach (Application::allExtensions('toolbox', 'settings') as $extension) {
             $extension->elements($form);
@@ -414,9 +414,9 @@ EOF;
 
     public function toolboxForm(){
         $form = Form::create();
-        $form->add('sslPrivateKey')->label('SSL Private Key Path');
-        $form->add('sslCertificate')->label('SSL Certificate');
-        $form->add('sslBundle')->label('SSL Bundle');
+        $form->addElement('sslPrivateKey')->label('SSL Private Key Path');
+        $form->addElement('sslCertificate')->label('SSL Certificate');
+        $form->addElement('sslBundle')->label('SSL Bundle');
 
         if($values = $form->values()){
             $this->toolbox($values);

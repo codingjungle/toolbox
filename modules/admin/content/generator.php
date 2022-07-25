@@ -76,7 +76,7 @@ class _generator extends Controller
 
         ];
         $form = Form::create()->formPrefix('dtcontent_');
-        $form->add('type', 'select')->options([
+        $form->addElement('type', 'select')->options([
             'options' => [
                 'none'   => 'Select Type',
                 'member' => 'Member',
@@ -102,12 +102,12 @@ class _generator extends Controller
                 throw new InvalidArgumentException('dtcontent_gen_none');
             }
         });
-        $form->add('limit', 'number')->empty(50)->options(['min' => 1]);
-        $form->add('rangeStart', 'date')->empty(Settings::i()->getFromConfGlobal('board_start'));
+        $form->addElement('limit', 'number')->empty(50)->options(['min' => 1]);
+        $form->addElement('rangeStart', 'date')->empty(Settings::i()->getFromConfGlobal('board_start'));
 //        $form->add('rangeEnd', 'date')->empty(time());
-        $form->add('passwords', 'yn');
-        $form->add('club', 'yn')->options(['disabled' => !Settings::i()->clubs]);
-        $form->add('group', 'select')
+        $form->addElement('passwords', 'yn');
+        $form->addElement('club', 'yn')->options(['disabled' => !Settings::i()->clubs]);
+        $form->addElement('group', 'select')
              ->empty(Settings::i()->getFromConfGlobal('member_group'))
              ->options(['options' => $groups]);
 
