@@ -65,5 +65,7 @@ class _header extends HeaderdocAbstract
      **/
     public function exclude(&$skip)
     {
+        $skip[] = 'AdminerDb';
+        $skip[] = 'adminer.php';
     }
 }

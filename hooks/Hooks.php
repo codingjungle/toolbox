@@ -13,8 +13,6 @@ use IPS\toolbox\Application;
 use ReflectionException;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
-    class _HOOK_CLASS_ extends Hook { }
-
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }

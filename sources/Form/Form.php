@@ -443,7 +443,7 @@ class _Form extends \IPS\Helpers\Form
                             $this->form->addTab($tab);
                         } else {
                             $this->form->_insert(
-                                Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                                Theme::i()->getTemplate('fforms', 'toolbox', 'global')->header(
                                     $tab,
                                     "{$this->form->id}_header_{$tab}"
                                 )
@@ -463,7 +463,7 @@ class _Form extends \IPS\Helpers\Form
                             $header = $key;
                         }
                         $this->form->_insert(
-                            Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                            Theme::i()->getTemplate('fforms', 'toolbox', 'global')->header(
                                 $header,
                                 "{$this->form->id}_header_{$key}"
                             )
@@ -499,7 +499,7 @@ class _Form extends \IPS\Helpers\Form
                                 $el->options['css'] ?? null );
                         } else {
                             $this->form->_insert(
-                                Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                                Theme::i()->getTemplate('fforms', 'toolbox', 'global')->header(
                                     $tab,
                                     "{$this->form->id}_header_{$tab}"
                                 )
@@ -519,7 +519,7 @@ class _Form extends \IPS\Helpers\Form
                             $header = $key;
                         }
                         $this->form->_insert(
-                            Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                            Theme::i()->getTemplate('fforms', 'toolbox', 'global')->header(
                                 $header,
                                 "{$this->form->id}_header_{$header}",
                                 implode(' ', $el->rowClasses)

@@ -927,6 +927,10 @@ foobar!</textarea>
  <template template_group="error" template_name="error" template_data="" template_location="admin" template_app="toolbox"><![CDATA[<div class="ipsAreaBackground_negative dtcode_error ipsPad">
     {lang="dtcode_error"}
 </div>]]></template>
+ <template template_group="fforms" template_name="header" template_data="$lang, $id, $class=''" template_location="global" template_app="toolbox"><![CDATA[<li class="ipsFieldRow_section {$class}" id="{$id}">
+    <span class="ipsType_bold">{lang="$lang"}</span>
+</li>
+]]></template>
  <template template_group="generator" template_name="sources" template_data="$appKey" template_location="front" template_app="toolbox"><![CDATA[
 <div class="ipsPadding ipsClearfix">
     <h1>

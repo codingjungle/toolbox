@@ -15,6 +15,8 @@ if (!defined("DRIVER")) {
 
 			function connect($server = "", $username = "", $password = "", $database = null, $port = null, $socket = null) {
 				global $adminer;
+                $port = $port ?? \IPS\Settings::i()->getFromConfGlobal('sql_port');
+                $socket = $socket ?? \IPS\Settings::i()->getFromConfGlobal('sql_socket');
 				mysqli_report(MYSQLI_REPORT_OFF); // stays between requests, not required since PHP 5.3.4
 				list($host, $port) = explode(":", $server, 2); // part after : is used for port or socket
 				$ssl = $adminer->connectSsl();

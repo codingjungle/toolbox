@@ -28,10 +28,12 @@ use IPS\Theme;
 use IPS\toolbox\Code\Db;
 use IPS\toolbox\Code\ErrorCodes;
 use IPS\toolbox\Code\FileStorage;
+use IPS\toolbox\Code\Hooks;
 use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
+use IPS\toolbox\Code\Utils\Hook;
 use OutOfRangeException;
 use RuntimeException;
 use UnexpectedValueException;
@@ -157,7 +159,11 @@ trait Analyzer
                     $complete = 4;
                     break;
                 case 4:
-//                    $warnings['hooks_']
+                        try {
+                            $hooks = new Hooks($app);
+                            $warnings['hooks_exists'] = $hooks->exist();
+                            $warnings['hooks_validation'] = $hooks->validate();
+                        }catch(\InvalidArgumentException $e){}
                     $complete = 5;
                     break;
                 case 5:

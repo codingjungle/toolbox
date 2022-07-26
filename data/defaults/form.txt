@@ -155,7 +155,7 @@
     public function dialogForm()
     {
         //$this->dialogForm = true;
-        $this->formClass('stratagemPopUpForm ipsClearfix');
+        $this->formClass('#app#PopUpForm ipsClearfix');
         return $this;
     }
 
@@ -379,7 +379,7 @@
                             $this->form->addTab($tab);
                         } else {
                             $this->form->_insert(
-                                Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                                Theme::i()->getTemplate('fforms', '#app#', 'global')->header(
                                     $tab,
                                     "{$this->form->id}_header_{$tab}"
                                 )
@@ -399,7 +399,7 @@
                             $header = $key;
                         }
                         $this->form->_insert(
-                            Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                            Theme::i()->getTemplate('fforms', '#app#', 'global')->header(
                                 $header,
                                 "{$this->form->id}_header_{$key}"
                             )
@@ -435,7 +435,7 @@
                                 $el->options['css'] ?? null );
                         } else {
                             $this->form->_insert(
-                                Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                                Theme::i()->getTemplate('fforms', '#app#', 'global')->header(
                                     $tab,
                                     "{$this->form->id}_header_{$tab}"
                                 )
@@ -455,7 +455,7 @@
                             $header = $key;
                         }
                         $this->form->_insert(
-                            Theme::i()->getTemplate('fforms', 'stratagem', 'front')->header(
+                            Theme::i()->getTemplate('fforms', '#app#', 'global')->header(
                                 $header,
                                 "{$this->form->id}_header_{$header}",
                                 implode(' ', $el->rowClasses)
