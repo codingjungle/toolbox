@@ -1,0 +1,24 @@
+{
+    "id": 50011,
+    "name": "5.0.11",
+    "steps": {
+        "queries": false,
+        "lang": false,
+        "theme": true,
+        "themeSettings": false,
+        "javascript": true,
+        "emailTemplates": false,
+        "hooks": false,
+        "acpSearchKeywords": false,
+        "settings": false,
+        "tasks": true,
+        "modules": false,
+        "widgets": false,
+        "whatsnew": false,
+        "customOptions": false,
+        "customRoutines": false
+    },
+    "forceMainUpgrader": false,
+    "forceManualDownloadNoCiC": false,
+    "forceManualDownloadCiC": false
+}

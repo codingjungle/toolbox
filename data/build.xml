@@ -10,7 +10,7 @@
  <module key="front/bt"><![CDATA[{"default_controller":"","protected":0,"default":0}]]></module>
  <module key="front/generator"><![CDATA[{"default_controller":"","protected":false,"default":null}]]></module>
  <task frequency="P0Y0M0DT1H0M0S">sendNotifications</task>
- <task frequency="P0Y0M0DT2H0M0S">updateBetaFiles</task>
+ <task frequency="P0Y0M0DT0H10M0S">updateBetaFiles</task>
  <setting key="dtdevplus_skip_dirs"><![CDATA[{"key":"dtdevplus_skip_dirs","default":""}]]></setting>
  <setting key="dtdevplus_skip_files"><![CDATA[{"key":"dtdevplus_skip_files","default":""}]]></setting>
  <setting key="dtprofiler_can_use"><![CDATA[{"key":"dtprofiler_can_use","default":""}]]></setting>

@@ -26,6 +26,7 @@ class ComposerStaticInitbcc7c6cbd9cf60c1182d9873f7e0285f
         'P' => 
         array (
             'Psr\\Http\\Message\\' => 17,
+            'PhpParser\\' => 10,
         ),
         'L' => 
         array (
@@ -68,6 +69,10 @@ class ComposerStaticInitbcc7c6cbd9cf60c1182d9873f7e0285f
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'PhpParser\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
         'Laminas\\Stdlib\\' => 
         array (

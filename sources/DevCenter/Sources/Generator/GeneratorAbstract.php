@@ -162,7 +162,9 @@ abstract class _GeneratorAbstract
             if ($strip === false) {
                 $key = str_replace('dtdevplus_class_', '', $key);
             }
-
+            if($key === 'extends'){
+                $val = trim('IPS\\'.$val);
+            }
             $val = !is_array($val) ? trim($val) : $val;
             if (!empty($val)) {
                 $this->{$key} = $val;

@@ -222,7 +222,6 @@ class _updateBetaFiles extends \IPS\Task
                     ->post($data);
 
                 if(!$response->isSuccessful()){
-                    _p($response);
                     $errors[] = [
                         'file' => $data['title'],
                         'error' => $response->decodeJson(),

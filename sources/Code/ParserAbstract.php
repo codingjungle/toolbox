@@ -65,7 +65,6 @@ abstract class _ParserAbstract
                 $app = Application::load($app);
             }
             $this->app = $app;
-            $this->appPath = $app->getApplicationPath() . '/';
             $this->getFiles();
         } catch (Exception $e) {
         }
@@ -76,6 +75,10 @@ abstract class _ParserAbstract
         $this->files = $this->getLocalFiles();
     }
 
+    protected function getAppPath(){
+        return $this->app->getApplicationPath() . '/';
+    }
+
     /**
      * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
      *
@@ -84,7 +87,7 @@ abstract class _ParserAbstract
     final protected function getLocalFiles()
     {
         $files = new Finder();
-        $files->in($this->appPath)->name('*.php')->name('*.js')->name('*.phtml');
+        $files->in($this->getAppPath())->name('*.php')->name('*.js')->name('*.phtml');
         if ($this->skip !== null) {
             foreach ($this->skip as $name) {
                 $files->notName($name);

@@ -157,6 +157,7 @@ trait Analyzer
                     $complete = 4;
                     break;
                 case 4:
+//                    $warnings['hooks_']
                     $complete = 5;
                     break;
                 case 5:

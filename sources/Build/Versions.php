@@ -186,7 +186,7 @@ class _Versions
         elseif($this->isRc){
             $this->semVer .= '-rc.'.$this->increment;
         }
-        
+
         $this->path = Application::getRootPath('core') . '/exports/' . $this->app->directory . '/' . $this->longVer . '/';
 
     }
