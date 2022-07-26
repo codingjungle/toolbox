@@ -1,3 +1,5 @@
+NOTE: you will likely need to be on PHP 8.0 min for all of toolbox to work. I use toolbox as a testing ground as well for new php versions, so there could be things used here, that are only found in php 8.0+.
+
 Toolbox For IPS
 This app is created for the use to help with development with in IPS.
 
