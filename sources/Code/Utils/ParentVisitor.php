@@ -26,15 +26,17 @@ class _ParentVisitor extends NodeVisitorAbstract {
     }
 
     public function enterNode(Node $node) {
+        if($node instanceof Node\Expr\StaticCall){
+            //_p($node);
+        }
         if (
             $node instanceof Node\Expr\StaticCall &&
-            $node->class instanceof Node\Name &&
-            $node->class->parts == ['parent']) {
+            $node->class instanceof Node\Name ) {
             $call = ['method' => $node->name->name];
             if ($node->getStartLine() > -1) {
                 $call['line'] = $this->firstLineNum + $node->getStartLine() - 1;
             }
-            $this->parentCalls[] = $call;
+            $this->parentCalls[\mb_strtolower($node->name->name)] = $call;
         }
     }
 

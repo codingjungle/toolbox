@@ -50,6 +50,8 @@ class _header extends HeaderdocAbstract
      **/
     public function filesSkip(&$skip)
     {
+        $skip[] = 'adminer.php';
+        $skip[] = 'bootstrap.inc.php';
     }
 
     /**
@@ -57,6 +59,7 @@ class _header extends HeaderdocAbstract
      **/
     public function dirSkip(&$skip)
     {
+        $skip[] = 'AdminerDb';
 
     }
 
@@ -66,6 +69,8 @@ class _header extends HeaderdocAbstract
     public function exclude(&$skip)
     {
         $skip[] = 'AdminerDb';
+
         $skip[] = 'adminer.php';
+        $skip[] = 'bootstrap.inc.php';
     }
 }

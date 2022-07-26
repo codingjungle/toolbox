@@ -15,5 +15,12 @@ namespace IPS\toolbox\Code\Utils;
 
 class _HookClass
 {
-    public function stupidipsrequirements(){}
+    /**
+     * @ips-lint ignore
+     * @return string
+     */
+    public function stupidipsrequirements()
+    {
+        return '';
+    }
 }

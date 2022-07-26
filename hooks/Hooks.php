@@ -33,11 +33,9 @@ class toolbox_hook_Hooks extends _HOOK_CLASS_
         $dtProxyFolder = \IPS\Application::getRootPath() . '/dtProxy/namespace.json';
 
         $parent = parent::devTable($url, $appOrPluginId, $hookDir);
-
         /** @var Form $parent */
         if ($parent instanceof Form && file_exists($dtProxyFolder)) {
             $elements = $parent->elements;
-
             $options = [
                 'placeholder'  => 'Namespace',
                 'autocomplete' => [
@@ -67,5 +65,6 @@ class toolbox_hook_Hooks extends _HOOK_CLASS_
 
         return $parent;
     }
+
 
 }

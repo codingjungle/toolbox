@@ -24,7 +24,6 @@ class toolbox_hook_Application extends _HOOK_CLASS_
 {
     public $skip = false;
 
-
     /**
      * @inheritdoc
      */

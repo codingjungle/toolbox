@@ -30,10 +30,13 @@ class toolbox_hook_BuilderIterator extends _HOOK_CLASS_
         $file = $this->key();
         $file = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/' . $file;
         $path = new SplFileInfo($this->key());
-        if (is_file($file) && (mb_strpos($file, '3rdparty') === false || mb_strpos(
-                    $file,
-                    '3rd_party'
-                ) === false || mb_strpos($file, 'vendor') === false) && $path->getExtension() === 'php') {
+        if (
+                is_file($file) &&
+                (mb_strpos($file, '3rdparty') === false ||
+                    mb_strpos($file, '3rd_party') === false ||
+                    mb_strpos($file, 'vendor') === false) &&
+                $path->getExtension() === 'php'
+        ) {
             $temporary = tempnam(TEMP_DIRECTORY, 'IPS');
             if (mb_strpos($path->getPath(), 'hooks') !== false) {
                 $contents = Plugin::addExceptionHandlingToHookFile($file);

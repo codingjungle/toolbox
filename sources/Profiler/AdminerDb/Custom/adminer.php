@@ -360,7 +360,7 @@ Min_DB
 extends
 MySQLi{var$extension="MySQLi";function
 __construct(){parent::init();}function
-connect($O="",$V="",$G="",$vb=null,$Ue=null,$Uf=null){global$b;$Ue=$Ue??\IPS\Settings::i()->getFromConfGlobal('sql_port');$Uf=$Uf??\IPS\Settings::i()->getFromConfGlobal('sql_socket');mysqli_report(MYSQLI_REPORT_OFF);list($Vc,$Ue)=explode(":",$O,2);$Zf=$b->connectSsl();if($Zf)$this->ssl_set($Zf['key'],$Zf['cert'],$Zf['ca'],'','');$K=@$this->real_connect(($O!=""?$Vc:ini_get("mysqli.default_host")),($O.$V!=""?$V:ini_get("mysqli.default_user")),($O.$V.$G!=""?$G:ini_get("mysqli.default_pw")),$vb,(is_numeric($Ue)?$Ue:ini_get("mysqli.default_port")),(!is_numeric($Ue)?$Ue:$Uf),($Zf?64:0));$this->options(MYSQLI_OPT_LOCAL_INFILE,false);return$K;}function
+connect($O="",$V="",$G="",$vb=null,$Ue=null,$Uf=null){global$b;mysqli_report(MYSQLI_REPORT_OFF);list($Vc,$Ue)=explode(":",$O,2);$Zf=$b->connectSsl();if($Zf)$this->ssl_set($Zf['key'],$Zf['cert'],$Zf['ca'],'','');$Ue=$Ue??(int)\IPS\Settings::i()->getFromConfGlobal('sql_port');$Uf=$Uf??\IPS\Settings::i()->getFromConfGlobal('sql_socket');$K=@$this->real_connect(($O!=""?$Vc:ini_get("mysqli.default_host")),($O.$V!=""?$V:ini_get("mysqli.default_user")),($O.$V.$G!=""?$G:ini_get("mysqli.default_pw")),$vb,(is_numeric($Ue)?$Ue:ini_get("mysqli.default_port")),(!is_numeric($Ue)?$Ue:$Uf),($Zf?64:0));$this->options(MYSQLI_OPT_LOCAL_INFILE,false);return$K;}function
 set_charset($Na){if(parent::set_charset($Na))return
 true;parent::set_charset('utf8');return$this->query("SET NAMES $Na");}function
 result($I,$l=0){$J=$this->query($I);if(!$J)return

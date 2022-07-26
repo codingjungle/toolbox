@@ -12,7 +12,14 @@
 
 namespace IPS\toolbox\Code;
 
+use DomainException;
 use InvalidArgumentException;
+use IPS\Helpers\Form;
+use IPS\Helpers\Form\Text;
+use IPS\Helpers\Table\Db;
+use IPS\Http\Url;
+use IPS\Request;
+use IPS\toolbox\Application;
 use IPS\toolbox\Code\ParserAbstract;
 use IPS\toolbox\Code\Utils\Hook;
 use IPS\toolbox\Code\Utils\HookClass;
@@ -22,11 +29,22 @@ use OutOfRangeException;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
+use ReflectionException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
+use Throwable;
+
+use toolbox_IPS_Plugin_Hook_ab9712a0d65901062b22f5262a724bd72\_HOOK_CLASS_;
+
 use function _d;
+use function _p;
+use function class_exists;
+use function defined;
+use function file_exists;
+use function header;
 use function print_r;
+use function array_slice;
 
 if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
     header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
@@ -39,11 +57,17 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 */
 class _Hooks extends ParserAbstract
 {
+    protected const DEFAULT_CONF = [
+        'check-renames' => true,
+        'rename-ignored-names' => ['val', 'value', 'data', 'arg'],
+    ];
     protected $hookFile;
     protected $existingHooks = [];
+    protected $conf;
 
     protected function getAppPath()
     {
+        $this->conf = self::DEFAULT_CONF;
         $appPath = parent::getAppPath();
         $this->hookFile = \json_decode(\file_get_contents($appPath.'data/hooks.json'),true);
         if(empty($this->hookFile) === true){
@@ -87,33 +111,44 @@ class _Hooks extends ParserAbstract
             'parameters' => [],
             'parent' => [],
             'parentUsage' => [],
-            'errors' => []
+            'errors' => [],
+            'files' => []
         ];
+        $f = [];
         /** @var Hook $hook */
         foreach($this->existingHooks as $hook) {
             if ($hook->isThemHook() === true) {
                 continue;
             }
+            $f[] = $hook->name();
+
+            $warnings['files'][] = $hook->name();
             $newName = uniqid('hook_', false);
+            $content = \file_get_contents(Application::getRootPath('core').'/foo.php');
+
             $content = preg_replace(
                 '/class \S+ extends _HOOK_CLASS_/',
                 "class {$newName} extends \\IPS\\toolbox\\Code\\Utils\\HookClass",
-                $hook->getContent()
+                $content//$hook->getContent()
             );
+//            _p($content);
             try {
                 @eval($content);
-            } catch (\ParseError $e) {
+            } catch (Throwable | \ParseError $e) {
+                $path = $this->buildPath($hook->path(),$e->getLine());
+
                 $warnings['parse'][] = [
                     'file' => $hook->name(),
-                    'path' => $hook->path(),
-                    'error' => $e->getMessage()
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                    'line' => $e->getLine()
                 ];
                 continue;
             }
 
             try {
                 $hookClass = new \ReflectionClass($newName);
-            } catch (\ReflectionException $e) {
+            } catch (Throwable | \Exception $e) {
                 $warnings['processing'][] = [
                     'file' => $hook->name(),
                     'path' => $hook->path(),
@@ -137,7 +172,6 @@ class _Hooks extends ParserAbstract
                 ];
                 continue;
             }
-
             foreach ($hookClass->getMethods() as $hookMethod) {
                 if (!mb_stristr($hookMethod->getDocComment(), '@ips-lint ignore')) {
                     try {
@@ -151,21 +185,27 @@ class _Hooks extends ParserAbstract
                             $warnings['signature'][] = $result;
                         }
                         $result = $this->validateParameters($hookMethod, $originalMethod, $hook);
-                        if($result !== null){
+                        if (empty($result) === false) {
                             $warnings['parameters'][] = $result;
                         }
                     } catch (\ReflectionException $e) {
                     }
-                }
-                $methodBody = static::extractLines(
-                    $content,
-                    $hookMethod->getStartLine(),
-                    $hookMethod->getEndLine());
-                try {
-                    $parentUsages = $this->findParentUsages($hook,$hookMethod->getName(),$methodBody, $hookMethod->getStartLine());
-                    foreach ($parentUsages as $parentUsage) {
-                        if (!$originalClass->hasMethod($parentUsage['method'])) {
-                            $path = $this->buildPath($hook->path(), $parentUsage['line']);
+
+                    $methodBody = static::extractLines(
+                        $content,
+                        $hookMethod->getStartLine(),
+                        $hookMethod->getEndLine()
+                    );
+                    try {
+                        $parentUsages = $this->findParentUsages(
+                            $hook,
+                            $hookMethod->getName(),
+                            $methodBody,
+                            $hookMethod->getStartLine()
+                        );
+                        $methodName = \mb_strtolower($hookMethod->getName());
+                        if (!isset($parentUsages[$methodName])) {
+                            $path = $this->buildPath($hook->path(),$hookMethod->getStartLine());
                             $warnings['parentUsage'][] = [
                                 'file' => $hook->name(),
                                 'path' => $path,
@@ -173,11 +213,11 @@ class _Hooks extends ParserAbstract
                                 'line' => $hookMethod->getStartLine()
                             ];
                         }
+                    } catch (\OutOfRangeException $e) {
+                        $warnings['errors'][] = [
+                            'error' => $e->getMessage()
+                        ];
                     }
-                }catch(\OutOfRangeException $e){
-                    $warnings['errors'][] = [
-                        'error' => $e->getMessage()
-                    ];
                 }
             }
         }
@@ -197,6 +237,8 @@ class _Hooks extends ParserAbstract
         Hook $hook
     )
     {
+        $warnings = [];
+        _p($hookMethod,$originalMethod);
         $path = $this->buildPath($hook->path(), $hookMethod->getStartLine());
         if ($originalMethod->isPrivate()) {
             return [
@@ -209,7 +251,7 @@ class _Hooks extends ParserAbstract
         if ($originalMethod->isPublic() !== $hookMethod->isPublic()) {
             $originalModifiers = implode(' ', \Reflection::getModifierNames($originalMethod->getModifiers()));
             $hookModifiers = implode(' ', \Reflection::getModifierNames($hookMethod->getModifiers()));
-            return [
+            $warnings[] = [
                 'file' => $hook->name(),
                 'path' => $path,
                 'error' => "Method {$hookMethod->getName()} ({$hookModifiers}) does not have same visibility as in " .
@@ -218,7 +260,7 @@ class _Hooks extends ParserAbstract
             ];
         }
         if ($originalMethod->isStatic() && !$hookMethod->isStatic()) {
-            return [
+            $warnings[] = [
                 'file' => $hook->name(),
                 'path' => $path,
                 'error' => "Method {$hookMethod->getName()} is static in {$originalMethod->getDeclaringClass()->getName()}, " .
@@ -227,7 +269,7 @@ class _Hooks extends ParserAbstract
             ];
         }
         if (!$originalMethod->isStatic() && $hookMethod->isStatic()) {
-            return [
+            $warnings[] = [
                 'file' => $hook->name(),
                 'path' => $path,
                 'error' => "{$hookMethod->getName()} is an instance method in " .
@@ -236,7 +278,7 @@ class _Hooks extends ParserAbstract
             ];
         }
         if ($originalMethod->hasReturnType() && !$hookMethod->hasReturnType()) {
-            return [
+            $warnings[] = [
                 'file' => $hook->name(),
                 'path' => $path,
                 'error' => "{$hookMethod->getName()} has a return type of {$originalMethod->getReturnType()->getName()} in " .
@@ -245,7 +287,7 @@ class _Hooks extends ParserAbstract
             ];
         }
 
-        return null;
+        return $warnings;
     }
 
     protected function validateParameters(
@@ -253,6 +295,7 @@ class _Hooks extends ParserAbstract
         \ReflectionMethod $originalMethod,
         Hook $hook
     ){
+        $warnings = [];
         $checkRenames = !mb_stristr($hookMethod->getDocComment(), "@ips-lint no-check-renames");
         $zipped = array_map(null, $hookMethod->getParameters(), $originalMethod->getParameters());
         $path = $this->buildPath($hook->path(), $hookMethod->getStartLine());
@@ -267,7 +310,7 @@ class _Hooks extends ParserAbstract
                     $paramNames[] = $extraParam->getName();
                 }
                 $paramNamesString = implode(", ", $paramNames);
-                return [
+                $warnings[] = [
                     'file' => $hook->name(),
                     'path' => $path,
                     'error' => "Method {$originalMethod->getName()} is missing parameters {$paramNamesString} (defined in " .
@@ -276,29 +319,28 @@ class _Hooks extends ParserAbstract
                 ];
             }
             $method = "{$originalMethod->getDeclaringClass()->getName()}::{$originalMethod->getName()}";
-            if (!$param[0]->isOptional()) {
-                if ($param[1] === null) {
-
-                    return [
+            if (isset($param[0]) && !$param[0]->isOptional()) {
+                if (isset($param[1]) && $param[1] === null) {
+                    $warnings[] = [
                         'file' => $hook->name(),
                         'path' => $path,
                         'error' => "Parameter {$param[0]->getName()} does not exist in {$method}, but is required in the hook",
                         'line' => $hookMethod->getStartLine()
                     ];
                 }
-                if ($param[1]->isOptional()) {
-                    return [
+                if (isset($param[1]) && $param[1]->isOptional()) {
+                    $warnings[] = [
                         'file' => $hook->name(),
                         'path' => $path,
                         'error' => "Parameter {$param[0]->getName()} is optional in {$method}, but is required in the hook",
                         'line' => $hookMethod->getStartLine()
                     ];
                 }
-            } elseif ($param[1] !== null && $param[1]->isOptional()) {
+            } elseif (isset($param[1]) && $param[1] !== null && $param[1]->isOptional()) {
                 $hookDefault = $param[0]->getDefaultValue();
                 $originalDefault = $param[1]->getDefaultValue();
                 if ($hookDefault !== $originalDefault) {
-                    return [
+                    $warnings[] = [
                         'file' => $hook->name(),
                         'path' => $path,
                         'error' => "Parameter {$param[0]->getName()} has default value " . print_r($originalDefault, true) .
@@ -307,8 +349,8 @@ class _Hooks extends ParserAbstract
                     ];
                 }
             }
-            if ($param[0]->hasType() && !$param[1]->hasType()) {
-                return [
+            if (isset($param[0]) && $param[0]->hasType() && !$param[1]->hasType()) {
+                $warnings[] = [
                     'file' => $hook->name(),
                     'path' => $path,
                     'error' => "Parameter {$param[0]->getName()} is untyped in {$method}, but has type " .
@@ -317,12 +359,14 @@ class _Hooks extends ParserAbstract
                 ];
             }
             if (
+                isset($param[0]) &&
+                isset($param[1]) &&
                 $checkRenames &&
                 $param[1] &&
                 $param[0]->getName() !== $param[1]->getName() &&
-                !in_array($param[0]->getName(), $this->conf['rename-ignored-names']) &&
-                !in_array($param[1]->getName(), $this->conf['rename-ignored-names'])) {
-                return [
+                !\in_array($param[0]->getName(), $this->conf['rename-ignored-names']) &&
+                !\in_array($param[1]->getName(), $this->conf['rename-ignored-names'])) {
+                $warnings[] = [
                     'file' => $hook->name(),
                     'path' => $path,
                     'error' => "Hook parameter of {$param[0]->getName()} does not match original parameter of " .
@@ -331,10 +375,10 @@ class _Hooks extends ParserAbstract
                 ];
             }
         }
-        return null;
+        return $warnings;
     }
 
-    protected function findParentUsages(Hook $hook, string $name, string $methodBody, int $firstLineNum): array {
+    protected function findParentUsages(Hook $hook, string $name, ?string $methodBody, int $firstLineNum): array {
         $lexer = new Lexer(['usedAttributes' => ['startLine']]);
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
         try {
@@ -342,8 +386,7 @@ class _Hooks extends ParserAbstract
         } catch (\Exception $e) {
             throw new OutOfRangeException($e->getMessage().' Method: '. $name .' File: '.$hook->name());
         }
-
-        $visitor = new ParentVisitor($firstLineNum - 1);
+        $visitor = new ParentVisitor($firstLineNum-1);
         $traverser = new NodeTraverser();
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);

@@ -45,7 +45,10 @@ class _Hook
     }
 
     public function getContent(){
-        return $this->file->getContents();
+        $content =  $this->file->getContents();
+        $exp = explode("\n", $content);
+        unset($exp[0]);
+        return implode("\n", $exp);
     }
 
 
