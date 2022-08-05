@@ -1,0 +1,29 @@
+{
+    "normal": {
+        "added": [
+            "hooks_exists",
+            "hooks_exists_desc",
+            "hooks_parse",
+            "hooks_parse_desc",
+            "hooks_processing",
+            "hooks_processing_desc",
+            "hooks_signature",
+            "hooks_signature_desc",
+            "hooks_parameters",
+            "hooks_parameters_desc",
+            "hooks_parent",
+            "hooks_parent_desc",
+            "hooks_parentUsage",
+            "hooks_parentUsage_desc",
+            "hooks_errors",
+            "hooks_errors_desc"
+        ],
+        "edited": [],
+        "removed": []
+    },
+    "js": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}

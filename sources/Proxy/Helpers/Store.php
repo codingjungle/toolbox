@@ -56,6 +56,11 @@ class _Store implements HelpersAbstract
         $classDoc[] = ['pt' => 'p', 'prop' => 'formularize_validation', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'formularize_ra', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'formularize_folders', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dt_error_codes', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dt_error_codes2', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dt_bitwise_files', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dt_interfacing', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dt_traits', 'type' => 'array'];
 
         /* @var Application $app */
         foreach (Application::appsWithExtension('toolbox', 'ProxyHelpers') as $app) {

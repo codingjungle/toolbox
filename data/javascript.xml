@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <javascript app="toolbox">
- <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/click" javascript_name="ips.adminer.changeTheme.js" javascript_type="controller" javascript_version="50013" javascript_position="1000050">;( function($, _, undefined){&#13;
+ <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/click" javascript_name="ips.adminer.changeTheme.js" javascript_type="controller" javascript_version="50021" javascript_position="1000050">;( function($, _, undefined){&#13;
     &quot;use strict&quot;;&#13;
     ips.controller.mixin('toolbox.changeTheme', 'core.admin.core.changeTheme', true, function () {&#13;
         this.after('themePreferenceSelected', function () {&#13;
@@ -16,7 +16,7 @@
     });&#13;
 }(jQuery, _));&#13;
 </file>
- <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/click" javascript_name="ips.ui.adminer.click.js" javascript_type="controller" javascript_version="50013" javascript_position="1000050"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/click" javascript_name="ips.ui.adminer.click.js" javascript_type="controller" javascript_version="50021" javascript_position="1000050"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.adminer.click', function(){
         /**
@@ -76,7 +76,7 @@
     };
  }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/debug" javascript_name="ips.debug.js" javascript_type="controller" javascript_version="50013" javascript_position="149"><![CDATA['use strict';
+ <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/debug" javascript_name="ips.debug.js" javascript_type="controller" javascript_version="50021" javascript_position="149"><![CDATA['use strict';
 var _cjProfilerP = _cjProfilerP || {},
     ogLog = console.log,
     ogTable = console.table,
@@ -612,7 +612,7 @@ if (dtProfilerReplaceConsole) {
     console.warn = _cjProfilerP.w;
   }
 }]]></file>
- <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/main" javascript_name="ips.toolbox.debugger.toolbox.js" javascript_type="controller" javascript_version="50013" javascript_position="1000200"><![CDATA[var _cjProfilerP = _cjProfilerP || null,
+ <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/main" javascript_name="ips.toolbox.debugger.toolbox.js" javascript_type="controller" javascript_version="50021" javascript_position="1000200"><![CDATA[var _cjProfilerP = _cjProfilerP || null,
     _toolbox = _toolbox || {};
 if(!_.isNull(_cjProfilerP)){
   _cjProfilerMin = 6;
@@ -853,7 +853,7 @@ if(!_.isNull(_cjProfilerP)){
 
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/main" javascript_name="ips.toolbox.main.js" javascript_type="controller" javascript_version="50013" javascript_position="100">;(function($, _, undefined) {
+ <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/main" javascript_name="ips.toolbox.main.js" javascript_type="controller" javascript_version="50021" javascript_position="100"><![CDATA[;(function($, _, undefined) {
     'use strict';
     ips.createModule('ips.toolbox.main', function() {
         var socket = null,
@@ -861,6 +861,12 @@ if(!_.isNull(_cjProfilerP)){
                 if(ips.getSetting('cj_debug_sockets')) {
                     getSocket().emit('join', ips.getSetting('cj_debug_key'));
                 }
+                $(document).on('submitDialog', (e,data) => {
+                    let response = data.response;
+                    if(response.hasOwnProperty('type') && response.type === 'dtsources'){
+                        ips.ui.flashMsg.show(response.msg,{sticky:true,dismissable:true});
+                    }
+                });
             },
             sockets = function() {
                 if(ips.getSetting('cj_debug_sockets')) {
@@ -891,8 +897,8 @@ if(!_.isNull(_cjProfilerP)){
         };
     });
 }(jQuery, _));
-</file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="diff.js" javascript_type="controller" javascript_version="50013" javascript_position="50"><![CDATA[/*!
+]]></file>
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="diff.js" javascript_type="controller" javascript_version="50021" javascript_position="50"><![CDATA[/*!
 
  diff v5.1.0
 
@@ -2520,7 +2526,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 })));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.debug.js" javascript_type="controller" javascript_version="50013" javascript_position="100"><![CDATA[;( function( $, _, undefined ) {
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.debug.js" javascript_type="controller" javascript_version="50021" javascript_position="100"><![CDATA[;( function( $, _, undefined ) {
     'use strict';
     ips.createModule( 'ips.dtprofiler.debug', function() {
         var respond = function( elem, options, e ) {
@@ -2651,32 +2657,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }( jQuery, _ ) );
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.dtprofiler.js" javascript_type="controller" javascript_version="50013" javascript_position="150"><![CDATA[;( function( $, _, undefined ) {
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.dtprofiler.js" javascript_type="controller" javascript_version="50021" javascript_position="150"><![CDATA[;(function ($, _, undefined) {
     'use strict';
-    ips.createModule( 'ips.dtprofiler.dtprofiler', function() {
+    ips.createModule('ips.dtprofiler.dtprofiler', function () {
         // Functions that become public methods
         var dialogId = null,
-            respond = function( elements ) {
-                let elem = $( elements );
-                if ( !elem.data( '_respond' ) ) {
-                    let h = elem.parent().outerHeight();
-                    $( '.dtProfilerPlaceHolder' ).css( 'height', h );
-                    if($('#elHideMenu').length !== 0){
-                        $('#elHideMenu').css({bottom:h});
+            respond = function (elements) {
+                let elem = $(elements);
+                if (!elem.data('_respond')) {
+                    let h1 = $('#dtProfilerOther').outerHeight(),
+                        pl = $('<div></div>'),
+                        h = elem.parent().outerHeight();
+                    // pl.attr('id','dtProfilerPlaceHolderOther');
+                    // pl.css({height:h1});
+                    // $('body').prepend(pl);
+                    // $('.dtProfilerPlaceHolderOther').css('height', h);
+                    // $('#dtProfilerOther').css({height:h1});
+                    // $('#dtProfilerOther').css({bottom:h});
+                    if ($('#elHideMenu').length !== 0) {
+                        $('#elHideMenu').css({bottom: h});
                     }
-                    if($('#elReorderAppMenu').length !== 0){
-                        $('#elReorderAppMenu').css({bottom:h});
+                    if ($('#elReorderAppMenu').length !== 0) {
+                        $('#elReorderAppMenu').css({bottom: h});
                     }
-                    $( window ).on( 'resize', function() {
+                    $(window).on('resize', function () {
                         let h = elem.parent().outerHeight();
-                        $( '.dtProfilerPlaceHolder' ).css( 'height', h );
-                        if($('#elHideMenu').length !== 0){
-                            $('#elHideMenu').css({bottom:h});
+                        $('.dtProfilerPlaceHolder').css('height', h);
+                        if ($('#elHideMenu').length !== 0) {
+                            $('#elHideMenu').css({bottom: h});
                         }
-                        if($('#elReorderAppMenu').length !== 0){
-                            $('#elReorderAppMenu').css({bottom:h});
+                        if ($('#elReorderAppMenu').length !== 0) {
+                            $('#elReorderAppMenu').css({bottom: h});
                         }
-                    } );
+                    });
 
                     // $(document).on('hideDialog', function () {
                     //     dialogId = null;
@@ -2690,90 +2703,80 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     //
                     // });
 
-                    $( document ).on( 'click', function( e ) {
-                        let el = $( e.target );
-                        let parent = el.parents( 'div#dtProfilerBarContainer' );
-                        if ( parent.length === 0 ) {
-                            elem.find( 'ul.isOpen' ).
-                                removeClass( 'isOpen' ).
-                                slideUp().
-                                parent().
-                                find( 'i.dtprofilearrow' ).
-                                removeClass( 'fa-rotate-180' );
+                    $(document).on('click', function (e) {
+                        let el = $(e.target);
+                        let parent = el.parents('div#dtProfilerBarContainer');
+                        if (parent.length === 0) {
+                            elem.find('ul.isOpen').removeClass('isOpen').slideUp().parent().find('i.dtprofilearrow').removeClass('fa-rotate-180');
                         }
-                    } );
-
-                    elem.find('[data-clear]').on('click',function(){
-                       let $this = $(this),
-                            parent = $this.closest('ul.ipsList_reset');
-                       parent.find('li:not(.notme)').each(function(){
-                           $(this).remove();
-                       });
-                       parent.prev().find('.dtprofilerCount').html(0);
                     });
-                    elem.find( '> li.isParent' ).on( 'click', function() {
-                        closeDialog();
-                        let el = $( this );
-                        if ( el.is( 'i' ) ) {
-                            el = el.parent( 'li' );
-                        }
-                        el.removeClass( 'dtprofilerFlash' );
-                        let bottom = $( '#dtProfilerBarContainer' ).outerHeight(),
-                            id = el.attr( 'id' ) + '_list',
-                            child = $( '#' + id ), left = el.position().left;
 
-                        if ( !child.hasClass( 'isOpen' ) ) {
-                            if ( child.hasClass( 'dtProfilerMaxWidth' ) ) {
+                    elem.find('[data-clear]').on('click', function () {
+                        let $this = $(this),
+                            parent = $this.closest('ul.ipsList_reset');
+                        parent.find('li:not(.notme)').each(function () {
+                            $(this).remove();
+                        });
+                        parent.prev().find('.dtprofilerCount').html(0);
+                    });
+                    elem.find('> li.isParent').on('click', function () {
+                        closeDialog();
+                        let el = $(this);
+                        if (el.is('i')) {
+                            el = el.parent('li');
+                        }
+                        el.removeClass('dtprofilerFlash');
+                        let bottom = $('#dtProfilerBarContainer').outerHeight(),
+                            id = el.attr('id') + '_list',
+                            child = $('#' + id), left = el.position().left;
+
+                        if (!child.hasClass('isOpen')) {
+                            if (child.hasClass('dtProfilerMaxWidth')) {
                                 left = 0;
                             } else {
                                 child.show();
                                 let cWidth = child.outerWidth();
                                 let cPos = left + cWidth;
                                 child.hide();
-                                let windowWidth = $( window ).width();
-                                if ( cPos > windowWidth ) {
-                                    left = left - ( cPos - windowWidth );
+                                let windowWidth = $(window).width();
+                                if (cPos > windowWidth) {
+                                    left = left - (cPos - windowWidth);
                                 }
                             }
-                            elem.find( 'ul.isOpen' ).
-                                removeClass( 'isOpen' ).
-                                slideUp().
-                                parent().
-                                find( 'i.dtprofilearrow' ).
-                                removeClass( 'fa-rotate-180' );
-                            child.css( 'left', left ).css( 'bottom', bottom );
-                            child.addClass( 'isOpen' ).slideDown().promise().done(function(){
+                            elem.find('ul.isOpen').removeClass('isOpen').slideUp().parent().find('i.dtprofilearrow').removeClass('fa-rotate-180');
+                            child.css('left', left).css('bottom', bottom);
+                            child.addClass('isOpen').slideDown().promise().done(function () {
                                 child.addClass('dtProfileMinHeight');
                             });
-                            el.find( 'i.dtprofilearrow' ).addClass( 'fa-rotate-180' );
+                            el.find('i.dtprofilearrow').addClass('fa-rotate-180');
                         } else {
-                            child.removeClass( 'isOpen' ).removeClass('dtProfileMinHeight');
+                            child.removeClass('isOpen').removeClass('dtProfileMinHeight');
                             child.slideUp();
-                            el.find( 'i.dtprofilearrow' ).removeClass( 'fa-rotate-180' );
+                            el.find('i.dtprofilearrow').removeClass('fa-rotate-180');
                         }
-                    } );
-                    elem.data( '_respond', 1 );
+                    });
+                    elem.data('_respond', 1);
                 }
             },
-            closeDialog = function() {
-                if ( dialogId !== null ) {
-                    $( document ).trigger( 'closeDialog', { dialogID: dialogId } );
+            closeDialog = function () {
+                if (dialogId !== null) {
+                    $(document).trigger('closeDialog', {dialogID: dialogId});
                 }
             };
 
         // Register this module as a widget to enable the data API and
         // jQuery plugin functionality
-        ips.ui.registerWidget( 'dtprofiler', ips.dtprofiler.dtprofiler );
+        ips.ui.registerWidget('dtprofiler', ips.dtprofiler.dtprofiler);
 
         // Expose public methods
         return {
             respond: respond,
         };
-    } );
-}( jQuery, _ ) );
+    });
+}(jQuery, _));
 
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.dtprofilergit.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850">;( function($, _, undefined){&#13;
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.dtprofilergit.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850">;( function($, _, undefined){&#13;
     &quot;use strict&quot;;&#13;
     ips.createModule('ips.dtprofiler.dtprofilergit', function(){&#13;
         // Functions that become public methods&#13;
@@ -2807,7 +2810,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     });&#13;
 }(jQuery, _));&#13;
 </file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.search.js" javascript_type="controller" javascript_version="50013" javascript_position="250"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.dtprofiler.search.js" javascript_type="controller" javascript_version="50021" javascript_position="250"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.dtprofiler.search', function(){
         // Functions that become public methods
@@ -2862,7 +2865,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     });
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.dtprofiler.clipboard.js" javascript_type="controller" javascript_version="50013" javascript_position="300">;( function( $, _, undefined ) {&#13;
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.dtprofiler.clipboard.js" javascript_type="controller" javascript_version="50021" javascript_position="300">;( function( $, _, undefined ) {&#13;
     'use strict';&#13;
     ips.createModule( 'ips.ui.dtprofiler.clipboard', function() {&#13;
         // Functions that become public methods&#13;
@@ -2930,7 +2933,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     } );&#13;
 }( jQuery, _ ) );&#13;
 </file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.collapsed.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.collapsed.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.collapsed', () => {
         /**
@@ -2992,7 +2995,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.hash.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.hash.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.hash', () => {
         /**
@@ -3112,7 +3115,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxbase.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxbase.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxbase', () => {
         /**
@@ -3233,7 +3236,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxbitwise.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxbitwise.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxbitwise', () => {
         /**
@@ -3277,18 +3280,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     });
     const _objectToybox = function(elem, options) {
         let init = () => {
-
-                elem.on('submit',_submit);
-                elem.on('change','[name="position"]',_position);
+                elem.on('change','#dtClass',_position);
+                elem.on('keyup input propertychange change','#position',_position);
         },
-            _submit = e => {
-                e.preventDefault();
-            },
-            _position = (e) => {
+            _position = e  => {
             e.preventDefault();
-            let el = elem.find('[name="position"]'),
+            let el = elem.find('#position'),
+                dtClass = elem.find('#dtClass'),
                 value = el.val(),
                 action = ips.getSetting('baseURL')+'?app=toolbox&module=bt&controller=bt&do=bitwiseValues&position='+value;
+            if(dtClass.length !== 0){
+                let vv = dtClass.val();
+                if(vv){
+                    action += '&class='+vv;
+                }
+            }
+            _toolbox.l(action);
              ajax({
                 type: "GET",
                 url: action,
@@ -3305,7 +3312,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxdates.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxdates.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxdates', () => {
         /**
@@ -3375,7 +3382,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxdiffs.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxdiffs.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxdiffs', () => {
         /**
@@ -3453,7 +3460,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxhtml.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxhtml.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxhtml', () => {
         /**
@@ -3587,7 +3594,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboximages.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;(function ($, _, undefined) {
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboximages.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;(function ($, _, undefined) {
     'use strict';
     ips.createModule('ips.ui.toolbox.toyboximages', () => {
         /**
@@ -3666,7 +3673,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxlorem.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxlorem.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxlorem', () => {
         /**
@@ -3785,7 +3792,115 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxnumbers.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxmenu.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;(function ($, _, undefined) {
+    "use strict";
+    ips.createModule('ips.ui.toolbox.toyboxmenu', () => {
+        /**
+         * Respond to a dialog trigger
+         *
+         * @param   {element}   elem        The element this widget is being created on
+         * @param   {object}    options     The options passed
+         * @param   {event}     e           if lazyload, event that is fire
+         * @returns {void}
+         */
+        const respond = (elem, options, e) => {
+                let el = $(elem);
+                if (!el.data('_loadedToyboxmenu')) {
+                    let mobject = _objectToyboxmenu(el, options);
+                    mobject.init();
+                    el.data('_loadedToyboxmenu', mobject);
+                }
+            },
+            /**
+             * Retrieve the instance (if any) on the given element
+             *
+             * @param    {element}    elem        The element to check
+             * @returns {mixed}    The instance or undefined
+             */
+            getObj = (elem) => {
+                if ($(elem).data('_loadedToyboxmenu')) {
+                    return $(elem).data('_loadedToyboxmenu');
+                }
+                return undefined;
+            };
+
+        // Register this module as a widget to enable the data API and
+        // jQuery plugin functionality
+        ips.ui.registerWidget(
+            'toolboxtoyboxmenu',
+            ips.ui.toolbox.toyboxmenu,
+            []
+        );
+
+        // Expose public methods
+        return {
+            respond: respond,
+            getObj: getObj
+        };
+    });
+    const _objectToyboxmenu = function (elem, options) {
+        let init = () => {
+                elem.css({zIndex: ips.ui.zIndex()});
+                elem.on('click', '[data-open]', _open);
+                $(document).not(elem).on('click', function (e) {
+                    let target = $(e.target);
+                    if (target.parents('.dtProfilerOther').length === 0) {
+                        $('#dtProfilerOther').find('.dtProfilerOtherSub').each(function () {
+                            $(this).hide().removeData('isOpen');
+                        });
+                    }
+                });
+            },
+            _open = (e) => {
+                elem.find('.dtActive').each(function () {
+                    $(this).removeClass('dtActive');
+                });
+                e.preventDefault();
+                let target = $(e.currentTarget),
+                    id = target.attr('id'),
+                    parent = target.parent(),
+                    child = $('#' + id + '_menu');
+                if (child.data('isOpen') !== 1) {
+                    let top = target.parent().outerHeight();
+                    if (parent.hasClass('isParent')) {
+                        elem.find('.ipsHide').each(function () {
+                            if ($(this).attr('id') !== child.attr('id')) {
+                                $(this).hide().removeData('isOpen');
+                            }
+                        });
+                    } else {
+                        elem.find('.dtProfilerOtherSubChild').each(function () {
+                            if ($(this).attr('id') !== child.attr('id')) {
+                                $(this).hide().removeData('isOpen');
+                            }
+                        });
+                    }
+                    child.data('isOpen', 1);
+                    if (parent.hasClass('isParent')) {
+                        child.css({
+                            zIndex: ips.ui.zIndex(),
+                        });
+                    } else {
+                        target.addClass('dtActive');
+                        child.css({
+                            zIndex: ips.ui.zIndex(),
+                            right: Math.abs(target.outerWidth() + 5)
+                        });
+                    }
+
+                    child.show();
+                } else {
+                    child.hide().removeData('isOpen');
+                    target.removeClass('dtActive');
+                }
+            };
+        return {
+            init: init
+        }
+    };
+}(jQuery, _));
+]]></file>
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxnumbers.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxnumbers', () => {
         /**
@@ -3863,7 +3978,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxuuid.js" javascript_type="controller" javascript_version="50013" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/profiler" javascript_name="ips.ui.toolbox.toyboxuuid.js" javascript_type="controller" javascript_version="50021" javascript_position="1000850"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.toyboxuuid', () => {
         /**
@@ -3935,7 +4050,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     };
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/proxy" javascript_name="ips.ui.toolbox.proxy.js" javascript_type="controller" javascript_version="50013" javascript_position="1000050"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="global" javascript_path="controllers/proxy" javascript_name="ips.ui.toolbox.proxy.js" javascript_type="controller" javascript_version="50021" javascript_position="1000050"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.createModule('ips.ui.toolbox.proxy', function(){
         /**
@@ -3985,7 +4100,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     });
 }(jQuery, _));
 ]]></file>
- <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/query" javascript_name="ips.query.query.js" javascript_type="controller" javascript_version="50013" javascript_position="1000150"><![CDATA[;( function($, _, undefined){
+ <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/query" javascript_name="ips.query.query.js" javascript_type="controller" javascript_version="50021" javascript_position="1000150"><![CDATA[;( function($, _, undefined){
     "use strict";
     ips.controller.register('ips.admin.dtdevplus.query', {
         initialize: function () {
@@ -4006,7 +4121,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         }
     });
 }(jQuery, _));]]></file>
- <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/socket" javascript_name="socket.io.js" javascript_type="controller" javascript_version="50013" javascript_position="1000900"><![CDATA[/*!
+ <file javascript_app="toolbox" javascript_location="front" javascript_path="controllers/socket" javascript_name="socket.io.js" javascript_type="controller" javascript_version="50021" javascript_position="1000900"><![CDATA[/*!
  * Socket.IO v4.5.1
  * (c) 2014-2022 Guillermo Rauch
  * Released under the MIT License.
@@ -8447,7 +8562,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }));
 //# sourceMappingURL=socket.io.js.map
 ]]></file>
- <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/toggles" javascript_name="ips.dwlabs.toggles.js" javascript_type="controller" javascript_version="50013" javascript_position="1000100">;(function ($, _, undefined) {&#13;
+ <file javascript_app="toolbox" javascript_location="admin" javascript_path="controllers/toggles" javascript_name="ips.dwlabs.toggles.js" javascript_type="controller" javascript_version="50021" javascript_position="1000100">;(function ($, _, undefined) {&#13;
     &quot;use strict&quot;;&#13;
     ips.createModule('ips.dtcode.toggles', function () {&#13;
         var respond = function (elem, options, e) {&#13;

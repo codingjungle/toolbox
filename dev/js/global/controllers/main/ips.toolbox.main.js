@@ -6,6 +6,12 @@
                 if(ips.getSetting('cj_debug_sockets')) {
                     getSocket().emit('join', ips.getSetting('cj_debug_key'));
                 }
+                $(document).on('submitDialog', (e,data) => {
+                    let response = data.response;
+                    if(response.hasOwnProperty('type') && response.type === 'dtsources'){
+                        ips.ui.flashMsg.show(response.msg,{sticky:true,dismissable:true});
+                    }
+                });
             },
             sockets = function() {
                 if(ips.getSetting('cj_debug_sockets')) {

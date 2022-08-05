@@ -1,0 +1,62 @@
+<ips:template parameters="array $values, $lang, $tableHead=[], $warning=false"/>
+{{$count = \count($values);}}
+    {{if $count }}
+        {{$msgType = 'error';}}
+        {{if $warning === true}}
+            {{$msgType = 'warning';}}
+        {{endif}}
+        {{else}}
+        {{$msgType = 'success';}}
+    {{endif}}
+<div{{if $count }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$lang}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+    {lang="{$lang}" sprintf="$count"} {{if $count }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$lang}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$lang}">
+<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_table">
+    {{if empty($tableHead) === false}}
+    <thead>
+        <tr>
+            {{foreach $tableHead as $head}}
+                <th>{lang="{$head}"}</th>
+            {{endforeach}}
+        </tr>
+    </thead>
+    {{endif}}
+    <tbody data-role="tableRows">
+        {{foreach $values as $data}}
+        <tr class="ipsClearfix">
+            <td class="ipsTable_wrap">
+                {{if $data['editorPath'] }}
+                <a href="{$data['editorPath']}">
+                    {$data['file']|raw}
+                </a>
+                {{else}}
+                {$data['file']|raw}
+                {{endif}}
+            </td>
+            <td class="ipsTable_wrap">
+
+                <div>
+
+                    {{if $data['editorPath'] }}
+                    <a href="{$data['editorPath']}">
+                        Path: {$data['path']|raw}
+                    </a>
+                    {{else}}
+                    Path: {$data['path']|raw}
+                    {{endif}}
+                </div>
+                <div>
+                    Error Message: {$data['error']|raw}
+                </div>
+            </td>
+        </tr>
+        {{endforeach}}
+    </tbody>
+</table>
+</div>

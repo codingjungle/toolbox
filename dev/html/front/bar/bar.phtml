@@ -1,4 +1,165 @@
 <ips:template parameters="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions,$myApps"/>
+<div id="dtProfilerOther" class="ipsClearfix dtProfilerOther ipsPos_relative " data-ipstoolboxtoyboxmenu>
+        {{if empty($myApps) === false}}
+        <div class="celProfileMyapps ipsPos_relative isParent">
+            <a href="#apps_myapps_menu" id="apps_myapps" class="" title="My Apps" data-open data-ipsTooltip>
+                <i class="fa fa-angle-left"></i> <i class="fa fa-cubes"></i>
+            </a>
+            <div id="apps_myapps_menu" class="ipsHide dtProfilerOtherSub dtProfilerOtherSubChildMyApps">
+                {{$i=0;}}
+                    {{foreach $myApps as $mm}}
+                    <div class="dtProfileOtherSubsItem ipsPos_relative">
+                        <a href="#elProfileSources_{$mm['hash']}_menu" id="elProfileSources_{$mm['hash']}" data-open>
+                            <i class="fa fa-caret-left"></i>
+                            {$mm['name']|raw}
+                        </a>
+                        <div id="elProfileSources_{$mm['hash']}_menu" class="ipsHide dtProfilerOtherSubChild">
+                            {{foreach $mm['subs'] as $key => $data}}
+                            <div class="dtProfileOtherSubsItem">
+                                <a href="{$data['url']}" {{if isset($data['target']) }} target="_blank" {{else}}data-ipsDialog data-ipsDialog-destructOnClose="true" {{if $key === 'Add Sources' || $key === 'Add Assets'}} data-ipsDialog-remoteSubmit="true"{{endif}}{{endif}}>
+                                    {{if isset($data['icon']) }}
+                                    <i class="fa {$data['icon']}"></i>
+                                    {{endif}}
+                                    {$key}
+                                </a>
+                            </div>
+                            {{endforeach}}
+                        </div>
+                    </div>
+                    {{endforeach}}
+            </div>
+        </div>
+        {{endif}}
+        <div class="celProfileSystem ipsPos_relative isParent">
+            <a id="elProfileSystem" href="#elProfileSystem_menu" class=""  title="Dev Toy Box" data-open data-ipsTooltip>
+                <i class="fa fa-angle-left"></i> <i class="fa fa-smile-o"></i>
+            </a>
+            <div id="elProfileSystem_menu" class="dtProfilerOtherSub dtProfilerOtherSubChildSystem ipsHide">
+                <div class="ipsMenu_title">
+                    Other
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
+                                <i class="fa fa-compass"></i>
+                                <br>
+                                Diffs
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{$info['cache']}">
+                                <i class="fa fa-remove"></i>
+                                <br>
+                                Clear Caches
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="#" data-ipstoolboxproxy>
+                                <i class="fa">🔃</i>
+                                <br>
+                                Proxy Class
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    Generators
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=lorem' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Lorem Ipsum Generator">
+                                <i class="fa fa-language"></i>
+                                <br>
+                                Lorem Ipsum
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=bitwiseValues' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="BitWise Generator">
+                                <i class="fa">♾️</i>
+                                <br>
+                                BitWise
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=hash' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Hash Generator">
+                                <i class="fa fa-hashtag"></i>
+                                <br>
+                                Hash
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=uuid' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="UUID Generator">
+                                <i class="fa">✳️</i>
+                                <br>
+                                UUID
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    Encoders/Decoders
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=html' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="HTML Encoder/Decoder">
+                                <i class="fa fa-html5"></i>
+                                <br>
+                                Html
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=base' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Base64 Encoder/Decoder">
+                                <i class="fa">6️⃣4️⃣</i>
+                                <br>
+                                Base64
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    Converters
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Numbers Converters">
+                                <i class="fa fa-calculator"></i>
+                                <br>
+                                Numbers
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=dates' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Dates Converters">
+                                <i class="fa fa-calendar"></i>
+                                <br>
+                                Dates
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=images' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Image Converter">
+                                <i class="fa fa-image"></i>
+                                <br>
+                                Images
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    System
+                </div>
+                <div class="ipsClearfix">
+                        {{foreach $info['server'] as $key => $val }}
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            {{if $key === 'IPS'}}
+                            <i class="fa">🅘🅟🅢</i>
+                            <br>
+                            {{elseif $key === 'MySql'}}
+                            <i class="fa">🅜🅨🅢🅠🅛</i>
+                            <br>
+                            {{endif}}
+                            {$val|raw}
+                        </div>
+                        {{endforeach}}
+                    </div>
+            </div>
+        </div>
+</div>
+
 <div id="dtProfilerBarContainer" class="dtProfilerBar">
     <ul class="ipsList_reset dtProfilerBar_list ipsClearfix" data-ipsdtprofiler{{if settings.dtprofiler_enable_debug && settings.dtprofiler_enable_debug_ajax }} data-ipsdtprofilerdebug data-url="{url='app=toolbox&module=bt&controller=bt' base='front'}"{{endif}}>
         {{if $time }}
@@ -64,7 +225,7 @@
             <ul id="elProfileSources_menu" class="ipsMenu ipsMenu_auto ipsMenu_wide ipsList_reset ipsHide">
                 {{foreach $info['sources'] as $key => $val }}
                 <li class="ipsMenu_item">
-                     <a href="{$val['url']}" data-ipsDialog data-ipsDialog-destructOnClos="true">
+                     <a href="{$val['url']}" data-ipsDialog data-ipsDialog-destructOnClos="true" >
                          {$val['name']}
                      </a>
                 </li>
@@ -73,171 +234,8 @@
         </li>
         {{endif}}
 
-        {{if empty($myApps) === false}}
-        <li class="isParent dtProfileFirst celProfileMyapps">
-            <a href="#apps_myapps_menu" id="apps_myapps" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
-                <i class="fa fa-compass"></i>
-                Build My Apps <i class="fa fa-angle-up"></i>
-            </a>
-            <div id="apps_myapps_menu" class="ipsMenu ipsMenu_wide ipsHide">
-                <div class="ipsMenu_innerContent ipsGrid">
-                    {{$i=0;}}
-                {{foreach $myApps as $mm}}
-                    {{$i++;}}
-                    {{if $i===4}}
-                </div>
-                    <div class="ipsMenu_innerContent ipsGrid">
-                        {{$i=1;}}
-                    {{endif}}
-                    <div class="ipsGrid_span4 ipsType_center ipsType_bold ipsPadding:half">
-                        <a href="{$mm['url']}">{$mm['name']|raw}</a>
-                    </div>
-                {{endforeach}}
-                </div>
-            </div>
-        </li>
-        {{endif}}
 
-        <li class="isParent dtProfileFirst celProfileSystem">
-            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
-                <i class="fa fa-smile-o"></i> Toy Box <i class="fa fa-angle-up"></i>
-            </a>
-            <div id="elProfileSystem_menu" class="ipsMenu ipsMenu_wide ipsHide">
-                <div class="ipsMenu_title">
-                    Generators
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=lorem' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Lorem Ipsum Generator">
-                                <i class="fa fa-language"></i>
-                                <br>
-                                Lorem Ipsum
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=bitwiseValues' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="BitWise Generator">
-                                <i class="fa">♾️</i>
-                                <br>
-                                BitWise
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=hash' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Hash Generator">
-                                <i class="fa fa-hashtag"></i>
-                                <br>
-                                Hash
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=uuid' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="UUID Generator">
-                                <i class="fa">✳️</i>
-                                <br>
-                                UUID
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="ipsMenu_title">
-                    Encoders/Decoders
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=html' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="HTML Encoder/Decoder">
-                                <i class="fa fa-html5"></i>
-                                <br>
-                                Html
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=base' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Base64 Encoder/Decoder">
-                                <i class="fa">6️⃣4️⃣</i>
-                                <br>
-                                Base64
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="ipsMenu_title">
-                    Converters
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Numbers Converters">
-                                <i class="fa fa-calculator"></i>
-                                <br>
-                                Numbers
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=dates' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Dates Converters">
-                                <i class="fa fa-calendar"></i>
-                                <br>
-                                Dates
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=images' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Image Converter">
-                                <i class="fa fa-image"></i>
-                                <br>
-                                Images
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="ipsMenu_title">
-                    System
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        {{foreach $info['server'] as $key => $val }}
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            {{if $key === 'IPS'}}
-                            <i class="fa">🅘🅟🅢</i>
-                            <br>
-                            {{elseif $key === 'MySql'}}
-                            <i class="fa">🅜🅨🅢🅠🅛</i>
-                            <br>
-                            {{endif}}
-                            {$val|raw}
-                        </div>
-                        {{endforeach}}
-                    </div>
-                </div>
 
-                <div class="ipsMenu_title">
-                    Other
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
-                                <i class="fa fa-compass"></i>
-                                <br>
-                                Diffs
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{$info['cache']}">
-                                <i class="fa fa-remove"></i>
-                                <br>
-                                Clear Caches
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="#" data-ipstoolboxproxy>
-                                <i class="fa">🔃</i>
-                                <br>
-                                Proxy Class
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </li>
         {{if \IPS\Settings::i()->dtprofiler_use_console }}
         <li id="elProfileConsoleLog" class="isParent dtProfileFirst dtProfilerConsole">
             <i class="fa fa-terminal"></i> Console

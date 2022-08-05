@@ -325,19 +325,30 @@ class _Element
 
     public function changeType(string $type, $custom = '')
     {
-        if (!isset(static::$nonHelpers[$type])) {
-            if (!($this->name instanceof FormAbstract) && isset(static::$helpers[$type])) {
-                $this->class = '\\IPS\\Helpers\\Form\\' . static::$helpers[$type] ?? 'Text';
-                $this->type = 'helper';
-            } elseif ($this->name instanceof FormAbstract) {
-                $this->class = $this->name;
-                $this->type = 'helper';
+        $class = null;
+
+        $type2 = mb_strtolower($type);
+
+        if ($type instanceof FormAbstract) {
+            $class = $type;
+            $type = 'helper';
+        } elseif (!isset(static::$nonHelpers[$type2])) {
+            if (!($type2 instanceof FormAbstract) && static::isHelper($type2) === true) {
+                $class = static::getHelper($type2) ?? Text::class;
+                $type = 'helper';
             }
-        } elseif ($type === 'custom') {
-            $this->class = $custom;
-            $this->type = 'helper';
+
+            if ($type2 instanceof FormAbstract) {
+                $class = $type2;
+                $type = 'helper';
+            }
+        } elseif ($type2 === 'custom') {
+            $class = $custom;
+            $type = 'helper';
             $this->custom = true;
         }
+        $this->type = $type;
+        $this->class = $class;
 
         return $this;
     }

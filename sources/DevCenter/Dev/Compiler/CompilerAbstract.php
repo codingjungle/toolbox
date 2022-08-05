@@ -73,7 +73,7 @@ abstract class _CompilerAbstract
     {
         $this->app = $this->application->directory;
 
-        if ($this->group_manual) {
+        if (!$this->group_manual) {
             $this->location = $this->group_manual_location;
             $this->group = $this->group_manual_folder;
         } else {
@@ -97,6 +97,7 @@ abstract class _CompilerAbstract
             $this->proxy = true;
         }
         $this->_writeFile($file, $content, $dir, false);
+        return $file;
     }
 
 

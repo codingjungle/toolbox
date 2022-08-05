@@ -89,6 +89,24 @@ class _profiler
          $vals = json_decode(Settings::i()->dtprofiler_console_replacements,true);
         $options = array_combine(array_values($data),array_values($data));
         $form->addElement('dtprofiler_console_replacements','cbs')->options(['options' => $options])->value($vals);
+
+        $form->tab('code_analyzer');
+        Member::loggedIn()->language()->words['code_analyzer_tab'] = 'Code Analyzer';
+        $options = [
+            'dtcode_analyze_db' => 'Database',
+            'dtcode_analyze_error_codes' => 'Error Codes',
+            'dtcode_analyze_filestorage' => 'File Storage',
+            'dtcode_analyze_hooks' => 'Hooks',
+            'dtcode_analyze_interface' => 'Interface Folder',
+            'dtcode_analyze_langs_check' => 'Language Strings Check',
+            'dtcode_analyze_langs_verify' => 'Language Strings Verify',
+            'dtcode_analyze_rootpath' => 'Rootpath Usage Check',
+            'dtcode_analyze_settings_check' => 'Settings Usage Check',
+            'dtcode_analyze_settings_verify' => 'Settings Usage Verify'
+        ];
+        foreach($options as $key => $label){
+            $form->addElement($key,'yn')->label($label);
+        }
     }
 
     /**

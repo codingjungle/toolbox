@@ -42,18 +42,22 @@
     });
     const _objectToybox = function(elem, options) {
         let init = () => {
-
-                elem.on('submit',_submit);
-                elem.on('change','[name="position"]',_position);
+                elem.on('change','#dtClass',_position);
+                elem.on('keyup input propertychange change','#position',_position);
         },
-            _submit = e => {
-                e.preventDefault();
-            },
-            _position = (e) => {
+            _position = e  => {
             e.preventDefault();
-            let el = elem.find('[name="position"]'),
+            let el = elem.find('#position'),
+                dtClass = elem.find('#dtClass'),
                 value = el.val(),
                 action = ips.getSetting('baseURL')+'?app=toolbox&module=bt&controller=bt&do=bitwiseValues&position='+value;
+            if(dtClass.length !== 0){
+                let vv = dtClass.val();
+                if(vv){
+                    action += '&class='+vv;
+                }
+            }
+            _toolbox.l(action);
              ajax({
                 type: "GET",
                 url: action,

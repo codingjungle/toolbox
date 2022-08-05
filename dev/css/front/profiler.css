@@ -5,6 +5,133 @@
     font-size:14px;
 }
 
+#dtProfilerOther .isParent {
+    color: #fff;
+}
+
+#dtProfilerOther .isParent:not(:last-child){
+    border-top-left-radius: 10px;
+}
+
+#dtProfilerOther .isParent:not(:first-child){
+    border-bottom-left-radius: 10px;
+}
+
+#dtProfilerOther .isParent > a {
+    display:block;
+    color: #fff;
+    font-size:14px;
+    padding: 6px;
+}
+
+#dtProfilerOther .isParent > a > .fa-angle-down{
+    font-size:12px;
+}
+
+.dtProfilerOtherSubChild,
+.dtProfilerOtherSub {
+    position: absolute;
+    background: rgb( var(--theme-area_background_reset) );
+    box-shadow: var(--popup--boxShadow);
+}
+
+.dtProfilerOtherSub a {
+
+    color:rgb( var(--theme-link) );
+}
+.celProfileMyapps .dtProfilerOtherSub a {
+    width:100%;
+    display: block;
+    padding:5px;
+}
+.ipsDarkMode .dtProfilerOtherSub a {
+    color:#fff;
+}
+
+.dtActive,
+.dtProfileOtherSubsItem > a:hover{
+    color: #fff !important;
+    background: rgb(var(--theme-text_light))
+}
+
+.dtProfileOtherSubsItem {
+    width:220px;
+}
+
+.dtProfilerOtherSubChildSystem {
+    color:rgb( var(--theme-link) );
+    width:300px;
+}
+
+.dtProfilerOtherSubChildSystem .ipsPos_left {
+    display:inline-block;
+    vertical-align: top;
+}
+
+.ipsDarkMode.ipsApp_admin .dtProfilerOtherSubChildSystem {
+    color: #fff;
+}
+
+#dtProfilerOther {
+    position: fixed;
+    top:35%;
+    right:0;
+}
+
+.dtProfilerOtherSub,
+.dtProfilerOtherSubChild {
+    top:0;
+    right:45px;
+    background: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+.dtProfilerOtherSubChild:after,
+.dtProfilerOtherSubChild:before,
+.dtProfilerOtherSub:after,
+.dtProfilerOtherSub:before {
+    left: 100%;
+    top: 15px;
+    border: solid transparent;
+    content: "";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.dtProfilerOtherSub:after,
+.dtProfilerOtherSubChild:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-left-color: #ffffff;
+    border-width: 10px;
+    margin-top: -10px;
+}
+
+.dtProfilerOtherSub:before,
+.dtProfilerOtherSubChild:before {
+    border-color: rgba(255, 255, 255, 0);
+    border-left-color: #ffffff;
+    border-width: 11px;
+    margin-top: -11px;
+}
+
+.ipsDarkMode .dtProfilerOtherSub,
+.ipsDarkMode .dtProfilerOtherSubChild {
+    background: var(--c1);
+    border: 1px solid var(--c1);
+}
+
+.ipsDarkMode .dtProfilerOtherSub:after,
+.ipsDarkMode .dtProfilerOtherSubChild:after {
+    border-left-color: var(--c1);
+}
+
+.ipsDarkMode .dtProfilerOtherSub:before,
+.ipsDarkMode .dtProfilerOtherSubChild:before {
+    border-left-color: var(--c1);
+}
+
 .dtProfilerBar {
     position:fixed;
     z-index:1500;
@@ -272,8 +399,10 @@
     color:#FF0000;
     padding-left:10px;
 }
-
 .dtProfilerBar .ipsMenu_innerContent,
+.toolboxPhpInfo a,
+.toolboxPhpInfo a:link {color: #000; text-decoration: none;}
+.ipsDarkMode .dtProfilerBar .ipsMenu_innerContent,
 .dtProfileExtra {
     color:#fff !important;
 }
@@ -290,8 +419,7 @@
 
 
 .toolboxPhpInfo {font-family: sans-serif !important; font-size: 16px;}
-.toolboxPhpInfo a,
-.toolboxPhpInfo a:link {color: #000; text-decoration: none;}
+
 .toolboxPhpInfo a:hover {text-decoration: underline;}
 .toolboxPhpInfo pre {
     margin: 0;
@@ -450,3 +578,35 @@
 .PopUpForm [type="submit"] {
     float:right;
 }
+.ipsPageAction{
+    bottom:100px;
+}
+
+.dtProfilerDevCenter .ipsTabs_item {
+    border-radius: var(--radius-2);
+}
+
+.dtProfilerDevCenter.ipsTabs [role="tablist"] {
+    display:block;
+}
+
+
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_label,*/
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_title,*/
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_vertical .ipsFieldRow > .ipsFieldRow_label,*/
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_vertical .ipsFieldRow > .ipsFieldRow_title {*/
+/*    float: left;*/
+/*     min-width: unset;*/
+/*    font-size: 14px;*/
+/*    font-weight: 500;*/
+/*    text-align: left;*/
+/*    width:200px;*/
+/*}*/
+/*.dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_label,*/
+/*.dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_title {*/
+/*    width: unset;*/
+/*}*/
+/*.dtProfilerDevCenterTabs .ipsField_stackItem .ipsField_autocomplete input[type="text"]:not(.ipsField_stackItemNoMargin){*/
+/*    margin-left:0;*/
+/*    padding-left:0;*/
+/*}*/

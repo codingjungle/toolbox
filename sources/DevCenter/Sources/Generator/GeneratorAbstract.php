@@ -29,8 +29,10 @@ use IPS\toolbox\Shared\SchemaBuilder;
 use IPS\toolbox\Shared\Write;
 use RuntimeException;
 
+use function _p;
 use function array_merge;
 use function array_shift;
+use function class_exists;
 use function count;
 use function defined;
 use function explode;
@@ -162,9 +164,7 @@ abstract class _GeneratorAbstract
             if ($strip === false) {
                 $key = str_replace('dtdevplus_class_', '', $key);
             }
-            if($key === 'extends'){
-                $val = trim('IPS\\'.$val);
-            }
+
             $val = !is_array($val) ? trim($val) : $val;
             if (!empty($val)) {
                 $this->{$key} = $val;
@@ -266,10 +266,12 @@ abstract class _GeneratorAbstract
 
         if ($this->extends !== null) {
             $extends = $this->extends;
-            if(mb_strpos('IPS', $extends) === false){
+            if(!class_exists($extends)){
                 $extends = '\\IPS\\'.$extends;
+                $this->extends = $extends;
             }
-            $this->generator->addExtends($this->extends);
+
+            $this->generator->addExtends($extends);
         }
 
         if (is_array($this->implements) && count($this->implements)) {
@@ -330,7 +332,7 @@ abstract class _GeneratorAbstract
         $this->generator->addNameSpace($this->namespace);
 
         if ($this->abstract) {
-            $this->generator->addType('abstract');
+            $this->generator->makeAbstract();
         }
 
         try {

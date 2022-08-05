@@ -41,6 +41,7 @@ use UnexpectedValueException;
 use function base64_encode;
 use function count;
 use function defined;
+use function explode;
 use function function_exists;
 use function header;
 use function implode;
@@ -51,15 +52,15 @@ use function is_object;
 use function json_decode;
 use function json_encode;
 use function mb_substr;
+use function md5;
 use function microtime;
 use function round;
 
+use const DT_MY_APPS;
 use const IPS\CACHE_PAGE_TIMEOUT;
 use const IPS\CACHING_LOG;
 use const IPS\NO_WRITES;
 use const PHP_VERSION;
-
-Application::loadAutoLoader();
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -68,12 +69,74 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Profiler extends Singleton
 {
-
     /**
      * @brief   Singleton Instances
      * @note    This needs to be declared in any child class.
      */
     protected static $instance;
+
+    public function __construct()
+    {
+        Application::loadAutoLoader();
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function getFrameworkTime(): ?int
+    {
+        if (Settings::i()->dtprofiler_enabled_execution) {
+            return round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;
+        }
+        return null;
+    }
+
+    protected function myApps(): array
+    {
+        $myApps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
+
+        if (empty($myApps) === false) {
+            $newMyApps = [];
+            $applications = Application::applications();
+            /** @var Application $app */
+            foreach ($applications as $app) {
+                if (!in_array($app->directory, $myApps)) {
+                    continue;
+                }
+                $name = $app->_title;
+                Member::loggedIn()->language()->parseOutputForDisplay($name);
+                $url = Url::internal('app=toolbox');
+                $source = $url->setQueryString(
+                    ['appKey' => $app->directory, 'module' => 'devcenter', 'controller' => 'sources']
+                );
+                $build = $url->setQueryString(
+                    ['appToBuild' => $app->directory, 'module' => 'bt', 'controller' => 'build', 'do' => 'form']
+                );
+                $assets = $url->setQueryString(
+                    ['appKey' => $app->directory, 'module' => 'devcenter', 'controller' => 'dev']
+                );
+                $devCenter = Url::internal(
+                    'app=core&module=applications&controller=developer&appKey=' . $app->directory,
+                    'admin'
+                );
+
+                $newMyApps[] = [
+                    'name' => $name,
+                    'app' => $app->directory,
+                    'hash' => md5($app->directory),
+                    'subs' => [
+                        'Add Sources' => ['url' => (string)$source, 'icon' => 'fa-arrow-down'],
+                        'Add Assets' => ['url' => (string)$assets, 'icon' => 'fa-code'],
+                        'Build' => ['url' => (string)$build, 'icon' => 'fa-fw fa-cog'],
+                        'DevCenter' => ['url' => (string)$devCenter, 'icon' => 'fa-fw fa-cogs', 'target' => '']
+                    ]
+                ];
+            }
+            $myApps = $newMyApps;
+        }
+
+        return $myApps;
+    }
 
     /**
      * @return mixed
@@ -82,96 +145,55 @@ class _Profiler extends Singleton
      * @throws RuntimeException
      * @throws UnexpectedValueException
      */
-    public function run()
+    public function run(): mixed
     {
         if (CACHE_PAGE_TIMEOUT !== 0 && !Member::loggedIn()->member_id) {
             return '';
         }
-        if (!Request::i()->isAjax()) {
-            $framework = null;
 
-            if (Settings::i()->dtprofiler_enabled_execution) {
-                $framework = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;
-            }
-            //
-            $logs = Logs::i()->build();
-            $database = Database::i()->build();
-            $templates = Templates::i()->build();
-            $extra = implode(' ', $this->extra());
-            $info = $this->info();
-            $environment = $this->environment();
-            $debug = null;
-            if (Settings::i()->dtprofiler_enable_debug) {
-                $debug = Debug::build();
-            }
-            $files = null;
-            $memory = null;
-            $cache = null;
-            $time = null;
-            $executions = Time::build();
+        $framework = $this->getFrameworkTime();
+        $logs = Logs::i()->build();
+        $database = Database::i()->build();
+        $templates = Templates::i()->build();
+        $extra = implode(' ', $this->extra());
+        $info = $this->info();
+        $environment = $this->environment();
+        $debug = Settings::i()->dtprofiler_enable_debug ? Debug::build() : null;
+        $time = null;
+        $executions = Time::build();
+        $files = Settings::i()->dtprofiler_enabled_files ? Files::i()->build() : null;
+        $cache = CACHING_LOG ? Caching::i()->build() : null;
+        $memory = Settings::i()->dtprofiler_enabled_memory ? Memory::build() : null;
 
-            if (Settings::i()->dtprofiler_enabled_files) {
-                $files = Files::i()->build();
-            }
-
-            if (CACHING_LOG) {
-                $cache = Caching::i()->build();
-            }
-
-            if (Settings::i()->dtprofiler_enabled_memory) {
-                $memory = Memory::build();
-            }
-
-            if (Settings::i()->dtprofiler_enabled_execution) {
-                $total = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;
-                $profileTime = $total - $framework;
-                $time = [
-                    'total'     => $total,
-                    'framework' => $framework,
-                    'profiler'  => $profileTime,
-                ];
-            }
-             $myApps = \defined('DT_MY_APPS') ? explode(',',DT_MY_APPS) : [];
-            if(empty($myApps) === false){
-                $newMyApps = [];
-                foreach($myApps as $app){
-                    $app = trim($app);
-                    if(Member::loggedIn()->language()->checkKeyExists('__app_'.$app)) {
-                        $name = Member::loggedIn()->language()->addToStack('__app_' . $app);
-                        Member::loggedIn()->language()->parseOutputForDisplay($name);
-                    }
-                    else{
-                        $name = $app;
-                    }
-                    $newMyApps[] = [
-                        'name' => $name,
-                        'app' => $app,
-                        'url' => (string) Url::internal('app=toolbox&module=bt&controller=bt&do=build&appToBuild='.$app, 'front')
-                    ];
-                }
-                $myApps = $newMyApps;
-            }
-
-            return Theme::i()
-                        ->getTemplate('bar', 'toolbox', 'front')
-                        ->bar(
-                            $time,
-                            $memory,
-                            $files,
-                            $templates,
-                            $database,
-                            $cache,
-                            $logs,
-                            $extra,
-                            $info,
-                            $environment,
-                            $debug,
-                            $executions,
-                            $myApps
-                        );
+        if (Settings::i()->dtprofiler_enabled_execution) {
+            $total = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;
+            $profileTime = $total - $framework;
+            $time = [
+                'total' => $total,
+                'framework' => $framework,
+                'profiler' => $profileTime,
+            ];
         }
 
-        return null;
+        $myApps = $this->myApps();
+
+        return Theme::i()
+            ->getTemplate('bar', 'toolbox', 'front')
+            ->bar(
+                $time,
+                $memory,
+                $files,
+                $templates,
+                $database,
+                $cache,
+                $logs,
+                $extra,
+                $info,
+                $environment,
+                $debug,
+                $executions,
+                $myApps
+            );
     }
 
     /**
@@ -266,18 +288,17 @@ class _Profiler extends Singleton
             'id' => $app,
         ]);
 
-        // $sources = [];
-        // foreach ($this->apps(false) as $app) {
-        //     $title = $app->_title;
-        //     Member::loggedIn()->language()->parseOutputForDisplay($title);
-
-        //     $sources[] = [
-        //         'url'  => Url::internal('app=toolbox&module=generator&controller=sources')
-        //                      ->setQueryString(['appKey' => $app->directory]),
-        //         'name' => $title
-        //     ];
-        // }
-        // $info['sources'] = $sources;
+//         $sources = [];
+//         foreach ($this->apps(false) as $app) {
+//             $title = $app->_title;
+//             Member::loggedIn()->language()->parseOutputForDisplay($title);
+//
+//             $sources[] = [
+//                 'url'  => ,
+//                 'name' => $title
+//             ];
+//         }
+//         $info['sources'] = $sources;
         return $info;
     }
 
@@ -474,9 +495,18 @@ class _Profiler extends Singleton
         $return = null;
         if (is_array($data) && count($data)) {
             $return = Theme::i()
-                           ->getTemplate('dtpsearch', 'toolbox', 'front')
-                           ->button('Environment', 'environment', 'Environment Variables.', $data, json_encode($data),
-                               count($data), 'random', true, false);
+                ->getTemplate('dtpsearch', 'toolbox', 'front')
+                ->button(
+                    'Environment',
+                    'environment',
+                    'Environment Variables.',
+                    $data,
+                    json_encode($data),
+                    count($data),
+                    'random',
+                    true,
+                    false
+                );
         }
 
         return $return;

@@ -35,7 +35,7 @@ use function mkdir;
 use function preg_match;
 use function preg_replace_callback;
 use function sprintf;
-
+use function implode;
 use const IPS\IPS_FOLDER_PERMISSION;
 
 
@@ -53,6 +53,7 @@ class _Build extends Singleton
      */
     public function export()
     {
+        implode(',',$foo);
         if (!Application::appIsEnabled('toolbox') || !\IPS\IN_DEV) {
             throw new InvalidArgumentException('toolbox not installed');
         }

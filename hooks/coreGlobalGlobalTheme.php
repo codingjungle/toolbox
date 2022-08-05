@@ -93,21 +93,21 @@ EOF;
 
             if (defined('DT_NODE') && DT_NODE) {
                 Application::addJs(['front_socket']);
-
-            }
-        }
-        Application::addJs(['global_main'],'global');
-        Application::addJs(['global_proxy'], 'global');
-
-        if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
-            Application::addJs(['front_profiler']);
-            if (Settings::i()->dtprofiler_enabled_js) {
-                Store::i()->dtprofiler_js = Output::i()->jsFiles;
-            }
-            if (Settings::i()->dtprofiler_enabled_jsvars) {
-                Store::i()->dtprofiler_js_vars = Output::i()->jsVars;
             }
 
+            Application::addJs(['global_main'],'global');
+            Application::addJs(['global_proxy'], 'global');
+
+            if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
+                Application::addJs(['front_profiler']);
+                if (Settings::i()->dtprofiler_enabled_js) {
+                    Store::i()->dtprofiler_js = Output::i()->jsFiles;
+                }
+
+                if (Settings::i()->dtprofiler_enabled_jsvars) {
+                    Store::i()->dtprofiler_js_vars = Output::i()->jsVars;
+                }
+            }
         }
 
         if ( \is_callable('parent::includeJS') )

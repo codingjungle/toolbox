@@ -15,8 +15,6 @@ namespace IPS\toolbox\DevCenter;
 use Exception;
 use InvalidArgumentException;
 use IPS\Application;
-use IPS\Http\Url;
-use IPS\Output;
 use IPS\Patterns\Singleton;
 use IPS\Request;
 use IPS\toolbox\Dev\Compiler\CompilerAbstract;
@@ -26,10 +24,10 @@ use IPS\toolbox\Form;
 use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\ReservedWords;
 use IPS\Xml\XMLReader;
-use LogicException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Throwable;
 
 use function array_pop;
 use function defined;
@@ -44,7 +42,6 @@ use function preg_match;
 
 use const DIRECTORY_SEPARATOR;
 use const SORT_REGULAR;
-
 
 \IPS\toolbox\Application::loadAutoLoader();
 
@@ -93,7 +90,7 @@ class _Dev extends Singleton
             $this->application = $application;
             $this->app = $this->application->directory;
         }
-        $this->form = Form::create()->formPrefix('dtdevplus_dev_');
+        $this->form = Form::create();
     }
 
     /**
@@ -103,6 +100,11 @@ class _Dev extends Singleton
     public function buildForm(array $config, string $type)
     {
         $this->type = $type;
+        $this->form
+            ->formPrefix('dtdevplus_dev__r' . $this->type . 'r_')
+            ->doLabels('_r' . $this->type . 'r_')
+            ->formId('dtdevplus_dev__r' . $this->type . 'r_')
+            ->submitLang('Create Asset');
 
         foreach ($config as $func) {
             $method = 'el' . mb_ucfirst($func);
@@ -116,20 +118,24 @@ class _Dev extends Singleton
     public function create()
     {
         if ($values = $this->form->values()) {
-            if ($this->type === 'template') {
-                $class = Template::class;
-            } else {
-                $class = Javascript::class;
+            $tt = \mb_strtoupper($this->type);
+            $msg = 'Asset ' . $tt . ' created!';
+            try {
+                if ($this->type === 'template') {
+                    $class = Template::class;
+                } else {
+                    $class = Javascript::class;
+                }
+                /**
+                 * @var CompilerAbstract $class ;
+                 */
+                $class = new $class($values, $this->application, $this->type);
+                $msg = $class->process();
+                $msg = 'Asset ' . $msg . ' created!';
+            } catch (Throwable|\Exception $e) {
+                $msg = $e->getMessage();
             }
-            /**
-             * @var CompilerAbstract $class ;
-             */
-            $class = new $class($values, $this->application, $this->type);
-            $class->process();
-            $url = Url::internal('&app=core&module=applications&controller=developer')->setQueryString(
-                ['appKey' => $this->app]
-            )->csrf();
-            Output::i()->redirect($url, 'File Created');
+            return $msg;
         }
     }
 
@@ -143,14 +149,20 @@ class _Dev extends Singleton
     {
         $location = null;
         $group = null;
-        if (!Request::i()->dtdevplus_dev_group_manual && !isset(
-                Request::i()->dtdevplus_dev_group_manual_checkbox
-            )) {
-            $locationGroup = Request::i()->dtdevplus_dev__group;
+        $manual = 'dtdevplus_dev__r' . $this->type . 'r_group_manual';
+        $manualCheck = $manual . '_checkbox';
+        $manualGroup = 'dtdevplus_dev__r' . $this->type . 'r__group';
+        if (
+            Request::i()->{$manual} &&
+            isset(Request::i()->{$manualCheck})
+        ) {
+            $locationGroup = Request::i()->{$manualGroup};
             [$location, $group] = explode(':', $locationGroup);
         } else {
-            $location = Request::i()->dtdevplus_dev_group_manual_location;
-            $group = Request::i()->dtdevplus_dev_group_manual_folder;
+            $loc = 'dtdevplus_dev__r' . $this->type . 'r_group_manual_location';
+            $gr = 'dtdevplus_dev__r' . $this->type . 'r_group_manual_folder';
+            $location = Request::i()->{$loc};
+            $group = Request::i()->{$gr};
         }
         $dir = \IPS\Application::getRootPath() . '/applications/' . $this->app . '/dev/';
         if ($this->type === 'template') {
@@ -170,7 +182,6 @@ class _Dev extends Singleton
             } elseif ($this->type === 'jsmixin') {
                 $file = 'ips.' . $this->app . '.' . $data;
             }
-
 
             if ($this->type === 'jstemplate') {
                 $type = 'templates';
@@ -229,8 +240,9 @@ class _Dev extends Singleton
     protected function elMixin()
     {
         $controllers = [];
+        /** @var Application $app */
         foreach (Application::applications() as $app) {
-            $file = \IPS\Application::getRootPath() . '/applications/' . $app->directory . '/data/javascript.xml';
+            $file = $app->getApplicationPath() . '/data/javascript.xml';
             if (is_file($file)) {
                 $xml = new XMLReader();
                 $xml->open($file);
@@ -272,38 +284,29 @@ class _Dev extends Singleton
 
     protected function elGroup()
     {
-        $groupManual = true;
-
-        if ($this->type === 'template') {
-            try {
-                $this->_getGroups();
-                $groupManual = false;
-            } catch (InvalidArgumentException $e) {
-                Debug::log($e);
-            }
+        $groupManual = false;
+        $options = [];
+        try {
+            $path = $this->type !== 'template' ? 'js' : 'html';
+            $options = $this->_getGroups($path);
+            $groupManual = true;
+        } catch (InvalidArgumentException $e) {
+            Debug::log($e);
         }
-
-        if (in_array($this->type, ['controller', 'module', 'widget','debugger'])) {
-            try {
-                $this->_getGroups('js');
-                $groupManual = false;
-            } catch (Exception $e) {
-            }
+        if (empty($options) === false) {
+            $this->form
+                ->addElement('group_manual', 'cb')
+                ->value($groupManual)
+                ->toggles(
+                    [
+                        'group_manual_location',
+                        'group_manual_folder',
+                    ],
+                    true
+                )
+                ->toggles(['_group']);
+            $this->form->addElement('_group', 'select')->options(['options' => $options]);
         }
-
-        if ($this->type === 'jstemplate') {
-            try {
-                $this->_getGroups('js', 'templates');
-                $groupManual = false;
-            } catch (Exception $e) {
-            }
-        }
-        $this->form->addElement('group_manual', 'yn')->value($groupManual)->toggles(
-            [
-                'group_manual_location',
-                'group_manual_folder',
-            ]
-        )->toggles(['_group'], true);
 
         $this->form->addElement('group_manual_location', 'select')->options(
             ['options' => ['admin' => 'admin', 'front' => 'front', 'global' => 'global']]
@@ -319,30 +322,49 @@ class _Dev extends Singleton
      * @throws InvalidArgumentException
      * @throws IOException
      */
-    protected function _getGroups($path = 'html', $altPath = 'controllers')
+    protected function _getGroups($path)
     {
         $options = [];
 
         try {
-            $base = \IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'applications' . DIRECTORY_SEPARATOR . $this->app . DIRECTORY_SEPARATOR . 'dev' . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR;
-
+            $admin = $front = $global = $this->application->getApplicationPath() . '/dev/' . $path . '/';
+            $admin .= 'admin/';
+            $front .= 'front/';
+            $global .= 'global/';
+            switch ($this->type) {
+                case 'jstemplate':
+                    $admin .= 'templates/';
+                    $front .= 'templates/';
+                    $global .= 'templates/';
+                    break;
+                case 'jsmixin':
+                    $admin .= 'mixin/';
+                    $front .= 'mixin/';
+                    $global .= 'mixin/';
+                    break;
+                case 'module':
+                case 'widget':
+                case 'controller':
+                case 'debugger':
+                    $admin .= 'controllers/';
+                    $front .= 'controllers/';
+                    $global .= 'controllers/';
+                    break;
+            }
+            //_p($admin, $front, $global);
             /* @var Finder $groups */
             $groups = new Finder();
             $fs = new Filesystem();
-            $extended = '';
-            if ($path === 'js') {
-                $extended = DIRECTORY_SEPARATOR . $altPath;
-            }
-            if ($fs->exists($base . 'admin' . $extended)) {
-                $groups->in($base . 'admin' . $extended);
+            if ($fs->exists($admin)) {
+                $groups->in($admin);
             }
 
-            if ($fs->exists($base . 'front' . $extended)) {
-                $groups->in($base . 'front' . $extended);
+            if ($fs->exists($front)) {
+                $groups->in($front);
             }
 
-            if ($fs->exists($base . 'global' . $extended)) {
-                $groups->in($base . 'global' . $extended);
+            if ($fs->exists($global)) {
+                $groups->in($global);
             }
             $groups->directories();
             foreach ($groups as $group) {
@@ -358,21 +380,15 @@ class _Dev extends Singleton
                     $options[$name] = $name;
                 }
             }
-        } catch (LogicException $es) {
+        } catch (Throwable|\Exception $e) {
+            throw new InvalidArgumentException($e->getMessage());
         }
 
         if (empty($options) !== false) {
             throw new InvalidArgumentException('meh');
         }
 
-        $this->elements[] = [
-            'class' => 'select',
-            'name'  => '_group',
-            'ops'   => [
-                'options' => $options,
-            ],
-        ];
-        $this->form->addElement('_group', 'select')->options(['options' => $options]);
+        return $options;
     }
 
     protected function elOptions()

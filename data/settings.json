@@ -1,5 +1,45 @@
 [
     {
+        "key": "dtcode_analyze_db",
+        "default": "1"
+    },
+    {
+        "key": "dtcode_analyze_error_codes",
+        "default": "1"
+    },
+    {
+        "key": "dtcode_analyze_filestorage",
+        "default": "1"
+    },
+    {
+        "key": "dtcode_analyze_hooks",
+        "default": "1"
+    },
+    {
+        "key": "dtcode_analyze_interface",
+        "default": "1"
+    },
+    {
+        "key": "dtcode_analyze_langs_check",
+        "default": "0"
+    },
+    {
+        "key": "dtcode_analyze_langs_verify",
+        "default": "0"
+    },
+    {
+        "key": "dtcode_analyze_rootpath",
+        "default": "1"
+    },
+    {
+        "key": "dtcode_analyze_settings_check",
+        "default": "0"
+    },
+    {
+        "key": "dtcode_analyze_settings_verify",
+        "default": "0"
+    },
+    {
         "key": "dtdevplus_skip_dirs",
         "default": ""
     },

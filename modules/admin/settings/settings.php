@@ -144,7 +144,7 @@ class _settings extends Controller
                 }
             }
             $form->saveAsSettings($values);
-            Output::i()->redirect($this->url, 'foo');
+            Output::i()->redirect($this->url, 'Settings Saved');
         }
         Output::i()->title = 'Settings';
         Output::i()->output = $form;

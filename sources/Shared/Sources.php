@@ -10,27 +10,25 @@
  * @version     -storm_version-
  */
 
-
 namespace IPS\toolbox\Shared;
 
-
-use IPS\Http\Url;
 use IPS\Output;
 use IPS\Request;
+use IPS\Theme;
 use IPS\toolbox\Proxy\Generator\Cache;
 
 use function array_shift;
 use function explode;
 use function implode;
 use function ltrim;
-use function mb_strtoupper;
 use function preg_grep;
 use function preg_quote;
 use function str_replace;
 
-
 trait Sources
 {
+    protected $alt;
+
     protected function standard()
     {
         $config = [
@@ -49,66 +47,71 @@ trait Sources
     protected function doOutput($config, $type, $title)
     {
         $this->elements->buildForm($config, $type);
-        $this->elements->create();
-        $pageTitle = mb_strtoupper($this->application->directory) . ': ' . $title;
-        $url = (string)Url::internal(
-            'app=core&module=applications&controller=developer&appKey=' . Request::i()->appKey
-        )->csrf();
-        unset(Output::i()->breadcrumb['module']);
-        if ($this->front === false) {
-            Output::i()->breadcrumb[] = [$url, 'Developer Center'];
-            Output::i()->breadcrumb[] = [$url, $this->application->directory];
-        } else {
-            $title = $pageTitle;
-        }
-        Output::i()->breadcrumb[] = [null, $title];
-        Output::i()->title = $pageTitle;
+        $return = $this->elements->create();
 
-        Output::i()->output = $this->elements->form;
+        $output = Theme::i()->getTemplate('generator', 'toolbox', 'front')->wrapper($title, $this->elements->form);
+
+        if ($this->elements->form->valuesError === true) {
+            $alt = $this->alt ?? $type;
+            Output::i()->output = Theme::i()->getTemplate('generator', 'toolbox', 'front')->sources(
+                $this->application->directory,
+                \IPS\toolbox\DevCenter\Sources::processedSubMenus()['sources'],
+                'devcenter',
+                'sources',
+                $alt,
+                $output
+            );
+        } elseif ($return === null) {
+            Output::i()->output = $output;
+        } else {
+            Output::i()->json(['msg' => $return, 'type' => 'dtsources']);
+        }
+    }
+
+    protected function doDone($msg)
+    {
+        Output::i()->output = '<div class="ipsMessage ipsMessage_info">' . $msg . '</div>';
     }
 
     protected function debug()
     {
         $this->elements->type = 'Debug';
-        $this->elements->generate();
-        $url = Url::internal(
-            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
-        );
-        Output::i()->redirect($url, 'Profiler Debug Class Generated');
+        $this->doDone($this->elements->generate());
     }
 
     protected function memory()
     {
         $this->elements->type = 'Memory';
-        $this->elements->generate();
-        $url = Url::internal(
-            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
-        );
-        Output::i()->redirect($url, 'Profiler Memory Class Generated');
+        $this->doDone($this->elements->generate());
     }
 
     protected function form()
     {
         $this->elements->type = 'Form';
-        $this->elements->generate();
-        $url = Url::internal(
-            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
-        );
-        Output::i()->redirect($url->csrf(), 'Form Class Generated');
+        $this->doDone($this->elements->generate());
     }
 
     protected function settings()
     {
         $this->elements->type = 'Settings';
-        $this->elements->generate();
-        $url = Url::internal(
-            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
-        );
-        Output::i()->redirect($url->csrf(), 'Settings Class Generated');
+        $this->doDone($this->elements->generate());
+    }
+
+    protected function orm()
+    {
+        $this->elements->type = 'Orm';
+        $this->doDone($this->elements->generate());
+    }
+
+    protected function member()
+    {
+        $this->elements->type = 'Member';
+        $this->doDone($this->elements->generate());
     }
 
     protected function cinterface()
     {
+        $this->alt = 'cinterface';
         $config = [
             'Namespace',
             'ClassName',
@@ -119,6 +122,7 @@ trait Sources
 
     protected function ctraits()
     {
+        $this->alt = 'ctraits';
         $config = [
             'Namespace',
             'ClassName',
@@ -138,26 +142,6 @@ trait Sources
         ];
 
         $this->doOutput($config, 'singleton', 'Singleton');
-    }
-
-    protected function member()
-    {
-        $this->elements->type = 'Member';
-        $this->elements->generate();
-        $url = Url::internal(
-            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
-        );
-        Output::i()->redirect($url, 'Member Class Generated');
-    }
-
-    protected function orm()
-    {
-        $this->elements->type = 'Orm';
-        $this->elements->generate();
-        $url = Url::internal(
-            'app=core&module=applications&controller=developer&appKey=' . $this->application->directory
-        );
-        Output::i()->redirect($url, 'ORM Trait Generated');
     }
 
     protected function ar()
@@ -245,21 +229,27 @@ trait Sources
 
     protected function findClass()
     {
-        $classes = Cache::i()->getClasses();
-
+        $type = Request::i()->type ?? 'class';
+        if ($type === 'interface') {
+            $classes = Cache::i()->getInterfaces();
+        } elseif ($type === 'trait') {
+            $classes = Cache::i()->getTraits();
+        } else {
+            $classes = Cache::i()->getClasses();
+        }
         if (empty($classes) !== true) {
-            $input = 'IPS\\' . ltrim(Request::i()->input, '\\');
+            $input = ltrim(Request::i()->input, '\\');
 
             $root = preg_quote($input, '#');
-            $foo = preg_grep('#^' . $root . '#i', $classes);
+            $foo = preg_grep('#' . $root . '#i', $classes);
             $return = [];
             foreach ($foo as $f) {
                 $ogClass = explode('\\', $f);
                 array_shift($ogClass);
                 $f = implode('\\', $ogClass);
                 $return[] = [
-                    'value' => $f,
-                    'html'  => '\\IPS\\' . $f,
+                    'value' => '\\IPS\\' . $f,
+                    'html' => '\\IPS\\' . $f,
                 ];
             }
             Output::i()->json($return);
@@ -331,5 +321,13 @@ trait Sources
             'apiType',
         ];
         $this->doOutput($config, 'api', 'API Class');
+    }
+
+    protected function manage()
+    {
+        $menus = \IPS\toolbox\DevCenter\Sources::processedSubMenus();
+        Output::i()->output = Theme::i()
+            ->getTemplate('generator', 'toolbox', 'front')
+            ->sources($this->application->directory, $menus['sources'], 'devcenter', 'sources', 'standard');
     }
 }

@@ -133,7 +133,6 @@ class _Url extends GeneratorAbstract
         $errorCodes = Store::i()->dt_error_codes ?? [];
         $this->writeClass('Error', 'ErrorCodesProvider', array_filter($errorCodes));
 
-        unset(Store::i()->dt_error_codes);
         try {
             $toWrite = [];
             $sql = Db::i()->select('*', 'core_modules', null, 'sys_module_position')->join('core_permission_index', [

@@ -3,5 +3,10 @@
         "adminer": {
             "adminer_manage": "adminer_manage"
         }
+    },
+    "bt": {
+        "build": {
+            "build_manage": "build_manage"
+        }
     }
 }

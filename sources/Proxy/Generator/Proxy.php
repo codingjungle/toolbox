@@ -37,6 +37,8 @@ use Laminas\Code\Generator\Exception\InvalidArgumentException;
 use Laminas\Code\Generator\MethodGenerator;
 use Laminas\Code\Generator\PropertyGenerator;
 
+use Throwable;
+
 use function array_filter;
 use function array_merge;
 use function array_shift;
@@ -53,6 +55,7 @@ use function get_class;
 use function header;
 use function implode;
 use function in_array;
+use function interface_exists;
 use function is_array;
 use function is_bool;
 use function is_dir;
@@ -68,11 +71,16 @@ use function preg_match;
 use function preg_match_all;
 use function preg_replace_callback;
 use function property_exists;
+use function str_contains;
 use function str_replace;
 use function strlen;
 use function substr;
+use function trait_exists;
 use function trim;
 use function var_export;
+
+use const T_INTERFACE;
+use const T_TRAIT;
 
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -138,9 +146,32 @@ class _Proxy extends GeneratorAbstract
     {
         try {
             $data = Proxyclass::i()->tokenize($content);
+            //make sure it is an IPS class
+            if(isset($data['namespace']) && !str_contains($data['namespace'],'IPS')){
+                throw new \InvalidArgumentException('Not an IPS class!');
+            }
             $proxied = Store::i()->dt_cascade_proxy ?? [];
 
-            if (isset($data['class'], $data['namespace'])) {
+            if(isset($data['type']) && $data['type'] !== T_CLASS){
+                $interfacing = Store::i()->dt_interfacing ?? [];
+                $traits = Store::i()->dt_traits ?? [];
+                $cc = $data['namespace'] .'\\'. $data['class'];
+                /* Is it an interface? */
+                if ( $data['type'] === T_INTERFACE && !str_contains($cc, 'IPS\\Content') && !str_contains($cc, 'IPS\\Node') )
+                {
+                    $interfacing[] = $cc;
+                }
+
+                /* Is it a trait? */
+                if ( $data['type'] === T_TRAIT  && !str_contains($cc, 'IPS\\Content') && !str_contains($cc, 'IPS\\Node') )
+                {
+                    $traits[] = $cc;
+                }
+
+                Store::i()->dt_interfacing = $interfacing;
+                Store::i()->dt_traits = $traits;
+            }
+            elseif (isset($data['class'], $data['namespace'])) {
                 preg_match('#\$bitOptions#', $content, $bitOptions);
 
                 $namespace = $data['namespace'];
@@ -149,9 +180,10 @@ class _Proxy extends GeneratorAbstract
                 $app = array_shift($ns2);
                 $isApp = false;
                 $appPath = \IPS\Application::getRootPath() . '/applications/' . $app;
-
+                $bitWiseFiles = Store::i()->dt_bitwise_files ?? [];
                 $codes = Store::i()->dt_error_codes ?? [];
                 $altCodes = Store::i()->dt_error_codes2 ?? [];
+
                 $lines = preg_split("/\n|\r\n|\n/", $content);
                 $line = 1;
                 foreach ($lines as $cline) {
@@ -199,7 +231,7 @@ class _Proxy extends GeneratorAbstract
                     if (ReservedWords::check($class)) {
                         return;
                     }
-
+                    $bb = [];
                     $type = '';
                     $body = [];
                     $deepAssoc = [];
@@ -259,14 +291,23 @@ class _Proxy extends GeneratorAbstract
                             )
                         );
                         if ($reflect->hasProperty('bitOptions')) {
+
                             $bits = $reflect->getProperty('bitOptions');
                             $bits->setAccessible(true);
 
                             if ($bits->isStatic()) {
+                                $cc = $data['namespace'] . '\\' . str_replace(
+                                        '_',
+                                        '',
+                                        $data['class']
+                                    );
+                                $bitWiseFiles[$cc] = $cc;
                                 $bt = $bits->getValue();
                                 if (is_array($bt)) {
                                     foreach ($bt as $key => $value) {
+                                        $bb[$key] = [];
                                         foreach ($value as $k => $v) {
+                                            $bb[$key][$k] = $v;
                                             $tags = 'array $' . $k . ' =[' . PHP_EOL;
                                             foreach ($v as $keyed => $vvv) {
                                                 $tags .= "'" . $keyed . "'" . ' => (bool),' . PHP_EOL;
@@ -315,14 +356,25 @@ class _Proxy extends GeneratorAbstract
                                     $this->buildProperty($dbClass, $classDefinition, $deepAssoc);
                                 }
                             }
-                        } catch (Exception $e) {
-                            Debug::log($e, 'ProxyClass');
-                            Debug::log($originalFilePath, 'ProxyClassFile');
-                        } catch (ParseError $e) {
+                        }  catch (ParseError $e) {
                             Debug::log($e, 'ParseError');
                             Debug::log($originalFilePath, 'ParseErrorFile');
+                        } catch (Throwable | Exception $e) {
+                            Debug::log($e, 'ProxyClass');
+                            Debug::log($originalFilePath, 'ProxyClassFile');
                         }
                         $this->runHelperClasses($dbClass, $classDefinition, $ipsClass, $body);
+
+                        if(empty($bb) === false){
+                            $body[] = PropertyGenerator::fromArray(
+                                [
+                                    'name' => 'bitOptions',
+                                    'static' => true,
+                                    'visibility' => 'public',
+                                    'defaultValue' => $bb
+                                ]
+                            );
+                        }
 
                         if (empty($deepAssoc) === false) {
                             foreach ($deepAssoc as $k => $vs) {
@@ -380,11 +432,14 @@ class _Proxy extends GeneratorAbstract
                     $proxyFile->setClass($new);
                     $proxyFile->setFilename($path . '/' . $file);
                     $proxyFile->write();
+                    Store::i()->dt_bitwise_files = $bitWiseFiles;
                 }
             }
-        } catch (Exception $e) {
+        } catch (Throwable | Exception $e) {
             // throw $e;
-            Debug::add('Proxy Create', $e);
+            if(!($e instanceof \InvalidArgumentException)) {
+                Debug::add('Proxy Create', $e);
+            }
         }
     }
 

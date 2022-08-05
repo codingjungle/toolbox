@@ -54,9 +54,6 @@ class _sources extends Controller
         parent::execute();
     }
 
-    protected function manage()
-    {
-    }
 
 
 }

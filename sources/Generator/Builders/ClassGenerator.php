@@ -37,6 +37,7 @@ use function mb_substr;
 use function md5;
 use function rand;
 use function random_int;
+use function str_contains;
 use function str_replace;
 use function time;
 use function token_get_all;
@@ -327,6 +328,8 @@ EOF;
             $class = $this->addImport($class);
         }
         $hash = $this->hash($class);
+        $class = ltrim($class,'\\');
+
         $this->classUses[$hash] = $class;
     }
 
@@ -351,6 +354,9 @@ EOF;
         if ($import === true && $this->doImports === true && count($og) >= 2) {
             $this->addImport($extends);
             $extends = array_pop($og);
+        }
+        if(\mb_substr($extends,0,3) === 'IPS' && $import === false){
+            $extends = '\\'.$extends;
         }
         $this->extends = $extends;
     }
@@ -379,6 +385,7 @@ EOF;
             $interface = array_pop($og);
         }
         $hash = $this->hash($interface);
+        $interface = ltrim($interface,'\\');
         $this->interfaces[$hash] = $interface;
     }
 
@@ -389,9 +396,7 @@ EOF;
         if (empty($this->classUses) === false) {
             foreach ($this->classUses as $use) {
                 {
-                    $this->output("\n\n{$tab}use ");
-                    $this->output($use);
-                    $this->output(";\n");
+                    $this->output("\n\n{$tab}use ".$use.";\n");
                 }
             }
         }

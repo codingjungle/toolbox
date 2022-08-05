@@ -1,0 +1,16 @@
+{
+    "added": [
+        "dtcode_analyze_db",
+        "dtcode_analyze_error_codes",
+        "dtcode_analyze_filestorage",
+        "dtcode_analyze_hooks",
+        "dtcode_analyze_interface",
+        "dtcode_analyze_langs_check",
+        "dtcode_analyze_langs_verify",
+        "dtcode_analyze_rootpath",
+        "dtcode_analyze_settings_check",
+        "dtcode_analyze_settings_verify"
+    ],
+    "edited": [],
+    "removed": []
+}

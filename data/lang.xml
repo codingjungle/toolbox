@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="toolbox" version="50013">
+ <app key="toolbox" version="50021">
   <word key="__app_toolbox" js="0">Dev Toolbox</word>
   <word key="menutab__devtools" js="0">Dev Toolbox</word>
   <word key="menutab__devtools_icon" js="0">wrench</word>
@@ -177,8 +177,8 @@
   <word key="dtdevplus_dev_html_group" js="0">Group</word>
   <word key="dtdevplus_dev_js_group" js="0">Group</word>
   <word key="dtdevplus_dev_html_group_desc" js="0">Select the group the file is to be added too.</word>
-  <word key="dtdevplus_dev_group_manual" js="0">Add Group</word>
-  <word key="dtdevplus_dev_group_manual_desc" js="0">If you want to add a new group.</word>
+  <word key="dtdevplus_dev_group_manual" js="0">Existing Group</word>
+  <word key="dtdevplus_dev_group_manual_desc" js="0">Uncheck if you want to create a new group.</word>
   <word key="dtdevplus_dev_group_manual_folder" js="0">Group Folder</word>
   <word key="dtdevplus_dev_group_manual_location" js="0">Group Location</word>
   <word key="dtdevplus_dev_group_manual_location_desc" js="0">Location for the group.</word>
@@ -368,6 +368,22 @@
   <word key="dtdevplus_menu_title_debugger" js="0">Debug</word>
   <word key="dtprofilerImagesConverter_images" js="0">Image</word>
   <word key="dtprofilerImagesConverter_to" js="0">Format</word>
+  <word key="hooks_exists" js="0">Hook Files Not In Use (%s)</word>
+  <word key="hooks_exists_desc" js="0">Hook files found in your apps /hooks/ folder, but no longer in use.</word>
+  <word key="hooks_parse" js="0">Hook Eval Failures (%s)</word>
+  <word key="hooks_parse_desc" js="0">Hooks files that wont eval properly, please check these.</word>
+  <word key="hooks_processing" js="0">Hook Load Failures (%s)</word>
+  <word key="hooks_processing_desc" js="0">Hooks files that failed to load, please check these.</word>
+  <word key="hooks_signature" js="0">Hooks Method Signatures (%s)</word>
+  <word key="hooks_signature_desc" js="0">Checks to see if the method's signature is the same as the parent method.NOTE: it is not a mistake that each hook file is doubled up, one is the path for the hook file and the other is the path to the parent class file.</word>
+  <word key="hooks_parameters" js="0">Hooks Method Parameters (%s)</word>
+  <word key="hooks_parameters_desc" js="0">Checks if method parameters are the same for the hook file and parent class. NOTE: it is not a mistake that each hook file is doubled up, one is the path for the hook file and the other is the path to the parent class file.</word>
+  <word key="hooks_parent" js="0">Parent Class Load Failure (%s)</word>
+  <word key="hooks_parent_desc" js="0">Parent class couldn't be loaded, you might need to check to see if class still exists, if it does, then you might need to manually check the hook signatures/parameters yourself.</word>
+  <word key="hooks_parentUsage" js="0">Parent::method not called (%s)</word>
+  <word key="hooks_parentUsage_desc" js="0">Checks each method with a parent, to see if the parent method is being called per IPS marketplace requirements.</word>
+  <word key="hooks_errors" js="0">Hook Errors (%s)</word>
+  <word key="hooks_errors_desc" js="0">Any error that isn't covered by the other hook checks.</word>
   <word key="toolbox_doing_proxies" js="1">Generating Proxies</word>
   <word key="toolbox_done_proxies" js="1">Proxies Generated!</word>
  </app>

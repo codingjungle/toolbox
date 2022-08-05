@@ -11,7 +11,7 @@
  */
 
 
-namespace IPS\toolbox\modules\front\generator;
+namespace IPS\toolbox\modules\front\devcenter;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
@@ -22,8 +22,13 @@ use IPS\Request;
 use IPS\Theme;
 use IPS\toolbox\DevCenter\Sources;
 
+use function _p;
+use function array_search;
+use function class_exists;
 use function defined;
 use function header;
+use function interface_exists;
+use function trait_exists;
 
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -61,10 +66,5 @@ class _sources extends Controller
         parent::execute();
     }
 
-    protected function manage()
-    {
-        Output::i()->output = Theme::i()
-                                   ->getTemplate('generator', 'toolbox', 'front')
-                                   ->sources($this->application->directory);
-    }
+
 }

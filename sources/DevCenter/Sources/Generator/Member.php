@@ -21,6 +21,8 @@ use IPS\Db;
 use IPS\Db\Select;
 
 
+use IPS\Member;
+
 use function array_merge;
 use function defined;
 use function header;
@@ -241,6 +243,7 @@ EOF;
         ];
 
         $this->db->addBulk($dbColumns);
+        $this->generator->addExtends(Member::class);
         $this->generator->addImport(Db::class);
         $this->generator->addImport(Select::class);
         $this->generator->addImportFunction('array_merge');

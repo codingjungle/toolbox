@@ -34,7 +34,9 @@ use function is_dir;
 use function is_numeric;
 use function mkdir;
 use function preg_match;
+use function rtrim;
 use function sprintf;
+use function str_replace;
 use function str_split;
 
 use const DT_SLASHER;
@@ -81,6 +83,7 @@ class _Versions
     protected bool $slasher;
     protected array $values;
     public $error;
+    protected $originalLongVersion;
     /**
     * _Versions constructor
     *
@@ -99,8 +102,9 @@ class _Versions
         $this->bumpType = $bumpType;
         $this->slasher = isset($data['slasher']) && $data['slasher'];
         $this->app = $application;
-        $this->semVer = $short ?? $application->version ? trim($application->version) : '1.0.0-alpha.1';
-        $this->longVer = $long ?? $application->long_version ? (int) $application->long_version : 10000;
+        $this->semVer = $short ? $short : ($application->version ? trim($application->version) : '0.0.0-alpha.1');
+        $this->longVer = $long ? $long : ($application->long_version ? (int)$application->long_version : 10000);
+        $this->originalLongVersion = $application->long_version ? (int)$application->long_version : 10000;
         $this->segmentedLong = $this->split($this->longVer);
         $this->bumpLong = $long === null;
         preg_match('#^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<preRelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildMetaData>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$#',$this->semVer,$matches);
@@ -160,10 +164,12 @@ class _Versions
                 $this->segmentedLong = $this->split($this->longVer);
                 break;
         }
-        if($this->bumpType === 'manual' && ($this->isAlpha === true || $this->isBeta === true || $this->isRc)){
+
+        if($this->bumpType === 'manual' && (!($this->longVer >= $this->originalLongVersion) ||$this->isAlpha === true || $this->isBeta === true || $this->isRc)){
             $this->longVer++;
             $this->segmentedLong = $this->split($this->longVer);
         }
+
         if($this->preRelease){
             preg_match('#(.*?)\.(\d+)#', $this->preRelease, $matches);
             if(isset($matches[1])){
@@ -174,9 +180,10 @@ class _Versions
                     }
                 }
             }
-
         }
+
         $this->semVer = $this->major.'.'.$this->minor.'.'.$this->patch;
+
         if($this->isAlpha){
             $this->semVer .= '-alpha.'.$this->increment;
         }
@@ -197,6 +204,7 @@ class _Versions
 
     public function build(){
         $this->bumpVersion();
+        $pharPath = null;
         try {
             $savePath = $this->path;
             $filename = $this->app->directory . ' - ' . $this->semVer;
@@ -226,13 +234,19 @@ class _Versions
                 $this->app->assignNewVersion($this->longVer, $this->semVer);
                 $this->app->build();
                 $this->app->save();
-                if (!is_dir($savePath)) {
-                    if (!mkdir($savePath, IPS_FOLDER_PERMISSION, true) && !is_dir($savePath)) {
-                        throw new RuntimeException(sprintf('Directory "%s" was not created', $savePath));
-                    }
-                    chmod($savePath, IPS_FOLDER_PERMISSION);
+
+                if(isset($this->values['download']) && $this->values['download']){
+                    $pharPath	= str_replace( '\\', '/', rtrim( \IPS\TEMP_DIRECTORY, '/' ) ) . '/' . $filename . ".tar";
                 }
-                $pharPath = $savePath . $filename . '.tar';
+                else {
+                    if (!is_dir($savePath)) {
+                        if (!mkdir($savePath, IPS_FOLDER_PERMISSION, true) && !is_dir($savePath)) {
+                            throw new RuntimeException(sprintf('Directory "%s" was not created', $savePath));
+                        }
+                        chmod($savePath, IPS_FOLDER_PERMISSION);
+                    }
+                    $pharPath = $savePath . $filename . '.tar';
+                }
                 $download = new PharData($pharPath, 0, $this->app->directory . '.tar', Phar::TAR);
                 $download->buildFromIterator(new BuilderIterator($this->app));
             } catch (Exception $e) {
@@ -245,6 +259,7 @@ class _Versions
         }
 
         unset(Store::i()->applications, $download);
+        return $pharPath;
     }
 
 }

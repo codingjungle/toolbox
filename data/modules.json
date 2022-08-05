@@ -34,6 +34,11 @@
             "default_controller": "",
             "protected": 0,
             "default": 0
+        },
+        "bt": {
+            "default_controller": "",
+            "protected": 0,
+            "default": 0
         }
     },
     "front": {
@@ -42,10 +47,10 @@
             "protected": 0,
             "default": 0
         },
-        "generator": {
+        "devcenter": {
             "default_controller": "",
-            "protected": false,
-            "default": null
+            "protected": 0,
+            "default": 0
         }
     }
 }

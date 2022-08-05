@@ -78,8 +78,10 @@ use const PHP_EOL;
 use const T_ABSTRACT;
 use const T_CLASS;
 use const T_FINAL;
+use const T_INTERFACE;
 use const T_NS_SEPARATOR;
 use const T_STRING;
+use const T_TRAIT;
 use const T_WHITESPACE;
 
 
@@ -293,7 +295,6 @@ class _Proxyclass extends Singleton
             Proxy::i()->generateSettings();
             $this->buildCss();
             unset(Store::i()->dtproxy_proxy_files, Store::i()->dtproxy_templates);
-
             return null;
         }
 
@@ -407,12 +408,21 @@ class _Proxyclass extends Singleton
         }
 
         if (empty($jsonMeta) === false) {
-            $content = json_encode($jsonMeta, JSON_PRETTY_PRINT);
-            $this->_writeFile('.ide-toolbox.metadata.json', $content, $this->save);
-            unset(Store::i()->dt_json);
-            $content = json_encode(Store::i()->dt_error_codes2, JSON_PRETTY_PRINT);
-            $this->_writeFile('altcodes.json', $content, $this->save);
-            unset(Store::i()->dt_error_codes2);
+            $this->_writeFile('.ide-toolbox.metadata.json', json_encode($jsonMeta, JSON_PRETTY_PRINT), $this->save);
+            $this->_writeFile('errocodes.json', json_encode(Store::i()->dt_error_codes, JSON_PRETTY_PRINT), $this->save);
+            $this->_writeFile('altcodes.json', json_encode(Store::i()->dt_error_codes2, JSON_PRETTY_PRINT), $this->save);
+            $this->_writeFile('bitwise.json', json_encode(Store::i()->dt_bitwise_files, JSON_PRETTY_PRINT), $this->save);
+            $this->_writeFile('interfaces.json',json_encode(Store::i()->dt_interfacing, JSON_PRETTY_PRINT),$this->save);
+            $this->_writeFile('traits.json',json_encode(Store::i()->dt_traits, JSON_PRETTY_PRINT),$this->save);
+
+            unset(
+                Store::i()->dt_error_codes,
+                Store::i()->dt_error_codes2,
+                Store::i()->dt_json,
+                Store::i()->dt_bitwise_files,
+                Store::i()->dt_interfacing,
+                Store::i()->dt_traits
+            );
         }
     }
 
@@ -924,10 +934,18 @@ class _Proxyclass extends Singleton
                 $abstract = true;
             }
 
-            if (($tokens[$i - 2][0] === T_CLASS || (isset($tokens[$i - 2][1]) && $tokens[$i - 2][1] === 'phpclass')) && $tokens[$i - 1][0] === T_WHITESPACE && $tokens[$i][0] === T_STRING) {
+            if (
+                (
+                    $tokens[$i - 2][0] === T_INTERFACE || (isset($tokens[$i - 2][1]) && $tokens[$i - 2][1] === 'interface') ||
+                    $tokens[$i - 2][0] === T_INTERFACE || (isset($tokens[$i - 2][1]) && $tokens[$i - 2][1] === 'trait') ||
+                    $tokens[$i - 2][0] === T_CLASS || (isset($tokens[$i - 2][1]) && $tokens[$i - 2][1] === 'class')
+                ) &&
+                $tokens[$i - 1][0] === T_WHITESPACE &&
+                $tokens[$i][0] === T_STRING
+            ) {
                 $class = $tokens[$i][1];
-
                 return [
+                    'type' => $tokens[$i - 2][0],
                     'namespace' => $namespace,
                     'class'     => $class,
                     'abstract'  => $abstract,

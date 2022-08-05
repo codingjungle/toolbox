@@ -95,8 +95,8 @@ trait Imports
         if (isset($skipOn[mb_strtolower($import)])) {
             return $import;
         }
-        $parts = explode('\\', $import);
 
+        $parts = explode('\\', $import);
         $class = array_pop($parts);
         $hash = $class;
 
@@ -109,7 +109,13 @@ trait Imports
         if ($this->getNameSpace() . '\\' . $class === $import) {
             $continue = false;
         }
+
         $return = $this->canMakeImport($import);
+
+        if($continue){
+            $import = ltrim($import,'\\');
+        }
+
         if($continue === true && (class_exists($import) || class_exists('\\'.$import)) && $this->checkForImport($class) === false && $this->checkForImport($alias) === false){
             $this->imports[$hash] = ['class' => $import, 'alias' => $alias];
         }

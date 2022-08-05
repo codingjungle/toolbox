@@ -66,7 +66,168 @@
 
 
 </section>]]></template>
- <template template_group="bar" template_name="bar" template_data="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions,$myApps" template_location="front" template_app="toolbox"><![CDATA[<div id="dtProfilerBarContainer" class="dtProfilerBar">
+ <template template_group="bar" template_name="bar" template_data="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions,$myApps" template_location="front" template_app="toolbox"><![CDATA[<div id="dtProfilerOther" class="ipsClearfix dtProfilerOther ipsPos_relative " data-ipstoolboxtoyboxmenu>
+        {{if empty($myApps) === false}}
+        <div class="celProfileMyapps ipsPos_relative isParent">
+            <a href="#apps_myapps_menu" id="apps_myapps" class="" title="My Apps" data-open data-ipsTooltip>
+                <i class="fa fa-angle-left"></i> <i class="fa fa-cubes"></i>
+            </a>
+            <div id="apps_myapps_menu" class="ipsHide dtProfilerOtherSub dtProfilerOtherSubChildMyApps">
+                {{$i=0;}}
+                    {{foreach $myApps as $mm}}
+                    <div class="dtProfileOtherSubsItem ipsPos_relative">
+                        <a href="#elProfileSources_{$mm['hash']}_menu" id="elProfileSources_{$mm['hash']}" data-open>
+                            <i class="fa fa-caret-left"></i>
+                            {$mm['name']|raw}
+                        </a>
+                        <div id="elProfileSources_{$mm['hash']}_menu" class="ipsHide dtProfilerOtherSubChild">
+                            {{foreach $mm['subs'] as $key => $data}}
+                            <div class="dtProfileOtherSubsItem">
+                                <a href="{$data['url']}" {{if isset($data['target']) }} target="_blank" {{else}}data-ipsDialog data-ipsDialog-destructOnClose="true" {{if $key === 'Add Sources' || $key === 'Add Assets'}} data-ipsDialog-remoteSubmit="true"{{endif}}{{endif}}>
+                                    {{if isset($data['icon']) }}
+                                    <i class="fa {$data['icon']}"></i>
+                                    {{endif}}
+                                    {$key}
+                                </a>
+                            </div>
+                            {{endforeach}}
+                        </div>
+                    </div>
+                    {{endforeach}}
+            </div>
+        </div>
+        {{endif}}
+        <div class="celProfileSystem ipsPos_relative isParent">
+            <a id="elProfileSystem" href="#elProfileSystem_menu" class=""  title="Dev Toy Box" data-open data-ipsTooltip>
+                <i class="fa fa-angle-left"></i> <i class="fa fa-smile-o"></i>
+            </a>
+            <div id="elProfileSystem_menu" class="dtProfilerOtherSub dtProfilerOtherSubChildSystem ipsHide">
+                <div class="ipsMenu_title">
+                    Other
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
+                                <i class="fa fa-compass"></i>
+                                <br>
+                                Diffs
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{$info['cache']}">
+                                <i class="fa fa-remove"></i>
+                                <br>
+                                Clear Caches
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="#" data-ipstoolboxproxy>
+                                <i class="fa">🔃</i>
+                                <br>
+                                Proxy Class
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    Generators
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=lorem' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Lorem Ipsum Generator">
+                                <i class="fa fa-language"></i>
+                                <br>
+                                Lorem Ipsum
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=bitwiseValues' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="BitWise Generator">
+                                <i class="fa">♾️</i>
+                                <br>
+                                BitWise
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=hash' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Hash Generator">
+                                <i class="fa fa-hashtag"></i>
+                                <br>
+                                Hash
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=uuid' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="UUID Generator">
+                                <i class="fa">✳️</i>
+                                <br>
+                                UUID
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    Encoders/Decoders
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=html' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="HTML Encoder/Decoder">
+                                <i class="fa fa-html5"></i>
+                                <br>
+                                Html
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=base' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Base64 Encoder/Decoder">
+                                <i class="fa">6️⃣4️⃣</i>
+                                <br>
+                                Base64
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    Converters
+                </div>
+                <div class="ipsClearfix">
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Numbers Converters">
+                                <i class="fa fa-calculator"></i>
+                                <br>
+                                Numbers
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=dates' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Dates Converters">
+                                <i class="fa fa-calendar"></i>
+                                <br>
+                                Dates
+                            </a>
+                        </div>
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            <a href="{url='app=toolbox&module=bt&controller=bt&do=images' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Image Converter">
+                                <i class="fa fa-image"></i>
+                                <br>
+                                Images
+                            </a>
+                        </div>
+                </div>
+                <div class="ipsMenu_title">
+                    System
+                </div>
+                <div class="ipsClearfix">
+                        {{foreach $info['server'] as $key => $val }}
+                        <div class="ipsPos_left ipsType_center ipsType_bold ipsPadding:half">
+                            {{if $key === 'IPS'}}
+                            <i class="fa">🅘🅟🅢</i>
+                            <br>
+                            {{elseif $key === 'MySql'}}
+                            <i class="fa">🅜🅨🅢🅠🅛</i>
+                            <br>
+                            {{endif}}
+                            {$val|raw}
+                        </div>
+                        {{endforeach}}
+                    </div>
+            </div>
+        </div>
+</div>
+
+<div id="dtProfilerBarContainer" class="dtProfilerBar">
     <ul class="ipsList_reset dtProfilerBar_list ipsClearfix" data-ipsdtprofiler{{if settings.dtprofiler_enable_debug && settings.dtprofiler_enable_debug_ajax }} data-ipsdtprofilerdebug data-url="{url='app=toolbox&module=bt&controller=bt' base='front'}"{{endif}}>
         {{if $time }}
         <li id="elProfileTimeLog" title="total time" class="isParent dtProfileFirst dtProfilerTime" data-ipstooltip>
@@ -131,7 +292,7 @@
             <ul id="elProfileSources_menu" class="ipsMenu ipsMenu_auto ipsMenu_wide ipsList_reset ipsHide">
                 {{foreach $info['sources'] as $key => $val }}
                 <li class="ipsMenu_item">
-                     <a href="{$val['url']}" data-ipsDialog data-ipsDialog-destructOnClos="true">
+                     <a href="{$val['url']}" data-ipsDialog data-ipsDialog-destructOnClos="true" >
                          {$val['name']}
                      </a>
                 </li>
@@ -140,171 +301,8 @@
         </li>
         {{endif}}
 
-        {{if empty($myApps) === false}}
-        <li class="isParent dtProfileFirst celProfileMyapps">
-            <a href="#apps_myapps_menu" id="apps_myapps" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
-                <i class="fa fa-compass"></i>
-                Build My Apps <i class="fa fa-angle-up"></i>
-            </a>
-            <div id="apps_myapps_menu" class="ipsMenu ipsMenu_wide ipsHide">
-                <div class="ipsMenu_innerContent ipsGrid">
-                    {{$i=0;}}
-                {{foreach $myApps as $mm}}
-                    {{$i++;}}
-                    {{if $i===4}}
-                </div>
-                    <div class="ipsMenu_innerContent ipsGrid">
-                        {{$i=1;}}
-                    {{endif}}
-                    <div class="ipsGrid_span4 ipsType_center ipsType_bold ipsPadding:half">
-                        <a href="{$mm['url']}">{$mm['name']|raw}</a>
-                    </div>
-                {{endforeach}}
-                </div>
-            </div>
-        </li>
-        {{endif}}
 
-        <li class="isParent dtProfileFirst celProfileSystem">
-            <a id="elProfileSystem" href="#elProfileSystem_menu" title="System" data-ipstooltip data-ipsmenu data-ipsmenu-appendTo="#dtProfilerBarContainer">
-                <i class="fa fa-smile-o"></i> Toy Box <i class="fa fa-angle-up"></i>
-            </a>
-            <div id="elProfileSystem_menu" class="ipsMenu ipsMenu_wide ipsHide">
-                <div class="ipsMenu_title">
-                    Generators
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=lorem' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Lorem Ipsum Generator">
-                                <i class="fa fa-language"></i>
-                                <br>
-                                Lorem Ipsum
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=bitwiseValues' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="BitWise Generator">
-                                <i class="fa">♾️</i>
-                                <br>
-                                BitWise
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=hash' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Hash Generator">
-                                <i class="fa fa-hashtag"></i>
-                                <br>
-                                Hash
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=uuid' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="UUID Generator">
-                                <i class="fa">✳️</i>
-                                <br>
-                                UUID
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="ipsMenu_title">
-                    Encoders/Decoders
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=html' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="HTML Encoder/Decoder">
-                                <i class="fa fa-html5"></i>
-                                <br>
-                                Html
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=base' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Base64 Encoder/Decoder">
-                                <i class="fa">6️⃣4️⃣</i>
-                                <br>
-                                Base64
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="ipsMenu_title">
-                    Converters
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=numbers' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Numbers Converters">
-                                <i class="fa fa-calculator"></i>
-                                <br>
-                                Numbers
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=dates' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Dates Converters">
-                                <i class="fa fa-calendar"></i>
-                                <br>
-                                Dates
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=images' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Image Converter">
-                                <i class="fa fa-image"></i>
-                                <br>
-                                Images
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="ipsMenu_title">
-                    System
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        {{foreach $info['server'] as $key => $val }}
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            {{if $key === 'IPS'}}
-                            <i class="fa">🅘🅟🅢</i>
-                            <br>
-                            {{elseif $key === 'MySql'}}
-                            <i class="fa">🅜🅨🅢🅠🅛</i>
-                            <br>
-                            {{endif}}
-                            {$val|raw}
-                        </div>
-                        {{endforeach}}
-                    </div>
-                </div>
 
-                <div class="ipsMenu_title">
-                    Other
-                </div>
-                <div class="ipsMenu_innerContent">
-                    <div class="ipsGrid">
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{url='app=toolbox&module=bt&controller=bt&do=diffs' base='front'}" data-ipsDialog data-ipsDialog-forceReload="true" data-ipsdialog-title="Compare 2 sources">
-                                <i class="fa fa-compass"></i>
-                                <br>
-                                Diffs
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="{$info['cache']}">
-                                <i class="fa fa-remove"></i>
-                                <br>
-                                Clear Caches
-                            </a>
-                        </div>
-                        <div class="ipsGrid_span3 ipsType_center ipsType_bold ipsPadding:half">
-                            <a href="#" data-ipstoolboxproxy>
-                                <i class="fa">🔃</i>
-                                <br>
-                                Proxy Class
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </li>
         {{if \IPS\Settings::i()->dtprofiler_use_console }}
         <li id="elProfileConsoleLog" class="isParent dtProfileFirst dtProfilerConsole">
             <i class="fa fa-terminal"></i> Console
@@ -342,76 +340,6 @@
 <div class="dtProfilerPlaceHolder">
 </div>
 ]]></template>
- <template template_group="bar" template_name="base" template_data="" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxbase>
-
-    <h4>Decoded</h4>
-    <div class="ipsClearfix">
-        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elDecodedContainer">X</button>
-        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elDecodedContainer">
-            <i class="fa fa-copy ipsCursor_pointer"></i>
-        </button>
-    </div>
-    <div class="ipsMargin_top">
-        <textarea id="elDecodedContainer">Hello World!!!!!</textarea>
-    </div>
-
-    <h4>Encoded</h4>
-    <div class="ipsClearfix">
-        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elEncodedContainer">X</button>
-        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elEncodedContainer">
-            <i class="fa fa-copy ipsCursor_pointer"></i>
-        </button>
-    </div>
-    <div class="ipsMargin_top">
-        <textarea id="elEncodedContainer">SGVsbG8gV29ybGQhISEhIQ==</textarea>
-    </div>
-</div>]]></template>
- <template template_group="bar" template_name="dates" template_data="$dates" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxdates >
-
-    <h4>Date</h4>
-    <div class="ipsMargin_top">
-        <label>
-            <input id="date" type="datetime-local" value="{$dates['date']}" data-input="dates">
-        </label>
-    </div>
-
-    <h4>Unix</h4>
-    <div class="ipsMargin_top">
-        <label>
-            <input id="unix" type="number" value="{$dates['unix']}" data-input="unix">
-        </label>
-    </div>
-
-    <h4>ISO 8601</h4>
-    <div class="ipsMargin_top">
-        <label>
-            <input id="iso" type="text" value="{$dates['iso']}" data-input="iso">
-        </label>
-    </div>
-
-    <div class="ipsMessage ipsMessage_info">
-        All times are in UTC Timezone.
-    </div>
-</div>]]></template>
- <template template_group="bar" template_name="diffs" template_data="" template_location="front" template_app="toolbox"><![CDATA[<div id="elDtProfilerDiffs" class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxdiffs>
-
-    <div class="ipsGrid">
-        <div class="ipsGrid_span6">
-            <h4>Source 1</h4>
-            <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="#source1">X</button>
-            <textarea id="source1" class="text">Hello World!
-foobar!</textarea>
-        </div>
-        <div class="ipsGrid_span6">
-            <h4>Source 2</h4>
-            <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="#source2">X</button>
-            <textarea id="source2">Whatever World!
-foobar!</textarea>
-        </div>
-    </div>
-    <h4>Diffs</h4>
-    <div id="diffs"></div>
-</div>]]></template>
  <template template_group="bar" template_name="git" template_data="$info=null" template_location="front" template_app="toolbox"><![CDATA[{{if isset( $info['app'] ) }}
     <div title="Application" data-ipsTooltip>{$info['app']}</div>
     <div title="Application Version" data-ipsTooltip>{$info['version']}</div>
@@ -466,133 +394,6 @@ foobar!</textarea>
     {{endif}}
 {{endif}}
 ]]></template>
- <template template_group="bar" template_name="hash" template_data="$hash, $md5, $sha1, $sha256,$sha512" template_location="front" template_app="toolbox"><![CDATA[{{if !\IPS\Request::i()->hash}}
-<div class="ipsPadding" data-ipstoolboxtoyboxhash>
-    <textarea id="hashbox">{$hash}</textarea>
-{{endif}}
-    <div class="ipsMargin_top" id="elHashContainer" >
-        <h3>md5</h3>
-        <div class="ipsClearfix ipsColumns">
-            <div class="ipsColumn ipsColumn_fluid">{$md5}</div>
-            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="md5">
-                <i class="fa fa-copy ipsCursor_pointer"></i>
-            </div>
-        </div>
-
-        <h3>sha1</h3>
-        <div class="ipsClearfix ipsColumns">
-            <div class="ipsColumn ipsColumn_fluid">{$sha1}</div>
-            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="sha1">
-                <i class="fa fa-copy ipsCursor_pointer"></i>
-            </div>
-        </div>
-
-        <h3>sha256</h3>
-        <div class="ipsClearfix ipsColumns">
-            <div class="ipsColumn ipsColumn_fluid">{$sha256}</div>
-            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="sha256">
-                <i class="fa fa-copy ipsCursor_pointer"></i>
-            </div>
-        </div>
-
-        <h3>sha512</h3>
-        <div class="ipsClearfix ipsColumns">
-            <div class="ipsColumn ipsColumn_fluid">{$sha512}</div>
-            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="sha512">
-                <i class="fa fa-copy ipsCursor_pointer"></i>
-            </div>
-        </div>
-    </div>
-{{if !\IPS\Request::i()->hash }}
-</div>
-{{endif}}]]></template>
- <template template_group="bar" template_name="html" template_data="$decoded,$encoded" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxhtml>
-
-    <h4>Decoded</h4>
-    <div class="ipsClearfix">
-        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elDecodedContainer">X</button>
-        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elDecodedContainer">
-            <i class="fa fa-copy ipsCursor_pointer"></i>
-        </button>
-    </div>
-    <div class="ipsMargin_top">
-        <textarea id="elDecodedContainer">{$decoded|raw}</textarea>
-    </div>
-
-    <h4>Encoded</h4>
-    <div class="ipsClearfix">
-        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elEncodedContainer">X</button>
-        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elEncodedContainer">
-            <i class="fa fa-copy ipsCursor_pointer"></i>
-        </button>
-    </div>
-    <div class="ipsMargin_top">
-        <textarea id="elEncodedContainer">{$encoded|raw}</textarea>
-    </div>
-</div>]]></template>
- <template template_group="bar" template_name="images" template_data="$form" template_location="front" template_app="toolbox"><![CDATA[<div id="elDtProfilerDiffs" class="ipsPadding ipsClearfix" data-ipstoolboxtoyboximages>
-    <h2>Image</h2>
-    {$form|raw}
-    <button class="ipsButton ipsButton_primary ipsButton_verySmall ipsPos_right ipsMargin_bottom:half" data-convert>Convert</button>
-    <div id="dl" class="ipsHide ipsType_center">
-        <div>
-        <a class="ipsButton ipsButton_primary ipsButton_verySmall ipsMargin_bottom:half">Download</a>
-        </div>
-        <img class="ipsImage ipsImage_thumb">
-    </div>
-</div>]]></template>
- <template template_group="bar" template_name="lorem" template_data="$form,$lorem" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxlorem>
-    {$form|raw}
-    <div class="ipsClearfix">
-    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-copy>
-        <i class="fa fa-copy"></i>
-    </button>
-    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-generate>Generate</button>
-    </div>
-    <div class="ipsMargin_top" id="elLoremContainer">{$lorem|raw}</div>
-</div>]]></template>
- <template template_group="bar" template_name="numbers" template_data="$output" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxnumbers>
-    <div id="error" class="ipsMessage ipsMessage_error{{if !isset($output['error']) }} ipsHide{{endif}}">
-        {{$error = $output['error'] ?? '';}}
-        {$error|raw}
-    </div>
-    <h4>Decimal</h4>
-    <div class="ipsMargin_top">
-        {{$dec = $output['decimal'] ?? 0;}}
-        <label>
-            <input id="decimal" type="number" value="{$dec}" data-input="decimal">
-        </label>
-    </div>
-    <h4>Hexadecimal</h4>
-    <div class="ipsMargin_top">
-        {{$hexa = $output['hexa'] ?? 0;}}
-        <label>
-            <input id="hexa" type="text" value="{$hexa}" data-input="hexa">
-        </label>
-    </div>
-    <h4>Ocatal</h4>
-    <div class="ipsMargin_top">
-        <label>
-            {{$octal = $output['octal'] ?? 0;}}
-            <input id="octal" type="number" value="{$octal}" data-input="octal">
-        </label>
-    </div>
-    <h4>Binary</h4>
-    <div class="ipsMargin_top">
-        <label>
-            {{$binary = $output['binary'] ?? 0;}}
-            <input id="binary" type="text" value="{$binary}" data-input="binary">
-        </label>
-    </div>
-</div>]]></template>
- <template template_group="bar" template_name="uuid" template_data="$form,$uuid" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxuuid>
-    {$form|raw}
-    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" id="clearuuid">X</button>
-    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" id="generate">Generate</button>
-    <div class="ipsMargin_top" id="elUuidContainer">
-        {$uuid|raw}
-    </div>
-</div>]]></template>
  <template template_group="bt" template_name="downloadInfo" template_data="$path, $error,$app" template_location="front" template_app="toolbox"><![CDATA[{{if $error !== null}}
 <div class="ipsMessage ipsMessage_error">
     <p>There was an error. Please check the system log for more details.</p>
@@ -669,11 +470,73 @@ foobar!</textarea>
     {{if $show}}
     <div class="ipsBorder_top ipsPadding ipsType_center">
         <a href='{$analyze}' class="ipsButton ipsButton_large ipsButton_primary">Reanalyze</a>
-        <a href='{$download}' class="ipsButton ipsButton_large ipsButton_primary">Download</a>
+        <a href='{$download}' class="ipsButton ipsButton_large ipsButton_primary">Build</a>
     </div>
     {{endif}}
 </div>
 
+]]></template>
+ <template template_group="code" template_name="hooksExists" template_data="array $values, $lang, $tableHead=[], $warning=false" template_location="admin" template_app="toolbox"><![CDATA[{{$count = \count($values);}}
+    {{if $count }}
+        {{$msgType = 'error';}}
+        {{if $warning === true}}
+            {{$msgType = 'warning';}}
+        {{endif}}
+        {{else}}
+        {{$msgType = 'success';}}
+    {{endif}}
+<div{{if $count }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$lang}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+    {lang="{$lang}" sprintf="$count"} {{if $count }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+    <div class="ipsType_medium ipsType_bold">
+        {lang="{$lang}_desc"}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$lang}">
+<table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_table">
+    {{if empty($tableHead) === false}}
+    <thead>
+        <tr>
+            {{foreach $tableHead as $head}}
+                <th>{lang="{$head}"}</th>
+            {{endforeach}}
+        </tr>
+    </thead>
+    {{endif}}
+    <tbody data-role="tableRows">
+        {{foreach $values as $data}}
+        <tr class="ipsClearfix">
+            <td class="ipsTable_wrap">
+                {{if $data['editorPath'] }}
+                <a href="{$data['editorPath']}">
+                    {$data['file']|raw}
+                </a>
+                {{else}}
+                {$data['file']|raw}
+                {{endif}}
+            </td>
+            <td class="ipsTable_wrap">
+
+                <div>
+
+                    {{if $data['editorPath'] }}
+                    <a href="{$data['editorPath']}">
+                        Path: {$data['path']|raw}
+                    </a>
+                    {{else}}
+                    Path: {$data['path']|raw}
+                    {{endif}}
+                </div>
+                <div>
+                    Error Message: {$data['error']|raw}
+                </div>
+            </td>
+        </tr>
+        {{endforeach}}
+    </tbody>
+</table>
+</div>
 ]]></template>
  <template template_group="code" template_name="lists" template_data="array $keys, $type,$msgType" template_location="admin" template_app="toolbox"><![CDATA[<div{{if \count($keys) }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$type}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
     <div class="ipsType_large ipsType_bold ipsClearfix">
@@ -931,78 +794,37 @@ foobar!</textarea>
     <span class="ipsType_bold">{lang="$lang"}</span>
 </li>
 ]]></template>
- <template template_group="generator" template_name="sources" template_data="$appKey" template_location="front" template_app="toolbox"><![CDATA[
-<div class="ipsPadding ipsClearfix">
+ <template template_group="generator" template_name="sources" template_data="$appKey, $menus, $module, $controller,$start, $active = null, $content=null" template_location="front" template_app="toolbox"><![CDATA[
+<div class="ipsPadding ipsClearfix dtProfilerDevCenterTabs">
     <h1>
-        Sources: {$appKey}
+        Application: {$appKey}
     </h1>
-    <div class="ipsColumn ipsColumn_medium ipsTabs" id="elTabs_sources_tabs" data-ipstabbar data-ipstabbar-contentarea="#elTabs_sources_tabs_content" data-ipstabbar-defaultTab="#elTab_sources_tab_standard">
-        <a href="#elTabs_sources_tabs" data-action="expandTabs"><i class="fa fa-caret-down"></i></a>
-        <ul role="tablist">
+    <div class="ipsColumn ipsColumn_medium ipsTabs dtProfilerDevCenter ipsPadding_bottom:half" id="elTabs_{$controller}_{$appKey}_tabs" data-ipstabbar data-ipstabbar-contentarea="#elTabs_{$controller}_{$appKey}_tabs_content" data-ipstabbar-defaultTab="#elTab_{$controller}_{$appKey}_tab_{{if $active === null}}{$start}{{else}}{$active}{{endif}}" data-ipstabbar-updateURL="false">
+        <a href="#elTabs_{$controller}_{$appKey}_tabs" data-action="expandTabs"><i class="fa fa-caret-down"></i></a>
+        <ul role="tablist" class="ipsList_reset">
+            {{foreach $menus as $m}}
             <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=standard"}' id="elTab_sources_tab_standard" class="ipsTabs_item" role="tab">
-                    Standard
+                <a href='{url="app=toolbox&module={$module}&controller={$controller}&appKey={$appKey}&do={$m}"}' id="elTab_{$controller}_{$appKey}_tab_{$m}" class="ipsTabs_item" role="tab">
+                    {lang="dtdevplus_menu_title_{$m}"}
                 </a>
             </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=cinterface"}' id="elTab_sources_tab_cinterface" class="ipsTabs_item" role="tab">
-                    Interface
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=ctraits"}' id="elTab_sources_tab_traits" class="ipsTabs_item" role="tab">
-                    Trait
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=singleton"}' id="elTab_sources_tab_singleton" class="ipsTabs_item" role="tab">
-                    Singleton
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=ar"}' id="elTab_sources_tab_ar" class="ipsTabs_item" role="tab">
-                    ActiveRecord
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=api"}' id="elTab_sources_tab_api" class="ipsTabs_item" role="tab">
-                    Api
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=node"}' id="elTab_sources_tab_node" class="ipsTabs_item" role="tab">
-                    Node
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=item"}' id="elTab_sources_tab_item" class="ipsTabs_item" role="tab">
-                    Item
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=comment"}' id="elTab_sources_tab_comment" class="ipsTabs_item" role="tab">
-                    Item's Comment
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=review"}' id="elTab_sources_tab_review" class="ipsTabs_item" role="tab">
-                    Item's Review
-                </a>
-            </li>
-            <li>
-                <a href='{url="app=toolbox&module=generator&controller=sources&appKey={$appKey}&do=debug"}' id="elTab_sources_tab_debug" class="ipsTabs_item" role="tab">
-                    Item's Review
-                </a>
-            </li>
+            {{endforeach}}
         </ul>
     </div>
-    <div class="ipsColumn ipsColumn_fluid" id="elTabs_sources_tabs_content">
-
+    <div class="ipsColumn ipsColumn_fluid" id="elTabs_{$controller}_{$appKey}_tabs_content">
+        {{if $active !== null}}
+        <div id="ipsTabs_elTabs_{$controller}_{$appKey}_tabs_elTab_{$controller}_{$appKey}_tab_{$active}_panel" class="ipsTabs_panel" aria-labelledby="elTab_{$controller}_{$appKey}_tab_{$active}" aria-hidden="false" animating="false">
+            {$content|raw}
+        </div>
+        {{endif}}
     </div>
-
 
 </div>
 ]]></template>
+ <template template_group="generator" template_name="wrapper" template_data="$title,$form" template_location="front" template_app="toolbox"><![CDATA[    <h2>{$title|raw}</h2>
+<div>
+    {$form|raw}
+</div>]]></template>
  <template template_group="generic" template_name="anchor" template_data="$name, $url, $dialog=false" template_location="front" template_app="toolbox"><![CDATA[{{if $url}}
 <a href="{$url}" {{if $dialog}}data-ipsDialog{{endif}}>
 {{endif}}
@@ -1115,6 +937,235 @@ foobar!</textarea>
     {$info|raw}
 </div>
 ]]></template>
+ <template template_group="toybox" template_name="base" template_data="" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxbase>
+
+    <h4>Decoded</h4>
+    <div class="ipsClearfix">
+        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elDecodedContainer">X</button>
+        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elDecodedContainer">
+            <i class="fa fa-copy ipsCursor_pointer"></i>
+        </button>
+    </div>
+    <div class="ipsMargin_top">
+        <textarea id="elDecodedContainer">Hello World!!!!!</textarea>
+    </div>
+
+    <h4>Encoded</h4>
+    <div class="ipsClearfix">
+        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elEncodedContainer">X</button>
+        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elEncodedContainer">
+            <i class="fa fa-copy ipsCursor_pointer"></i>
+        </button>
+    </div>
+    <div class="ipsMargin_top">
+        <textarea id="elEncodedContainer">SGVsbG8gV29ybGQhISEhIQ==</textarea>
+    </div>
+</div>]]></template>
+ <template template_group="toybox" template_name="bitwise" template_data="$pos,$bits,$class" template_location="front" template_app="toolbox"><![CDATA[{{if \IPS\Request::i()->position === null}}
+<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxbitwise>
+    <h4>Position</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="position" name="position" type="number" value="{$pos}" min="1">
+        </label>
+    </div>
+    {{if empty($class) === false}}
+    <h4>Class</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <select name="dtClass" id="dtClass">
+                <option value="0">Select Class..</option>
+                {{foreach $class as $k => $c}}
+                <option value="{$k}">{$c}</option>
+                {{endforeach}}
+            </select>
+        </label>
+    </div>
+    {{endif}}
+{{endif}}
+    <div class="ipsPadding ipsClearfix" id="elBitWiseBox">
+        <div class="ipsPos_left ipsMargin_right">
+            {{foreach $bits as $bit}}
+            {$bit|raw}
+            {{endforeach}}
+        </div>
+    </div>
+{{if \IPS\Request::i()->position === null}}
+</div>
+{{endif}}]]></template>
+ <template template_group="toybox" template_name="dates" template_data="$dates" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxdates >
+
+    <h4>Date</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="date" type="datetime-local" value="{$dates['date']}" data-input="dates">
+        </label>
+    </div>
+
+    <h4>Unix</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="unix" type="number" value="{$dates['unix']}" data-input="unix">
+        </label>
+    </div>
+
+    <h4>ISO 8601</h4>
+    <div class="ipsMargin_top">
+        <label>
+            <input id="iso" type="text" value="{$dates['iso']}" data-input="iso">
+        </label>
+    </div>
+
+    <div class="ipsMessage ipsMessage_info">
+        All times are in UTC Timezone.
+    </div>
+</div>]]></template>
+ <template template_group="toybox" template_name="diffs" template_data="" template_location="front" template_app="toolbox"><![CDATA[<div id="elDtProfilerDiffs" class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxdiffs>
+
+    <div class="ipsGrid">
+        <div class="ipsGrid_span6">
+            <h4>Source 1</h4>
+            <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="#source1">X</button>
+            <textarea id="source1" class="text">Hello World!
+foobar!</textarea>
+        </div>
+        <div class="ipsGrid_span6">
+            <h4>Source 2</h4>
+            <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="#source2">X</button>
+            <textarea id="source2">Whatever World!
+foobar!</textarea>
+        </div>
+    </div>
+    <h4>Diffs</h4>
+    <div id="diffs"></div>
+</div>]]></template>
+ <template template_group="toybox" template_name="hash" template_data="$hash, $md5, $sha1, $sha256,$sha512" template_location="front" template_app="toolbox"><![CDATA[{{if !\IPS\Request::i()->hash}}
+<div class="ipsPadding" data-ipstoolboxtoyboxhash>
+    <textarea id="hashbox">{$hash}</textarea>
+{{endif}}
+    <div class="ipsMargin_top" id="elHashContainer" >
+        <h3>md5</h3>
+        <div class="ipsClearfix ipsColumns">
+            <div class="ipsColumn ipsColumn_fluid">{$md5}</div>
+            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="md5">
+                <i class="fa fa-copy ipsCursor_pointer"></i>
+            </div>
+        </div>
+
+        <h3>sha1</h3>
+        <div class="ipsClearfix ipsColumns">
+            <div class="ipsColumn ipsColumn_fluid">{$sha1}</div>
+            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="sha1">
+                <i class="fa fa-copy ipsCursor_pointer"></i>
+            </div>
+        </div>
+
+        <h3>sha256</h3>
+        <div class="ipsClearfix ipsColumns">
+            <div class="ipsColumn ipsColumn_fluid">{$sha256}</div>
+            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="sha256">
+                <i class="fa fa-copy ipsCursor_pointer"></i>
+            </div>
+        </div>
+
+        <h3>sha512</h3>
+        <div class="ipsClearfix ipsColumns">
+            <div class="ipsColumn ipsColumn_fluid">{$sha512}</div>
+            <div class="ipsColumn ipsColumn_veryNarrow" data-copy="sha512">
+                <i class="fa fa-copy ipsCursor_pointer"></i>
+            </div>
+        </div>
+    </div>
+{{if !\IPS\Request::i()->hash }}
+</div>
+{{endif}}]]></template>
+ <template template_group="toybox" template_name="html" template_data="$decoded,$encoded" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxhtml>
+
+    <h4>Decoded</h4>
+    <div class="ipsClearfix">
+        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elDecodedContainer">X</button>
+        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elDecodedContainer">
+            <i class="fa fa-copy ipsCursor_pointer"></i>
+        </button>
+    </div>
+    <div class="ipsMargin_top">
+        <textarea id="elDecodedContainer">{$decoded|raw}</textarea>
+    </div>
+
+    <h4>Encoded</h4>
+    <div class="ipsClearfix">
+        <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-clear="elEncodedContainer">X</button>
+        <button class="copy ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-copy="elEncodedContainer">
+            <i class="fa fa-copy ipsCursor_pointer"></i>
+        </button>
+    </div>
+    <div class="ipsMargin_top">
+        <textarea id="elEncodedContainer">{$encoded|raw}</textarea>
+    </div>
+</div>]]></template>
+ <template template_group="toybox" template_name="images" template_data="$form" template_location="front" template_app="toolbox"><![CDATA[<div id="elDtProfilerDiffs" class="ipsPadding ipsClearfix" data-ipstoolboxtoyboximages>
+    <h2>Image</h2>
+    {$form|raw}
+    <button class="ipsButton ipsButton_primary ipsButton_verySmall ipsPos_right ipsMargin_bottom:half" data-convert>Convert</button>
+    <div id="dl" class="ipsHide ipsType_center">
+        <div>
+        <a class="ipsButton ipsButton_primary ipsButton_verySmall ipsMargin_bottom:half">Download</a>
+        </div>
+        <img class="ipsImage ipsImage_thumb">
+    </div>
+</div>]]></template>
+ <template template_group="toybox" template_name="lorem" template_data="$form,$lorem" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxlorem>
+    {$form|raw}
+    <div class="ipsClearfix">
+    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" data-copy>
+        <i class="fa fa-copy"></i>
+    </button>
+    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" data-generate>Generate</button>
+    </div>
+    <div class="ipsMargin_top" id="elLoremContainer">{$lorem|raw}</div>
+</div>]]></template>
+ <template template_group="toybox" template_name="numbers" template_data="$output" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxnumbers>
+    <div id="error" class="ipsMessage ipsMessage_error{{if !isset($output['error']) }} ipsHide{{endif}}">
+        {{$error = $output['error'] ?? '';}}
+        {$error|raw}
+    </div>
+    <h4>Decimal</h4>
+    <div class="ipsMargin_top">
+        {{$dec = $output['decimal'] ?? 0;}}
+        <label>
+            <input id="decimal" type="number" value="{$dec}" data-input="decimal">
+        </label>
+    </div>
+    <h4>Hexadecimal</h4>
+    <div class="ipsMargin_top">
+        {{$hexa = $output['hexa'] ?? 0;}}
+        <label>
+            <input id="hexa" type="text" value="{$hexa}" data-input="hexa">
+        </label>
+    </div>
+    <h4>Ocatal</h4>
+    <div class="ipsMargin_top">
+        <label>
+            {{$octal = $output['octal'] ?? 0;}}
+            <input id="octal" type="number" value="{$octal}" data-input="octal">
+        </label>
+    </div>
+    <h4>Binary</h4>
+    <div class="ipsMargin_top">
+        <label>
+            {{$binary = $output['binary'] ?? 0;}}
+            <input id="binary" type="text" value="{$binary}" data-input="binary">
+        </label>
+    </div>
+</div>]]></template>
+ <template template_group="toybox" template_name="uuid" template_data="$form,$uuid" template_location="front" template_app="toolbox"><![CDATA[<div class="ipsPadding ipsClearfix" data-ipstoolboxtoyboxuuid>
+    {$form|raw}
+    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary" id="clearuuid">X</button>
+    <button class="ipsPos_right ipsButton ipsButton_veryVerySmall ipsButton_primary ipsMargin_right:half" id="generate">Generate</button>
+    <div class="ipsMargin_top" id="elUuidContainer">
+        {$uuid|raw}
+    </div>
+</div>]]></template>
  <css css_location="admin" css_app="toolbox" css_attributes="" css_path="." css_name="adminer.css"><![CDATA[#acpMainLayout {
   overflow: unset;
 }
@@ -2406,6 +2457,133 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
     font-size:14px;
 }
 
+#dtProfilerOther .isParent {
+    color: #fff;
+}
+
+#dtProfilerOther .isParent:not(:last-child){
+    border-top-left-radius: 10px;
+}
+
+#dtProfilerOther .isParent:not(:first-child){
+    border-bottom-left-radius: 10px;
+}
+
+#dtProfilerOther .isParent > a {
+    display:block;
+    color: #fff;
+    font-size:14px;
+    padding: 6px;
+}
+
+#dtProfilerOther .isParent > a > .fa-angle-down{
+    font-size:12px;
+}
+
+.dtProfilerOtherSubChild,
+.dtProfilerOtherSub {
+    position: absolute;
+    background: rgb( var(--theme-area_background_reset) );
+    box-shadow: var(--popup--boxShadow);
+}
+
+.dtProfilerOtherSub a {
+
+    color:rgb( var(--theme-link) );
+}
+.celProfileMyapps .dtProfilerOtherSub a {
+    width:100%;
+    display: block;
+    padding:5px;
+}
+.ipsDarkMode .dtProfilerOtherSub a {
+    color:#fff;
+}
+
+.dtActive,
+.dtProfileOtherSubsItem > a:hover{
+    color: #fff !important;
+    background: rgb(var(--theme-text_light))
+}
+
+.dtProfileOtherSubsItem {
+    width:220px;
+}
+
+.dtProfilerOtherSubChildSystem {
+    color:rgb( var(--theme-link) );
+    width:300px;
+}
+
+.dtProfilerOtherSubChildSystem .ipsPos_left {
+    display:inline-block;
+    vertical-align: top;
+}
+
+.ipsDarkMode.ipsApp_admin .dtProfilerOtherSubChildSystem {
+    color: #fff;
+}
+
+#dtProfilerOther {
+    position: fixed;
+    top:35%;
+    right:0;
+}
+
+.dtProfilerOtherSub,
+.dtProfilerOtherSubChild {
+    top:0;
+    right:45px;
+    background: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+.dtProfilerOtherSubChild:after,
+.dtProfilerOtherSubChild:before,
+.dtProfilerOtherSub:after,
+.dtProfilerOtherSub:before {
+    left: 100%;
+    top: 15px;
+    border: solid transparent;
+    content: "";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.dtProfilerOtherSub:after,
+.dtProfilerOtherSubChild:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-left-color: #ffffff;
+    border-width: 10px;
+    margin-top: -10px;
+}
+
+.dtProfilerOtherSub:before,
+.dtProfilerOtherSubChild:before {
+    border-color: rgba(255, 255, 255, 0);
+    border-left-color: #ffffff;
+    border-width: 11px;
+    margin-top: -11px;
+}
+
+.ipsDarkMode .dtProfilerOtherSub,
+.ipsDarkMode .dtProfilerOtherSubChild {
+    background: var(--c1);
+    border: 1px solid var(--c1);
+}
+
+.ipsDarkMode .dtProfilerOtherSub:after,
+.ipsDarkMode .dtProfilerOtherSubChild:after {
+    border-left-color: var(--c1);
+}
+
+.ipsDarkMode .dtProfilerOtherSub:before,
+.ipsDarkMode .dtProfilerOtherSubChild:before {
+    border-left-color: var(--c1);
+}
+
 .dtProfilerBar {
     position:fixed;
     z-index:1500;
@@ -2673,8 +2851,10 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
     color:#FF0000;
     padding-left:10px;
 }
-
 .dtProfilerBar .ipsMenu_innerContent,
+.toolboxPhpInfo a,
+.toolboxPhpInfo a:link {color: #000; text-decoration: none;}
+.ipsDarkMode .dtProfilerBar .ipsMenu_innerContent,
 .dtProfileExtra {
     color:#fff !important;
 }
@@ -2691,8 +2871,7 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 
 
 .toolboxPhpInfo {font-family: sans-serif !important; font-size: 16px;}
-.toolboxPhpInfo a,
-.toolboxPhpInfo a:link {color: #000; text-decoration: none;}
+
 .toolboxPhpInfo a:hover {text-decoration: underline;}
 .toolboxPhpInfo pre {
     margin: 0;
@@ -2850,7 +3029,39 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 }
 .PopUpForm [type="submit"] {
     float:right;
-}]]></css>
+}
+.ipsPageAction{
+    bottom:100px;
+}
+
+.dtProfilerDevCenter .ipsTabs_item {
+    border-radius: var(--radius-2);
+}
+
+.dtProfilerDevCenter.ipsTabs [role="tablist"] {
+    display:block;
+}
+
+
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_label,*/
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_title,*/
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_vertical .ipsFieldRow > .ipsFieldRow_label,*/
+/*html[dir] .dtProfilerDevCenterTabs .ipsForm_vertical .ipsFieldRow > .ipsFieldRow_title {*/
+/*    float: left;*/
+/*     min-width: unset;*/
+/*    font-size: 14px;*/
+/*    font-weight: 500;*/
+/*    text-align: left;*/
+/*    width:200px;*/
+/*}*/
+/*.dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_label,*/
+/*.dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_title {*/
+/*    width: unset;*/
+/*}*/
+/*.dtProfilerDevCenterTabs .ipsField_stackItem .ipsField_autocomplete input[type="text"]:not(.ipsField_stackItemNoMargin){*/
+/*    margin-left:0;*/
+/*    padding-left:0;*/
+/*}*/]]></css>
  <css css_location="admin" css_app="toolbox" css_attributes="" css_path="." css_name="test.css"><![CDATA[
 .adminerDarkMode a {
     color: blue;

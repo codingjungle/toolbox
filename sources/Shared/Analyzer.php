@@ -88,7 +88,19 @@ trait Analyzer
     {
         $application = Request::i()->myApp ?? Request::i()->application;
         $download = Request::i()->download ?? 0;
-        if(\IPS\Dispatcher::i()->controllerLocation === 'admin'){
+
+        if($download !== 0){
+            $baseUrl = Url::internal('app=toolbox&module=bt&controller=build')
+                ->setQueryString(
+                    [
+                        'myApp' => $application,
+                        'download' => $download
+                    ]
+                );
+            $url = $baseUrl->setQueryString(['do'=>'queue']);
+            $redirect = $url->setQueryString(['do'=>'results']);
+        }
+        else{
             $url = Url::internal('app=toolbox&module=code&controller=analyzer&do=queue&download=1')
                 ->setQueryString(
                     [
@@ -101,17 +113,6 @@ trait Analyzer
                 'application' => $application,
                 'download'    => $download
             ]);
-        }
-        else{
-            $baseUrl = Url::internal('app=toolbox&module=bt&controller=build')
-                ->setQueryString(
-                    [
-                        'myApp' => $application,
-                        'download' => $download
-                    ]
-                );
-            $url = $baseUrl->setQueryString(['do'=>'queue']);
-            $redirect = $url->setQueryString(['do'=>'results']);
         }
 
         Output::i()->output = new MultipleRedirect(
@@ -137,53 +138,74 @@ trait Analyzer
                     $complete++;
                     break;
                 case 0:
-                    $warnings['sql_check'] = (new Db($app))->check();
+                    if(\IPS\Settings::i()->dtcode_analyze_db) {
+                        $warnings['sql_check'] = (new Db($app))->check();
+                    }
                     $complete = 1;
                     break;
                 case 1:
-                    $warnings['filestorage_check'] = (new FileStorage($app))->check();
+                    if(\IPS\Settings::i()->dtcode_analyze_filestorage) {
+                        $warnings['filestorage_check'] = (new FileStorage($app))->check();
+                    }
                     $complete = 2;
                     break;
                 case 2:
-                    $warnings['root_path'] = (new RootPath($app))->check();
+                    if(\IPS\Settings::i()->dtcode_analyze_rootpath) {
+                        $warnings['root_path'] = (new RootPath($app))->check();
+                    }
                     $complete = 3;
                     break;
                 case 3:
-                    $errorsCodes = (new ErrorCodes($app))->check();
-                    if (empty($errorsCodes['warnings']) === false) {
-                        $warnings['error_codes_ips'] = $errorsCodes['warnings'];
-                    }
-                    if (empty($errorsCodes['dupes']) === false) {
-                        $warnings['error_codes_dupes'] = $errorsCodes['dupes'];
+                    if(\IPS\Settings::i()->dtcode_analyze_error_codes) {
+                        $errorsCodes = (new ErrorCodes($app))->check();
+                        if (empty($errorsCodes['warnings']) === false) {
+                            $warnings['error_codes_ips'] = $errorsCodes['warnings'];
+                        }
+                        if (empty($errorsCodes['dupes']) === false) {
+                            $warnings['error_codes_dupes'] = $errorsCodes['dupes'];
+                        }
                     }
                     $complete = 4;
                     break;
                 case 4:
+                    if(\IPS\Settings::i()->dtcode_analyze_hooks) {
                         try {
                             $hooks = new Hooks($app);
                             $warnings['hooks_exists'] = $hooks->exist();
                             $warnings['hooks_validation'] = $hooks->validate();
-                        }catch(\InvalidArgumentException $e){}
+                        } catch (\InvalidArgumentException $e) {
+                        }
+                    }
                     $complete = 5;
                     break;
                 case 5:
-                    $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
+                    if(\IPS\Settings::i()->dtcode_analyze_interface) {
+                        $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
+                    }
                     $complete = 6;
                     break;
                 case 6:
-                    $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
+                    if(\IPS\Settings::i()->dtcode_analyze_settings_verify) {
+                        $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
+                    }
                     $complete = 7;
                     break;
                 case 7:
-                    $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
+                    if(\IPS\Settings::i()->dtcode_analyze_settings_check) {
+                        $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
+                    }
                     $complete = 8;
                     break;
                 case 8:
-                    $warnings['langs_check'] = (new Langs($app))->check();
+                    if(\IPS\Settings::i()->dtcode_analyze_langs_check) {
+                        $warnings['langs_check'] = (new Langs($app))->check();
+                    }
                     $complete = 9;
                     break;
                 case 9:
-                    $warnings['langs_verify'] = (new Langs($app))->verify();
+                    if(\IPS\Settings::i()->dtcode_analyze_langs_verify) {
+                        $warnings['langs_verify'] = (new Langs($app))->verify();
+                    }
                     $complete = 10;
                     break;
             }
@@ -348,26 +370,42 @@ trait Analyzer
                             ]
                         );
                         break;
+                    case 'hooks_exists':
+                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->hooksExists(
+                            $val,
+                            'hooks_exists',
+                            [
+                                'File',
+                                'Path',
+                            ]
+                        );
+                        break;
+                    case 'hooks_validation':
+                        $parse = $val['parse'] ?? null;
+                        $loading = $value['processing'] ?? null;
+                        foreach($val as $key => $data){
+                            $headers = [];
+                            if($key === 'signature' || $key === 'parameters'){
+                                $headers[] = 'File';
+                            }
+                            $headers[] = 'Path';
+                            $headers[] = 'Error';
+                            $headers[] = 'Line';
+                            $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                                $data,
+                                'hooks_'.$key,
+                                [
+                                    'File',
+                                    'Error',
+                                    'Line'
+                                ]
+                            );
+                        }
+                        break;
                 }
             }
             $download = Request::i()->download ?? 0;
-            if(\IPS\Dispatcher::i()->controllerLocation === 'admin'){
-                $analyze = Url::internal('app=toolbox&module=code&controller=analyzer&do=queue&download=1')
-                    ->setQueryString(
-                        [
-                            'application' => $application,
-                            'analyzed'    => $download
-                        ]
-                    );
-                $downloadUrl = Url::internal('app=core&module=applications&controller=applications&do=download')
-                    ->setQueryString(
-                        [
-                            'appKey' => $application,
-                            'analyzed'    => $download
-                        ]
-                    );
-            }
-            else{
+
                 $baseUrl = Url::internal('app=toolbox&module=bt&controller=build')
                     ->setQueryString(
                         [
@@ -377,7 +415,6 @@ trait Analyzer
                     );
                 $analyze = $baseUrl->setQueryString(['do'=>'queue']);
                 $downloadUrl = $baseUrl->setQueryString(['do'=>'download']);
-            }
             Output::i()->output = Theme::i()->getTemplate('code','toolbox','admin')->final(
                 $output,
                 (bool)$download,

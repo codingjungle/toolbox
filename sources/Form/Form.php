@@ -68,6 +68,8 @@ class _Form extends \IPS\Helpers\Form
      */
     public $error;
 
+    public $valuesError;
+
     /**
      * @var \IPS\Helpers\Form
      */
@@ -148,6 +150,9 @@ class _Form extends \IPS\Helpers\Form
     protected $wizard = false;
     protected $wizardEdit = false;
     protected $random = false;
+    protected $doLabels = false;
+    protected $stripLabels;
+    protected $hasSubmitted = false;
 
     /**
      * Form constructor.
@@ -167,6 +172,12 @@ class _Form extends \IPS\Helpers\Form
         } elseif ($form instanceof \IPS\Helpers\Form) {
             $this->form = $form;
         }
+    }
+
+    public function doLabels($toStrips){
+        $this->doLabels = true;
+        $this->stripLabels = $toStrips;
+        return $this;
     }
 
     /**
@@ -439,6 +450,9 @@ class _Form extends \IPS\Helpers\Form
                             Member::loggedIn()->language()->words[$key] = $tab;
                             $tab = $key;
                         }
+                        if($this->doLabels === true){
+                            $tab = str_replace($this->stripLabels,'',$tab);
+                        }
                         if ($this->tabsToHeaders === false) {
                             $this->form->addTab($tab);
                         } else {
@@ -455,6 +469,9 @@ class _Form extends \IPS\Helpers\Form
                     $suffix = $this->suffix === true ? '_header' : '';
                     $prefix = $this->prefixTabs === true ? $this->formPrefix : '';
                     $header = $prefix . $el->header . $suffix;
+                    if($this->doLabels === true){
+                        $header = str_replace($this->stripLabels,'',$header);
+                    }
                     if (!isset($this->headerStore[$header])) {
                         $this->headerStore[$header] = 1;
                         if ($this->createLangs === true) {
@@ -474,6 +491,10 @@ class _Form extends \IPS\Helpers\Form
                 if ($el->sidebar) {
                     $suffix = $this->suffix ? '_sidebar' : '';
                     $sideBar = $this->formPrefix . $el->sidebar . $suffix;
+
+                    if($this->doLabels === true){
+                        $sideBar = str_replace($this->stripLabels,'',$sideBar);
+                    }
                     if (Member::loggedIn()->language()->checkKeyExists($sideBar)) {
                         $sideBar = Member::loggedIn()->language()->addToStack($sideBar);
                     }
@@ -494,6 +515,9 @@ class _Form extends \IPS\Helpers\Form
                             Member::loggedIn()->language()->words[$key] = $tab;
                             $tab = $key;
                         }
+                        if($this->doLabels === true){
+                            $tab = str_replace($this->stripLabels,'',$tab);
+                        }
                         if ($this->tabsToHeaders === false) {
                             $this->form->addTab($tab, $el->options['icon'] ?? null, null,
                                 $el->options['css'] ?? null );
@@ -511,6 +535,9 @@ class _Form extends \IPS\Helpers\Form
                     $suffix = $this->suffix === true ? '_header' : '';
                     $prefix = $this->prefixTabs === true ? $this->formPrefix : '';
                     $header = $prefix . $el->name . $suffix;
+                    if($this->doLabels === true){
+                        $header = str_replace($this->stripLabels,'',$header);
+                    }
                     if (!isset($this->headerStore[$header])) {
                         $this->headerStore[$header] = 1;
                         if ($this->createLangs === true) {
@@ -528,6 +555,9 @@ class _Form extends \IPS\Helpers\Form
                     }
                     break;
                 case 'sidebar':
+                    if($this->doLabels === true){
+                        $name = str_replace($this->stripLabels,'',$name);
+                    }
                     if (Member::loggedIn()->language()->checkKeyExists($name)) {
                         $name = Member::loggedIn()->language()->addToStack($name);
                     }
@@ -538,6 +568,9 @@ class _Form extends \IPS\Helpers\Form
                     break;
                 case 'message':
                     $parse = false;
+                    if($this->doLabels === true){
+                        $name = str_replace($this->stripLabels,'',$name);
+                    }
                     if (Member::loggedIn()->language()->checkKeyExists($name)) {
                         $parse = true;
                         if (isset($extra['sprintf'])) {
@@ -656,7 +689,11 @@ class _Form extends \IPS\Helpers\Form
                     ) {
                         $langs = [];
                         foreach ($options['options'] as $key => $val) {
-                            $langs[$key] = $this->formPrefix . $val . '_options';
+                            $nn = $this->formPrefix . $val . '_options';
+                            if($this->doLabels === true){
+                                $nn = str_replace($this->stripLabels,'',$nn);
+                            }
+                            $langs[$key] = $nn;
                         }
                         $options['options'] = $langs;
                     }
@@ -684,8 +721,17 @@ class _Form extends \IPS\Helpers\Form
                     if ($el->appearRequired === true) {
                         $element->appearRequired = $el->appearRequired;
                     }
+                    $exists = true;
+                    if($this->doLabels === true && !isset($el->label['key']) && $this->hasSubmitted === false){
+                        $exists = false;
+                        $el->label(str_replace($this->stripLabels,'',$name));
+                    }
                     if (is_array($el->label) && isset($el->label['key'])) {
                         $label = $el->label['key'];
+                        if($this->doLabels === true && $exists === true){
+                            $label = str_replace($this->stripLabels,'',$this->formPrefix).$label;
+                        }
+
                         if (Member::loggedIn()->language()->checkKeyExists($this->formPrefix . $label)) {
                             if (isset($el->label['sprintf']) && is_array($el->label['sprintf'])) {
                                 $label = Member::loggedIn()->language()->addToStack(
@@ -696,7 +742,7 @@ class _Form extends \IPS\Helpers\Form
                                 $label = Member::loggedIn()->language()->addToStack($this->formPrefix . $label);
                             }
                         }
-                        if ($label === $el->label['key'] && Member::loggedIn()->language()->checkKeyExists($label)) {
+                        if (Member::loggedIn()->language()->checkKeyExists($label)) {
                             if (isset($el->label['sprintf']) && is_array($el->label['sprintf'])) {
                                 $label = Member::loggedIn()->language()->addToStack(
                                     $label,
@@ -708,9 +754,19 @@ class _Form extends \IPS\Helpers\Form
                         }
                         $element->label = $label;
                     }
-
+                    $existsDesc = true;
+                    if($this->doLabels === true && !isset($el->description['key'])){
+                        $desc = str_replace($this->stripLabels,'',$name.'_desc');
+                        if(Member::loggedIn()->language()->checkKeyExists($desc)) {
+                            $existsDesc = false;
+                            $el->description($desc);
+                        }
+                    }
                     if (is_array($el->description) && isset($el->description['key'])) {
                         $desc = $el->description['key'];
+                        if($this->doLabels === true && $existsDesc === true && $this->hasSubmitted === false){
+                            $desc = str_replace($this->stripLabels,'',$this->formPrefix).$desc;
+                        }
                         if (Member::loggedIn()->language()->checkKeyExists($this->formPrefix . $desc)) {
                             if (isset($el->description['sprintf'])) {
                                 $desc = Member::loggedIn()->language()->addToStack(
@@ -1192,7 +1248,10 @@ class _Form extends \IPS\Helpers\Form
             if ($this->built === false) {
                 $this->build();
             }
+            $this->valuesError = true;
+            $this->hasSubmitted = true;
             if ($values = $this->form->values($stringValues)) {
+                $this->valuesError = false;
                 foreach ($values as $key => $value) {
                     $og = $key;
                     $key = $this->stripPrefix($key);

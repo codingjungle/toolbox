@@ -239,13 +239,15 @@ trait ClassMethods
     {
         return $this->methods[$name] ?? null;
     }
-
-    public function addMixin($class)
+    public function addMixin($class, $doImport = false)
     {
         $og = explode('\\', $class);
-        if ($this->doImports === true && count($og) >= 2) {
+        if ($doImport === true && count($og) >= 2) {
             $this->addImport($class);
             $class = array_pop($og);
+        }
+        if(\mb_substr($class,0,1) !== '\\'){
+            $class = '\\'.$class;
         }
         $this->classComment[] = '@mixin ' . $class;
     }
