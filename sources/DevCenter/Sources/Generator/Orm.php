@@ -41,6 +41,9 @@ class _Orm extends GeneratorAbstract
         $this->generator->addImportFunction('strlen');
         $this->generator->addImportFunction('explode');
 
-        $this->generator->addClassBody(\file_get_contents(Application::getRootPath('toolbox').'/applications/toolbox/data/defaults/orm.txt') );
+        $tb = Application::getRootPath('toolbox');
+        $content = \file_get_contents($tb . '/applications/toolbox/data/defaults/sources/orm.txt');
+
+        $this->generator->addClassBody($content);
     }
 }

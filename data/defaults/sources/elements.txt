@@ -19,6 +19,7 @@
         'dr'           => DateRange::class,
         'editor'       => Editor::class,
         'email'        => Email::class,
+        'file'         => File::class,
         'ftp'          => Ftp::class,
         'interval'     => Interval::class,
         'item'         => Item::class,
@@ -54,9 +55,7 @@
         'url'          => Url::class,
         'widthheight'  => WidthHeight::class,
         'wh'           => WidthHeight::class,
-        'yesno'        => YesNo::class,
-        'yn'           => YesNo::class,
-        'toggle'       => YesNo::class
+        'yn'           => YesNo::class
     ];
 
     public static $nonHelpers = [
@@ -199,7 +198,9 @@
             if (!($name instanceof FormAbstract) && static::isHelper($type) === true) {
                 $class = static::getHelper($type) ?? Text::class;
                 $type = 'helper';
-            } elseif ($name instanceof FormAbstract) {
+            }
+
+            if ($name instanceof FormAbstract) {
                 $class = $name;
                 $type = 'helper';
             }
@@ -224,6 +225,36 @@
         return static::$helpers[$type] ?? null;
     }
 
+    public function changeType(string $type, $custom = '')
+    {
+        $class = null;
+
+        $type2 = mb_strtolower($type);
+
+        if ($type instanceof FormAbstract) {
+            $class = $type;
+            $type = 'helper';
+        } elseif (!isset(static::$nonHelpers[$type2])) {
+            if (!($type2 instanceof FormAbstract) && static::isHelper($type2) === true) {
+                $class = static::getHelper($type2) ?? Text::class;
+                $type = 'helper';
+            }
+
+            if ($type2 instanceof FormAbstract) {
+                $class = $type2;
+                $type = 'helper';
+            }
+        } elseif ($type2 === 'custom') {
+            $class = $custom;
+            $type = 'helper';
+            $this->custom = true;
+        }
+        $this->type = $type;
+        $this->class = $class;
+
+        return $this;
+    }
+
     /**
      * @param $value
      *
@@ -237,7 +268,7 @@
     }
 
     /**
-     * @return self
+     * @return \IPS\formularize\Form\_Element
      */
     public function required(bool $required = true): self
     {
@@ -289,7 +320,7 @@
      */
     public function prefix(?string $prefix): self
     {
-        if($prefix !== null) {
+        if ($prefix !== null) {
             $this->prefix = $prefix;
         }
         return $this;
@@ -302,7 +333,7 @@
      */
     public function suffix(?string $suffix): self
     {
-        if($suffix !== null) {
+        if ($suffix !== null) {
             $this->suffix = $suffix;
         }
         return $this;

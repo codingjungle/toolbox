@@ -1,0 +1,6 @@
+.#app#PopUpForm {
+    padding: 0 var(--sp-4) var(--sp-4) var(--sp-4);
+}
+.#app#PopUpForm [type="submit"] {
+    float:right;
+}

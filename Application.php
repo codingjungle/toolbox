@@ -22,16 +22,14 @@ use IPS\Theme;
 use function array_merge;
 use function count;
 use function defined;
+use function file_get_contents;
 use function is_array;
+use function json_decode;
 use function ob_end_clean;
 use function ob_get_clean;
 use function ob_start;
 use function preg_replace_callback;
 use function str_replace;
-
-use function file_get_contents;
-use function json_decode;
-
 
 
 /**
@@ -53,8 +51,9 @@ class _Application extends Application
     {
         if (static::$loaded === false) {
             static::$loaded = true;
-            require \IPS\Application::getRootPath() . '/applications/toolbox/sources/vendor/autoload.php';
-            IPS::$PSR0Namespaces['Generator'] = \IPS\Application::getRootPath() . '/applications/toolbox/sources/Generator/';
+            require \IPS\Application::getRootPath('toolbox') . '/applications/toolbox/sources/vendor/autoload.php';
+            IPS::$PSR0Namespaces['Generator'] = \IPS\Application::getRootPath(
+                ) . '/applications/toolbox/sources/Generator/';
         }
     }
 

@@ -290,6 +290,7 @@ class _Sources
     {
         $this->type = $type;
         $this->form
+            ->dialogForm()
             ->formPrefix('dtdevplus_class__r' . $this->type . 'r_')
             ->doLabels('_r' . $this->type . 'r_')
             ->formId('dtdevplus_class__r' . $this->type . 'r_')

@@ -10,9 +10,7 @@
  * @version     -storm_version-
  */
 
-
 namespace IPS\toolbox\DevCenter\Sources\Generator;
-
 
 use IPS\Helpers\Form;
 use IPS\Lang;
@@ -91,8 +89,11 @@ class _NewForm extends GeneratorAbstract
     {
         $config = [
             'name'   => 'classMap',
-            'value'  => new PropertyValueGenerator(static::$classMap, PropertyValueGenerator::TYPE_ARRAY,
-                PropertyValueGenerator::OUTPUT_MULTIPLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                static::$classMap,
+                PropertyValueGenerator::TYPE_ARRAY,
+                PropertyValueGenerator::OUTPUT_MULTIPLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -105,8 +106,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'form',
-            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                null,
+                PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -119,8 +123,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'id',
-            'value'  => new PropertyValueGenerator('defaul', PropertyValueGenerator::TYPE_STRING,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                'defaul',
+                PropertyValueGenerator::TYPE_STRING,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -133,8 +140,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'elementStore',
-            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY_SHORT,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                [],
+                PropertyValueGenerator::TYPE_ARRAY_SHORT,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -147,8 +157,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'object',
-            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                null,
+                PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -161,8 +174,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'bitOptions',
-            'value'  => new PropertyValueGenerator([], PropertyValueGenerator::TYPE_ARRAY_SHORT,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                [],
+                PropertyValueGenerator::TYPE_ARRAY_SHORT,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -175,8 +191,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'formPrefix',
-            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                null,
+                PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -189,8 +208,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'lang',
-            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                null,
+                PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [
@@ -203,8 +225,11 @@ class _NewForm extends GeneratorAbstract
 
         $config = [
             'name'   => 'header',
-            'value'  => new PropertyValueGenerator(null, PropertyValueGenerator::TYPE_NULL,
-                PropertyValueGenerator::OUTPUT_SINGLE_LINE),
+            'value'  => new PropertyValueGenerator(
+                null,
+                PropertyValueGenerator::TYPE_NULL,
+                PropertyValueGenerator::OUTPUT_SINGLE_LINE
+            ),
             'vis'    => 'protected',
             'doc'    => [
                 'tags' => [

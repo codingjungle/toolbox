@@ -15,7 +15,6 @@ namespace IPS\toolbox\Shared;
 \IPS\toolbox\Application::loadAutoLoader();
 
 use Exception;
-use IPS\Application;
 use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\Proxy\Proxyclass;
 use RuntimeException;
@@ -70,7 +69,7 @@ trait Write
             $fs->appendToFile($dir . '/' . $file, $content);
             $fs->chmod($dir . '/' . $file, IPS_FILE_PERMISSION);
 
-            if ($this->proxy && Application::appIsEnabled('dtproxy')) {
+            if ($this->proxy) {
                 Proxyclass::i()->buildAndMake($dir . '/' . $file);
             }
         } catch (RuntimeException $e) {

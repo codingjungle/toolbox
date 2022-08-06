@@ -52,7 +52,6 @@ use function trim;
 use const T_PROTECTED;
 use const T_PUBLIC;
 
-
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
@@ -82,7 +81,6 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  */
 abstract class _GeneratorAbstract
 {
-
     use LanguageBuilder;
     use Magic;
     use ModuleBuilder;
@@ -198,10 +196,9 @@ abstract class _GeneratorAbstract
         $this->app = $this->application->directory;
         $this->type = mb_ucfirst($this->type);
         if (in_array($this->type, static::$arDescendent, true)) {
-            if($this->classname_lower === 'member'){
+            if ($this->classname_lower === 'member') {
                 $this->database = $this->app.'_members';
-            }
-            elseif ($this->database === null) {
+            } elseif ($this->database === null) {
                 $this->database = $this->app . '_' . $this->classname_lower;
             } else {
                 $this->database = $this->app . '_' . $this->database;
@@ -222,7 +219,6 @@ abstract class _GeneratorAbstract
             $this->generator = new TraitGenerator();
         }
         $this->generator->addHeaderCatch();
-
     }
 
     /**
@@ -241,8 +237,8 @@ abstract class _GeneratorAbstract
             $this->namespace = 'IPS\\' . $this->app;
         } else {
             $this->namespace = $this->namespace !== null ? 'IPS\\' . $this->app . '\\' . mb_ucfirst(
-                    $this->namespace
-                ) : 'IPS\\' . $this->app;
+                $this->namespace
+            ) : 'IPS\\' . $this->app;
         }
 
         if ($this->type !== 'Api' && !in_array($this->type, static::$arDescendent, true) && $this->includeConstructor
@@ -266,7 +262,7 @@ abstract class _GeneratorAbstract
 
         if ($this->extends !== null) {
             $extends = $this->extends;
-            if(!class_exists($extends)){
+            if (!class_exists($extends)) {
                 $extends = '\\IPS\\'.$extends;
                 $this->extends = $extends;
             }
@@ -299,7 +295,7 @@ abstract class _GeneratorAbstract
         $file = $this->classname . '.php';
         $this->proxy = true;
 
-        if(file_exists($dir.'/'.$file)){
+        if (file_exists($dir.'/'.$file)) {
             throw new SourceBuilderException('This class already exists: '.$dir.'/'.$file);
         }
 
@@ -346,7 +342,7 @@ abstract class _GeneratorAbstract
                 $this->_createRelation($file, $dir, $this->database);
                 if (is_array($this->scaffolding_type) && in_array('db', $this->scaffolding_type, false)) {
                     try {
-                        if($this->classname_lower !== 'member') {
+                        if ($this->classname_lower !== 'member') {
                             $this->db->add('bitwise');
                         }
                         $this->db->createTable()->_buildSchemaFile($this->database, $this->application);
@@ -377,7 +373,6 @@ abstract class _GeneratorAbstract
                             ]
                         );
                         throw new SourceBuilderException($msg);
-
                     }
                 }
             }
@@ -450,7 +445,7 @@ abstract class _GeneratorAbstract
             );
         }
 
-        if($this->classname_lower !== 'member') {
+        if ($this->classname_lower !== 'member') {
             //databaseTable
             $document = [
                 '@brief [ActiveRecord] Database table',

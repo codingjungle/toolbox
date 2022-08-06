@@ -13,7 +13,6 @@
 namespace IPS\toolbox\DevCenter\Sources\Generator;
 
 use InvalidArgumentException;
-use IPS\Helpers\Form\Select;
 use IPS\Helpers\Form\Address;
 use IPS\Helpers\Form\Captcha;
 use IPS\Helpers\Form\Checkbox;
@@ -36,6 +35,7 @@ use IPS\Helpers\Form\Poll;
 use IPS\Helpers\Form\Radio;
 use IPS\Helpers\Form\Rating;
 use IPS\Helpers\Form\Search;
+use IPS\Helpers\Form\Select;
 use IPS\Helpers\Form\SocialGroup;
 use IPS\Helpers\Form\Sort;
 use IPS\Helpers\Form\Stack;
@@ -57,7 +57,6 @@ class _Elements extends GeneratorAbstract
     public function bodyGenerator()
     {
         $this->brief = 'Class';
-        $this->generator->addImport(InvalidArgumentException::class);
         $this->generator->addImport(Address::class);
         $this->generator->addImport(Captcha::class);
         $this->generator->addImport(CheckboxSet::class);
@@ -73,6 +72,7 @@ class _Elements extends GeneratorAbstract
         $this->generator->addImport(Ftp::class);
         $this->generator->addImport(Interval::class);
         $this->generator->addImport(\IPS\Helpers\Form\Item::class);
+        $this->generator->addImport(InvalidArgumentException::class);
         $this->generator->addImport(KeyValue::class);
         $this->generator->addImport(Matrix::class);
         $this->generator->addImport(\IPS\Helpers\Form\Member::class);
@@ -126,6 +126,8 @@ class _Elements extends GeneratorAbstract
         $this->generator->addClassComments('@property-read FormAbstract|string|null $class');
         $this->generator->addClassComments('@property-read bool $custom');
 
-        $this->generator->addClassBody(\file_get_contents(Application::getRootPath('toolbox').'/applications/toolbox/data/defaults/elements.txt') );
+        $ad = Application::getRootPath('toolbox');
+        $content = \file_get_contents($ad . '/applications/toolbox/data/defaults/sources/elements.txt');
+        $this->generator->addClassBody($content);
     }
 }
