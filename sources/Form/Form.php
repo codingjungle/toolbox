@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox;
 
+use Exception;
 use InvalidArgumentException;
 use IPS\Content\Item;
 use IPS\Helpers\Form\FormAbstract;
@@ -173,10 +174,21 @@ class _Form extends \IPS\Helpers\Form
         $this->formClass($this->baseClass);
     }
 
-    public function doLabels($toStrips)
+    /**
+     * @param $class
+     *
+     * @return \IPS\formularize\_Form
+     */
+    public function formClass($class): self
     {
-        $this->doLabels = true;
-        $this->stripLabels = $toStrips;
+        $customClasses = explode(' ', $this->customClasses);
+        $customClasses = array_combine(array_values($customClasses), array_values($customClasses));
+        $nc = explode(' ', $class);
+        $nc = array_combine(array_values($nc), array_values($nc));
+        foreach ($nc as $k => $v) {
+            $customClasses[$k] = $v;
+        }
+        $this->customClasses = implode(' ', $customClasses);
         return $this;
     }
 
@@ -193,6 +205,13 @@ class _Form extends \IPS\Helpers\Form
         $attributes = []
     ): self {
         return new static($id, $submitLang, $action, $attributes, $form);
+    }
+
+    public function doLabels($toStrips)
+    {
+        $this->doLabels = true;
+        $this->stripLabels = $toStrips;
+        return $this;
     }
 
     public function clearBaseClass()
@@ -235,24 +254,6 @@ class _Form extends \IPS\Helpers\Form
         } else {
             $this->formClass('ipsForm_horizontal');
         }
-        return $this;
-    }
-
-    /**
-     * @param $class
-     *
-     * @return \IPS\formularize\_Form
-     */
-    public function formClass($class): self
-    {
-        $customClasses = explode(' ', $this->customClasses);
-        $customClasses = array_combine(array_values($customClasses), array_values($customClasses));
-        $nc = explode(' ', $class);
-        $nc = array_combine(array_values($nc), array_values($nc));
-        foreach ($nc as $k => $v) {
-            $customClasses[$k] = $v;
-        }
-        $this->customClasses = implode(' ', $customClasses);
         return $this;
     }
 
@@ -345,7 +346,7 @@ class _Form extends \IPS\Helpers\Form
     {
         if ($langKey !== null) {
             $attributes = [
-                'tabindex'  => '2',
+                'tabindex' => '2',
                 'accesskey' => 's',
             ];
             if ($disabled === true) {
@@ -915,6 +916,63 @@ class _Form extends \IPS\Helpers\Form
         return $this->form;
     }
 
+    /**
+     * @param string $name
+     * @param string $type
+     * @param array $extra
+     *
+     * @return Element
+     */
+    public function addElement($name, $type = 'text', string $custom = '', ?array $placement = null): Element
+    {
+        $n = $name;
+        if ($name instanceof FormAbstract) {
+            $n = $name->name;
+        }
+        $element = new Element($name, $type, $custom);
+        if (empty($placement) === false) {
+            $this->insertElement($placement['type'], $placement['element'], $n, $element);
+        } else {
+            $this->elementStore[$n] = $element;
+        }
+        return $this->elementStore[$n];
+    }
+
+    protected function insertElement($type, $index, $newKey, $element)
+    {
+        $store = $this->elementStore;
+        if (!array_key_exists($index, $store)) {
+            throw new Exception("Index, {$index}, not found");
+        }
+        $tmpArray = array();
+        foreach ($store as $key => $value) {
+            if ($type === 'before' && $key === $index) {
+                $tmpArray[$newKey] = $element;
+            }
+            $tmpArray[$key] = $value;
+            if ($type === 'after' && $key === $index) {
+                $tmpArray[$newKey] = $element;
+            }
+        }
+        $this->elementStore = $tmpArray;
+    }
+
+    public function header($header): Element
+    {
+        $this->elementStore[$header] = new Element($header, 'header');
+
+        return $this->elementStore[$header];
+    }
+
+    public function customTemplate($template)
+    {
+        $args = func_get_args();
+
+        $this->customTemplateData = $args;
+
+        return $this->build();
+    }
+
     protected function randomize()
     {
         $elements = $this->form->elements;
@@ -952,47 +1010,6 @@ class _Form extends \IPS\Helpers\Form
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @param string $type
-     * @param array $extra
-     *
-     * @return Element
-     */
-    public function addElement($name, $type = 'text', string $custom = '', ?array $placement = null): Element
-    {
-        $n = $name;
-        if ($name instanceof FormAbstract) {
-            $n = $name->name;
-        }
-        $element = new Element($name, $type, $custom);
-        if (empty($placement) === false) {
-            $this->insertElement($placement['type'], $placement['element'], $n, $element);
-        } else {
-            $this->elementStore[$n] = $element;
-        }
-        return $this->elementStore[$n];
-    }
-
-    protected function insertElement($type, $index, $newKey, $element)
-    {
-        $store = $this->elementStore;
-        if (!array_key_exists($index, $store)) {
-            throw new \Exception("Index, {$index}, not found");
-        }
-        $tmpArray = array();
-        foreach ($store as $key => $value) {
-            if ($type === 'before' && $key === $index) {
-                $tmpArray[$newKey] = $element;
-            }
-            $tmpArray[$key] = $value;
-            if ($type === 'after' && $key === $index) {
-                $tmpArray[$newKey] = $element;
-            }
-        }
-        $this->elementStore = $tmpArray;
-    }
-
     public function replaceElement($name, Element $element)
     {
         $n = $name;
@@ -1007,13 +1024,6 @@ class _Form extends \IPS\Helpers\Form
         $this->elementStore[$element->name] = $element;
 
         return $this;
-    }
-
-    public function header($header): Element
-    {
-        $this->elementStore[$header] = new Element($header, 'header');
-
-        return $this->elementStore[$header];
     }
 
     public function removeHeader($header)
@@ -1152,10 +1162,10 @@ class _Form extends \IPS\Helpers\Form
             $n = $name->name;
         }
         $this->elementStore[$n] = [
-            'name'   => $name,
+            'name' => $name,
             'matrix' => $matrix,
-            'after'  => $after,
-            'tab'    => $tab
+            'after' => $after,
+            'tab' => $tab
         ];
 
         return $this;
@@ -1211,15 +1221,6 @@ class _Form extends \IPS\Helpers\Form
     {
         $this->form->addButton($lang, $type, $href, $class, $attributes);
         return $this;
-    }
-
-    public function customTemplate($template)
-    {
-        $args = func_get_args();
-
-        $this->customTemplateData = $args;
-
-        return $this->build();
     }
 
     public function getLastUsedTab()
