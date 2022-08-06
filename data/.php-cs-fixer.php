@@ -14,4 +14,4 @@ return $config->setRules([
     'strict_param' => true,
     'array_syntax' => ['syntax' => 'short'],
     'ordered_imports' => ['sort_algorithm' => 'length', 'imports_order' => ['class', 'function', 'const']]
-])->setFinder($finder);
+])->setFinder($finder)->setRiskyAllowed(true);

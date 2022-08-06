@@ -135,7 +135,7 @@ class _Form extends \IPS\Helpers\Form
     protected $dbPrefix = true;
     protected $customTemplateData;
     protected $tabsToHeaders = false;
-    protected $baseClass = '';
+    protected $baseClass;
     protected $prefixTabs = true;
     protected $prefixHeaders = true;
     protected $createLangs = false;
@@ -164,14 +164,17 @@ class _Form extends \IPS\Helpers\Form
         $action = null,
         $attributes = [],
         \IPS\Helpers\Form $form = null
-    ) {
+    )
+    {
         parent::__construct($id, $submitLang, $action, $attributes);
         if ($form === null) {
             $this->form = new \IPS\Helpers\Form();
         } else {
             $this->form = $form;
         }
-        $this->formClass($this->baseClass);
+        if ($this->baseClass) {
+            $this->formClass($this->baseClass);
+        }
     }
 
     /**
@@ -393,7 +396,7 @@ class _Form extends \IPS\Helpers\Form
      */
     public function __toString()
     {
-        return (string)$this->build();
+        return (string) $this->build();
     }
 
     /**
@@ -911,8 +914,10 @@ class _Form extends \IPS\Helpers\Form
         if ($this->random === true) {
             $this->randomize();
         }
-        $this->form->class = $this->customClasses;
 
+        if ($this->customClasses) {
+            $this->form->class = $this->customClasses;
+        }
         return $this->form;
     }
 
@@ -944,7 +949,7 @@ class _Form extends \IPS\Helpers\Form
         if (!array_key_exists($index, $store)) {
             throw new Exception("Index, {$index}, not found");
         }
-        $tmpArray = array();
+        $tmpArray = [];
         foreach ($store as $key => $value) {
             if ($type === 'before' && $key === $index) {
                 $tmpArray[$newKey] = $element;
@@ -1006,7 +1011,7 @@ class _Form extends \IPS\Helpers\Form
 
     public function randomOrder($rand)
     {
-        $this->random = (bool)$rand;
+        $this->random = (bool) $rand;
         return $this;
     }
 
@@ -1252,8 +1257,8 @@ class _Form extends \IPS\Helpers\Form
         $newValues = [];
         /* Did we submit the form? */
         if (isset(Request::i()->{$name}) && Login::compareHashes(
-                (string)Session::i()->csrfKey,
-                (string)Request::i()->csrfKey
+                (string) Session::i()->csrfKey,
+                (string) Request::i()->csrfKey
             )) {
             if ($this->built === false) {
                 $this->build();
