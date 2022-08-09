@@ -12,45 +12,45 @@
 
 namespace IPS\toolbox\DevCenter\Sources\Generator;
 
-use Exception;
-use Generator\Builders\ClassGenerator;
-use Generator\Builders\InterfaceGenerator;
-use Generator\Builders\TraitGenerator;
-use IPS\Application;
 use IPS\Log;
+use Exception;
 use IPS\Member;
-use IPS\toolbox\DevCenter\Sources\SourceBuilderException;
+use IPS\Application;
+use RuntimeException;
+use IPS\toolbox\Shared\Magic;
+use IPS\toolbox\Shared\Write;
 use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\Proxy\Proxyclass;
-use IPS\toolbox\Shared\LanguageBuilder;
-use IPS\toolbox\Shared\Magic;
 use IPS\toolbox\Shared\ModuleBuilder;
 use IPS\toolbox\Shared\SchemaBuilder;
-use IPS\toolbox\Shared\Write;
-use RuntimeException;
+use Generator\Builders\ClassGenerator;
+use Generator\Builders\TraitGenerator;
+use IPS\toolbox\Shared\LanguageBuilder;
+use Generator\Builders\InterfaceGenerator;
+use IPS\toolbox\DevCenter\Sources\SourceBuilderException;
 
 use function _p;
-use function array_merge;
-use function array_shift;
-use function class_exists;
+use function trim;
 use function count;
+use function header;
 use function defined;
 use function explode;
-use function file_exists;
-use function file_get_contents;
-use function header;
 use function implode;
 use function in_array;
 use function is_array;
+use function mb_ucfirst;
+use function array_merge;
+use function array_shift;
+use function file_exists;
 use function json_decode;
 use function json_encode;
-use function mb_strtolower;
-use function mb_ucfirst;
 use function str_replace;
-use function trim;
+use function class_exists;
+use function mb_strtolower;
+use function file_get_contents;
 
-use const T_PROTECTED;
 use const T_PUBLIC;
+use const T_PROTECTED;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -293,28 +293,26 @@ abstract class _GeneratorAbstract
         $file = $this->classname . '.php';
         $this->proxy = true;
 
-        if($this->overrideDir === false) {
+        if ($this->overrideDir === false) {
             if ($this->type === 'Api') {
                 $dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/api/';
             } else {
                 $dir = \IPS\Application::getRootPath(
-                    ) . '/applications/' . $this->application->directory . '/sources/' . $this->_getDir();
+                ) . '/applications/' . $this->application->directory . '/sources/' . $this->_getDir();
             }
             if (file_exists($dir.'/'.$file)) {
                 throw new SourceBuilderException('This class already exists: '.$dir.'/'.$file);
             }
-        }
-        else{
+        } else {
             $dir = $this->dir;
         }
 
         $this->generator->addPath($dir);
 
-        if (!in_array($this->type, ['Interface', 'Traits'])) {
+        if (!in_array($this->type, ['Interface', 'Traits'], true)) {
             $this->proxy = false;
         }
-        $this->generator->addFileName($file);
-        $this->generator->isProxy = $this->proxy;
+         $this->generator->isProxy = $this->proxy;
         $doc = [
             '@brief      ' . $this->classname . ' ' . $this->brief,
             '@author     -storm_author-',

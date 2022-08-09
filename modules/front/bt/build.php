@@ -16,6 +16,7 @@ namespace IPS\toolbox\modules\front\bt;
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
 use IPS\Data\Store;
+use IPS\Dispatcher\Admin;
 use IPS\Member;
 use IPS\Output;
 use IPS\Request;
@@ -24,6 +25,8 @@ use IPS\toolbox\Application;
 use IPS\toolbox\Build\Versions;
 use IPS\toolbox\Form;
 use IPS\toolbox\Shared\Analyzer;
+
+use RuntimeException;
 
 use function array_merge;
 use function explode;
@@ -44,5 +47,19 @@ class _build extends \IPS\Dispatcher\Controller
 {
     use Analyzer;
     use \IPS\toolbox\Shared\Build;
+    /**
+     * @inheritdoc
+     * @throws RuntimeException
+     */
+    public function execute()
+    {
+        Output::i()->cssFiles = array_merge(Output::i()->cssFiles, Theme::i()->css('dtcode.css', 'toolbox', 'admin'));
+        Output::i()->jsFiles = array_merge(
+            Output::i()->jsFiles,
+            Output::i()->js('admin_toggles.js', 'toolbox', 'admin')
+        );
 
+
+        parent::execute();
+    }
 }

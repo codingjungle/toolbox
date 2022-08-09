@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="toolbox" version="50022">
+ <app key="toolbox" version="50024">
   <word key="__app_toolbox" js="0">Dev Toolbox</word>
   <word key="menutab__devtools" js="0">Dev Toolbox</word>
   <word key="menutab__devtools_icon" js="0">wrench</word>
@@ -384,6 +384,27 @@
   <word key="hooks_parentUsage_desc" js="0">Checks each method with a parent, to see if the parent method is being called per IPS marketplace requirements.</word>
   <word key="hooks_errors" js="0">Hook Errors (%s)</word>
   <word key="hooks_errors_desc" js="0">Any error that isn't covered by the other hook checks.</word>
+  <word key="dtdevplus_menu_title_application" js="0">Application.php Improvements</word>
+  <word key="dtdevplus_class_addToApplications" js="0">Add To Class:</word>
+  <word key="dtdevplus_class_js_options" js="0">addJs</word>
+  <word key="dtdevplus_class_css_options" js="0">addCss</word>
+  <word key="dtdevplus_class_jsVars_options" js="0">addJsVars</word>
+  <word key="dtdevplus_class_color_options" js="0">Color Generator</word>
+  <word key="dtdevplus_class_quickColor_options" js="0">Quick Color Generator</word>
+  <word key="dtdevplus_class_convertTime_options" js="0">Convert Seconds to Time</word>
+  <word key="dtdevplus_class_applications" js="0"><![CDATA[Note: This will rename and move your Application.php to <appdir>/sources/ApplicationOG/ApplicationOG.php and create a new Application.php with the chosen options in it. You should continue to make your changes to <appdir>/scources/ApplicationOG/ApplicationOG.php as if you run this again, it will overwrite without any checks or adding missing methods.]]></word>
+  <word key="dtdevplus_class_frontNavigation_options" js="0">Front Navigation</word>
+  <word key="dtdevplus_class_rootTabs" js="0">RootTabs</word>
+  <word key="dtdevplus_class_rootTabs_desc" js="0">Root Menu Navigation Item. Use FrontNavigation Extension Name.</word>
+  <word key="dtdevplus_class_browseTabs" js="0">BrowseTabs</word>
+  <word key="dtdevplus_class_browseTabs_desc" js="0">Add to Browse Tab. Use FrontNavigation Extension Name.</word>
+  <word key="dtdevplus_class_browseTabsEnd" js="0">BrowseTabsEnd</word>
+  <word key="dtdevplus_class_browseTabsEnd_desc" js="0">Add to the end of Browse Tab. Use FrontNavigation Extension Name.</word>
+  <word key="dtdevplus_class_activityTabs" js="0">Activity Tab</word>
+  <word key="dtdevplus_class_activityTabs_desc" js="0">Add to the activity Tab. Use FrontNavigation Extension Name.</word>
+  <word key="devCenterPlusCreateFrontNavigation" js="0">Add Front Navigation</word>
+  <word key="devCenterPlusCreateFrontNavigation_desc" js="0">Creates a front navigation extension</word>
+  <word key="dtdevplus_class_oauth_message" js="0">a simple class to connect to an oauth api, only tested on IPS oauth, so it might not work with others and it isn't totally complete atm. used at your own discretion.</word>
   <word key="toolbox_doing_proxies" js="1">Generating Proxies</word>
   <word key="toolbox_done_proxies" js="1">Proxies Generated!</word>
  </app>

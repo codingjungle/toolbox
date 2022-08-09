@@ -1326,4 +1326,8 @@ class _Form extends \IPS\Helpers\Form
         unset($this->elementStore[$n]);
         return $this;
     }
+
+    public function addToElementStore(Element $element){
+        $this->elementStore[$element->name] = $element;
+    }
 }

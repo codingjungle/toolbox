@@ -25,6 +25,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 */
 class _UpdateCheck extends Oauth
 {
+    protected static $instance;
     protected function setup()
     {
         $this->client = 'ccff05eb602312b6183ccaea8ed6a235';

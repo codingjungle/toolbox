@@ -15,7 +15,11 @@ namespace IPS\toolbox\modules\admin\bt;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
+use IPS\Output;
+use IPS\Theme;
 use IPS\toolbox\Shared\Analyzer;
+
+use function array_merge;
 
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
@@ -41,7 +45,14 @@ class _build extends \IPS\Dispatcher\Controller
 	 */
 	public function execute()
 	{
-		\IPS\Dispatcher::i()->checkAcpPermission( 'build_manage' );
+        Output::i()->cssFiles = array_merge(Output::i()->cssFiles, Theme::i()->css('dtcode.css', 'toolbox', 'admin'));
+        Output::i()->jsFiles = array_merge(
+            Output::i()->jsFiles,
+            Output::i()->js('admin_toggles.js', 'toolbox', 'admin')
+        );
+
+        \IPS\Dispatcher::i()->checkAcpPermission( 'build_manage' );
 		parent::execute();
 	}
+
 }

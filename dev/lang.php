@@ -404,5 +404,6 @@ $lang = [
     'dtdevplus_class_activityTabs_desc' => 'Add to the activity Tab. Use FrontNavigation Extension Name.',
     'devCenterPlusCreateFrontNavigation' => 'Add Front Navigation',
     'devCenterPlusCreateFrontNavigation_desc' => 'Creates a front navigation extension',
+    'dtdevplus_class_oauth_message' => 'a simple class to connect to an oauth api, only tested on IPS oauth, so it might not work with others and it isn\'t totally complete atm. used at your own discretion.'
 
 ];

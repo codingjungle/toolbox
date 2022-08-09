@@ -208,6 +208,7 @@ class _Sources
                 'item',
                 'comment',
                 'review',
+                'oauthApi',
                 'debug',
                 'memory',
                 'member',
@@ -304,54 +305,16 @@ class _Sources
             ->formId('dtdevplus_class__r' . $this->type . 'r_')
             ->submitLang('Create Source');
 
-        if ($type === 'application') {
-            $ops = [
-                'js' => 'js',
-                'css' => 'css',
-                'jsVar' => 'jsVar',
-                'color' => 'color',
-                'quickColor' => 'quickColor',
-                'convertTime' => 'convertTime',
-                'frontNavigation' => 'frontNavigation'
-            ];
-            $class = '\\IPS\\' . $this->application->directory . '\\Application';
-            if (property_exists($class, 'hasDefaultNavigation')) {
-                unset($ops['frontNavigation']);
-            }
-            $options = [
-                'prefixLang' => true,
-                'parse' => 'lang',
-                'options' => $ops
-            ];
-            $this->form
-                ->addElement('addToApplications', 'cbs')
-                ->options($options)
-                ->toggles(
-                    [
-                       'frontNavigation' => [
-                           'rootTabs',
-                           'browseTabs',
-                           'browseTabsEnd',
-                           'activityTabs'
-                       ]
-                    ]
-                )
-                ->value([]);
-            $this->form->hidden('type', 'Application');
-            $this->form->hidden('className', 'Application');
-            if (!property_exists($class, 'hasDefaultNavigation')) {
-                $this->form->addElement('rootTabs', 'stack');
-                $this->form->addElement('browseTabs', 'stack');
-                $this->form->addElement('browseTabsEnd', 'stack');
-                $this->form->addElement('activityTabs', 'stack');
-            }
-            $this->form->message('applications', 'ipsMessage ipsMessage_warning');
-        } else {
+
             foreach ($config as $func) {
-                $method = 'el' . $func;
-                $this->{$method}();
+                if($func instanceof Form\Element){
+                    $this->form->addToElementStore($func);
+                }
+                else {
+                    $method = 'el' . $func;
+                    $this->{$method}();
+                }
             }
-        }
     }
 
     /**

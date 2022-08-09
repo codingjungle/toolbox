@@ -301,8 +301,6 @@
         </li>
         {{endif}}
 
-
-
         {{if \IPS\Settings::i()->dtprofiler_use_console }}
         <li id="elProfileConsoleLog" class="isParent dtProfileFirst dtProfilerConsole">
             <i class="fa fa-terminal"></i> Console
@@ -673,7 +671,7 @@
     {{foreach $lists as $list }}
     <li>
         <div class="ipsPad">
-        <a href="{$list['url']}" data-ipsdialog>
+        <a href="#" data-ipsdialog data-ipsdialog-content="#{$list['id']}" data-ipsdialog-title="SQL Query">
             {{if $list['server'] }}
             Server: {$list['server']}<br>
             {{endif}}
@@ -681,6 +679,26 @@
             {{if $list['mem'] !== null}}Memory: {$list['mem']}<br>{{endif}}
             <code class="prettyprint lang-sql">{$list['query']|raw}</code>
         </a>
+            <div id="{$list['id']}" class="ipsHide ipsPad">
+                {{if $list['server'] }}
+                Server: {$list['server']}<br>
+                {{endif}}
+                {{if $list['time'] !== null}}Execution Time: {$list['time']}ms<br>{{endif}}
+                {{if $list['mem'] !== null}}Memory: {$list['mem']}<br>{{endif}}
+                <code class="prettyprint lang-sql">
+                {$list['query']|raw}
+                </code>
+                {{if $list['code'] === true}}
+                <br>
+                <pre class="prettyprint lang-php">
+                    {$list['bt']|raw}
+                </pre>
+                {{else}}
+                <div class="ipsMargin_top:half">
+                {$list['bt']|raw}
+                </div>
+                {{endif}}
+            </div>
         </div>
     </li>
     {{endforeach}}
@@ -770,7 +788,6 @@
         {{endforeach}}
     </ul>
     {{endif}}
-
 </ul>
 {{endif}}
 ]]></template>
@@ -778,9 +795,10 @@
     <div class="ipsColumn ipsColumn_wide">{$key|raw}</div>
     <div class="ipsColumn ipsColumn_fluid">
         {{if \is_array($value) }}
-        {{foreach $value as $k => $v}}
-        {template="keyvalue" group="dtpsearch" location="front" app="toolbox" params="$k,$v"}
-        {{endforeach}}
+        <div data-ipstoolboxtoyboxprettyprint data-ipstoolboxtoyboxprettyprint-depth="2">
+            {{$vv = json_encode($value);}}
+            {$vv|raw}
+        </div>
         {{else}}
         {expression="(new \IPS\toolbox\Profiler\Dumper)->type($value)" raw="true"}
         {{endif}}
@@ -907,6 +925,7 @@
 {{endif}}
 
 ]]></template>
+ <template template_group="generic" template_name="logs" template_data="$log" template_location="front" template_app="toolbox">{$log|raw}</template>
  <template template_group="generic" template_name="plain" template_data="$data, $name=null, $class=null" template_location="front" template_app="toolbox"><![CDATA[{{if $name }}
 <h4>{$name}</h4>
 {{endif}}
@@ -2959,7 +2978,7 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 
 #elProfileConsoleLog_list .dtProfilerTypetable
 {
-    background:rgba(189, 189, 189,0.6);
+    background:rgba(189, 189, 189,0.3);
 }
 
 #elProfileConsoleLog_list .dtProfilerTypeassert
@@ -3042,7 +3061,16 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
     display:block;
 }
 
-
+.dtProfilerBacktrace {
+    margin-top:10px;
+    font-size: 10px;
+}
+.dtProfilerDatabase a,
+.dtProfilerDatabase a:hover,
+.dtProfilerLog a,
+.dtProfilerLog a:hover{
+    color:#800;
+}
 /*html[dir] .dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_label,*/
 /*html[dir] .dtProfilerDevCenterTabs .ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_title,*/
 /*html[dir] .dtProfilerDevCenterTabs .ipsForm_vertical .ipsFieldRow > .ipsFieldRow_label,*/
@@ -3061,7 +3089,205 @@ https://raw.github.com/vrana/adminer/master/designs/ng9/adminer.css
 /*.dtProfilerDevCenterTabs .ipsField_stackItem .ipsField_autocomplete input[type="text"]:not(.ipsField_stackItemNoMargin){*/
 /*    margin-left:0;*/
 /*    padding-left:0;*/
-/*}*/]]></css>
+/*}*/
+
+
+
+.json-formatter-row {
+    font-family: monospace;
+}
+.json-formatter-row,
+.json-formatter-row a,
+.json-formatter-row a:hover {
+    color: black;
+    text-decoration: none;
+}
+.json-formatter-row .json-formatter-row {
+    margin-left: 1rem;
+}
+.json-formatter-row .json-formatter-children.json-formatter-empty {
+    opacity: 0.5;
+    margin-left: 1rem;
+}
+.json-formatter-row .json-formatter-children.json-formatter-empty:after {
+    display: none;
+}
+.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {
+    content: "No properties";
+}
+.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {
+    content: "[]";
+}
+.json-formatter-row .json-formatter-string,
+.json-formatter-row .json-formatter-stringifiable {
+    color: green;
+    white-space: pre;
+    word-wrap: break-word;
+}
+.json-formatter-row .json-formatter-number {
+    color: blue;
+}
+.json-formatter-row .json-formatter-boolean {
+    color: red;
+}
+.json-formatter-row .json-formatter-null {
+    color: #855A00;
+}
+.json-formatter-row .json-formatter-undefined {
+    color: #ca0b69;
+}
+.json-formatter-row .json-formatter-function {
+    color: #FF20ED;
+}
+.json-formatter-row .json-formatter-date {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.json-formatter-row .json-formatter-url {
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+}
+.json-formatter-row .json-formatter-bracket {
+    color: blue;
+}
+.json-formatter-row .json-formatter-key {
+    color: #00008B;
+    padding-right: 0.2rem;
+}
+.json-formatter-row .json-formatter-toggler-link {
+    cursor: pointer;
+}
+.json-formatter-row .json-formatter-toggler {
+    line-height: 1.2rem;
+    font-size: 0.7rem;
+    vertical-align: middle;
+    opacity: 0.6;
+    cursor: pointer;
+    padding-right: 0.2rem;
+}
+.json-formatter-row .json-formatter-toggler:after {
+    display: inline-block;
+    transition: transform 100ms ease-in;
+    content: "►";
+}
+.json-formatter-row > a > .json-formatter-preview-text {
+    opacity: 0;
+    transition: opacity 0.15s ease-in;
+    font-style: italic;
+}
+.json-formatter-row:hover > a > .json-formatter-preview-text {
+    opacity: 0.6;
+}
+.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {
+    transform: rotate(90deg);
+}
+.json-formatter-row.json-formatter-open > .json-formatter-children:after {
+    display: inline-block;
+}
+.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {
+    display: none;
+}
+.json-formatter-row.json-formatter-open.json-formatter-empty:after {
+    display: block;
+}
+.json-formatter-dark.json-formatter-row {
+    font-family: monospace;
+}
+.json-formatter-dark.json-formatter-row,
+.json-formatter-dark.json-formatter-row a,
+.json-formatter-dark.json-formatter-row a:hover {
+    color: white;
+    text-decoration: none;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-row {
+    margin-left: 1rem;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty {
+    opacity: 0.5;
+    margin-left: 1rem;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty:after {
+    display: none;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-object:after {
+    content: "No properties";
+}
+.json-formatter-dark.json-formatter-row .json-formatter-children.json-formatter-empty.json-formatter-array:after {
+    content: "[]";
+}
+.json-formatter-dark.json-formatter-row .json-formatter-string,
+.json-formatter-dark.json-formatter-row .json-formatter-stringifiable {
+    color: #31F031;
+    white-space: pre;
+    word-wrap: break-word;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-number {
+    color: #66C2FF;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-boolean {
+    color: #EC4242;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-null {
+    color: #EEC97D;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-undefined {
+    color: #ef8fbe;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-function {
+    color: #FD48CB;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-date {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+.json-formatter-dark.json-formatter-row .json-formatter-url {
+    text-decoration: underline;
+    color: #027BFF;
+    cursor: pointer;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-bracket {
+    color: #9494FF;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-key {
+    color: #23A0DB;
+    padding-right: 0.2rem;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-toggler-link {
+    cursor: pointer;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-toggler {
+    line-height: 1.2rem;
+    font-size: 0.7rem;
+    vertical-align: middle;
+    opacity: 0.6;
+    cursor: pointer;
+    padding-right: 0.2rem;
+}
+.json-formatter-dark.json-formatter-row .json-formatter-toggler:after {
+    display: inline-block;
+    transition: transform 100ms ease-in;
+    content: "►";
+}
+.json-formatter-dark.json-formatter-row > a > .json-formatter-preview-text {
+    opacity: 0;
+    transition: opacity 0.15s ease-in;
+    font-style: italic;
+}
+.json-formatter-dark.json-formatter-row:hover > a > .json-formatter-preview-text {
+    opacity: 0.6;
+}
+.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-toggler-link .json-formatter-toggler:after {
+    transform: rotate(90deg);
+}
+.json-formatter-dark.json-formatter-row.json-formatter-open > .json-formatter-children:after {
+    display: inline-block;
+}
+.json-formatter-dark.json-formatter-row.json-formatter-open > a > .json-formatter-preview-text {
+    display: none;
+}
+.json-formatter-dark.json-formatter-row.json-formatter-open.json-formatter-empty:after {
+    display: block;
+}
+]]></css>
  <css css_location="admin" css_app="toolbox" css_attributes="" css_path="." css_name="test.css"><![CDATA[
 .adminerDarkMode a {
     color: blue;

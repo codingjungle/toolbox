@@ -1,0 +1,34 @@
+{
+    "files": {
+        "added": [
+            "toolbox\/front\/controllers\/profiler\/ips.dtprofiler.prettyprint.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxprettyprint.js"
+        ],
+        "edited": [
+            "toolbox\/admin\/controllers\/click\/ips.ui.adminer.click.js",
+            "toolbox\/global\/controllers\/debug\/ips.debug.js",
+            "toolbox\/front\/controllers\/profiler\/ips.dtprofiler.debug.js",
+            "toolbox\/front\/controllers\/profiler\/ips.dtprofiler.dtprofiler.js",
+            "toolbox\/front\/controllers\/profiler\/ips.dtprofiler.search.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.collapsed.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.hash.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxbase.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxbitwise.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxdates.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxdiffs.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxhtml.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboximages.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxlorem.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxnumbers.js",
+            "toolbox\/front\/controllers\/profiler\/ips.ui.toolbox.toyboxuuid.js",
+            "toolbox\/global\/controllers\/proxy\/ips.ui.toolbox.proxy.js",
+            "toolbox\/admin\/controllers\/query\/ips.query.query.js"
+        ],
+        "removed": []
+    },
+    "orders": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}

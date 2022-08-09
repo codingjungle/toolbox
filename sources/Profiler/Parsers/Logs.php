@@ -94,7 +94,6 @@ class _Logs extends Singleton
 
             $body = $log->message;
             $msg = nl2br(htmlentities($body));
-            if (str_contains($body, 'Stack trace:')) {
                 $body = explode("\n", $body);
                 $keep = [];
                 $process = [];
@@ -113,12 +112,13 @@ class _Logs extends Singleton
                     }
                     $i++;
                 }
-                $newMsg = '';
-                \IPS\toolbox\Profiler\Parsers\Logs::process($newMsg, $process, true);
-                $keep[$replace] = $newMsg;
+                if(empty($process) === false) {
+                    $newMsg = '';
+                    \IPS\toolbox\Profiler\Parsers\Logs::process($newMsg, $process, true);
+                    $keep[$replace] = $newMsg;
+                }
                 $msg = '<h5>Log Message</h5>';
                 $msg .= implode("\n", $keep);
-            }
             $name .= '<br>'.$msg;
             $name .= '<h5>Backtrace</h5>';
 
@@ -139,7 +139,7 @@ class _Logs extends Singleton
                     ->button('Logs', 'logs', 'list of logs', $list, count($list), 'list', true, false);
     }
 
-    public static function process(&$output, $dbt, $noWrapper = false, $id=0)
+    public static function process(&$output, $dbt, $noWrapper = false)
     {
         if ($noWrapper === false) {
             $output .= '<div class="ipsBorder ipsPadding:half ipsMargin_top">';
@@ -153,7 +153,7 @@ class _Logs extends Singleton
             }
             preg_match('#^(.*)\((.*?)\)$#i', $protoFile, $m1);
             $editor = true;
-            if (!isset($m[1])) {
+            if (!isset($m1[1])) {
                 $file = $protoFile;
                 $editor = false;
             } else {

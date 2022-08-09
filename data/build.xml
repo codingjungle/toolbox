@@ -48,6 +48,8 @@
  <setting key="dtproxy_do_constants"><![CDATA[{"key":"dtproxy_do_constants","default":"1"}]]></setting>
  <setting key="dtproxy_do_props"><![CDATA[{"key":"dtproxy_do_props","default":"1"}]]></setting>
  <setting key="dtproxy_do_proxies"><![CDATA[{"key":"dtproxy_do_proxies","default":"0"}]]></setting>
+ <setting key="toolbox_at"><![CDATA[{"key":"toolbox_at","default":""}]]></setting>
+ <setting key="toolbox_beta_key"><![CDATA[{"key":"toolbox_beta_key","default":""}]]></setting>
  <setting key="toolbox_debug_templates"><![CDATA[{"key":"toolbox_debug_templates","default":"0"}]]></setting>
  <setting key="toolbox_use_tabs_applications"><![CDATA[{"key":"toolbox_use_tabs_applications","default":"1"}]]></setting>
  <hook key="cmsDesignerMode"><![CDATA[{"type":"C","class":"\\IPS\\cms\\extensions\\core\\DesignersMode\\Cms"}]]></hook>

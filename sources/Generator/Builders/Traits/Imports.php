@@ -34,7 +34,7 @@ trait Imports
      *
      * @var array
      */
-    protected $imports = [];
+    public $imports = [];
 
     /**
      * list of function import FQN's
@@ -115,8 +115,7 @@ trait Imports
         if($continue){
             $import = ltrim($import,'\\');
         }
-
-        if($continue === true && (class_exists($import) || class_exists('\\'.$import)) && $this->checkForImport($class) === false && $this->checkForImport($alias) === false){
+        if($continue === true && ($import === 'Throwable' || $import === '\\Throwable' || class_exists($import) || class_exists('\\'.$import)) && $this->checkForImport($class) === false && $this->checkForImport($alias) === false){
             $this->imports[$hash] = ['class' => $import, 'alias' => $alias];
         }
         if ($continue === true && $return !== $import && $this->checkForImport($class) === false && $this->checkForImport($alias) === false) {

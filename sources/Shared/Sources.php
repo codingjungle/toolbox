@@ -15,6 +15,7 @@ namespace IPS\toolbox\Shared;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
+use IPS\toolbox\Form\Element;
 use IPS\toolbox\Proxy\Generator\Cache;
 
 use function array_shift;
@@ -23,6 +24,7 @@ use function implode;
 use function ltrim;
 use function preg_grep;
 use function preg_quote;
+use function property_exists;
 use function str_replace;
 
 trait Sources
@@ -42,6 +44,17 @@ trait Sources
         ];
 
         $this->doOutput($config, 'standard', 'Standard Class');
+    }
+
+    protected function oauthApi(){
+        $config = [
+            'Namespace',
+            'ClassName',
+            'Traits',
+            'Interfaces',
+            (new Element('oauth_message', 'message'))->extra(['css' => 'ipsMessage ipsMessage_error'])
+        ];
+        $this->doOutput($config, 'oauthApi', 'OAUTH API');
     }
 
     protected function doOutput($config, $type, $title)
@@ -228,7 +241,47 @@ trait Sources
     }
 
     protected function application(){
-        $this->doOutput([], 'application', 'Application Class Improvements');
+        $ops = [
+            'js' => 'js',
+            'css' => 'css',
+            'jsVar' => 'jsVar',
+            'color' => 'color',
+            'quickColor' => 'quickColor',
+            'convertTime' => 'convertTime',
+            'frontNavigation' => 'frontNavigation'
+        ];
+        $class = '\\IPS\\' . $this->application->directory . '\\Application';
+        if (property_exists($class, 'hasDefaultNavigation')) {
+            unset($ops['frontNavigation']);
+        }
+        $options = [
+            'prefixLang' => true,
+            'parse' => 'lang',
+            'options' => $ops
+        ];
+        $toggles = [
+            'frontNavigation' => [
+                'rootTabs',
+                'browseTabs',
+                'browseTabsEnd',
+                'activityTabs'
+            ]
+        ];
+        $config = [
+            (new Element('addToApplications','cbs'))->options($options)->toggles($toggles)->value([]),
+            (new Element('type', 'hidden'))->value('Application'),
+            (new Element('className', 'hidden'))->value('Application')
+        ];
+
+        if (!property_exists($class, 'hasDefaultNavigation')) {
+            $config[] = (new Element('rootTabs', 'stack'));
+            $config[] = (new Element('browseTabs', 'stack'));
+            $config[] = (new Element('browseTabsEnd', 'stack'));
+            $config[] = (new Element('activityTabs', 'stack'));
+        }
+        $config[] = (new Element('application','message'))->extra( [ 'css'=> 'ipsMessage ipsMessage_warning'] );
+
+        $this->doOutput($config, 'application', 'Application Class Improvements');
     }
 
     protected function findClass()

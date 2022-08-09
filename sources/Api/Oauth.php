@@ -13,12 +13,11 @@
 namespace IPS\toolbox\Api;
 
 use Exception;
-use IPS\Output;
 use IPS\Http\Url;
-use IPS\Settings;
+use IPS\Http\Response;
 use IPS\Patterns\Singleton;
 
-use function _p;
+
 use function json_encode;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -32,6 +31,8 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 */
 abstract class _Oauth extends Singleton
 {
+    protected static $instance;
+
     /**
      * @var string client id, configure in setup()
      */
@@ -85,14 +86,14 @@ abstract class _Oauth extends Singleton
         $this->accessToken = $this->authorize();
     }
 
-    abstract protected function setup();
+    abstract protected function setup(): void;
 
     /**
      * @throws ApiException
      */
-    protected function authorize()
+    protected function authorize(): string
     {
-        if ($this->getCredentials() !== null) {
+        if (empty($this->getCredentials()) === false) {
             return $this->getCredentials();
         } else {
             $authorization = Url::external($this->token);
@@ -128,22 +129,22 @@ abstract class _Oauth extends Singleton
         }
     }
 
-    protected function clearCredentials(){
-
-    }
-
-    protected function storeCredentials($credentials)
+    protected function clearCredentials(): void
     {
     }
 
-    protected function getCredentials()
+    protected function storeCredentials($credentials): mixed
+    {
+    }
+
+    protected function getCredentials(): ?string
     {
         return null;
     }
 
     protected function getApi(string $endPoint, array $queryString = [])
     {
-        $url = Url::external($this->url.$endPoint);
+        $url = Url::external($this->url . $endPoint);
         if (empty($queryString) === false) {
             $url = $url->setQueryString($queryString);
         }
@@ -161,38 +162,40 @@ abstract class _Oauth extends Singleton
         if ($this->forceTls) {
             $request->forceTls();
         }
+
         return $request;
     }
 
-    protected function buildHeaders(&$headers)
+    /**
+     * @param string $meth - method to us
+     * @param string $endPoint - endpoint of the api
+     * @param array $qs - query string to add to the api url
+     * @param array $headers - any additional headers to be sent
+     * @param array $data - any data to be sent
+     * @return array
+     * @throws ApiException
+     */
+    public function call(string $method, string $endPoint, array $qs = [], array $headers = [], array $data = []): array
     {
-    }
-
-    public function call(string $method, string $endPoint, array $queryString = [], array $headers = [], array $data = [])
-    {
-        $api = $this->getApi($endPoint, $queryString);
+        $api = $this->getApi($endPoint, $qs);
         $accessToken = $this->accessToken;
         $headers['Authorization'] = 'Bearer ' . $accessToken;
-        $headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
         $response = $api->setHeaders($headers)->{$method}($data);
         $content = $response->decodeJson();
 
         if ($response->isSuccessful()) {
             return $content;
         } else {
-            _p($response);
-            try{
+            try {
                 $ec = $content['errorCode'] ?? null;
-                if($ec !== null && ($content['errorCode'] === '1S290/F')){
+                if ($this->retry($response) === true || ($ec !== null && ($content['errorCode'] === '1S290/F'))) {
                     $this->clearCredentials();
                     $this->authorize();
-                    return $this->call($method,$endPoint,$queryString,$headers,$data);
-                }
-                else{
+                    return $this->call($method, $endPoint, $qs, $headers, $data);
+                } else {
                     throw new Exception();
                 }
-            }
-            catch(\Exception $e) {
+            } catch (Exception $e) {
                 $cc = json_encode($content) ?? $content;
                 $msg = 'ResponseCode: ' . $response->httpResponseCode . "\n";
                 $msg .= ' ResponseText: ' . $response->httpResponseText . "\n";
@@ -200,6 +203,11 @@ abstract class _Oauth extends Singleton
                 throw new ApiException($msg);
             }
         }
+    }
+
+    public function retry(Response $response): bool
+    {
+        return false;
     }
 
     /**
@@ -210,27 +218,27 @@ abstract class _Oauth extends Singleton
      * @return void
      * @throws ApiException
      */
-    public function post(array $data, string $endPoint, array $queryString = [], $headers = [])
+    public function post(array $data, string $endPoint, array $queryString = [], $headers = []): array
     {
         return $this->call('post', $endPoint, $queryString, $headers, $data);
     }
 
-    public function put(array $data, string $endPoint, array $queryString = [], $headers = [])
+    public function put(array $data, string $endPoint, array $queryString = [], $headers = []): array
     {
         return $this->call('put', $endPoint, $queryString, $headers, $data);
     }
 
-    public function get(string $endPoint, array $queryString = [], array $headers = [])
+    public function get(string $endPoint, array $queryString = [], array $headers = []): array
     {
         return $this->call('get', $endPoint, $queryString, $headers);
     }
 
-    public function delete(string $endPoint, array $queryString = [], array $headers = [])
+    public function delete(string $endPoint, array $queryString = [], array $headers = []): array
     {
         return $this->call('delete', $endPoint, $queryString, $headers);
     }
 
-    public function head(string $endPoint, array $queryString = [], array $headers = [])
+    public function head(string $endPoint, array $queryString = [], array $headers = []): array
     {
         return $this->call('head', $endPoint, $queryString, $headers);
     }

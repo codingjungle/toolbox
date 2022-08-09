@@ -1,0 +1,56 @@
+{
+    "html": {
+        "added": [],
+        "edited": [
+            "front\/bar\/git",
+            "front\/bt\/phpinfo",
+            "front\/caching\/caching",
+            "admin\/code\/files",
+            "admin\/code\/final",
+            "admin\/code\/hooksExists",
+            "admin\/code\/lists",
+            "admin\/code\/results",
+            "admin\/code\/sql",
+            "front\/database\/database",
+            "admin\/devBar\/devBar",
+            "admin\/devBar\/li",
+            "admin\/dtdpmenu\/menu",
+            "front\/dtpsearch\/button",
+            "front\/dtpsearch\/keyvalue",
+            "admin\/error\/error",
+            "front\/generic\/anchor",
+            "front\/generic\/button",
+            "front\/generic\/genericVal",
+            "front\/generic\/keyvalue",
+            "front\/generic\/keyvalueDebug",
+            "front\/generic\/li",
+            "front\/generic\/plain",
+            "front\/generic\/string",
+            "front\/generic\/stringDebug",
+            "admin\/other\/phpinfo",
+            "front\/toybox\/base",
+            "front\/toybox\/bitwise",
+            "front\/toybox\/dates",
+            "front\/toybox\/diffs",
+            "front\/toybox\/hash",
+            "front\/toybox\/html",
+            "front\/toybox\/images",
+            "front\/toybox\/lorem",
+            "front\/toybox\/numbers",
+            "front\/toybox\/uuid"
+        ],
+        "removed": []
+    },
+    "css": {
+        "added": [],
+        "edited": [
+            "admin\/devbar.css"
+        ],
+        "removed": []
+    },
+    "resources": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}

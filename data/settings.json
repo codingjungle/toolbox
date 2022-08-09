@@ -148,6 +148,10 @@
         "default": ""
     },
     {
+        "key": "toolbox_beta_key",
+        "default": ""
+    },
+    {
         "key": "toolbox_debug_templates",
         "default": "0"
     },

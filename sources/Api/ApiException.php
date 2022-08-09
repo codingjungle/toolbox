@@ -27,8 +27,6 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 */
 class _ApiException extends Exception
 {
-    protected $ecode;
-
     public function __construct($message = "", $code = 0, Throwable $previous = null)
     {
         if (Member::loggedIn()->language()->checkKeyExists($message)) {

@@ -15,10 +15,12 @@ namespace IPS\toolbox\tasks;
 
 use IPS\Log;
 use SplFileInfo;
+use ApiException;
 use IPS\Http\Url;
 use IPS\Settings;
 use IPS\Session\Front;
 use IPS\Dispatcher\Build;
+use IPS\toolbox\Api\Beta;
 use IPS\toolbox\Application;
 use Symfony\Component\Finder\Finder;
 
@@ -80,47 +82,15 @@ class _updateBetaFiles extends \IPS\Task
 
             $category = DT_BETA_CATEGORY;
             $author = DT_BETA_AUTHOR;
-            $communityUrl = DT_BETA_URL;
+            $response = Beta::i()->get('downloads/files', [ 'categories' => $category ]);
 
-            $endpoint = 'downloads/files';
+            foreach ($response['results'] as $result) {
+                $existing[$result['title']] = [
+                    'id' => $result['id'],
+                    'time' => strtotime($result['updated'] ?? $result['date'])
+                ];
+            }
 
-            $at = Application::getRootPath('core') . '/at.json';
-            if (file_exists($at)) {
-                $credentials = json_decode(file_get_contents($at), true);
-            } else {
-                $clientId = DT_BETA_CLIENT_ID;
-                $clientSecret = DT_BETA_CLIENT_SECRET;
-                $authorization = Url::external('https://codingjungle.com/oauth/token/')
-                    ->request()
-                    ->post([
-                        'grant_type' => 'client_credentials',
-                        'client_id' => $clientId,
-                        'client_secret' => $clientSecret,
-                        'scope' => 'profile'
-                    ]);
-                $credentials = $authorization->decodeJson();
-                file_put_contents($at, json_encode($credentials, JSON_PRETTY_PRINT));
-            }
-            $accessToken = $credentials['access_token'];
-            $headers = [
-                'Authorization' => 'Bearer ' . $accessToken,
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
-            ];
-            $response = Url::external($communityUrl . '/api/' . $endpoint)
-                ->setQueryString(['categories' => $category])
-                ->request()
-                ->setHeaders($headers)
-                ->get();
-            $existing = [];
-            if ((int) $response->isSuccessful()) {
-                $results = $response->decodeJson();
-                foreach ($results['results'] as $result) {
-                    $existing[$result['title']] = [
-                        'id' => $result['id'],
-                        'time' => strtotime($result['updated'] ?? $result['date'])
-                    ];
-                }
-            }
             $finder = new Finder();
             $finder->in(\IPS\Application::getRootPath('core') . '/exports/');
             $filter = function (SplFileInfo $file) {
@@ -134,11 +104,12 @@ class _updateBetaFiles extends \IPS\Task
             $files = $finder->filter($filter)->files();
             $skip = explode(',', DT_BETA_ALLOWED);
             $disregard = explode(',', DT_BETA_DISALLOWED);
-
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
             foreach ($files as $file) {
                 $ft = str_replace('.tar', '', $file->getFilename());
+
                 preg_match('#^(.*?)-(.*?)$#', $ft, $match);
+
                 $name = trim(mb_strtolower($match[1]));
                 $version = trim($match[2]);
                 if (
@@ -214,19 +185,17 @@ class _updateBetaFiles extends \IPS\Task
                     ];
                 }
             }
-            $errors = [];
+
             foreach ($update as $key => $data) {
                 $endpoint = '/downloads/files/' . $data['id'] . '/history';
                 unset($data['time']);
-                $response = Url::external($communityUrl . '/api/' . $endpoint)
-                    ->request()
-                    ->setHeaders($headers)
-                    ->post($data);
 
-                if (!$response->isSuccessful()) {
+                try {
+                    $response = Beta::i()->post($data, $endpoint);
+                }catch( ApiException $e) {
                     $errors[] = [
                         'file' => $data['title'],
-                        'error' => $response->decodeJson(),
+                        'error' => $e->getMessage(),
                         'updated' => 1,
                     ];
                 }
@@ -235,16 +204,14 @@ class _updateBetaFiles extends \IPS\Task
             $endpoint = '/downloads/files';
             foreach ($new as $key => $data) {
                 unset($data['time']);
-                $response = Url::external($communityUrl . '/api/' . $endpoint)
-                    ->request()
-                    ->setHeaders($headers)
-                    ->post($data);
 
-                if (!$response->isSuccessful()) {
+                try {
+                    $response = Beta::i()->post($data, $endpoint);
+                }catch( ApiException $e) {
                     $errors[] = [
                         'file' => $data['title'],
-                        'error' => $response->decodeJson(),
-                        'update' => 0
+                        'error' => $e->getMessage(),
+                        'updated' => 0,
                     ];
                 }
             }

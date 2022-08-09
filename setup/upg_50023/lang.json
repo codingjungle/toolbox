@@ -1,0 +1,33 @@
+{
+    "normal": {
+        "added": [
+            "dtdevplus_menu_title_application",
+            "dtdevplus_class_addToApplications",
+            "dtdevplus_class_js_options",
+            "dtdevplus_class_css_options",
+            "dtdevplus_class_jsVars_options",
+            "dtdevplus_class_color_options",
+            "dtdevplus_class_quickColor_options",
+            "dtdevplus_class_convertTime_options",
+            "dtdevplus_class_applications",
+            "dtdevplus_class_frontNavigation_options",
+            "dtdevplus_class_rootTabs",
+            "dtdevplus_class_rootTabs_desc",
+            "dtdevplus_class_browseTabs",
+            "dtdevplus_class_browseTabs_desc",
+            "dtdevplus_class_browseTabsEnd",
+            "dtdevplus_class_browseTabsEnd_desc",
+            "dtdevplus_class_activityTabs",
+            "dtdevplus_class_activityTabs_desc",
+            "devCenterPlusCreateFrontNavigation",
+            "devCenterPlusCreateFrontNavigation_desc"
+        ],
+        "edited": [],
+        "removed": []
+    },
+    "js": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}
