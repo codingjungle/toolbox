@@ -6,6 +6,7 @@
             respond = function (elements) {
                 let elem = $(elements);
                 if (!elem.data('_respond')) {
+                    elem.css({zIndex:ips.ui.zIndex()});
                     let h1 = $('#dtProfilerOther').outerHeight(),
                         pl = $('<div></div>'),
                         h = elem.parent().outerHeight();
@@ -31,18 +32,14 @@
                             $('#elReorderAppMenu').css({bottom: h});
                         }
                     });
-
-                    // $(document).on('hideDialog', function () {
-                    //     dialogId = null;
-                    // });
-                    //
-                    // $(document).on('openDialog', function (e, data) {
-                    //     if (dialogId !== null) {
-                    //         $(document).trigger('closeDialog', {dialogID: dialogId});
-                    //     }
-                    //     dialogId = data.elemID + '_dialog';
-                    //
-                    // });
+                    let foo = {};
+                    foo.one = 1;
+                    foo.two = {t:1,v:2,q: {a:4,b:23,c:85,d:{e:1,ds:2},asdf:5555}};
+                    foo.three = 3;
+                    foo.four = 4;
+                    _toolbox.t(foo);
+                    _toolbox.l(foo);
+                    _toolbox.t(foo);
 
                     $(document).on('click', function (e) {
                         let el = $(e.target);
@@ -72,22 +69,26 @@
                             child = $('#' + id), left = el.position().left;
 
                         if (!child.hasClass('isOpen')) {
+                            child.show();
+                            $(document).trigger('contentChange',[el]);
                             if (child.hasClass('dtProfilerMaxWidth')) {
                                 left = 0;
                             } else {
-                                child.show();
                                 let cWidth = child.outerWidth();
                                 let cPos = left + cWidth;
-                                child.hide();
                                 let windowWidth = $(window).width();
                                 if (cPos > windowWidth) {
                                     left = left - (cPos - windowWidth);
                                 }
                             }
+                            child.hide();
                             elem.find('ul.isOpen').removeClass('isOpen').slideUp().parent().find('i.dtprofilearrow').removeClass('fa-rotate-180');
                             child.css('left', left).css('bottom', bottom);
                             child.addClass('isOpen').slideDown().promise().done(function () {
-                                child.addClass('dtProfileMinHeight');
+                                if(el.attr('id') === 'elProfileConsoleLog'){
+                                    child.animate({scrollTop: child.find('li:last').position().top - 10 },500);
+                                }
+                                // child.addClass('dtProfileMinHeight');
                             });
                             el.find('i.dtprofilearrow').addClass('fa-rotate-180');
                         } else {

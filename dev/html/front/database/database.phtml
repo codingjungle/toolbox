@@ -6,7 +6,7 @@
     {{foreach $lists as $list }}
     <li>
         <div class="ipsPad">
-        <a href="{$list['url']}" data-ipsdialog>
+        <a href="#" data-ipsdialog data-ipsdialog-content="#{$list['id']}" data-ipsdialog-title="SQL Query">
             {{if $list['server'] }}
             Server: {$list['server']}<br>
             {{endif}}
@@ -14,6 +14,26 @@
             {{if $list['mem'] !== null}}Memory: {$list['mem']}<br>{{endif}}
             <code class="prettyprint lang-sql">{$list['query']|raw}</code>
         </a>
+            <div id="{$list['id']}" class="ipsHide ipsPad">
+                {{if $list['server'] }}
+                Server: {$list['server']}<br>
+                {{endif}}
+                {{if $list['time'] !== null}}Execution Time: {$list['time']}ms<br>{{endif}}
+                {{if $list['mem'] !== null}}Memory: {$list['mem']}<br>{{endif}}
+                <code class="prettyprint lang-sql">
+                {$list['query']|raw}
+                </code>
+                {{if $list['code'] === true}}
+                <br>
+                <pre class="prettyprint lang-php">
+                    {$list['bt']|raw}
+                </pre>
+                {{else}}
+                <div class="ipsMargin_top:half">
+                {$list['bt']|raw}
+                </div>
+                {{endif}}
+            </div>
         </div>
     </li>
     {{endforeach}}

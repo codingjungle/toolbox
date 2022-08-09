@@ -3,9 +3,10 @@
     <div class="ipsColumn ipsColumn_wide">{$key|raw}</div>
     <div class="ipsColumn ipsColumn_fluid">
         {{if \is_array($value) }}
-        {{foreach $value as $k => $v}}
-        {template="keyvalue" group="dtpsearch" location="front" app="toolbox" params="$k,$v"}
-        {{endforeach}}
+        <div data-ipstoolboxtoyboxprettyprint data-ipstoolboxtoyboxprettyprint-depth="2">
+            {{$vv = json_encode($value);}}
+            {$vv|raw}
+        </div>
         {{else}}
         {expression="(new \IPS\toolbox\Profiler\Dumper)->type($value)" raw="true"}
         {{endif}}

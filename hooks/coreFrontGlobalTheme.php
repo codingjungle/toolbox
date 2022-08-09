@@ -29,6 +29,7 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
 
     public function queryLog($querylog)
     {
+
         if (
             Dispatcher::hasInstance() &&
             Dispatcher::i()->controllerLocation === 'admin' &&
@@ -53,6 +54,7 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
             try {
                 return Profiler::i()->run();
             } catch (Exception $e) {
+                \IPS\toolbox\Profiler\Debug::log($e);
             }
         }
 

@@ -314,6 +314,29 @@ trait Sources
         }
     }
 
+    protected function findClassHook()
+    {
+        $classes = Cache::i()->getClasses();
+
+        if (empty($classes) !== true) {
+            $input = ltrim(Request::i()->input, '\\');
+
+            $root = preg_quote($input, '#');
+            $foo = preg_grep('#^' . $root . '#i', $classes);
+            $return = [];
+            foreach ($foo as $f) {
+                $ogClass = explode('\\', $f);
+                array_shift($ogClass);
+                $f = implode('\\', $ogClass);
+                $return[] = [
+                    'value' => $f,
+                    'html'  => '\\IPS\\' . $f,
+                ];
+            }
+            Output::i()->json($return);
+        }
+    }
+
     protected function api()
     {
         $config = [

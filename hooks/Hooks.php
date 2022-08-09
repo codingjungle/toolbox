@@ -39,7 +39,7 @@ class toolbox_hook_Hooks extends _HOOK_CLASS_
             $options = [
                 'placeholder'  => 'Namespace',
                 'autocomplete' => [
-                    'source'               => 'app=toolbox&module=devcenter&controller=sources&do=findClass&appKey=' . Request::i()->appKey,
+                    'source'               => 'app=toolbox&module=devcenter&controller=sources&do=findClassHook&appKey=' . Request::i()->appKey,
                     'minimized'            => false,
                     'commaTrigger'         => false,
                     'unique'               => true,

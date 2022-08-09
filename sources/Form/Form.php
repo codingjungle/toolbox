@@ -689,7 +689,7 @@ class _Form extends \IPS\Helpers\Form
                                         foreach ($toggle['elements'] as $val) {
                                             if ($this->togglesAppending) {
                                                 $prefixed = 'js_' . $this->formPrefix . $val;
-                                                $a = $toggle['key'] === 'togglesOn' ? $prefixed : $val;
+                                                $a = $toggle['key'] === 'togglesOff' ? $prefixed : $val;
                                                 $options['togglesOff'][] = $a;
                                             } else {
                                                 $options['togglesOff'][] = str_replace('.', '_', $val);

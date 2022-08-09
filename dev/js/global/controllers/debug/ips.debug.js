@@ -48,51 +48,99 @@ var _cjProfilerP = _cjProfilerP || {},
       cc = Number(count) + cc;
       countEl.html(cc).attr('data-count', cc);
       el.addClass('dtprofilerFlash');
+      let debugEnabled = Debug.isEnabled();
+      Debug.setEnabled(false);
       container.trigger('contentChange', [container.parent()]);
+      Debug.setEnabled(debugEnabled);
     },
     isEmpty = (obj) => {
   return Object.keys(obj).length === 0;
 },
     getStackTrace = (type = 'log', min = 5, linkify = true) => {
-
       let file,
           other,
           line = 0,
           path,
           url,
           matches,
-          main,
+          main = '',
+          first = null,
           error = new Error(),
           stack = error.stack || '';
+      matches = stack.match(/\bhttps?:\/\/\S+\)/gi);
 
       stack = stack.split('\n').map(function(line) {
         return line.trim();
       });
-      stack = stack.splice(stack[0] === 'Error' ? min : 1);
-      main = stack[0];
-      //http://codingjungle.test/dev/applications/toolbox/dev/js/global/controllers/main/ips.toolbox.main.js?v=022c8961120a686efa330e667336b7cd1657607257:6:23)
-      matches = main.match(/\bhttps?:\/\/\S+/gi);
-      if (linkify && dtProfilerEditor) {
-        url = matches[0].replace(')', '').split('/');
-        file = url[url.length - 1];
+      // ogLog(stack);
+      //
+      // ogLog(matches);
+      if(linkify && dtProfilerEditor) {
+        main += '<div class="dtProfilerBacktrace">via: console.' + type + '()';
+      }
+      else{
+        main += 'via: console.' + type + '()';
+      }
+      $.each(stack, (index, value) => {
+        if( !value.includes('Error') &&
+            !value.includes('ips.debug.js') &&
+            !value.includes('debugger') &&
+            !value.includes('Debug.js')
+        ){
+          let srg = new RegExp(/\?v=(.*?):/g );
+          let vf = value.replace(srg,':');
+          if(linkify && dtProfilerEditor){
+            matches = value.match(/\bhttps?:\/\/\S+/gi);
+              url = matches[0].replace(')', '').split('/');
+              file = url[url.length - 1];
 
-        path = matches[0].replace(')', '').replace(dtProfilerBaseUrl, '');
-        path = path.split('?');
+              path = matches[0].replace(')', '').replace(dtProfilerBaseUrl, '');
+              path = path.split('?');
 
-        try {
-          other = path[1].split(':');
-          line = other[1] ?? 0;
-        } catch (error) {
+              try {
+                other = path[1].split(':');
+                line = other[1] ?? 0;
+              } catch (error) {
+              }
+              path = path[0];
+
+              main += '<div><a href="' + dtProfilerEditor + '://open?file=' + dtProfilerAppPath + '/' + path + '&line=' + line + '">' + vf + '</a>'
+          }
+          else{
+              main += vf;
+          }
         }
-        path = path[0];
-
-        return '<div><a href="' + dtProfilerEditor + '://open?file=' +
-            dtProfilerAppPath + '/' + path + '&line=' + line + '">in ' + path +
-            ':' + line + ' via console.' + type + '()</a></div>';
+      });
+      if(linkify && dtProfilerEditor) {
+        main += '</div>';
       }
 
-      return 'in ' + matches[0].replace(')', '') + ' via console.' + type +
-          '()';
+      return main;
+      // stack = stack.splice(stack[0] === 'Error' ? min : 1);
+      // main = stack[0];
+      // //http://codingjungle.test/dev/applications/toolbox/dev/js/global/controllers/main/ips.toolbox.main.js?v=022c8961120a686efa330e667336b7cd1657607257:6:23)
+      // matches = main.match(/\bhttps?:\/\/\S+/gi);
+      // if (linkify && dtProfilerEditor) {
+      //   url = matches[0].replace(')', '').split('/');
+      //   file = url[url.length - 1];
+      //
+      //   path = matches[0].replace(')', '').replace(dtProfilerBaseUrl, '');
+      //   path = path.split('?');
+      //
+      //   try {
+      //     other = path[1].split(':');
+      //     line = other[1] ?? 0;
+      //   } catch (error) {
+      //   }
+      //   path = path[0];
+      //
+      //   return '<div><a href="' + dtProfilerEditor + '://open?file=' +
+      //       dtProfilerAppPath + '/' + path + '&line=' + line + '">in ' + path +
+      //       ':' + line + ' via console.' + type + '()</a></div>';
+      // }
+      //
+      // return 'in ' + matches[0].replace(')', '') + ' via console.' + type +
+      //     '()';
     };
 
 _cjProfilerQue = setInterval(()=>{
@@ -123,10 +171,10 @@ _cjProfilerP = function() {
         }
         $.each(table, function(index, value) {
           if (_.isObject(value) || _.isArray(value)) {
-            tables += '<tr><td>' + index + '</td><td>' + value +
-                _buildTable(value, ['Index', 'Values']) +
-                '</td></tr>';
-
+            let obj = $('<div></div>');
+            obj.addClass('dark-mode');
+            obj.attr('data-ipstoolboxtoyboxprettyprint',1);
+            tables += '<tr><td>' + index + '</td><td>' + obj.html(JSON.stringify(value)).prop("outerHTML")+'</td></tr>';
           } else {
             tables += '<tr><td>' + index + '</td><td>' + value +
                 '</td></tr>';
@@ -140,21 +188,26 @@ _cjProfilerP = function() {
         let li = $('<li></li>'),
             container = $('<div></div>');
         li.addClass('ipsPad_half dtProfilerSearch dtProfilerType' + type);
+        li.append(data);
         if (type !== 'groupEnd') {
           li.append(getStackTrace(type,getMinNum()));
         } else {
           li.removeClass('ipsPad_half dtProfilerSearch');
         }
-        li.append(data);
-        container.html(li);
-        _process(container.html(), 1, type);
+        // ogLog(data);
+        // container.html(li);
+        _process(li, 1, type);
       },
       newLog = (u, type = 'log', classes = null ) => {
         let nv = '',
             includeIndex = u.length > 1;
         $.each(u, (index, value) => {
           if (_.isObject(value)) {
-            value = _buildTable(value);
+            let obj = $('<div></div>');
+            obj.addClass('dark-mode');
+            obj.attr('data-ipstoolboxtoyboxprettyprint',1);
+            value = obj.html(JSON.stringify(value)).prop("outerHTML");
+
           }
           nv += '<div';
           if (!_.isNull(classes)) {
@@ -352,11 +405,8 @@ _cjProfilerP = function() {
         }
       },
       trace = function() {
-
         if (dtProfilerUseConsole) {
-          let args = [],
-              error = new Error();
-          args.push(error.stack);
+          let args = ['Trace'];
           newLog(args, 'trace');
         } else {
           return write('trace');

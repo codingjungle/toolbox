@@ -22,7 +22,6 @@ use function header;
 use function is_bool;
 use function is_numeric;
 
-
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
@@ -42,17 +41,15 @@ class _Dumper extends HtmlDumper
     {
         if (is_numeric($value)) {
             $key = 'Number';
-        } else {
-            if (is_bool($value)) {
-                if ((bool)$value === true) {
-                    $value = 'true';
-                } else {
-                    $value = 'false';
-                }
-                $key = 'Bool';
+        } elseif (is_bool($value)) {
+            if ((bool) $value === true) {
+                $value = 'true';
             } else {
-                $key = 'String';
+                $value = 'false';
             }
+            $key = 'Bool';
+        } else {
+            $key = 'String';
         }
 
         return Theme::i()->getTemplate('generic', 'toolbox', 'front')->genericVal($value, $key);

@@ -144,6 +144,10 @@
         "default": "0"
     },
     {
+        "key": "toolbox_at",
+        "default": ""
+    },
+    {
         "key": "toolbox_debug_templates",
         "default": "0"
     },

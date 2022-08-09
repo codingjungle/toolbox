@@ -12,25 +12,25 @@
 
 namespace IPS\toolbox\Profiler\Parsers;
 
-use IPS\Data\Store;
-use IPS\Http\Url;
-use IPS\Patterns\Singleton;
-use IPS\Settings;
 use IPS\Theme;
+use IPS\Http\Url;
+use IPS\Settings;
+use IPS\Data\Store;
 use IPS\toolbox\Editor;
+use IPS\Patterns\Singleton;
 
 use UnexpectedValueException;
 
 use function count;
+use function ksort;
+use function header;
 use function defined;
 use function explode;
-use function header;
 use function implode;
 use function is_array;
+use function mb_strpos;
 use function json_decode;
 use function json_encode;
-use function ksort;
-use function mb_strpos;
 use function str_replace;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -40,7 +40,6 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Templates extends Singleton
 {
-
     /**
      * @brief   Singleton Instances
      * @note    This needs to be declared in any child class.
@@ -147,8 +146,17 @@ class _Templates extends Singleton
         ksort($list);
         $store['templates'] = Theme::i()
                                    ->getTemplate('dtpsearch', 'toolbox', 'front')
-                                   ->button('Templates', 'Templates', 'list of loaded Template files.', $list,
-                                       json_encode($list), count($list), 'code', true, false);
+                                   ->button(
+                                       'Templates',
+                                       'Templates',
+                                       'list of loaded Template files.',
+                                       $list,
+                                       json_encode($list),
+                                       count($list),
+                                       'code',
+                                       true,
+                                       false
+                                   );
     }
 
     /**
@@ -170,8 +178,11 @@ class _Templates extends Singleton
             return;
         }
         foreach ($css as $c) {
-            $path = str_replace(Url::baseUrl(Url::PROTOCOL_RELATIVE) . 'applications/core/interface/css/css.php?css=',
-                '', $c);
+            $path = str_replace(
+                Url::baseUrl(Url::PROTOCOL_RELATIVE) . 'applications/core/interface/css/css.php?css=',
+                '',
+                $c
+            );
 
             if (mb_strpos($path, ',') !== false) {
                 $p = explode(',', $path);
@@ -188,8 +199,17 @@ class _Templates extends Singleton
         ksort($list);
         $store['css'] = Theme::i()
                              ->getTemplate('dtpsearch', 'toolbox', 'front')
-                             ->button('CSS', 'CSS', 'list of loaded CSS files.', $list, json_encode($list),
-                                 count($list), 'hashtag', true, false);
+                             ->button(
+                                 'CSS',
+                                 'CSS',
+                                 'list of loaded CSS files.',
+                                 $list,
+                                 json_encode($list),
+                                 count($list),
+                                 'hashtag',
+                                 true,
+                                 false
+                             );
     }
 
     /**
@@ -221,8 +241,17 @@ class _Templates extends Singleton
         ksort($list);
         $store['js'] = Theme::i()
                             ->getTemplate('dtpsearch', 'toolbox', 'front')
-                            ->button('JS', 'js', 'list of loaded javascript files.', $list, json_encode($list),
-                                count($list), 'file-code-o', true, false);
+                            ->button(
+                                'JS',
+                                'js',
+                                'list of loaded javascript files.',
+                                $list,
+                                json_encode($list),
+                                count($list),
+                                'file-code-o',
+                                true,
+                                false
+                            );
     }
 
     /**
@@ -256,7 +285,16 @@ class _Templates extends Singleton
         }
         $store['jsVars'] = Theme::i()
                                 ->getTemplate('dtpsearch', 'toolbox', 'front')
-                                ->button('JSVars', 'jsvars', 'Loaded JS Vars', $list, json_encode($list), count($list),
-                                    'file-code-o', true, false);
+                                ->button(
+                                    'JSVars',
+                                    'jsvars',
+                                    'Loaded JS Vars',
+                                    $list,
+                                    json_encode($list),
+                                    count($list),
+                                    'file-code-o',
+                                    true,
+                                    false
+                                );
     }
 }

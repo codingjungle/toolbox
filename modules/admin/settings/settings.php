@@ -196,17 +196,47 @@ EOF;
             $init = $path . 'init.php';
             $content = file_get_contents($init);
             if (!is_file(\IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'init.bu.php')) {
+
+                $preg = "#class IPS$#msu";
+                $content = preg_replace_callback($preg, static function ($e) {
+                    return 'class IPSOG';
+                }, $content);
+                file_put_contents(\IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'init.original.php', $content);
+                $preg = "#class IPSOG$#msu";
+                $content = preg_replace_callback($preg, static function ($e) {
+                    return 'class IPSBU';
+                }, $content);
+                $content = str_replace('\\IPS\\IPS','static',$content);
+                $content = str_replace('IPS::init();','//IPS::init();', $content);
+                $content = str_replace('self::', 'static::', $content);
+
                 file_put_contents(\IPS\Application::getRootPath() . DIRECTORY_SEPARATOR . 'init.bu.php', $content);
             }
-            $content = str_replace('self::monkeyPatch', 'static::monkeyPatch', $content);
-            $preg = "#class IPS$#msu";
-            $content = preg_replace_callback($preg, static function ($e) {
-                return 'class IPSBU';
-            }, $content);
-            $preg = "#^IPS::init\(\);#msu";
-            $content = preg_replace_callback($preg, static function ($e) {
-                return <<<'eof'
+//            $content = str_replace('self::monkeyPatch', 'static::monkeyPatch', $content);
+//            $preg = "#class IPS$#msu";
+//            $content = preg_replace_callback($preg, static function ($e) {
+//                return 'class IPSBU';
+//            }, $content);
+//            $preg = "#^IPS::init\(\);#msu";
+//            $content = preg_replace_callback($preg, static function ($e) {
+//
+//            }, $content);
+//            $preg = "#public static function monkeyPatch\((.*?)public#msu";
+//            $before = <<<'eof'
+//
+//eof;
+//            $content = preg_replace_callback(
+//                $preg,
+//                function ($e) use ($before) {
+//                    return $before . "\n\n  public";
+//                },
+//                $content
+//            );
 
+            $content = <<<'eof'
+<?php
+namespace IPS;
+require 'init.bu.php';
 class IPS extends \IPS\IPSBU {
     public static $beenPatched = true;
     public static function exceptionHandler( $exception )
@@ -277,19 +307,6 @@ class IPS extends \IPS\IPSBU {
 }    
 IPS::init();
 eof;
-            }, $content);
-//            $preg = "#public static function monkeyPatch\((.*?)public#msu";
-//            $before = <<<'eof'
-//
-//eof;
-//            $content = preg_replace_callback(
-//                $preg,
-//                function ($e) use ($before) {
-//                    return $before . "\n\n  public";
-//                },
-//                $content
-//            );
-
             file_put_contents($init, $content);
         }
 

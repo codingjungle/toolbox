@@ -11,33 +11,47 @@
 
 namespace IPS\toolbox;
 
-use IPS\Application;
-use IPS\Dispatcher;
-use IPS\Http\Url;
 use IPS\IPS;
+use IPS\Theme;
 use IPS\Output;
 use IPS\Request;
-use IPS\Theme;
+use IPS\Http\Url;
+use IPS\Settings;
+use IPS\Dispatcher;
 
-use function array_merge;
+use IPS\Application;
+
+use IPS\toolbox\Api\_UpdateCheck;
+
+use IPS\toolbox\Api\UpdateCheck;
+
+use function _p;
 use function count;
 use function defined;
-use function file_get_contents;
 use function is_array;
+use function ob_start;
+use function strtotime;
+use function array_merge;
+use function file_exists;
 use function json_decode;
+use function json_encode;
+use function str_replace;
 use function ob_end_clean;
 use function ob_get_clean;
-use function ob_start;
-use function preg_replace_callback;
-use function str_replace;
+use function file_get_contents;
 
+use function preg_replace_callback;
+
+use const DT_BETA_URL;
+use const DT_BETA_CLIENT_ID;
+use const JSON_PRETTY_PRINT;
+use const DT_BETA_CLIENT_SECRET;
 
 /**
  * Dev Toolbox: Base Application Class
  */
 class _Application extends Application
 {
-
     public static $toolBoxApps = [
         'toolbox',
         'toolbox',
@@ -53,7 +67,7 @@ class _Application extends Application
             static::$loaded = true;
             require \IPS\Application::getRootPath('toolbox') . '/applications/toolbox/sources/vendor/autoload.php';
             IPS::$PSR0Namespaces['Generator'] = \IPS\Application::getRootPath(
-                ) . '/applications/toolbox/sources/Generator/';
+            ) . '/applications/toolbox/sources/Generator/';
         }
     }
 
@@ -171,7 +185,7 @@ class _Application extends Application
 
     public static function specialHooks()
     {
-        $apps = array();
+        $apps = [];
         foreach (static::applications() as $application) {
             if (count($application->extensions('toolbox', 'SpecialHooks'))) {
                 $apps[$application->directory] = $application;
@@ -240,13 +254,13 @@ EOF;
                                 '_name'  => $key
                             ]);
             $html .= <<<EOF
-<li class="ipsClearfix ipsMargin_bottom:half"> 
+<li class="ipsClearfix ipsMargin_bottom:half">
 <a href="{$url}"{$active} class="ipsPos_left ipsType_break">
 {$key}
-</a> 
+</a>
 <a href="{$addColumn}" class="ipsButton ipsButton_alternate ipsButton_veryVerySmall ipsPos_right" data-ipsdialog data-ipsDialog-desctructOnClose="true" data-ipsDialog-title="Add Column"><i class="fa fa-plus"></i></a>
 <a href="#toolbox_schema_fields_{$key}_menu" id="toolbox_schema_fields_{$key}" class="ipsButton ipsButton_positive ipsButton_veryVerySmall ipsPos_right" data-ipsMenu><i class="fa fa-chevron-circle-down"></i></a>
-{$html2} 
+{$html2}
 </li>
 EOF;
         }
@@ -262,5 +276,34 @@ EOF;
     protected function get__icon()
     {
         return 'wrench';
+    }
+    public const URL = 'https://codingjungle.com/api/';
+    public const TOKEN_URL = 'https://codingjungle.com/oauth/token/';
+    public const CLIENT_ID = 'ccff05eb602312b6183ccaea8ed6a235';
+    public const CLIENT_SECRET = '642534793abd1831cc6e49d224e6bb03069b2c70c12543ae';
+    public static function checkNew()
+    {
+        $response = UpdateCheck::i()->get('downloads/files/47/');
+        _p($response);
+    }
+
+    protected function getAutho()
+    {
+        if (Settings::i()->toolbox_at) {
+            return Settings::i()->toolbox_at;
+        } else {
+            $authorization = Url::external(static::TOKEN_URL)
+                ->request()
+                ->post([
+                    'grant_type' => 'client_credentials',
+                    'client_id' => static::CLIENT_ID,
+                    'client_secret' => static::CLIENT_SECRET,
+                    'scope' => 'downloads'
+                ]);
+            $credentials = $authorization->decodeJson();
+
+            Settings::i()->changeValues(['toolbox_at' => $credentials['access_token']]);
+            return $credentials['access_token'];
+        }
     }
 }

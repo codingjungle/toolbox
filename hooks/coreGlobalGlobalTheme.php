@@ -2,14 +2,13 @@
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
-use IPS\Theme;
+use IPS\Data\Store;
 use IPS\Output;
 use IPS\Request;
 use IPS\Settings;
-use IPS\Data\Store;
+use IPS\Theme;
 use IPS\toolbox\Application;
 
-use const IPS\DEBUG_JS;
 use const IPS\CACHING_LOG;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -65,16 +64,13 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
             $js = '';
             foreach ($debugjs as $j) {
                 $js .= '<script type="text/javascript" src="' . $j . '?v=' . \IPS\Output\Javascript::javascriptCacheBustKey(
-                ) . '" data-ips></script>';
+                    ) . '" data-ips></script>';
             }
             $vals = json_decode(Settings::i()->dtprofiler_console_replacements, true) ?? [];
             $replacements = json_encode(array_combine(array_values($vals), array_values($vals)));
             $canUse = Settings::i()->dtprofiler_use_console ? 1 : 0;
             $canUse = \IPS\QUERY_LOG ? $canUse : 0;
             $canReplace = Settings::i()->dtprofiler_replace_console ? 1 : 0;
-            if (DEV_DEBUG_JS || DEBUG_JS) {
-                $canReplace = 0;
-            }
             $cjEditor = \IPS\DEV_WHOOPS_EDITOR;
             $cjBaseUrl = \IPS\Settings::i()->base_url;
             $cjAppPath = Application::getRootPath('toolbox');
@@ -88,8 +84,7 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     var dtProfilerBaseUrl = '{$cjBaseUrl}';
     var dtProfilerAppPath = '{$cjAppPath}';
     var dtProfilerDebug = '{$cjDebug}';
-    var dtProfilerReplacements = {$replacements};
-
+    var dtProfilerReplacements = {$replacements}; 
 </script>
 {$js}
 EOF;
