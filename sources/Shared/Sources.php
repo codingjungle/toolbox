@@ -227,6 +227,10 @@ trait Sources
         $this->doOutput($config, 'review', 'Review Class');
     }
 
+    protected function application(){
+        $this->doOutput([], 'application', 'Application Class Improvements');
+    }
+
     protected function findClass()
     {
         $type = Request::i()->type ?? 'class';

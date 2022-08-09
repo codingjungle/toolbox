@@ -10,60 +10,64 @@
 
 namespace IPS\toolbox\DevCenter;
 
-use InvalidArgumentException;
+use Exception;
+use IPS\Theme;
+use Throwable;
+use IPS\Member;
+use IPS\Output;
+use IPS\Request;
+use SplObserver;
+use IPS\Http\Url;
 use IPS\Application;
-use IPS\Content\Anonymous;
-use IPS\Content\ClubContainer;
-use IPS\Content\EditHistory;
-use IPS\Content\Embeddable;
-use IPS\Content\Featurable;
-use IPS\Content\Followable;
-use IPS\Content\FuturePublishing;
+use IPS\Content\Tags;
+use IPS\Node\Ratings;
+use IPS\toolbox\Form;
+use IPS\Content\Polls;
+use IPS\Content\Views;
+use IPS\Node\Colorize;
 use IPS\Content\Hideable;
-use IPS\Content\ItemTopic;
 use IPS\Content\Lockable;
 use IPS\Content\MetaData;
 use IPS\Content\Pinnable;
-use IPS\Content\Polls;
+use IPS\Content\Solvable;
+use IPS\Node\Permissions;
+use IPS\Content\Anonymous;
+use IPS\Content\ItemTopic;
 use IPS\Content\Reactable;
-use IPS\Content\ReadMarkers;
-use IPS\Content\Recognizable;
+use IPS\Content\Shareable;
+use IPS\Content\Embeddable;
+use IPS\Content\Featurable;
+use IPS\Content\Followable;
 use IPS\Content\Reportable;
 use IPS\Content\Searchable;
-use IPS\Content\Shareable;
-use IPS\Content\Solvable;
 use IPS\Content\Statistics;
-use IPS\Content\Tags;
-use IPS\Content\Views;
-use IPS\Http\Url;
-use IPS\Member;
-use IPS\Node\Colorize;
-use IPS\Node\Permissions;
-use IPS\Node\Ratings;
-use IPS\Output;
-use IPS\Request;
-use IPS\Theme;
-use IPS\toolbox\DevCenter\Sources\Generator\Elements;
-use IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract;
-use IPS\toolbox\DevCenter\Sources\SourceBuilderException;
-use IPS\toolbox\DevCenter\Sources\SourcesFormAbstract;
-use IPS\toolbox\Form;
-use IPS\toolbox\ReservedWords;
-use SplObserver;
-use Throwable;
+use IPS\Content\EditHistory;
+use IPS\Content\ReadMarkers;
+use InvalidArgumentException;
+use IPS\Content\Recognizable;
 use UnexpectedValueException;
+use IPS\Content\ClubContainer;
+use IPS\toolbox\ReservedWords;
+use IPS\Content\FuturePublishing;
+use IPS\toolbox\DevCenter\Sources\Generator\Elements;
+use IPS\toolbox\DevCenter\Sources\SourcesFormAbstract;
+use IPS\toolbox\DevCenter\Sources\SourceBuilderException;
 
+use IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract;
+
+use function count;
+use function header;
+use function defined;
+use function in_array;
+use function is_array;
 use function array_keys;
+use function mb_ucfirst;
 use function array_search;
 use function class_exists;
-use function count;
-use function defined;
-use function header;
-use function in_array;
-use function interface_exists;
-use function is_array;
-use function mb_ucfirst;
 use function trait_exists;
+use function mb_strtolower;
+use function property_exists;
+use function interface_exists;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -119,7 +123,7 @@ class _Sources
         $this->application = $application;
         $url = 'app=toolbox&module=devcenter&controller=sources&appKey=' . $this->application->directory;
         $base = [
-            'source' => (string)$url . '&do=findClass',
+            'source' => (string) $url . '&do=findClass',
             'minimized' => false,
             'commaTrigger' => false,
             'unique' => true,
@@ -148,7 +152,7 @@ class _Sources
             Output::i()->sidebar['actions']['devcenter'] = [
                 'icon'  => null,
                 'title' => 'dtdevplus_devcenter',
-                'link'  => (string)Url::internal(
+                'link'  => (string) Url::internal(
                     'app=core&module=applications&controller=developer&appKey=' . Request::i()->appKey
                 )->csrf(),
             ];
@@ -156,7 +160,7 @@ class _Sources
         Output::i()->sidebar['actions']['sources'] = [
             'icon' => 'arrow-down',
             'title' => 'dtdevplus_sources',
-            'link' => (string)Url::internal(
+            'link' => (string) Url::internal(
                 'app=toolbox&module=devcenter&controller=sources&appKey=' . Request::i()->appKey
             ),
             'id' => 'adminMenu_button',
@@ -170,7 +174,7 @@ class _Sources
         Output::i()->sidebar['actions']['dev'] = [
             'icon' => 'code',
             'title' => 'dtdevplus_dev',
-            'link' => (string)Url::internal(
+            'link' => (string) Url::internal(
                 'app=toolbox&module=devcenter&controller=dev&appKey=' . Request::i()->appKey
             ),
             'id' => 'adminMenuDev_button',
@@ -209,7 +213,8 @@ class _Sources
                 'member',
                 'form',
                 'orm',
-                'settings'
+                'settings',
+                'application'
             ],
             'check' => [
                 'Debug',
@@ -245,22 +250,25 @@ class _Sources
         $subs = $menus['sources'];
         $ns = '\\IPS\\' . Request::i()->appKey;
         foreach ($menus['check'] as $ignored) {
+            if ($ignored === 'Application') {
+                $ignored = 'ApplicationOG';
+            }
             $og = $ns;
             if ($ignored === 'Orm') {
                 $ns .= '\\Traits';
             }
-            if (\in_array($ignored, ['Debug', 'Memory'])) {
+            if (in_array($ignored, ['Debug', 'Memory'], true)) {
                 $ns .= '\\Profiler';
             }
             $cs = $ns . '\\' . $ignored;
             try {
                 if (class_exists($cs) || trait_exists($cs) || interface_exists($cs)) {
-                    $key = array_search(\mb_strtolower($ignored), $subs);
+                    $key = array_search(mb_strtolower($ignored), $subs, true);
                     if ($key !== false) {
                         unset($subs[$key]);
                     }
                 }
-            } catch (Throwable|\Exception $e) {
+            } catch (Throwable|Exception $e) {
             }
             $ns = $og;
         }
@@ -296,9 +304,53 @@ class _Sources
             ->formId('dtdevplus_class__r' . $this->type . 'r_')
             ->submitLang('Create Source');
 
-        foreach ($config as $func) {
-            $method = 'el' . $func;
-            $this->{$method}();
+        if ($type === 'application') {
+            $ops = [
+                'js' => 'js',
+                'css' => 'css',
+                'jsVar' => 'jsVar',
+                'color' => 'color',
+                'quickColor' => 'quickColor',
+                'convertTime' => 'convertTime',
+                'frontNavigation' => 'frontNavigation'
+            ];
+            $class = '\\IPS\\' . $this->application->directory . '\\Application';
+            if (property_exists($class, 'hasDefaultNavigation')) {
+                unset($ops['frontNavigation']);
+            }
+            $options = [
+                'prefixLang' => true,
+                'parse' => 'lang',
+                'options' => $ops
+            ];
+            $this->form
+                ->addElement('addToApplications', 'cbs')
+                ->options($options)
+                ->toggles(
+                    [
+                       'frontNavigation' => [
+                           'rootTabs',
+                           'browseTabs',
+                           'browseTabsEnd',
+                           'activityTabs'
+                       ]
+                    ]
+                )
+                ->value([]);
+            $this->form->hidden('type', 'Application');
+            $this->form->hidden('className', 'Application');
+            if (!property_exists($class, 'hasDefaultNavigation')) {
+                $this->form->addElement('rootTabs', 'stack');
+                $this->form->addElement('browseTabs', 'stack');
+                $this->form->addElement('browseTabsEnd', 'stack');
+                $this->form->addElement('activityTabs', 'stack');
+            }
+            $this->form->message('applications', 'ipsMessage ipsMessage_warning');
+        } else {
+            foreach ($config as $func) {
+                $method = 'el' . $func;
+                $this->{$method}();
+            }
         }
     }
 
@@ -588,7 +640,7 @@ class _Sources
             'review',
         ];
 
-        if (in_array($this->type, $tabs)) {
+        if (in_array($this->type, $tabs, true)) {
             $this->form->tab('general');
         }
 
@@ -689,7 +741,7 @@ class _Sources
 
         $sc['db'] = 'Database';
 
-        if (!in_array($this->type, ['activerecord', 'review', 'comment'])) {
+        if (!in_array($this->type, ['activerecord', 'review', 'comment'], true)) {
             $sc['modules'] = 'Module';
         }
 
@@ -805,7 +857,8 @@ class _Sources
         }
         $autoComplete = $this->findTraits;
         unset($autoComplete['maxItems']);
-        $this->form->addElement('traits')->options(['autocomplete' => $autoComplete])->validation([$this, 'traitsCheck']
+        $this->form->addElement('traits')->options(['autocomplete' => $autoComplete])->validation(
+            [$this, 'traitsCheck']
         );
     }
 

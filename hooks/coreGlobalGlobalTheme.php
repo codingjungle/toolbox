@@ -88,16 +88,15 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
 </script>
 {$js}
 EOF;
-
+            $loadJs = [];
             if (defined('DT_NODE') && DT_NODE) {
-                Application::addJs(['front_socket']);
+                $loadJs[] = 'front_socket';
             }
+            $loadJs[] = 'global_main';
+            $loadJs[] = 'global_proxy';
 
-            Application::addJs(['global_main'], 'global');
-            Application::addJs(['global_proxy'], 'global');
-
-            if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
-                Application::addJs(['front_profiler']);
+            if (\IPS\QUERY_LOG ) {
+                $loadJs[] = 'front_profiler';
                 if (Settings::i()->dtprofiler_enabled_js) {
                     Store::i()->dtprofiler_js = Output::i()->jsFiles;
                 }
@@ -106,6 +105,7 @@ EOF;
                     Store::i()->dtprofiler_js_vars = Output::i()->jsVars;
                 }
             }
+            Application::addJs($loadJs);
         }
 
         if (\is_callable('parent::includeJS')) {

@@ -150,8 +150,8 @@ class _adminer extends \IPS\Dispatcher\Controller
       /* Swap back certain tags that confuse phpQuery */
       $return = preg_replace('/<(\/)?temp(html|head|body)(.*?)>/', '<$1$2$3>', $return);
       $return = str_replace('<hypertemp></hypertemp>', '<!DOCTYPE html>', $return);
-      Application::addJs(['admin_click'], 'admin');
-      Application::addCss(['adminer'], 'admin');
+      Application::addJs(['admin_click']);
+      Application::addCss(['admin_adminer']);
       Output::i()->output = Theme::i()->getTemplate('adminer', 'toolbox', 'admin')->adminer($return);
     }
   }

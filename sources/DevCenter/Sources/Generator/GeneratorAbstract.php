@@ -151,6 +151,10 @@ abstract class _GeneratorAbstract
 
     protected $includeConstructor = true;
 
+    protected $overrideDir = false;
+
+    protected $dir;
+
     /**
      * @param array $values
      * @param Application $application
@@ -286,24 +290,29 @@ abstract class _GeneratorAbstract
             $this->mixin = $this->namespace . '\\' . $this->classname;
         }
 
-        if ($this->type === 'Api') {
-            $dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/api/';
-        } else {
-            $dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/sources/' . $this->_getDir();
-        }
-
         $file = $this->classname . '.php';
         $this->proxy = true;
 
-        if (file_exists($dir.'/'.$file)) {
-            throw new SourceBuilderException('This class already exists: '.$dir.'/'.$file);
+        if($this->overrideDir === false) {
+            if ($this->type === 'Api') {
+                $dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/api/';
+            } else {
+                $dir = \IPS\Application::getRootPath(
+                    ) . '/applications/' . $this->application->directory . '/sources/' . $this->_getDir();
+            }
+            if (file_exists($dir.'/'.$file)) {
+                throw new SourceBuilderException('This class already exists: '.$dir.'/'.$file);
+            }
         }
+        else{
+            $dir = $this->dir;
+        }
+
+        $this->generator->addPath($dir);
 
         if (!in_array($this->type, ['Interface', 'Traits'])) {
             $this->proxy = false;
         }
-
-        $this->generator->addPath($dir);
         $this->generator->addFileName($file);
         $this->generator->isProxy = $this->proxy;
         $doc = [

@@ -91,6 +91,7 @@ var _cjProfilerP = _cjProfilerP || {},
           let vf = value.replace(srg,':');
           if(linkify && dtProfilerEditor){
             matches = value.match(/\bhttps?:\/\/\S+/gi);
+
               url = matches[0].replace(')', '').split('/');
               file = url[url.length - 1];
 

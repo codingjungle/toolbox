@@ -23,7 +23,7 @@ class toolbox_hook_phpinfo extends _HOOK_CLASS_
 
     protected function manage()
     {
-        \IPS\toolbox\Application::addCss(['phpinfo'],'admin');
+        \IPS\toolbox\Application::addCss(['admin_phpinfo']);
         ob_start();
         phpinfo();
         $content = ob_get_contents();

@@ -1,8 +1,8 @@
 <?php
 
-require_once '../../../init.php';
+//require_once '../../../init.php';
 $finder = PhpCsFixer\Finder::create()
-    ->in(\IPS\ROOT_PATH);
+    ->in(__DIR__);
 
 $config = new PhpCsFixer\Config();
 return $config->setRules([
