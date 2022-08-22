@@ -26,7 +26,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 class _UpdateCheck extends Oauth
 {
     protected static $instance;
-    protected function setup()
+    protected function setup(): void
     {
         $this->client = 'ccff05eb602312b6183ccaea8ed6a235';
         $this->secret = '642534793abd1831cc6e49d224e6bb03069b2c70c12543ae';
@@ -35,18 +35,18 @@ class _UpdateCheck extends Oauth
         $this->scopes = 'downloads';
     }
 
-    protected function storeCredentials($credentials)
+    protected function storeCredentials($credentials): mixed
     {
         Settings::i()->changeValues(['toolbox_at' => $credentials['access_token']]);
         return $credentials['access_token'];
     }
 
-    protected function getCredentials()
+    protected function getCredentials(): ?string
     {
         return Settings::i()->toolbox_at;
     }
 
-    protected function clearCredentials()
+    protected function clearCredentials(): void
     {
         Settings::i()->changeValues(['toolbox_at' => null]);
     }
