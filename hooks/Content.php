@@ -2,8 +2,6 @@
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
-use function defined;
-
 use const TOOLBOXDEV_IMMEDIATE;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -13,7 +11,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 abstract class toolbox_hook_Content extends _HOOK_CLASS_
 {
 
-    public function modAction($action, Member $member = null, $reason = null, $immediately = false)
+	public function modAction( $action, \IPS\Member $member = NULL, $reason = NULL, $immediately = FALSE )
     {
         if (defined('TOOLBOXDEV_IMMEDIATE') && TOOLBOXDEV_IMMEDIATE) {
             $immediately = true;

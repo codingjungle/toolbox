@@ -119,7 +119,7 @@ class toolbox_hook_developer extends _HOOK_CLASS_
         }
     }
 
-    public function addVersionQuery()
+    protected function addVersionQuery()
     {
         Output::i()->jsFiles = array_merge(Output::i()->jsFiles, Output::i()->js('admin_query.js', 'toolbox', 'admin'));
 
@@ -461,7 +461,7 @@ class toolbox_hook_developer extends _HOOK_CLASS_
         parent::execute($command);
     }
 
-    public function manage()
+	protected function manage()
     {
         Sources::menu();
         parent::manage();
