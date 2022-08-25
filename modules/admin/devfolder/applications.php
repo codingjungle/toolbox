@@ -95,7 +95,7 @@ class _applications extends Controller
         /**
          * @param $data
          */
-        $form = Form::create()->formPrefix('dtdevfolder_app');
+        $form = Form::create()->setPrefix('dtdevfolder_app');
         $validate = static function ($data) {
             if ($data === 'select') {
                 throw new InvalidArgumentException('form_bad_value');

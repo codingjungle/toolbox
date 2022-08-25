@@ -101,9 +101,9 @@ class _Dev extends Singleton
     {
         $this->type = $type;
         $this->form
-            ->formPrefix('dtdevplus_dev__r' . $this->type . 'r_')
-            ->doLabels('_r' . $this->type . 'r_')
-            ->formId('dtdevplus_dev__r' . $this->type . 'r_')
+            ->setPrefix('dtdevplus_dev_')
+            ->addExtraPrefix('_r' . $this->type . 'r_')
+            ->setId('dtdevplus_dev__r' . $this->type . 'r_')
             ->submitLang('Create Asset');
 
         foreach ($config as $func) {

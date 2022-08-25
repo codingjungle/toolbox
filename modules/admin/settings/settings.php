@@ -25,9 +25,13 @@ use IPS\toolbox\GitHooks;
 use RuntimeException;
 
 use function _p;
+use function filemtime;
 use function array_merge;
 use function defined;
 use function explode;
+use function file_exists;
+use function preg_replace;
+use function trigger_error;
 use function file_get_contents;
 use function file_put_contents;
 use function function_exists;
@@ -42,8 +46,10 @@ use function str_replace;
 
 use function time;
 
+use const E_USER_ERROR;
 use const DIRECTORY_SEPARATOR;
 use const IPS\NO_WRITES;
+use const IPS\SITE_FILES_PATH;
 
 
 \IPS\toolbox\Application::loadAutoLoader();
@@ -122,8 +128,8 @@ class _settings extends Controller
 //            }
         }
 
-        $form = Form::create()->object(Settings::i());
-        $form->tab('toolbox');
+        $form = Form::create()->setObject(Settings::i());
+        $form->addTab('toolbox');
         $form->addElement('toolbox_debug_templates', 'yn');
         $form->addElement('toolbox_use_tabs_applications','yn');
         /* @var \IPS\toolbox\extensions\toolbox\Settings\settings $extension */
@@ -253,20 +259,20 @@ class IPS extends \IPS\IPSBU {
     {
         $realClass = "_{$finalClass}";
         if (isset(self::$hooks[ "\\{$namespace}\\{$finalClass}" ]) AND \IPS\RECOVERY_MODE === false) {
-            $path = ROOT_PATH . '/hook_temp/';
+            $path = ROOT_PATH . '/hookTemp/';
             if (!\is_dir($path)) {
                 \mkdir($path, 0777, true);
             }
-            $rpath = ROOT_PATH;
-            if ( \IPS\CIC2 AND static::isThirdParty( $data['file'] ) )
-            {
-                $rpath = SITE_FILES_PATH;
-            }
-            
+
             $vendor = ROOT_PATH.'/applications/toolbox/sources/vendor/autoload.php';
             require $vendor;
 
             foreach (self::$hooks[ "\\{$namespace}\\{$finalClass}" ] as $id => $data) {
+                $rpath = ROOT_PATH;
+                if ( \IPS\CIC2 AND static::isThirdParty( $data['file'] ) )
+                {
+                    $rpath = SITE_FILES_PATH;
+                }
                 $mtime = filemtime( $rpath . '/' . $data[ 'file' ] );
                 $name = \str_replace(["\\", '/'], '_', $namespace . $realClass . $finalClass . $data[ 'file' ]);
                 $filename = $name.'_' . $mtime . '.php';
@@ -290,9 +296,9 @@ class IPS extends \IPS\IPSBU {
                         \file_put_contents($path . $filename, "<?php\n\n" . $contents);
                     }
                 }
-                if( static::isThirdParty( $data['file'] ) and \IPS\Dispatcher::hasInstance() )
+                if( static::isThirdParty( $data['file'] ) )
                 {
-                    \IPS\Dispatcher::i()->loadedHooks[] = $data['file'];
+                    static::$loadedHooks[] = $data['file'];
                 }
                 require_once $path . $filename;
                 $realClass = $data[ 'class' ];
@@ -300,7 +306,7 @@ class IPS extends \IPS\IPSBU {
         }
         
         $reflection = new \ReflectionClass("{$namespace}\\_{$finalClass}");
-        if (eval("namespace {$namespace}; " . $extraCode . ($reflection->isAbstract() ? 'abstract' : '') . " class {$finalClass} extends {$realClass} {}") === false)       { 
+        if (eval("namespace {$namespace}; " . $extraCode . ($reflection->isAbstract() ? 'abstract' : '') . " class {$finalClass} extends {$realClass} {}") === false)       {
             trigger_error("There was an error initiating the class {$namespace}\\{$finalClass}.", E_USER_ERROR);
         }
     }

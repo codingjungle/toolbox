@@ -52,6 +52,8 @@ use const DT_BETA_CLIENT_SECRET;
  */
 class _ApplicationOG extends Application
 {
+    public static $thirdParty = [];
+
     public static $toolBoxApps = [
         'toolbox',
         'toolbox',

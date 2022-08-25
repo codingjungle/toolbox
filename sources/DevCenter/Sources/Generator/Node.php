@@ -21,6 +21,7 @@ use IPS\Node\Ratings;
 
 use function defined;
 use function file_exists;
+use function class_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function header;
@@ -76,6 +77,33 @@ class _Node extends GeneratorAbstract
             'seoTitle',
         ];
 
+        $doc = [
+            '@brief Application',
+            '@var string',
+        ];
+        $this->generator->addProperty(
+            'application',
+            $this->app,
+            [
+                'visibility' => T_PUBLIC,
+                'static'     => true,
+                'document'   => $doc,
+            ]
+        );
+
+        $doc = [
+            '@brief Module',
+            '@var string',
+        ];
+        $this->generator->addProperty(
+        'module',
+        $this->classname_lower,
+        [
+            'visibility' => T_PUBLIC,
+            'static'     => true,
+            'document'   => $doc,
+        ]
+    );
         $this->databaseColumnParent();
         $this->databaseColumnParentRootValue();
         $this->databaseColumnOrder();
@@ -91,6 +119,7 @@ class _Node extends GeneratorAbstract
             '@brief max number of results to return for form helper',
             '@var int'
         ];
+
         $this->generator->addProperty('maxFormHelperResults', 10, ['static' => true, 'document' => $doc]);
 
         if ($this->content_item_class !== null) {
@@ -115,8 +144,32 @@ class _Node extends GeneratorAbstract
         $params = [
             ['name' => 'form', 'reference' => true],
         ];
+        $body = '';
+        $formatValues = 'return $values;';
+        $formClass = '\\IPS\\'.$this->application->directory.'\\Form';
+        if(class_exists($formClass)) {
+            $this->generator->addImport($formClass);
+            $body = '$form = Form::create($form)->setObject($this);';
 
-        $this->generator->addMethod('form', '', $params, ['document' => $doc]);
+
+            //lang prefix
+            $doc = [
+                '@brief [Node] Prefix string that is automatically prepended to permission matrix language strings',
+                '@var string',
+            ];
+
+            $this->generator->addProperty(
+                'formPrefix',
+                $this->app . '_' . $this->classname_lower . '_form_',
+                [
+                    'visibility' => T_PUBLIC,
+                    'static'     => true,
+                    'document'   => $doc,
+                ]
+            );
+        }
+
+        $this->generator->addMethod('form', $body, $params, ['document' => $doc]);
 
         //formatValues
         $doc = [
@@ -128,9 +181,15 @@ class _Node extends GeneratorAbstract
         $params = [
             ['name' => 'values'],
         ];
+        $traitInUse = '\\IPS\\' . $this->application->directory . '\\Traits\\Orm';
+        if (is_array($this->traits) && count($this->traits) && \in_array($traitInUse, $this->traits)) {
+            $formatValues = <<<eof
+        \$this->processBitwise(\$values);
+        return \$values;
+eof;
+        }
 
-        $this->generator->addMethod('formatFormValues', 'return $values;', $params, ['document' => $doc]);
-
+        $this->generator->addMethod('formatFormValues', $formatValues, $params, ['document' => $doc]);
         $this->db->addBulk($dbColumns);
         $this->_addToLangs($this->app . '_' . $this->classname_lower . '_node', $this->classname, $this->application);
     }
@@ -311,7 +370,7 @@ class _Node extends GeneratorAbstract
                 ];
 
                 $this->generator->addProperty(
-                    'permApp',
+                    'permType',
                     $this->classname_lower,
                     [
                         'visibility' => T_PUBLIC,
@@ -353,7 +412,7 @@ class _Node extends GeneratorAbstract
 
                 $this->generator->addProperty(
                     'permissionLangPrefix',
-                    $this->app . '_' . $this->classname_lower . '_',
+                    $this->app . '_' . $this->classname_lower . '_perms_',
                     [
                         'visibility' => T_PUBLIC,
                         'static'     => true,

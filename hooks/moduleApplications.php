@@ -5,17 +5,22 @@ use IPS\Application;
 use IPS\Db;
 use IPS\Member;
 use IPS\Output;
+use IPS\toolbox\Build\Cons;
 use IPS\Patterns\ActiveRecordIterator;
 use IPS\Request;
 use IPS\Settings;
 use IPS\Theme;
 use IPS\toolbox\Build;
 
+use function _p;
+use function implode;
+use function is_array;
 use function array_keys;
 use function array_merge;
 use function defined;
 use function explode;
 use function file_exists;
+use function array_combine;
 use function file_get_contents;
 use function in_array;
 use function is_dir;
@@ -219,7 +224,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
                     function () use ($uninstalled, $baseUrl) {
                         $rows = array();
 
-                        if (!empty($uninstalled) and \is_array($uninstalled)) {
+                        if (!empty($uninstalled) and is_array($uninstalled)) {
                             foreach ($uninstalled as $k => $app) {
                                 $buttons = array();
                                 if (\IPS\IPS::canManageResources()) {
@@ -335,6 +340,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
         return $rows;
     }
 
+
     public function _thirdPartyRoots(){
         $rows = array();
         $apps = \IPS\IPS::$ipsApps;
@@ -346,9 +352,84 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
         $roots = new ActiveRecordIterator($sql, Application::class);
         foreach( $roots as $node )
         {
+            \IPS\toolbox\Application::$thirdParty[$node->directory] = 1;
             $rows[ $node->_id ] = $this->_getRow( $node );
         }
 
         return $rows;
     }
+
+    protected function removeFromMyApps(){
+        $app = Request::i()->appKey;
+        $cons = Cons::i()->buildConstants();
+        $apps = [];
+        $values = [];
+        foreach($cons as $k => $v){
+            switch ($v['type']) {
+                case 'integer':
+                case 'boolean':
+                    $check = (int)$v['current'];
+                    $check2 = (int)$v['default'];
+                    break;
+                default:
+                    if (is_array($v['default'])) {
+                        $check2 = $v['default'];
+                        $check = $v['current'];
+                    } else {
+                        $check2 = (string)$v['default'];
+                        $check = (string)$v['current'];
+                    }
+                    break;
+            }
+            $values[$k] = $check !== $check2 ? $v['current'] : $v['default'];;
+        }
+        if(defined('DT_MY_APPS')) {
+            $myApps = explode(',', DT_MY_APPS);
+            $apps = array_combine($myApps,$myApps);
+        }
+        if(isset($apps[$app])){
+            unset($apps[$app]);
+            $apps = implode(',',$apps);
+        }
+        $values['DT_MY_APPS'] = $apps;
+        Cons::i()->save($values,$cons);
+        $url = \IPS\Http\Url::internal( 'app=core&module=applications&controller=applications' );
+        Output::i()->redirect( $url, 'Application, ' . $app . ', removed from My Apps');
+    }
+
+    protected function addToMyApps(){
+        $app = Request::i()->appKey;
+        $cons = Cons::i()->buildConstants();
+        $apps = [];
+        $values = [];
+        foreach($cons as $k => $v){
+            switch ($v['type']) {
+                case 'integer':
+                case 'boolean':
+                    $check = (int)$v['current'];
+                    $check2 = (int)$v['default'];
+                    break;
+                default:
+                    if (is_array($v['default'])) {
+                        $check2 = $v['default'];
+                        $check = $v['current'];
+                    } else {
+                        $check2 = (string)$v['default'];
+                        $check = (string)$v['current'];
+                    }
+                    break;
+            }
+            $values[$k] = $check !== $check2 ? $v['current'] : $v['default'];;
+        }
+        if(defined('DT_MY_APPS')) {
+            $myApps = explode(',', DT_MY_APPS);
+            $apps = array_combine($myApps,$myApps);
+        }
+        $apps[$app] = $app;
+        $values['DT_MY_APPS'] = implode(',',$apps);
+        Cons::i()->save($values,$cons);
+        $url = \IPS\Http\Url::internal( 'app=core&module=applications&controller=applications' );
+        Output::i()->redirect( $url, 'Application, ' . $app . ', added to My Apps');
+    }
+
 }

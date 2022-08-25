@@ -55,6 +55,7 @@ use IPS\toolbox\DevCenter\Sources\SourceBuilderException;
 
 use IPS\toolbox\DevCenter\Sources\Generator\GeneratorAbstract;
 
+use function _p;
 use function count;
 use function header;
 use function defined;
@@ -300,12 +301,10 @@ class _Sources
         $this->type = $type;
         $this->form
             ->dialogForm()
-            ->formPrefix('dtdevplus_class__r' . $this->type . 'r_')
-            ->doLabels('_r' . $this->type . 'r_')
-            ->formId('dtdevplus_class__r' . $this->type . 'r_')
+            ->setPrefix('dtdevplus_class_')
+            ->addExtraPrefix('_r' . $this->type . 'r_')
+            ->setId('dtdevplus_class__r' . $this->type . 'r_')
             ->submitLang('Create Source');
-
-
             foreach ($config as $func) {
                 if($func instanceof Form\Element){
                     $this->form->addToElementStore($func);
@@ -362,13 +361,6 @@ class _Sources
                     $values['className'] = 'Form';
                     $values['namespace'] = '';
                     $values['extends'] = \IPS\Helpers\Form::class;
-                    $vals = [
-                        'type' => 'Element',
-                        'className' => 'Element',
-                        'namespace' => 'Form',
-                    ];
-                    $eclass = new Elements($vals, $this->application);
-                    $eclass->process();
                     break;
                 case 'Orm':
                     $class .= 'Orm';
@@ -604,7 +596,7 @@ class _Sources
         ];
 
         if (in_array($this->type, $tabs, true)) {
-            $this->form->tab('general');
+            $this->form->addTab('general');
         }
 
         $options = [
@@ -754,7 +746,7 @@ class _Sources
             Ratings::class     => Ratings::class,
         ];
 
-        $this->form->tab('interfaces');
+        $this->form->addTab('interfaces');
         $this->form->addElement('ips_implements', 'checkboxset')
                    ->label('interface_implements_node')
                    ->options(['options' => $interfacesNode]);
@@ -797,7 +789,7 @@ class _Sources
         ];
 
         $traitsNode = $this->arTraits($traitsNode);
-        $this->form->tab('traits');
+        $this->form->addTab('traits');
         $this->form->addElement('ips_traits', 'checkboxset')->label('ips_traits_node')->options(['options' => $traitsNode]);
 
         $this->elTraits();
@@ -839,7 +831,7 @@ class _Sources
             Statistics::class => Statistics::class
         ];
         $traitsItems = $this->arTraits($traitsItems);
-        $this->form->tab('traits');
+        $this->form->addTab('traits');
         $this->form->addElement('ips_traits', 'checkboxset')
                    ->label('ips_traits_item')
                    ->value([])
@@ -875,7 +867,7 @@ class _Sources
             Views::class                    => Views::class,
         ];
 
-        $this->form->tab('interfaces');
+        $this->form->addTab('interfaces');
         $this->form->addElement('ips_implements', 'checkboxset')
                    ->label('interface_implements_item')
                    ->value([])
@@ -936,7 +928,7 @@ class _Sources
             Lockable::class    => Lockable::class,
             EditHistory::class => EditHistory::class,
         ];
-        $this->form->tab('interfaces');
+        $this->form->addTab('interfaces');
         $this->form->addElement('interface_implements_comment', 'checkboxset')->empty(array_keys($interfacesComment))->options(
             ['options' => $interfacesComment]
         );

@@ -379,6 +379,7 @@ abstract class _GeneratorAbstract
                                 ],
                             ]
                         );
+                        Debug::log($e);
                         throw new SourceBuilderException($msg);
                     }
                 }
@@ -532,7 +533,7 @@ EOF;
             $relations = json_decode(file_get_contents($relationFile . '/arRelations.json'), true);
         }
         $relations[$database] = str_replace(\IPS\Application::getRootPath() . '/', '', $dir) . '/' . $file;
-        $this->_writeFile('arRelations.json', json_encode($relations), $relationFile, false);
+        $this->_writeFile('arRelations.json', json_encode($relations, JSON_PRETTY_PRINT), $relationFile, false);
     }
 
     /**

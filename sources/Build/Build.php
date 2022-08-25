@@ -77,8 +77,8 @@ class _Build extends Singleton
             $beta = $match[1] + 1;
         }
         $form = Form::create();
-        $form->dummy('Previous Long Version', $newLong);
-        $form->dummy('Previous Short Version', $newShort);
+        $form->addDummy('Previous Long Version', $newLong);
+        $form->addDummy('Previous Short Version', $newShort);
         $form->addElement('toolbox_increment', 'yn')->value(1)->toggles(
             ['toolbox_long_version', 'toolbox_short_version'],
             true

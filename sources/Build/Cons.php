@@ -18,6 +18,10 @@ use IPS\Patterns\Singleton;
 use IPS\Request;
 use IPS\toolbox\Form;
 
+use function _p;
+use function md5;
+use function time;
+use function random_int;
 use function array_merge;
 use function constant;
 use function defined;
@@ -108,7 +112,7 @@ class _Cons extends Singleton
         return $form;
     }
 
-    protected function buildConstants()
+    public function buildConstants()
     {
         if ($this->constants === null) {
             $cons = IPS::defaultConstants();
@@ -163,7 +167,7 @@ class _Cons extends Singleton
             $extension->formateValues($values);
         }
         foreach ($constants as $key => $val) {
-            $data = $values[$key];
+            $data = $values[$key]??null;
 
             switch ($val['type']) {
                 case 'integer':
@@ -181,6 +185,10 @@ class _Cons extends Singleton
                     }
                     break;
             }
+            if($key === 'CACHEBUST_KEY') {
+                $check = md5(random_int(0, 10000) . time());
+                $check2 = md5(random_int(0, 10000) . time());
+            }
             if ($key === 'SUITE_UNIQUE_KEY') {
                 $check2 = "\$versions = json_decode(file_get_contents(__DIR__ . '/applications/core/data/versions.json'), true);";
                 $check2 .= "\nmb_substr(md5(array_pop(\$versions)), 10, 10)";
@@ -192,7 +200,6 @@ class _Cons extends Singleton
                     $dataType = "mb_substr(md5(array_pop(\$versions)), 10, 10)";
                 } else {
                     $dataType = "'" . $data . "'";
-
                     switch ($val['type']) {
                         case 'integer':
                             $dataType = (int)$data;
@@ -201,8 +208,11 @@ class _Cons extends Singleton
                             $dataType = $data ? 'true' : 'false';
                             break;
                     }
-                    if ($key === 'CACHEBUST_KEY' || $key === 'SUITE_UNIQUE_KEY') {
+                    if ($key === 'SUITE_UNIQUE_KEY') {
                         $dataType = $data;
+                    }
+                    if($key === 'CACHEBUST_KEY') {
+                        $dataType = "'" .  md5(random_int(0, 10000) . time()) . "'";
                     }
                 }
                 //test test

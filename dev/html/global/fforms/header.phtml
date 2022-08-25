@@ -1,4 +1,4 @@
-<ips:template parameters="$lang, $id, $class=''" />
-<li class="ipsFieldRow_section {$class}" id="{$id}">
+<ips:template parameters="string $lang, string $id, ?string $class=null" />
+<li class="ipsFieldRow_section{{if $class !== null}} {$class}{{endif}}" id="{$id}">
     <span class="ipsType_bold">{lang="$lang"}</span>
 </li>

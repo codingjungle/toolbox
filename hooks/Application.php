@@ -8,13 +8,22 @@ use IPS\toolbox\DevFolder\Applications;
 use IPS\toolbox\Proxy\Generator\Proxy;
 use IPS\toolbox\Proxy\Proxyclass;
 
+use function _p;
 use function date;
+use function defined;
+use function explode;
+use function array_keys;
 use function file_exists;
+use function array_merge;
+use function array_combine;
+use function array_unshift;
 use function file_get_contents;
 use function is_dir;
 use function mb_ucfirst;
 use function mkdir;
 use function str_replace;
+
+use const DT_MY_APPS;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -99,8 +108,11 @@ class toolbox_hook_Application extends _HOOK_CLASS_
             $form->addElement('devCenterPlusCreateFrontNavigation', 'yn');
         }
     }
+
     protected $isNew = false;
+
     protected $doFrontNav = false;
+
     public function formatFormValues($values)
     {
         $this->isNew = $this->id ? false : true;
@@ -178,5 +190,38 @@ class toolbox_hook_Application extends _HOOK_CLASS_
         }
 
         return $parent;
+    }
+
+    public function getButtons($url, $subnode = false)
+    {
+        $thirdParty = \IPS\toolbox\Application::$thirdParty;
+        $apps = [];
+        $buttons = parent::getButtons($url, $subnode);
+        if(defined('DT_MY_APPS')) {
+            $apps = explode(',', DT_MY_APPS);
+            $apps = array_combine($apps, $apps);
+        }
+        if(isset($thirdParty[$this->directory])){
+            $buttons['addToMyApps']  = [
+                'icon' => 'plus',
+                'title' => 'addToMyApps',
+                'link' => $url->setQueryString(['do' => 'addToMyApps', 'appKey' => $this->directory]),
+                'data' => [
+                    'confirm' => \IPS\Member::loggedIn()->language()->addToStack('addToMyApps'),
+                ],
+            ];
+        }
+        elseif(isset($apps[$this->directory])){
+            $buttons['removeFromMyApps'] = [
+                'icon' => 'minus',
+                'title' => 'removeFromMyApps',
+                'link' => $url->setQueryString(['do' => 'removeFromMyApps', 'appKey' => $this->directory]),
+                'data' => [
+                    'confirm' => \IPS\Member::loggedIn()->language()->addToStack('removeFromMyApps'),
+                ],
+            ];
+        }
+
+        return $buttons;
     }
 }

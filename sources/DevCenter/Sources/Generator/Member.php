@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @brief       Profiler Standard
+ * @brief       Member Standard
  * @author      -storm_author-
  * @copyright   -storm_copyright-
  * @package     IPS Social Suite
@@ -23,9 +23,12 @@ use IPS\Db\Select;
 
 use IPS\Member;
 
+use IPS\Patterns\ActiveRecord;
+
 use function array_merge;
 use function defined;
 use function header;
+use function class_exists;
 use function mb_strtolower;
 use function trim;
 
@@ -144,6 +147,21 @@ EOF;
      */
     public function bodyGenerator()
     {
+        $vals = [
+            'type' => 'Group',
+            'className' => 'Group',
+            'namespace' => 'Member',
+            'extends' => ActiveRecord::class,
+            'database' => $this->application->directory . '_group',
+            'prefix' => 'group_',
+        ];
+        $orm = '\\IPS\\' . $this->application->directory . '\\Traits\\Orm';
+        if(class_exists($orm)) {
+            $vals['traits'] = [$orm];
+        }
+        $eclass = new Group($vals, $this->application);
+        $eclass->process();
+
         $this->brief = 'Class';
 
         $this->addConstructLoadQuery();

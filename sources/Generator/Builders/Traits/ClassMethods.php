@@ -16,6 +16,7 @@ namespace Generator\Builders\Traits;
 use Exception;
 use ReflectionNamedType;
 
+use function mb_substr;
 use function array_key_exists;
 use function array_pop;
 use function count;
@@ -42,13 +43,15 @@ trait ClassMethods
      */
     protected $methods = [];
     protected $body = [];
+
     public function addClassBody($body){
         $this->body[] = $body;
     }
+
     public function writeMethods()
     {
         if(empty($this->body) === false){
-            $this->output(implode("\n", $this->body));
+            $this->output(implode("\n\n", $this->body));
         }
 
         if(empty($this->methods) === false){
@@ -95,14 +98,12 @@ trait ClassMethods
 
                 if ($visibility === T_PUBLIC) {
                     $visibility = 'public';
+                } elseif ($visibility === T_PROTECTED) {
+                    $visibility = 'protected';
+                } elseif ($visibility === T_PRIVATE) {
+                    $visibility = 'private';
                 } else {
-                    if ($visibility === T_PROTECTED) {
-                        $visibility = 'protected';
-                    } else {
-                        if ($visibility === T_PRIVATE) {
-                            $visibility = 'private';
-                        }
-                    }
+                    $visibility = 'public';
                 }
 
                 $this->output($this->tab . $abstract . $final . $visibility . $static . ' function ' . $name . '(');
@@ -239,6 +240,7 @@ trait ClassMethods
     {
         return $this->methods[$name] ?? null;
     }
+
     public function addMixin($class, $doImport = false)
     {
         $og = explode('\\', $class);
@@ -246,7 +248,7 @@ trait ClassMethods
             $this->addImport($class);
             $class = array_pop($og);
         }
-        if(\mb_substr($class,0,1) !== '\\'){
+        if(mb_substr($class,0,1) !== '\\'){
             $class = '\\'.$class;
         }
         $this->classComment[] = '@mixin ' . $class;

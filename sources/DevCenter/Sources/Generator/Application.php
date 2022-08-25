@@ -17,6 +17,8 @@ use IPS\Theme;
 use Throwable;
 use UnderflowException;
 
+use IPS\toolbox\Proxy\Proxyclass;
+
 use function class_exists;
 use function explode;
 use function var_export;
@@ -44,6 +46,8 @@ class _Application extends GeneratorAbstract
                 \mkdir($newPath, 0777, true);
             }
             \file_put_contents($newPath . '/ApplicationOG.php', $content);
+            Proxyclass::i()->build($newPath . '/ApplicationOG.php');
+
         }
         $this->brief = 'Application Class';
         $this->extends = $og;

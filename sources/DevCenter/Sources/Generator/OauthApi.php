@@ -28,19 +28,12 @@ use ReflectionClass;
 
 use Throwable;
 
-use function _p;
-use function array_unshift;
 use function class_exists;
-use function file;
-use function file_exists;
-use function implode;
+
 use function ltrim;
 use function rtrim;
 use function trim;
 
-use const DT_BETA_CLIENT_ID;
-use const DT_BETA_CLIENT_SECRET;
-use const DT_BETA_URL;
 
 class _OauthApi extends GeneratorAbstract
 {

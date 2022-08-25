@@ -345,7 +345,7 @@ class _bt extends Controller
 
     protected function lorem(): void
     {
-        $form = Form::create()->formPrefix('toolbox_lorem_')->submitLang(null)->attributes(
+        $form = Form::create()->setPrefix('toolbox_lorem_')->submitLang(null)->attributes(
             ['data-ipstoolboxtoyboxlorem' => 1]
         );
 
@@ -466,7 +466,9 @@ class _bt extends Controller
         $html = [];
 
 
-        $form = Form::create()->attributes(['data-ipstoolboxtoyboxuuid' => null])->submitLang(null);
+        $form = Form::create()
+                    ->setAttributes(['data-ipstoolboxtoyboxuuid' => null])
+                    ->submitLang(null);
         $form->addElement('count', 'number')->value(3)->options(['min' => 1]);
         $form->addElement('hyphens', 'yn')->value(1);
         $form->addElement('lowercase', 'yn');
@@ -533,7 +535,7 @@ class _bt extends Controller
 
     protected function images()
     {
-        $form = Form::create()->formPrefix('dtprofilerImagesConverter_')->submitLang(null);
+        $form = Form::create()->setPrefix('dtprofilerImagesConverter_')->submitLang(null);
         $options = [
             'storageExtension' => 'toolbox_FileStorage',
             'storageContainer' => 'toolboxConverter',

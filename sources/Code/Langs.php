@@ -155,15 +155,15 @@ class _Langs extends ParserAbstract
         }
 
         $files = new Finder();
-        $files->in($this->appPath . 'dev/')->files()->name('*lang.php');
-        $lf = $this->appPath . 'dev/lang.php';
+        $files->in($this->getAppPath() . 'dev/')->files()->name('*lang.php');
+        $lf = $this->getAppPath() . 'dev/lang.php';
         if (file_exists($lf)) {
             $lang = null;
             require $lf;
             $this->langs = $lang;
         }
 
-        $jlf = $this->appPath . 'dev/jslang.php';
+        $jlf = $this->getAppPath() . 'dev/jslang.php';
         if (file_exists($jlf)) {
             $lang = null;
             require $jlf;

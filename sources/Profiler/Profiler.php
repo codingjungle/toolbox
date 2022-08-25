@@ -83,7 +83,7 @@ class _Profiler extends Singleton
     /**
      * @return int|null
      */
-    protected function getFrameworkTime(): ?int
+    protected function getFrameworkTime(): ?float
     {
         if (Settings::i()->dtprofiler_enabled_execution) {
             return round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;

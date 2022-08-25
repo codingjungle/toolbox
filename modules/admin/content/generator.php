@@ -75,7 +75,7 @@ class _generator extends Controller
             'link'  => $url,
 
         ];
-        $form = Form::create()->formPrefix('dtcontent_');
+        $form = Form::create()->setPrefix('dtcontent_');
         $form->addElement('type', 'select')->options([
             'options' => [
                 'none'   => 'Select Type',

@@ -13,19 +13,19 @@
 namespace IPS\toolbox\Generator;
 
 use IPS\toolbox\Application;
-use ReflectionClassConstant;
-use ReflectionException;
 use Laminas\Code\Generator\ClassGenerator;
 use Laminas\Code\Generator\DocBlockGenerator;
 use Laminas\Code\Generator\MethodGenerator;
 use Laminas\Code\Generator\PropertyGenerator;
 use Laminas\Code\Reflection\ClassReflection;
+use Laminas\Code\Generator\PromotedParameterGenerator;
 
 use function array_diff;
 use function defined;
 use function header;
 use function preg_replace;
-
+use function method_exists;
+use function strtolower;
 Application::loadAutoLoader();
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -41,6 +41,8 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
  */
 class _DTClassGenerator extends ClassGenerator
 {
+    private const CONSTRUCTOR_NAME  = '__construct';
+
     public static function fromReflection(ClassReflection $classReflection)
     {
         $cg = new static($classReflection->getName());
@@ -66,7 +68,6 @@ class _DTClassGenerator extends ClassGenerator
         if ($parentClass) {
             $cg->addUse($parentClass->getName());
             $cg->setExtendedClass($parentClass->getName());
-
             $interfaces = array_diff($interfaces, $parentClass->getInterfaces());
         }
 
@@ -91,18 +92,14 @@ class _DTClassGenerator extends ClassGenerator
 
         $constants = [];
 
-        foreach ($classReflection->getConstants() as $name => $value) {
-            try {
-                $cc = new ReflectionClassConstant($classReflection->getName(), $name);
-
-                if ($cc->getDeclaringClass()->getName() === $classReflection->getName()) {
-                    $constants[] = [
-                        'name'  => $name,
-                        'value' => $value,
-                    ];
-                }
-            } catch (ReflectionException $e) {
-            }
+        foreach ($classReflection->getReflectionConstants() as $constReflection) {
+            $constants[] = [
+                'name'    => $constReflection->getName(),
+                'value'   => $constReflection->getValue(),
+                'isFinal' => method_exists($constReflection, 'isFinal')
+                    ? $constReflection->isFinal()
+                    : false,
+            ];
         }
 
         $cg->addConstants($constants);
@@ -110,10 +107,24 @@ class _DTClassGenerator extends ClassGenerator
         $methods = [];
 
         foreach ($classReflection->getMethods() as $reflectionMethod) {
-            $className = $cg->getNamespaceName() ? $cg->getNamespaceName() . '\\' . $cg->getName() : $cg->getName();
+            $className     = $cg->getName();
+            $namespaceName = $cg->getNamespaceName();
+            if ($namespaceName !== null) {
+                $className = $namespaceName . '\\' . $className;
+            }
 
-            if ($reflectionMethod->getDeclaringClass()->getName() === $className) {
-                $methods[] = MethodGenerator::fromReflection($reflectionMethod);
+            if ($reflectionMethod->getDeclaringClass()->getName() == $className) {
+                $method = MethodGenerator::fromReflection($reflectionMethod);
+
+                if (self::CONSTRUCTOR_NAME === strtolower($method->getName())) {
+                    foreach ($method->getParameters() as $parameter) {
+                        if ($parameter instanceof PromotedParameterGenerator) {
+                            $cg->removeProperty($parameter->getName());
+                        }
+                    }
+                }
+
+                $methods[] = $method;
             }
         }
 

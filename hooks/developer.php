@@ -140,9 +140,12 @@ class toolbox_hook_developer extends _HOOK_CLASS_
             $t[$foo[0]] = $foo[0];
         }
 
-        $form = Form::create()->formPrefix('dtdevplus_')->attributes(
-            ['data-controller' => 'ips.admin.dtdevplus.query']
-        )->formId('add_version_query')->removePrefix(false);
+        $form = Form::create()->setPrefix('dtdevplus_')
+                              ->setAttributes(
+                                      ['data-controller' => 'ips.admin.dtdevplus.query']
+                              )
+                              ->setId('add_version_query')
+                              ->removePrefix(false);
         $opts = [
             'options' => [
                 0            => 'Select One',

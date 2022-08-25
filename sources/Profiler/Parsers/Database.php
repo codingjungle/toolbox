@@ -105,7 +105,7 @@ class _Database extends Singleton
                 $code = false;
                 foreach ($dbt as $i => $v) {
                     $file = $v['file'] ?? null;
-                    if(str_contains($file,'hook_temp')){
+                    if($file !== null && str_contains($file,'hook_temp')){
                         if(!file_exists($file)){
                             $path = \IPS\ROOT_PATH . '/hook_temp/';
                             $parts = explode('.php_',$file);

@@ -105,7 +105,7 @@ trait Build
             Output::i()->js('admin_toggles.js', 'toolbox', 'admin')
         );
         $app = Request::i()->appToBuild;
-        $form = Form::create()->submitLang('Build')->formClass('ipsBox ipsPadding');
+        $form = Form::create()->submitLang('Build')->setPrefix('ipsBox ipsPadding');
         $myApps = \defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
         if (empty($myApps) === false && \in_array($app, $myApps)) {
             $application = Application::load($app);
@@ -127,7 +127,7 @@ trait Build
             Member::loggedIn()->language()->words[$app . '_header'] = \mb_strtoupper(
                     $app
                 ) . ' Version: ' . $version;
-            $form->header($app);
+            $form->addHeader($app);
 
             $form->addElement('bumpType', 'radio')
                 ->options(

@@ -12,6 +12,9 @@
 
 namespace IPS\toolbox\DevCenter\Sources\Generator;
 
+use IPS\File;
+use IPS\Helpers\Form\Enum;
+use IPS\Helpers\Form\Trbl;
 use InvalidArgumentException;
 use IPS\Helpers\Form\Address;
 use IPS\Helpers\Form\Captcha;
@@ -49,6 +52,12 @@ use IPS\Helpers\Form\Url;
 use IPS\Helpers\Form\WidthHeight;
 use IPS\Helpers\Form\YesNo;
 use IPS\toolbox\Application;
+use Laminas\Code\Reflection\ClassReflection;
+
+use function trim;
+use function ltrim;
+use function rtrim;
+use function str_replace;
 
 class _Elements extends GeneratorAbstract
 {
@@ -57,77 +66,71 @@ class _Elements extends GeneratorAbstract
     public function bodyGenerator()
     {
         $this->brief = 'Class';
-        $this->generator->addImport(Address::class);
-        $this->generator->addImport(Captcha::class);
-        $this->generator->addImport(CheckboxSet::class);
-        $this->generator->addImport(Checkbox::class);
-        $this->generator->addImport(Codemirror::class);
-        $this->generator->addImport(Color::class);
-        $this->generator->addImport(Custom::class);
-        $this->generator->addImport(Date::class);
-        $this->generator->addImport(DateRange::class);
-        $this->generator->addImport(Editor::class);
-        $this->generator->addImport(Email::class);
-        $this->generator->addImport(FormAbstract::class);
+
+        $this->generator->addImport(File::class);
         $this->generator->addImport(Ftp::class);
-        $this->generator->addImport(Interval::class);
+        $this->generator->addImport(Tel::class);
+        $this->generator->addImport(Url::class);
+        $this->generator->addImport(Enum::class);
+        $this->generator->addImport(Trbl::class);
+        $this->generator->addImport(Date::class);
         $this->generator->addImport(\IPS\Helpers\Form\Item::class);
-        $this->generator->addImport(InvalidArgumentException::class);
-        $this->generator->addImport(KeyValue::class);
+        $this->generator->addImport(\IPS\Helpers\Form\Node::class);
+        $this->generator->addImport(Poll::class);
+        $this->generator->addImport(Sort::class);
+        $this->generator->addImport(Text::class);
+        $this->generator->addImport(Color::class);
+        $this->generator->addImport(Email::class);
+        $this->generator->addImport(Radio::class);
+        $this->generator->addImport(Stack::class);
+        $this->generator->addImport(YesNo::class);
+        $this->generator->addImport(Custom::class);
+        $this->generator->addImport(Editor::class);
         $this->generator->addImport(Matrix::class);
         $this->generator->addImport(\IPS\Helpers\Form\Member::class);
-        $this->generator->addImport(\IPS\Helpers\Form\Node::class);
         $this->generator->addImport(Number::class);
-        $this->generator->addImport(Password::class);
-        $this->generator->addImport(Poll::class);
-        $this->generator->addImport(Radio::class);
         $this->generator->addImport(Rating::class);
         $this->generator->addImport(Search::class);
+        $this->generator->addImport(Upload::class);
         $this->generator->addImport(Select::class);
-        $this->generator->addImport(SocialGroup::class);
-        $this->generator->addImport(Sort::class);
-        $this->generator->addImport(Stack::class);
-        $this->generator->addImport(Tel::class);
-        $this->generator->addImport(Text::class);
+        $this->generator->addImport(InvalidArgumentException::class);
+        $this->generator->addImport(Address::class);
+        $this->generator->addImport(Captcha::class);
+        $this->generator->addImport(Checkbox::class);
+        $this->generator->addImport(Interval::class);
+        $this->generator->addImport(KeyValue::class);
+        $this->generator->addImport(Password::class);
         $this->generator->addImport(TextArea::class);
         $this->generator->addImport(Timezone::class);
-        $this->generator->addImport(Translatable::class);
-        $this->generator->addImport(Upload::class);
-        $this->generator->addImport(Url::class);
+        $this->generator->addImport(DateRange::class);
+        $this->generator->addImport(Codemirror::class);
+        $this->generator->addImport(CheckboxSet::class);
+        $this->generator->addImport(SocialGroup::class);
         $this->generator->addImport(WidthHeight::class);
-        $this->generator->addImport(YesNo::class);
+        $this->generator->addImport(FormAbstract::class);
+        $this->generator->addImport(Translatable::class);
 
-        $this->generator->addImportFunction('array_merge');
-        $this->generator->addImportFunction('array_pop');
+        $this->generator->addImportFunction('header');
         $this->generator->addImportFunction('defined');
         $this->generator->addImportFunction('explode');
-        $this->generator->addImportFunction('header');
         $this->generator->addImportFunction('is_array');
+        $this->generator->addImportFunction('array_pop');
+        $this->generator->addImportFunction('array_merge');
         $this->generator->addImportFunction('mb_strtolower');
+        $this->generator->addImportFunction('property_exists');
 
-        $this->generator->addClassComments('@property-read string $name');
-        $this->generator->addClassComments('@property-read string $type');
-        $this->generator->addClassComments('@property-read string|int|array $value');
-        $this->generator->addClassComments('@property-read bool $required');
-        $this->generator->addClassComments('@property-read array $options');
-        $this->generator->addClassComments('@property-read callable $validationCallback');
-        $this->generator->addClassComments('@property-read string $prefix');
-        $this->generator->addClassComments('@property-read string $suffix');
-        $this->generator->addClassComments('@property-read string $id');
-        $this->generator->addClassComments('@property-read string $tab');
-        $this->generator->addClassComments('@property-read bool $skip');
-        $this->generator->addClassComments('@property-read string $header');
-        $this->generator->addClassComments('@property-read bool $appearRequired');
-        $this->generator->addClassComments('@property-read array $toggles');
-        $this->generator->addClassComments('@property-read array $label');
-        $this->generator->addClassComments('@property-read array $description');
-        $this->generator->addClassComments('@property-read array $extra');
-        $this->generator->addClassComments('@property-read string $sidebar');
-        $this->generator->addClassComments('@property-read FormAbstract|string|null $class');
-        $this->generator->addClassComments('@property-read bool $custom');
+        $app = $this->application->directory;
+        $find = ['fforms','toolbox'];
+        $replacements = ['cjforms',$app];
 
-        $ad = Application::getRootPath('toolbox');
-        $content = \file_get_contents($ad . '/applications/toolbox/data/defaults/sources/elements.txt');
+        //build body of form
+        $code = (new ClassReflection(\IPS\toolbox\Form\Element::class))->getParentClass();
+        $content = $code->getContents(false);
+        $content = trim($content);
+        $content = ltrim($content,'{');
+        $content = rtrim($content,"}");
+        $content = trim($content);
+        $content = str_replace($find, $replacements, $content);
         $this->generator->addClassBody($content);
     }
 }

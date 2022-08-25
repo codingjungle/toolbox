@@ -373,6 +373,9 @@ EOF;
      */
     public function addInterface($interface)
     {
+        if(empty($interface)){
+            return $this;
+        }
         if (is_array($interface)) {
             $og = $interface;
             $interface = implode('\\', $interface);

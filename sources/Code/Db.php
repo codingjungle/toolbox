@@ -91,7 +91,7 @@ class _Db extends ParserAbstract
     protected function getFiles()
     {
         $files = new Finder();
-        $files->in($this->appPath . 'setup/')->name('queries.json');
+        $files->in($this->getAppPath() . 'setup/')->name('queries.json');
         if ($this->skip !== null) {
             foreach ($this->skip as $name) {
                 $files->notName($name);

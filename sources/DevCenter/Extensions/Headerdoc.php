@@ -85,7 +85,7 @@ class _Headerdoc extends ExtensionsAbstract
      */
     public function elements()
     {
-        $this->form->element('use_default')->toggles(['table', 'field'], true);
+        $this->form->addElement('use_default','yn')->toggles(['table', 'field'], true);
         $this->form->addElement('enabled', 'yn');
         $this->form->addElement('indexEnabled', 'yn');
         $this->form->addElement('dirSkip', 'stack');

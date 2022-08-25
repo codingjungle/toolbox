@@ -62,7 +62,7 @@ class _InterfaceFolder extends ParserAbstract
     protected function getFiles()
     {
         $files = new Finder();
-        $files->in($this->appPath . 'interface/')->notName('index.html');
+        $files->in($this->getAppPath() . 'interface/')->notName('index.html');
         if ($this->skip !== null) {
             foreach ($this->skip as $name) {
                 $files->notName($name);

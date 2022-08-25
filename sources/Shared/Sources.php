@@ -18,6 +18,7 @@ use IPS\Theme;
 use IPS\toolbox\Form\Element;
 use IPS\toolbox\Proxy\Generator\Cache;
 
+use function ksort;
 use function array_shift;
 use function explode;
 use function implode;
@@ -379,17 +380,18 @@ trait Sources
             $input = ltrim(Request::i()->input, '\\');
 
             $root = preg_quote($input, '#');
-            $foo = preg_grep('#^' . $root . '#i', $classes);
+            $foo = preg_grep('#' . $root . '#i', $classes);
             $return = [];
             foreach ($foo as $f) {
                 $ogClass = explode('\\', $f);
                 array_shift($ogClass);
                 $f = implode('\\', $ogClass);
-                $return[] = [
+                $return[$f] = [
                     'value' => $f,
                     'html'  => '\\IPS\\' . $f,
                 ];
             }
+            ksort($return);
             Output::i()->json($return);
         }
     }

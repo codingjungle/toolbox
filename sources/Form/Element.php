@@ -13,85 +13,68 @@
 
 namespace IPS\toolbox\Form;
 
-use InvalidArgumentException;
 use IPS\File;
+use IPS\Helpers\Form\Ftp;
+use IPS\Helpers\Form\Tel;
+use IPS\Helpers\Form\Url;
+use IPS\Helpers\Form\Enum;
+use IPS\Helpers\Form\Trbl;
+use IPS\Helpers\Form\Date;
+use IPS\Helpers\Form\Item;
+use IPS\Helpers\Form\Node;
+use IPS\Helpers\Form\Poll;
+use IPS\Helpers\Form\Sort;
+use IPS\Helpers\Form\Text;
+use IPS\Helpers\Form\Color;
+use IPS\Helpers\Form\Email;
+use IPS\Helpers\Form\Radio;
+use IPS\Helpers\Form\Stack;
+use IPS\Helpers\Form\YesNo;
+use IPS\Helpers\Form\Custom;
+use IPS\Helpers\Form\Editor;
+use IPS\Helpers\Form\Matrix;
+use IPS\Helpers\Form\Member;
+use IPS\Helpers\Form\Number;
+use IPS\Helpers\Form\Rating;
+use IPS\Helpers\Form\Search;
+use IPS\Helpers\Form\Upload;
+use IPS\Helpers\Form\Select;
+use InvalidArgumentException;
 use IPS\Helpers\Form\Address;
 use IPS\Helpers\Form\Captcha;
 use IPS\Helpers\Form\Checkbox;
-use IPS\Helpers\Form\CheckboxSet;
-use IPS\Helpers\Form\Codemirror;
-use IPS\Helpers\Form\Color;
-use IPS\Helpers\Form\Custom;
-use IPS\Helpers\Form\Date;
-use IPS\Helpers\Form\DateRange;
-use IPS\Helpers\Form\Editor;
-use IPS\Helpers\Form\Email;
-use IPS\Helpers\Form\FormAbstract;
-use IPS\Helpers\Form\Ftp;
 use IPS\Helpers\Form\Interval;
-use IPS\Helpers\Form\Item;
 use IPS\Helpers\Form\KeyValue;
-use IPS\Helpers\Form\Matrix;
-use IPS\Helpers\Form\Member;
-use IPS\Helpers\Form\Node;
-use IPS\Helpers\Form\Number;
 use IPS\Helpers\Form\Password;
-use IPS\Helpers\Form\Poll;
-use IPS\Helpers\Form\Radio;
-use IPS\Helpers\Form\Rating;
-use IPS\Helpers\Form\Search;
-use IPS\Helpers\Form\SocialGroup;
-use IPS\Helpers\Form\Sort;
-use IPS\Helpers\Form\Stack;
-use IPS\Helpers\Form\Tel;
-use IPS\Helpers\Form\Text;
 use IPS\Helpers\Form\TextArea;
 use IPS\Helpers\Form\Timezone;
-use IPS\Helpers\Form\Translatable;
-use IPS\Helpers\Form\Upload;
-use IPS\Helpers\Form\Url;
+use IPS\Helpers\Form\DateRange;
+use IPS\Helpers\Form\Codemirror;
+use IPS\Helpers\Form\CheckboxSet;
+use IPS\Helpers\Form\SocialGroup;
 use IPS\Helpers\Form\WidthHeight;
-use IPS\Helpers\Form\YesNo;
-use IPS\Helpers\Form\Select;
+use IPS\Helpers\Form\FormAbstract;
+use IPS\Helpers\Form\Translatable;
 
-use function array_merge;
-use function array_pop;
+use function header;
 use function defined;
 use function explode;
-use function header;
 use function is_array;
+use function array_pop;
+use function array_merge;
 use function mb_strtolower;
+use function property_exists;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
+
 /**
  * Class _Element
  *
  * @package Forms
  * @mixin  Element
- * @property-read string $name
- * @property-read string $type
- * @property-read string|int|array $value
- * @property-read bool $required
- * @property-read array $options
- * @property-read callable $validationCallback
- * @property-read string $prefix
- * @property-read string $suffix
- * @property-read string $id
- * @property-read string $tab
- * @property-read bool $skip
- * @property-read string $header
- * @property-read bool $appearRequired
- * @property-read array $toggles
- * @property-read array $label
- * @property-read array $description
- * @property-read array $extra
- * @property-read string $sidebar
- * @property-read FormAbstract|string|null $class
- * @property-read bool $custom
- *
  */
 class _Element
 {
@@ -99,183 +82,186 @@ class _Element
     /**
      * @var array
      */
-    public static $helpers = [
-        'address'      => Address::class,
-        'addy'         => Address::class,
-        'captcha'      => Captcha::class,
-        'checkbox'     => Checkbox::class,
-        'cb'           => Checkbox::class,
-        'checkboxset'  => CheckboxSet::class,
-        'cbs'          => CheckboxSet::class,
-        'codemirror'   => Codemirror::class,
-        'cm'           => Codemirror::class,
-        'color'        => Color::class,
-        'custom'       => Custom::class,
-        'cs'           => Custom::class,
-        'date'         => Date::class,
-        'daterange'    => DateRange::class,
-        'dr'           => DateRange::class,
-        'editor'       => Editor::class,
-        'email'        => Email::class,
-        'file'         => File::class,
-        'ftp'          => Ftp::class,
-        'interval'     => Interval::class,
-        'item'         => Item::class,
-        'keyvalue'     => KeyValue::class,
-        'kv'           => KeyValue::class,
-        'matrix'       => Matrix::class,
-        'member'       => Member::class,
-        'node'         => Node::class,
-        'number'       => Number::class,
-        'num'          => Number::class,
-        '#'            => Number::class,
-        'password'     => Password::class,
-        'pw'           => Password::class,
-        'poll'         => Poll::class,
-        'radio'        => Radio::class,
-        'rating'       => Rating::class,
-        'search'       => Search::class,
-        'select'       => Select::class,
-        'socialgroup'  => SocialGroup::class,
-        'sg'           => SocialGroup::class,
-        'sort'         => Sort::class,
-        'stack'        => Stack::class,
-        'Telephone'    => Tel::class,
-        'tel'          => Tel::class,
-        'text'         => Text::class,
-        'textarea'     => TextArea::class,
-        'ta'           => TextArea::class,
-        'timezone'     => Timezone::class,
+    protected static $helpers = [
+        'address' => Address::class,
+        'addy' => Address::class,
+        'captcha' => Captcha::class,
+        'checkbox' => Checkbox::class,
+        'cb' => Checkbox::class,
+        'checkboxset' => CheckboxSet::class,
+        'cbs' => CheckboxSet::class,
+        'codemirror' => Codemirror::class,
+        'cm' => Codemirror::class,
+        'color' => Color::class,
+        'custom' => Custom::class,
+        'cs' => Custom::class,
+        'date' => Date::class,
+        'daterange' => DateRange::class,
+        'dr' => DateRange::class,
+        'editor' => Editor::class,
+        'email' => Email::class,
+        'enum' => Enum::class,
+        'file' => File::class,
+        'ftp' => Ftp::class,
+        'interval' => Interval::class,
+        'item' => Item::class,
+        'keyvalue' => KeyValue::class,
+        'kv' => KeyValue::class,
+        'matrix' => Matrix::class,
+        'member' => Member::class,
+        'node' => Node::class,
+        'number' => Number::class,
+        'num' => Number::class,
+        '#' => Number::class,
+        'password' => Password::class,
+        'pw' => Password::class,
+        'poll' => Poll::class,
+        'radio' => Radio::class,
+        'rating' => Rating::class,
+        'search' => Search::class,
+        'select' => Select::class,
+        'socialgroup' => SocialGroup::class,
+        'sg' => SocialGroup::class,
+        'sort' => Sort::class,
+        'stack' => Stack::class,
+        'Telephone' => Tel::class,
+        'tel' => Tel::class,
+        'text' => Text::class,
+        'textarea' => TextArea::class,
+        'ta' => TextArea::class,
+        'timezone' => Timezone::class,
         'translatable' => Translatable::class,
-        'trans'        => Translatable::class,
-        'upload'       => Upload::class,
-        'up'           => Upload::class,
-        'url'          => Url::class,
-        'widthheight'  => WidthHeight::class,
-        'wh'           => WidthHeight::class,
-        'yn'           => YesNo::class
+        'trans' => Translatable::class,
+        'trbl' => Trbl::class,
+        'upload' => Upload::class,
+        'up' => Upload::class,
+        'url' => Url::class,
+        'widthheight' => WidthHeight::class,
+        'wh' => WidthHeight::class,
+        'yn' => YesNo::class,
+        'yesno' => YesNo::class
     ];
 
-    public static $nonHelpers = [
-        'sidebar'   => 1,
-        'header'    => 1,
+    protected static $nonHelpers = [
+        'sidebar' => 1,
+        'header' => 1,
         'separator' => 1,
-        'message'   => 1,
-        'tab'       => 1,
-        'dummy'     => 1,
-        'html'      => 1,
-        'hidden'    => 1,
-        'custom'    => 1,
+        'message' => 1,
+        'tab' => 1,
+        'dummy' => 1,
+        'html' => 1,
+        'hidden' => 1,
+        'custom' => 1,
     ];
 
     /**
      * @var string
      */
-    public $name;
+    protected string $nameVal = '';
 
     /**
      * @var string
      */
-    public $type;
+    protected string $typeVal = '';
 
     /**
      * @var string|int|array
      */
-    public $value;
+    protected $valueVal = null;
 
     /**
      * @var bool
      */
-    public $required = false;
+    protected bool $requiredVal = false;
 
     /**
      * @var array
      */
-    public $options = [];
+    protected array $optionsVal = [];
 
     /**
      * @var callable
      */
-    public $validationCallback;
+    protected $validationCallbackVal = null;
 
     /**
      * @var string
      */
-    public $prefix;
+    protected ?string $prefixVal = null;
 
     /**
      * @var string
      */
-    public $suffix;
+    protected ?string $suffixVal = null;
 
     /**
      * @var string
      */
-    public $id;
+    protected ?string $idVal = null;
 
     /**
      * @var string
      */
-    public $tab;
+    protected ?string $tabVal = null;
 
     /**
      * @var bool
      */
-    public $skip = false;
+    protected bool $skipVal = false;
 
     /**
      * @var string
      */
-    public $header;
+    protected ?string $headerVal = null;
 
     /**
      * @var bool
      */
-    public $appearRequired;
+    protected bool $appearRequiredVal = false;
 
     /**
      * @var array
      */
-    public $label;
+    protected array $labelVal = [];
 
     /**
      * @var array
      */
-    public $description;
+    protected array $descriptionVal = [];
 
     /**
      * @var array
      */
-    public $toggles = [];
+    protected array $togglesVal = [];
 
     /**
      * @var array
      */
-    public $extra = [];
+    protected array $extraVal = [];
 
     /**
      * @var string
      */
-    public $sidebar;
+    protected ?string $sidebarVal = null;
 
     /**
      * @var FormAbstract|string|null
      */
-    public $class;
+    protected $classVal;
 
     /**
      * @var bool
      */
-    public $custom = false;
+    protected bool $customVal = false;
 
     /**
-     * @var null|string
+     * @var mixed
      */
-    public $empty;
+    protected mixed $emptyVal = null;
 
-    public $append;
+    protected ?string $appendVal = null;
 
-    public $rowClasses = [];
+    protected array $rowClassesVal = [];
 
     /**
      * FormAbstract constructor.
@@ -284,33 +270,17 @@ class _Element
      * @param string $type
      * @param string $custom
      */
-    public function __construct($name, string $type, string $custom = '')
+    public function __construct(string $name, string $type)
     {
-        $class = null;
         $type = mb_strtolower($type);
-
-        if ($name instanceof FormAbstract) {
-            $class = $name;
+        $class = null;
+        if (static::isHelper($type) === true) {
+            $class = static::getHelper($type) ?? Text::class;
             $type = 'helper';
-        } elseif (!isset(static::$nonHelpers[$type])) {
-            if (!($name instanceof FormAbstract) && static::isHelper($type) === true) {
-                $class = static::getHelper($type) ?? Text::class;
-                $type = 'helper';
-            }
-
-            if ($name instanceof FormAbstract) {
-                $class = $name;
-                $type = 'helper';
-            }
-        } elseif ($type === 'custom') {
-            $class = $custom;
-            $type = 'helper';
-            $this->custom = true;
         }
-
-        $this->name = $name;
-        $this->type = $type;
-        $this->class = $class;
+        $this->nameVal = $name;
+        $this->typeVal = $type;
+        $this->classVal = $class;
     }
 
     public static function isHelper($type)
@@ -323,30 +293,27 @@ class _Element
         return static::$helpers[$type] ?? null;
     }
 
+    public static function getNonHelpers()
+    {
+        return static::$nonHelpers;
+    }
+
+    public static function getHelpers()
+    {
+        return static::$helpers;
+    }
+
     public function changeType(string $type, $custom = '')
     {
         $class = null;
 
-        $type2 = mb_strtolower($type);
+        $type = mb_strtolower($type);
 
-        if ($type instanceof FormAbstract) {
-            $class = $type;
+        if (static::isHelper($type) === true) {
+            $class = static::getHelper($type) ?? Text::class;
             $type = 'helper';
-        } elseif (!isset(static::$nonHelpers[$type2])) {
-            if (!($type2 instanceof FormAbstract) && static::isHelper($type2) === true) {
-                $class = static::getHelper($type2) ?? Text::class;
-                $type = 'helper';
-            }
-
-            if ($type2 instanceof FormAbstract) {
-                $class = $type2;
-                $type = 'helper';
-            }
-        } elseif ($type2 === 'custom') {
-            $class = $custom;
-            $type = 'helper';
-            $this->custom = true;
         }
+
         $this->type = $type;
         $this->class = $class;
 
@@ -360,7 +327,7 @@ class _Element
      */
     public function value($value): self
     {
-        $this->value = $value;
+        $this->valueVal = $value;
 
         return $this;
     }
@@ -370,7 +337,7 @@ class _Element
      */
     public function required(bool $required = true): self
     {
-        $this->required = $required;
+        $this->requiredVal = $required;
 
         return $this;
     }
@@ -387,14 +354,14 @@ class _Element
                 'Your options array contains toggles/togglesOn/togglesOff, use the toggles() method instead'
             );
         }
-        $this->options = array_merge($this->options, $options);
+        $this->optionsVal = array_merge($this->optionsVal, $options);
 
         return $this;
     }
 
     public function disabled(bool $disabled)
     {
-        $this->options = array_merge($this->options, ['disabled' => $disabled]);
+        $this->optionsVal = array_merge($this->optionsVal, ['disabled' => $disabled]);
 
         return $this;
     }
@@ -406,7 +373,7 @@ class _Element
      */
     public function validation(callable $validation): self
     {
-        $this->validationCallback = $validation;
+        $this->validationCallbackVal = $validation;
 
         return $this;
     }
@@ -419,7 +386,7 @@ class _Element
     public function prefix(?string $prefix): self
     {
         if ($prefix !== null) {
-            $this->prefix = $prefix;
+            $this->prefixVal = $prefix;
         }
         return $this;
     }
@@ -432,14 +399,14 @@ class _Element
     public function suffix(?string $suffix): self
     {
         if ($suffix !== null) {
-            $this->suffix = $suffix;
+            $this->suffixVal = $suffix;
         }
         return $this;
     }
 
     public function append(string $append)
     {
-        $this->append = $append;
+        $this->appendVal = $append;
         return $this;
     }
 
@@ -450,7 +417,7 @@ class _Element
      */
     public function id(string $id): self
     {
-        $this->id = $id;
+        $this->idVal = $id;
 
         return $this;
     }
@@ -462,7 +429,7 @@ class _Element
      */
     public function tab(string $tab): self
     {
-        $this->tab = $tab;
+        $this->tabVal = $tab;
 
         return $this;
     }
@@ -472,7 +439,7 @@ class _Element
      */
     public function skip(): self
     {
-        $this->skip = true;
+        $this->skipVal = true;
 
         return $this;
     }
@@ -484,7 +451,7 @@ class _Element
      */
     public function header(string $header): self
     {
-        $this->header = $header;
+        $this->headerVal = $header;
 
         return $this;
     }
@@ -496,7 +463,7 @@ class _Element
      */
     public function appearRequired(bool $off = false): self
     {
-        $this->appearRequired = $off ? false : true;
+        $this->appearRequiredVal = $off ? false : true;
 
         return $this;
     }
@@ -510,8 +477,8 @@ class _Element
      */
     public function label(string $label, array $sprintf = []): self
     {
-        $this->label = [
-            'key'     => $label,
+        $this->labelVal = [
+            'key' => $label,
             'sprintf' => $sprintf,
         ];
 
@@ -527,8 +494,8 @@ class _Element
      */
     public function description(?string $description, array $sprintf = []): self
     {
-        $this->description = [
-            'key'     => $description,
+        $this->descriptionVal = [
+            'key' => $description,
             'sprintf' => $sprintf,
         ];
 
@@ -545,13 +512,13 @@ class _Element
     public function toggles(array $toggles, bool $off = false, bool $na = false): self
     {
         $key = 'togglesOff';
-        $class = explode('\\', $this->class);
+        $class = explode('\\', $this->classVal);
         $class = is_array($class) ? array_pop($class) : null;
         if ($off === false) {
             $key = 'toggles';
             $togglesOn = [
                 'Checkbox' => 1,
-                'YesNo'    => 1,
+                'YesNo' => 1,
             ];
 
             if (isset($togglesOn[$class])) {
@@ -571,8 +538,8 @@ class _Element
             $key = 'na' . $key;
         }
 
-        $this->toggles[] = [
-            'key'      => $key,
+        $this->togglesVal[] = [
+            'key' => $key,
             'elements' => $toggles,
         ];
 
@@ -586,7 +553,7 @@ class _Element
      */
     public function extra(array $extra): self
     {
-        $this->extra = $extra;
+        $this->extraVal = array_merge($this->extraVal, $extra);
 
         return $this;
     }
@@ -598,7 +565,7 @@ class _Element
      */
     public function sidebar(string $sidebar): self
     {
-        $this->sidebar = $sidebar;
+        $this->sidebarVal = $sidebar;
 
         return $this;
     }
@@ -610,7 +577,7 @@ class _Element
      */
     public function empty($empty): self
     {
-        $this->empty = $empty;
+        $this->emptyVal = $empty;
 
         return $this;
     }
@@ -619,11 +586,20 @@ class _Element
     {
         if ($class !== null) {
             if (is_array($class)) {
-                $this->rowClasses = array_merge($this->rowClasses, $class);
+                $this->rowClassesVal = array_merge($this->rowClassesVal, $class);
             } else {
-                $this->rowClasses[] = $class;
+                $this->rowClassesVal[] = $class;
             }
         }
         return $this;
+    }
+
+    public function getProp(string $name)
+    {
+        $name .= 'Val';
+        if (property_exists($this, $name)) {
+            return $this->{$name};
+        }
+        return null;
     }
 }

@@ -50,7 +50,7 @@ class _Template extends ParserAbstract
      */
     protected function getFiles()
     {
-        $this->finder = (new Finder())->in($this->appPath . 'dev/')->files();
+        $this->finder = (new Finder())->in($this->getAppPath() . 'dev/')->files();
 
         foreach (ReservedWords::get() as $invalidName) {
             $this->finder->name($invalidName . '.php');

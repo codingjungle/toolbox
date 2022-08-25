@@ -134,7 +134,12 @@ class _Item extends GeneratorAbstract
             '@var string',
         ];
 
-        $this->generator->addProperty('module', $this->app, ['static' => true, 'document' => $doc]);
+        $this->generator
+            ->addProperty(
+                'module',
+                $this->classname_lower,
+                ['static' => true, 'document' => $doc]
+            );
     }
 
     /**

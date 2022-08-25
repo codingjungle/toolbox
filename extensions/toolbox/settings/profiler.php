@@ -48,10 +48,10 @@ class _profiler
                 $members[] = Member::load($user);
             }
         }
-        $form->tab('dtprofiler');
+        $form->addTab('dtprofiler');
         $form->addElement('dtprofiler_can_use', 'member')->value($members)->options(['multiple' => 10]);
         $form->addElement('dtprofiler_show_admin', 'yn');
-        $form->header('dtprofiler_profiler_tabs');
+        $form->addHeader('dtprofiler_profiler_tabs');
         $form->addElement('dtprofiler_enabled_execution', 'yn');
         $form->addElement('dtprofiler_enabled_executions', 'yn');
         $form->addElement('dtprofiler_enabled_memory', 'yn');
@@ -90,7 +90,7 @@ class _profiler
         $options = array_combine(array_values($data),array_values($data));
         $form->addElement('dtprofiler_console_replacements','cbs')->options(['options' => $options])->value($vals);
 
-        $form->tab('code_analyzer');
+        $form->addTab('code_analyzer');
         Member::loggedIn()->language()->words['code_analyzer_tab'] = 'Code Analyzer';
         $options = [
             'dtcode_analyze_db' => 'Database',

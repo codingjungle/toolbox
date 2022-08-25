@@ -27,7 +27,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 /**
 * Oauth Class
-* @mixin \IPS\toolbox\Api\Oauth
+* @mixin Oauth
 */
 abstract class _Oauth extends Singleton
 {
@@ -36,45 +36,41 @@ abstract class _Oauth extends Singleton
     /**
      * @var string client id, configure in setup()
      */
-    protected $client;
+    protected string $client;
     /**
      * @var string client secret, configure in setup()
      */
-    protected $secret;
+    protected string $secret;
     /**
      * @var string token url, configure in setup()
      */
-    protected $token;
+    protected string $token;
     /**
      * @var string scopes for the apis, configure in setup()
      */
-    protected $scopes;
+    protected string $scopes;
     /**
      * @var string api url, configure in setup()
      */
-    protected $url;
+    protected string $url;
     /**
      * @var string if the api needs a login, configure in setup() or leave null if not needed
      */
-    protected $username ;
+    protected ?string $username = null;
     /**
      * @var string if the api needs a login, configure in setup() or leave null if not needed
      */
-    protected $password = false;
+    protected string|bool $password = false;
     /**
-     * @var string sslChecks, configure in setup(). true to enable, false to disable, null to do nothing
+     * @var sslChecks, configure in setup(). true to enable, false to disable, null to do nothing
      */
-    protected $sslCheck;
+    protected bool $sslCheck = false;
     /**
      * @var bool forceTls, configure in setup()
      */
     protected $forceTls = false;
-    /**
-     * @var Req
-     */
-    protected $api;
 
-    protected $accessToken;
+    protected ?string $accessToken = null;
 
     /**
     * _Oauth constructor
@@ -102,10 +98,11 @@ abstract class _Oauth extends Singleton
                 $request->login($this->username, $this->password);
             }
 
-            if ($this->sslCheck !== null) {
+            if ($this->sslCheck === true) {
                 $request->sslCheck($this->sslCheck);
             }
-            if ($this->forceTls) {
+
+            if ($this->forceTls === true) {
                 $request->forceTls();
             }
 

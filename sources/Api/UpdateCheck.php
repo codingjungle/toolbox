@@ -21,7 +21,8 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 /**
 * UpdateCheck Class
-* @mixin \IPS\toolbox\Api\UpdateCheck
+* @mixin UpdateCheck
+ * @mixin Oauth
 */
 class _UpdateCheck extends Oauth
 {
@@ -33,6 +34,7 @@ class _UpdateCheck extends Oauth
         $this->token = 'https://codingjungle.com/oauth/token/';
         $this->url = 'https://codingjungle.com/api/';
         $this->scopes = 'downloads';
+        $this->accessToken = null;
     }
 
     protected function storeCredentials($credentials): mixed

@@ -241,7 +241,7 @@ trait ModuleBuilder
         $mixin = '\\' . $ns . '\\' . $classLower;
         $docBlock = DocBlockGenerator::fromArray([
             'shortDescription' => $classLower . ' Class',
-            'longDescription'  => null,
+            'longDescription'  => '',
             'tags'             => [['name' => 'mixin', 'description' => $mixin]],
         ]);
         $this->classGenerator->setDocBlock($docBlock);

@@ -103,10 +103,10 @@ abstract class _ExtensionsAbstract
         $this->extension = $extension;
         $this->dir = \IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/extensions/' . $this->extApp->directory . '/' . $this->extension . '/';
         $this->blanks = \IPS\Application::getRootPath() . '/applications/toolbox/data/defaults/modExtensions/';
-        $this->form = Form::create()->attributes(['data-controller' => 'ips.admin.dtdevplus.query'])->formPrefix(
-            'dtdevplus_ext_'
-        );
-        $this->form->header('title_' . $extension);
+        $this->form = Form::create()
+                          ->setAttributes(['data-controller' => 'ips.admin.dtdevplus.query'])
+                          ->setPrefix('dtdevplus_ext_');
+        $this->form->addHeader('title_' . $extension);
         $this->form->addElement('class')->value($this->getName());
         $this->form->addElement('use_default', 'yn');
     }

@@ -154,7 +154,18 @@ var _cjProfilerP = _cjProfilerP || {},
         // return 'in ' + matches[0].replace(')', '') + ' via console.' + type +
         //     '()';
     };
-
+const isJson = (data) => {
+    try {
+        const testIfJson = JSON.parse(data);
+        if (typeof testIfJson === "object") {
+            return true;
+        } else {
+            return false;
+        }
+    } catch {
+        return false;
+    }
+};
 _cjProfilerQue = setInterval(() => {
     _cjProfilerQindex++;
     if (!isEmpty(_cjProfilerQueue)) {
@@ -214,12 +225,19 @@ _cjProfilerP = function () {
             let nv = '',
                 includeIndex = u.length > 1;
             $.each(u, (index, value) => {
-                if (_.isObject(value)) {
-                    let obj = $('<div></div>');
-                    obj.addClass('dark-mode');
-                    obj.attr('data-ipstoolboxtoyboxprettyprint', 1);
-                    value = obj.html(JSON.stringify(value)).prop("outerHTML");
+                if (_.isObject(value) ) {
+                    if(value instanceof jQuery){
+                        ogLog(value);
 
+                        value = "this is a jquery.fn.init object, please check the console";
+                    }
+                    else {
+                        let v = value,
+                            obj = $('<div></div>');
+                        obj.addClass('dark-mode');
+                        obj.attr('data-ipstoolboxtoyboxprettyprint', 1);
+                        value = obj.html(JSON.stringify(v));
+                    }
                 }
                 nv += '<div';
                 if (!_.isNull(classes)) {
