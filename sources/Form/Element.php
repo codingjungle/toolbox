@@ -314,8 +314,8 @@ class _Element
             $type = 'helper';
         }
 
-        $this->type = $type;
-        $this->class = $class;
+        $this->typeVal = $type;
+        $this->classVal = $class;
 
         return $this;
     }

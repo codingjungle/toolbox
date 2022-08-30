@@ -93,16 +93,17 @@ class _Cons extends Singleton
 
             switch (gettype($value['current'])) {
                 case 'boolean':
-                    $form->element($key)->changeType('yn')->empty((bool)$value['current']);
+                    $form->getElement($key)->changeType('yn')->empty((bool)$value['current']);
                     break;
                 case 'int':
-                    $form->element($key)->changeType('number');
+                    $form->getElement($key)->changeType('number');
                     break;
                 case 'url':
-                    $form->element($key)->changeType('url');
+                    $form->getElement($key)->changeType('url');
                     break;
             }
         }
+
 
         if ($values = $form->values()) {
             $this->save($values, $constants);

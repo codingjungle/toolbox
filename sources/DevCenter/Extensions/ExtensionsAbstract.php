@@ -193,8 +193,8 @@ abstract class _ExtensionsAbstract
             }
         }
 
-        $this->content = $this->_replace($find, $replace, $content);
-        $this->_writeFile($file, $this->content, $dir);
+        $this->content = trim($this->_replace($find, $replace, $content));
+        $this->_writeFile($file, $this->content, $dir, false);
         Application::writeJson(\IPS\Application::getRootPath() . '/applications/' . $this->application->directory . '/data/extensions.json',
             $this->application->buildExtensionsJson());
     }

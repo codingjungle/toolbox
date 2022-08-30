@@ -50,7 +50,7 @@ class _FileStorage extends ExtensionsAbstract
      */
     public function elements()
     {
-        $this->form->element('use_default')->toggles(['table', 'field'], true);
+        $this->form->addElement('use_default','yn')->toggles(['table', 'field'], true);
 
         /* @var array $tablesDb */
         $tablesDb = Db::i()->query('SHOW TABLES');

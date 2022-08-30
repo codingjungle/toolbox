@@ -148,7 +148,7 @@ class _Proxy extends GeneratorAbstract
             $data = Proxyclass::i()->tokenize($content);
             //make sure it is an IPS class
             if(isset($data['namespace']) && !str_contains($data['namespace'],'IPS')){
-                throw new \InvalidArgumentException('Not an IPS class!');
+                throw new \IPS\toolbox\Proxy\NotIpsClassException('Not an IPS class!');
             }
             $proxied = Store::i()->dt_cascade_proxy ?? [];
 
@@ -437,8 +437,9 @@ class _Proxy extends GeneratorAbstract
             }
         } catch (Throwable | Exception $e) {
             // throw $e;
-            if(!($e instanceof \InvalidArgumentException)) {
+            if(!($e instanceof \IPS\toolbox\Proxy\NotIpsClassException)) {
                 Debug::add('Proxy Create', $e);
+                Debug::add('Proxy Create File', $originalFilePath);
             }
         }
     }

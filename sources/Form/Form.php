@@ -108,7 +108,7 @@ class _Form extends \IPS\Helpers\Form
     /**
      * @var bool
      */
-    protected bool $stripPrefix = true;
+    protected bool $stripPrefix = false;
     /**
      * @var bool
      */
