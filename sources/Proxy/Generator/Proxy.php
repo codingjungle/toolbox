@@ -79,6 +79,8 @@ use function trait_exists;
 use function trim;
 use function var_export;
 
+use function PHPSTORM_META\exitPoint;
+
 use const T_INTERFACE;
 use const T_TRAIT;
 
@@ -828,6 +830,26 @@ eof;
             $file->setBody($extra);
             $this->_writeFile('IPS_Constants.php', $file->generate(), $this->save, false);
         }
+
+        $body = <<<eof
+<?php
+
+namespace PHPSTORM_META {
+    exitPoint(\IPS\_Output::error());
+    exitPoint(\IPS\_Output::error());
+    exitPoint(\IPS\_Output::sendOutput());
+    exitPoint(\IPS\_Output::json());
+    exitPoint(\IPS\_Output::redirect());
+    exitPoint(\IPS\_Output::showOffline());
+    exitPoint(\IPS\_Output::showBanned());
+}
+eof;
+
+
+        $file = new DTFileGenerator();
+        $file->setBody($body);
+        $this->_writeFile('.phpstorm.meta.php', $file->generate(), $this->save, false);
+
     }
 
 
