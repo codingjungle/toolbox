@@ -82,7 +82,7 @@ class _Output implements HelpersAbstract
                         new ParameterGenerator('httpStatusCode', 'int', 200, 1),
 
                     ],
-                    'body'       => 'return parent::json(... func_get_arguments());',
+                    'body'       => 'return parent::json( ...\func_get_args() );',
                     'docblock'   => $methodDocBlock,
                     'static'     => false,
                 ]
