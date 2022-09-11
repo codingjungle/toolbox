@@ -83,7 +83,7 @@ class CliDumper extends AbstractDumper
             ]);
         }
 
-        $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: 'file://%f#L%l';
+        $this->displayOptions['fileLinkFormat'] = \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: 'file://%f#L%l';
     }
 
     /**
@@ -548,7 +548,7 @@ class CliDumper extends AbstractDumper
     /**
      * {@inheritdoc}
      */
-    protected function dumpLine(int $depth, bool $endOfValue = false)
+    protected function dumpLine(int $depth)
     {
         if ($this->colors) {
             $this->line = sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);

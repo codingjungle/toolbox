@@ -130,7 +130,7 @@ abstract class _Oauth extends Singleton
     {
     }
 
-    protected function storeCredentials($credentials): mixed
+    protected function storeCredentials($credentials): string
     {
     }
 

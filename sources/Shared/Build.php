@@ -105,7 +105,7 @@ trait Build
             Output::i()->js('admin_toggles.js', 'toolbox', 'admin')
         );
         $app = Request::i()->appToBuild;
-        $form = Form::create()->submitLang('Build')->setPrefix('ipsBox ipsPadding');
+        $form = Form::create()->submitLang('Build')->addClass('ipsBox ipsPadding');
         $myApps = \defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
         if (empty($myApps) === false && \in_array($app, $myApps)) {
             $application = Application::load($app);

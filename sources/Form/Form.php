@@ -487,7 +487,15 @@ class _Form extends \IPS\Helpers\Form
         return $this;
     }
 
-    public function addButton($lang, $type, $href = null, $class = '', $attributes = []): self
+    /**
+     * @param $lang
+     * @param $type
+     * @param $href
+     * @param $class
+     * @param $attributes
+     * @return $this
+     */
+    public function addButton($lang, $type, $href = null, $class = '', $attributes = [])
     {
         parent::addButton($lang, $type, $href, $class, $attributes);
         return $this;
@@ -780,7 +788,14 @@ class _Form extends \IPS\Helpers\Form
         parent::addTab($lang, $icon, $blurblang, $css);
     }
 
-    public function addTab($lang, $icon = null, $blurbLang = null, $css = null): self
+    /**
+     * @param $lang
+     * @param $icon
+     * @param $blurbLang
+     * @param $css
+     * @return $this|void
+     */
+    public function addTab($lang, $icon = null, $blurbLang = null, $css = null)
     {
         $key = $lang . '_tab';
         $tab = new Element($lang, 'tab');
@@ -1157,7 +1172,15 @@ class _Form extends \IPS\Helpers\Form
         return $this;
     }
 
-    public function addMatrix($name, $matrix, $after = null, $tab = null): self
+    /**
+     * @param $name
+     * @param $matrix
+     * @param $after
+     * @param $tab
+     * @return $this
+     * @throws Exception
+     */
+    public function addMatrix($name, $matrix, $after = null, $tab = null)
     {
         $element = new Element($name, 'matrix');
         $element->extra(['matrix' => $matrix]);
@@ -1169,8 +1192,21 @@ class _Form extends \IPS\Helpers\Form
         return $this;
     }
 
-    public function addHeader($lang, $after = null, $tab = null, ?string $css = null, ?string $id = null): Element
+    /**
+     * @param $lang
+     * @param $after
+     * @param $tab
+     * @param string|null $css
+     * @param string|null $id
+     * @return Element|mixed|void
+     * @throws Exception
+     */
+    public function addHeader($lang, $after = null, $tab = null)
     {
+        return $this->addHeaders($lang,$after,$tab);
+    }
+
+    protected function addHeaders($lang, $after = null, $tab = null, ?string $css = null, ?string $id = null){
         $element = new Element($lang, 'header');
         if ($css !== null) {
             $element->extra(['css' => $css]);
@@ -1186,7 +1222,13 @@ class _Form extends \IPS\Helpers\Form
         return $this->elementStore[$lang];
     }
 
-    public function addSeparator($after = null, $tab = null): self
+    /**
+     * @param $after
+     * @param $tab
+     * @return $this
+     * @throws Exception
+     */
+    public function addSeparator($after = null, $tab = null)
     {
         $name = uniqid('separator_', true);
         $element = new Element($name, 'separator');
@@ -1226,7 +1268,18 @@ class _Form extends \IPS\Helpers\Form
         return $this;
     }
 
-    public function addDummy($langKey, $value, $desc = null, $warning = '', $id = '', $after = null, $tab = null): self
+    /**
+     * @param $langKey
+     * @param $value
+     * @param $desc
+     * @param $warning
+     * @param $id
+     * @param $after
+     * @param $tab
+     * @return $this
+     * @throws Exception
+     */
+    public function addDummy($langKey, $value, $desc = null, $warning = '', $id = '', $after = null, $tab = null)
     {
         if (empty($id) === true) {
             $id = uniqid('dummy_');
@@ -1252,7 +1305,14 @@ class _Form extends \IPS\Helpers\Form
         return $this;
     }
 
-    public function addHtml($html, $after = null, $tab = null): self
+    /**
+     * @param $html
+     * @param $after
+     * @param $tab
+     * @return $this
+     * @throws Exception
+     */
+    public function addHtml($html, $after = null, $tab = null)
     {
         $name = sha1($html);
         $element = (new Element($name, 'html'))->extra(['html' => $html]);

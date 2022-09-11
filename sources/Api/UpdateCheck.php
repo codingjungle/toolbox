@@ -37,7 +37,7 @@ class _UpdateCheck extends Oauth
         $this->accessToken = null;
     }
 
-    protected function storeCredentials($credentials): mixed
+    protected function storeCredentials($credentials): string
     {
         Settings::i()->changeValues(['toolbox_at' => $credentials['access_token']]);
         return $credentials['access_token'];
