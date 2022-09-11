@@ -92,5 +92,6 @@ class _proxy
         $helpers[ActiveRecord::class][] = \IPS\toolbox\Proxy\Helpers\ActiveRecord::class;
         $helpers[Session::class][] = \IPS\toolbox\Proxy\Helpers\Session::class;
         $helpers[\IPS\Member::class][] = Member::class;
+        $helpers[\IPS\Log::class][] = \IPS\toolbox\Proxy\Helpers\Log::class;
     }
 }

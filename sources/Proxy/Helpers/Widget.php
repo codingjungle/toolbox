@@ -50,7 +50,7 @@ class _Widget implements HelpersAbstract
                     'parameters' => [
                         new ParameterGenerator('callback', null, null, 0),
                     ],
-                    'body' => 'return parent::template(... func_get_arguments());',
+                    'body' => 'return parent::template( ...\func_get_args() );',
                     'docblock' => $methodDocBlock,
                     'static' => false,
                 ]

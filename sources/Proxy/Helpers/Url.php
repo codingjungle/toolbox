@@ -56,7 +56,7 @@ class _Url implements HelpersAbstract
                         new ParameterGenerator('followRedirects', null, 'null', 2),
                         new ParameterGenerator('skipLocalhostRedirects', null, 'null', 4),
                     ],
-                    'body' => 'return parent::request(... func_get_arguments());',
+                    'body' => 'return parent::request( ...\func_get_args() );',
                     'docblock' => $methodDocBlock,
                     'static' => false,
                 ]
