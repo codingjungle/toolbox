@@ -142,5 +142,9 @@
     "friendlyUrl": {
         "type": "C",
         "class": "\\IPS\\Http\\Url\\Friendly"
+    },
+    "adminSupportTemplate": {
+        "type": "S",
+        "class": "\\IPS\\Theme\\class_core_admin_support"
     }
 }
