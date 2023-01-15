@@ -87,7 +87,7 @@ class _Cons extends Singleton
             }
 
 
-            $form->addElement($key)->label($key)->empty($value['current'])->description($value['description'] ?? '')->tab(
+            $form->addElement($key)->label($key)->value($value['current'])->description($value['description'] ?? '')->tab(
                 $tab
             );
 
@@ -169,7 +169,7 @@ class _Cons extends Singleton
         }
         foreach ($constants as $key => $val) {
             $data = $values[$key]??null;
-
+            $data = str_replace(['\\'], ['\\\\'], $data);
             switch ($val['type']) {
                 case 'integer':
                 case 'boolean':
@@ -218,6 +218,10 @@ class _Cons extends Singleton
                 }
                 //test test
                 $cons[] = $prefix . "\\define('" . $key . "'," . $dataType . ');';
+                if($key === 'DT_USE_WSL'){
+                    $cons[] = $prefix . "\\define('DEV_WHOOPS_HANDLER', '\\IPS\\toolbox\Debug\\Handler');";
+                }
+
             }
         }
         $toWrite = 'include __DIR__.\'/applications/toolbox/sources/Debug/Helpers.php\';' . "\n";

@@ -1,2 +1,5 @@
 .DS_Store
 data/.php-cs-fixer.cache
+.idea
+.github
+.github/

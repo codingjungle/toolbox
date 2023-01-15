@@ -13,8 +13,12 @@
 
 namespace IPS\toolbox\extensions\toolbox\constants;
 
+use IPS\IPS;
+
 use function defined;
 use function header;
+
+use function property_exists;
 
 use const DT_ANALYZE;
 use const DT_BETA_AUTHOR;
@@ -53,7 +57,7 @@ class _toolbox
      */
     public function getConstants()
     {
-        return [
+        $return = [
             'DT_ANALYZE'                         => [
                 'name'        => 'DT_ANALYZE',
                 'default'     => false,
@@ -184,6 +188,21 @@ class _toolbox
                 'type' => 'url',
                 'tab'         => 'Debug',
             ],
+            'DT_USE_WSL' => [
+                'name'        => 'DT_USE_WSL',
+                'default'     => false,
+                'current'     => defined('\DT_USE_WSL') ? DT_USE_WSL : false,
+                'description' => 'Are we using WSL?',
+                'type' => 'boolean',
+                'tab'         => 'Debug',
+            ],'DT_WSL_PATH' => [
+                'name'        => 'DT_WSL_PATH',
+                'default'     => '\\\\wsl.localhost\\Ubuntu',
+                'current'     => defined('\DT_WSL_PATH') ? DT_WSL_PATH : '\\\\wsl.localhost\\Ubuntu',
+                'description' => 'Path to wsl, this most likely will not be changed, unless you use another distro.',
+                'type' => 'string',
+                'tab'         => 'Debug',
+            ],
             'DT_BETA_UPLOAD'                         => [
                 'name'        => 'DT_BETA_UPLOAD',
                 'default'     => false,
@@ -250,6 +269,11 @@ class _toolbox
                 'tab'         => 'Beta',
             ],
         ];
+
+
+
+
+        return $return;
     }
 
     /**

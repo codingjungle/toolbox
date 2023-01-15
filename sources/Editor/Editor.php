@@ -15,6 +15,8 @@ namespace IPS\toolbox;
 use function rawurlencode;
 use function str_replace;
 
+use const DT_WSL_PATH;
+
 
 class _Editor
 {
@@ -55,6 +57,11 @@ class _Editor
     {
         if (isset(static::$editors[\IPS\DEV_WHOOPS_EDITOR])) {
             $editor = static::$editors[\IPS\DEV_WHOOPS_EDITOR];
+            if(defined('DT_USE_WSL') && DT_USE_WSL === true){
+                $path =str_replace(['//','/'],['\\','\\'], $path);
+
+                $path = DT_WSL_PATH . $path;
+            }
             $path = rawurlencode($path);
             if ($line === null) {
                 $line = 0;
