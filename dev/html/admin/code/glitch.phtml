@@ -1,0 +1,35 @@
+<ips:template parameters="string $type, $url, string $name, string $message, $analyze"/>
+<div class="ipsMessage ipsMessage_info">
+    {lang="dt_code_glitch"}
+</div>
+<div class="ipsPadding ipsBox">
+    <table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>File</th>
+                <th>Error Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="ipsClearfix">
+                <td class="ipsTable_wrap">
+                    <strong>{$type}</strong>
+                </td>
+                <td class="ipsTable_wrap">
+                    {{if \IPS\DEV_WHOOPS_EDITOR}}
+                    <a href="{$url}">{$name}</a>
+                    {{else}}
+                    {$name}
+                    {{endif}}
+                </td>
+                <td class="ipsTable_wrap">
+                    <strong>{$message|raw}</strong>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="ipsBorder_top ipsPadding ipsType_center">
+        <a href='{$analyze}' class="ipsButton ipsButton_large ipsButton_primary">Fixed, Reanalyze!</a>
+    </div>
+</div>

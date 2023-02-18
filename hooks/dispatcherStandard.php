@@ -14,6 +14,8 @@ use function defined;
 
 use const DT_NODE;
 use const DT_NODE_URL;
+use const DT_USE_WSL;
+use const DT_WSL_PATH;
 
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
@@ -41,5 +43,7 @@ abstract class toolbox_hook_dispatcherStandard extends _HOOK_CLASS_
         Output::i()->jsVars['cj_app_path'] = Application::getRootPath('toolbox');
         Output::i()->jsVars['cj_use_profiler_console'] = Settings::i()->dtprofiler_use_console;
         Output::i()->jsVars['cj_use_profiler_replace_console'] = Settings::i()->dtprofiler_use_console;
+        Output::i()->jsVars['cj_wsl_path'] = null;
+        Output::i()->jsVars['cj_use_wsl'] = false;
     }
 }

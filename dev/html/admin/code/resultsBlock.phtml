@@ -1,0 +1,17 @@
+<ips:template parameters="string $lang, int $count, string $content"/>
+<div class="">
+    <div class="ipsClearfix ipsCursor_pointer ipsMessage ipsMessage_{{if $count}}error{{else}}success{{endif}} dtcode_header"{{if $count }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$lang}"{{endif}} >
+        <div class="ipsType_large ipsType_bold ipsClearfix">
+            {lang="{$lang}" sprintf="$count"}
+        {{if $count}}
+            <i class="fa fa-angle-down ipsPos_right"></i>
+        {{endif}}
+        </div>
+        <div class="ipsType_medium ipsType_bold">
+            {lang="{$lang}_desc"}
+        </div>
+    </div>
+    <div class="ipsPadding ipsBox ipsHide" id="tab_{$lang}">
+        {$content|raw}
+    </div>
+</div>

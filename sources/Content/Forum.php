@@ -132,6 +132,7 @@ class _Forum extends Generator
             'forum_description' => $desc,
             'forum_type'        => $type,
             'forum_parent_id'   => $parent,
+            'min_posts_post' => 0
         ];
 
         if ($type === 'qa') {

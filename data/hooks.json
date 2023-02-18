@@ -135,10 +135,6 @@
         "type": "C",
         "class": "\\IPS\\Session"
     },
-    "Dispatcher": {
-        "type": "C",
-        "class": "\\IPS\\Dispatcher"
-    },
     "friendlyUrl": {
         "type": "C",
         "class": "\\IPS\\Http\\Url\\Friendly"

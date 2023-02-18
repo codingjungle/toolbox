@@ -7,6 +7,7 @@ use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
+use IPS\toolbox\Profiler;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
@@ -52,11 +53,26 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
                 Output::i()->cssFiles,
                 Theme::i()->css('devbar.css', 'toolbox', 'admin')
             );
-
+        $return = '';
         if ( \is_callable('parent::globalTemplate') )
         {
-            return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
+            $return = \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
         }
+        $hide = defined('DT_HIDE_MYAPPS') ? DT_HIDE_MYAPPS : false;
+        if (
+            !$hide &&
+            !\IPS\QUERY_LOG &&
+            !\IPS\Request::i()->isAjax()
+        ) {
+            try {
+                $myapps = Profiler::i()->justMyApps();
+                $return = str_replace('</body>', $myapps.'</body>', $return);
+            } catch (Exception $e) {
+                \IPS\toolbox\Profiler\Debug::log($e);
+            }
+        }
+
+        return $return;
     }
 
     public function tabs(

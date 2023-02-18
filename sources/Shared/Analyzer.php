@@ -25,6 +25,7 @@ use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
+use IPS\toolbox\Code\ClassScanner;
 use IPS\toolbox\Code\Db;
 use IPS\toolbox\Code\ErrorCodes;
 use IPS\toolbox\Code\FileStorage;
@@ -34,6 +35,7 @@ use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
 use IPS\toolbox\Code\Utils\Hook;
+use IPS\toolbox\Editor;
 use OutOfRangeException;
 use RuntimeException;
 use UnexpectedValueException;
@@ -118,7 +120,7 @@ trait Analyzer
         Output::i()->output = new MultipleRedirect(
             $url,
             function ($data) use( $url, $application ) {
-            $total = 10;
+            $total = 11;
             $percent = round(100 / $total);
             $complete = 0;
             $app = $application;
@@ -134,26 +136,20 @@ trait Analyzer
             }
 
             switch ($complete) {
-                default:
-                    $complete++;
-                    break;
                 case 0:
                     if(\IPS\Settings::i()->dtcode_analyze_db) {
                         $warnings['sql_check'] = (new Db($app))->check();
                     }
-                    $complete = 1;
                     break;
                 case 1:
                     if(\IPS\Settings::i()->dtcode_analyze_filestorage) {
                         $warnings['filestorage_check'] = (new FileStorage($app))->check();
                     }
-                    $complete = 2;
                     break;
                 case 2:
                     if(\IPS\Settings::i()->dtcode_analyze_rootpath) {
                         $warnings['root_path'] = (new RootPath($app))->check();
                     }
-                    $complete = 3;
                     break;
                 case 3:
                     if(\IPS\Settings::i()->dtcode_analyze_error_codes) {
@@ -165,7 +161,6 @@ trait Analyzer
                             $warnings['error_codes_dupes'] = $errorsCodes['dupes'];
                         }
                     }
-                    $complete = 4;
                     break;
                 case 4:
                     if(\IPS\Settings::i()->dtcode_analyze_hooks) {
@@ -176,41 +171,41 @@ trait Analyzer
                         } catch (\InvalidArgumentException $e) {
                         }
                     }
-                    $complete = 5;
                     break;
                 case 5:
                     if(\IPS\Settings::i()->dtcode_analyze_interface) {
                         $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
                     }
-                    $complete = 6;
                     break;
                 case 6:
                     if(\IPS\Settings::i()->dtcode_analyze_settings_verify) {
                         $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
                     }
-                    $complete = 7;
                     break;
                 case 7:
                     if(\IPS\Settings::i()->dtcode_analyze_settings_check) {
                         $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
                     }
-                    $complete = 8;
                     break;
                 case 8:
                     if(\IPS\Settings::i()->dtcode_analyze_langs_check) {
                         $warnings['langs_check'] = (new Langs($app))->check();
                     }
-                    $complete = 9;
                     break;
                 case 9:
                     if(\IPS\Settings::i()->dtcode_analyze_langs_verify) {
                         $warnings['langs_verify'] = (new Langs($app))->verify();
                     }
-                    $complete = 10;
+                    break;
+                case 10:
+                    if(\IPS\Settings::i()->dtcode_analyze_class_scanner) {
+                        $warnings['class_scanner_validation'] = (new ClassScanner($app))->validate();
+                    }
                     break;
             }
+                $complete++;
 
-            Store::i()->dtcode_warnings = $warnings;
+                Store::i()->dtcode_warnings = $warnings;
 
             if ($complete > $total) {
                 return null;
@@ -261,7 +256,27 @@ trait Analyzer
             /**
              * @var array $warnings
              */
-            $warnings = Store::i()->dtcode_warnings;
+            $stored = Store::i()->dtcode_warnings;
+            $warnings = [];
+            if(isset($stored['class_scanner_validation'])){
+                $warnings['class_scanner_validation'] = $stored['class_scanner_validation'];
+                unset($stored['class_scanner_validation']);
+            }
+
+            if(isset($stored['hooks_exists'])){
+                $warnings['hooks_exists'] = $stored['hooks_exists'];
+                unset($stored['hooks_exists']);
+            }
+
+            if(isset($stored['hooks_validation'])){
+                $warnings['hooks_validation'] = $stored['hooks_validation'];
+                unset($stored['hooks_validation']);
+            }
+
+            foreach($stored as $key => $value){
+                $warnings[$key] = $value;
+            }
+
             $output = '';
             foreach ($warnings as $key => $val) {
                 switch ($key) {
@@ -383,17 +398,22 @@ trait Analyzer
                     case 'hooks_validation':
                         $parse = $val['parse'] ?? null;
                         $loading = $value['processing'] ?? null;
-                        foreach($val as $key => $data){
+                        $count = 0;
+
+                        $op = '';
+                        foreach($val as $k => $data){
+
+                            $count += count($data);
                             $headers = [];
-                            if($key === 'signature' || $key === 'parameters'){
+                            if($k === 'signature' || $k === 'parameters'){
                                 $headers[] = 'File';
                             }
                             $headers[] = 'Path';
                             $headers[] = 'Error';
                             $headers[] = 'Line';
-                            $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                            $op .= Theme::i()->getTemplate('code','toolbox','admin')->results(
                                 $data,
-                                'hooks_'.$key,
+                                'hooks_'.$k,
                                 [
                                     'File',
                                     'Error',
@@ -401,6 +421,32 @@ trait Analyzer
                                 ]
                             );
                         }
+
+                        $output .= Theme::i()
+                            ->getTemplate('code','toolbox','admin')
+                            ->resultsBlock($key.'_title',$count, $op);
+                        break;
+                    case 'class_scanner_validation':
+                        $headers = [
+                            'Error',
+                            'Path',
+                            'Line',
+                            'Method',
+                        ];
+                        $op = '';
+                        $count = 0;
+                        foreach($val as $k => $data){
+                            $count += count($data);
+
+                            $op .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                                $data,
+                                'class_scanner_'.$k,
+                                $headers
+                            );
+                        }
+                        $output .= Theme::i()
+                            ->getTemplate('code','toolbox','admin')
+                            ->resultsBlock($key.'_title',$count, $op);
                         break;
                 }
             }
@@ -424,5 +470,25 @@ trait Analyzer
         }
     }
 
-
+    protected function glitch(){
+        $application = Request::i()->myApp ?? Request::i()->application;
+        $app = Application::load($application);
+        $info = Store::i()->toolbox_code_analyzer_interrupted;
+        $curl = Request::i()->url();
+        $url = (new Editor())->replace($info['file'], $info['line']);
+        $name = str_replace($app->getApplicationPath(),'',$info['file']);
+        $analyze = $curl->setQueryString(['download' => 1,'do'=>'queue']);
+        if(isset(Request::i()->application)){
+            $analyze = $analyze->stripQueryString(['application'])->setQueryString(['myApp'=>$application]);
+        }
+        Output::i()->output = Theme::i()
+            ->getTemplate('code','toolbox','admin')
+            ->glitch(
+                'E_COMPILE_ERROR',
+                $url,
+                $name,
+                $info['message'],
+                $analyze
+            );
+    }
 }

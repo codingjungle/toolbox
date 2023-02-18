@@ -1,5 +1,9 @@
 [
     {
+        "key": "dtcode_analyze_class_scanner",
+        "default": "1"
+    },
+    {
         "key": "dtcode_analyze_db",
         "default": "1"
     },
@@ -21,11 +25,11 @@
     },
     {
         "key": "dtcode_analyze_langs_check",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "dtcode_analyze_langs_verify",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "dtcode_analyze_rootpath",
@@ -33,11 +37,11 @@
     },
     {
         "key": "dtcode_analyze_settings_check",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "dtcode_analyze_settings_verify",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "dtdevplus_skip_dirs",
@@ -101,7 +105,7 @@
     },
     {
         "key": "dtprofiler_enabled_memory_summary",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "dtprofiler_enabled_templates",
@@ -121,11 +125,11 @@
     },
     {
         "key": "dtprofiler_show_admin",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "dtprofiler_show_changes",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "dtprofiler_use_console",
@@ -141,7 +145,7 @@
     },
     {
         "key": "dtproxy_do_proxies",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "toolbox_at",
@@ -153,7 +157,7 @@
     },
     {
         "key": "toolbox_debug_templates",
-        "default": "0"
+        "default": ""
     },
     {
         "key": "toolbox_use_tabs_applications",

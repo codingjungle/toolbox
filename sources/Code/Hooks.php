@@ -212,6 +212,7 @@ class _Hooks extends ParserAbstract
                     try {
                         //we are only interested in parent extend classes here
                         $originalMethod = $originalClass->getMethod($hookMethod->getName());
+
                         $this->validateHookSignature(
                             $hookMethod,
                             $originalMethod,
@@ -219,6 +220,7 @@ class _Hooks extends ParserAbstract
                             $originalClass->getFileName(),
                             $warnings
                         );
+
                         $this->validateParameters(
                             $hookMethod,
                             $originalMethod,
@@ -233,6 +235,7 @@ class _Hooks extends ParserAbstract
                             $hookMethod->getEndLine()
                         );
                         try {
+                            //checks to see if it calls the parent method
                             if(!\in_array($hookMethod->getName(),static::IGNORED_PARENTS)) {
                                 //let's see if the methods that exist in the parent class, are getting called here!
                                 $parentUsages = $this->findParentUsages(
@@ -246,7 +249,7 @@ class _Hooks extends ParserAbstract
                                     $path = $this->buildPath($hook->path(), $hookMethod->getStartLine());
                                     $warnings['parentUsage'][] = [
                                         'path' => ['url' => $path, 'name' => $hook->path()],
-                                        'error' => "Method {$hookMethod->getName()} does not exist in {$hook->getClass()}",
+                                        'error' => "Method {$hookMethod->getName()} does not call parent",
                                         'line' => $hookMethod->getStartLine()
                                     ];
                                 }
@@ -361,6 +364,21 @@ class _Hooks extends ParserAbstract
                 'path' => ['url' => $path2, 'name' => $originalFilePath],
                 'error' => "{$hookMethod->getName()} has a return type of {$originalMethod->getReturnType()->getName()} in " . "{$originalMethod->getDeclaringClass()->getName()}, but no return type in the hook",
                 'line' => $originalMethod->getStartLine()
+            ];
+        }
+
+        if (!$originalMethod->hasReturnType() && $hookMethod->hasReturnType()) {
+            $warnings['signature'][] = [
+                'hook' => $hook->name(),
+                'path' => ['url' => $path, 'name' => $hook->path()],
+                'error' => "{$hookMethod->getName()} has a return type of {$hookMethod->getReturnType()->getName()} in " . "{$originalMethod->getDeclaringClass()->getName()}, but no return type in the original",
+                'line' => $originalMethod->getStartLine()
+            ];
+            $warnings['signature'][] = [
+                'hook' => $hook->name(),
+                'path' => ['url' => $path2, 'name' => $originalFilePath],
+                'error' => "{$hookMethod->getName()} has a return type of {$hookMethod->getReturnType()->getName()} in " . "{$originalMethod->getDeclaringClass()->getName()}, but no return type in the original",
+                'line' => $hookMethod->getStartLine()
             ];
         }
     }

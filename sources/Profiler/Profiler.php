@@ -91,6 +91,12 @@ class _Profiler extends Singleton
         return null;
     }
 
+    public function justMyApps(){
+        $myapps = $this->myApps();
+        $info = $this->info();
+        return Theme::i()->getTemplate('bar','toolbox','front')->myapps($info,$myapps);
+    }
+
     protected function myApps(): array
     {
         $myApps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];

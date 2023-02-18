@@ -116,7 +116,20 @@ var _cjProfilerP = _cjProfilerP || {},
                     if (isNull === true) {
                         main += '<div>' + vf + '</div>';
                     } else {
-                        main += '<div><a href="' + dtProfilerEditor + '://open?file=' + dtProfilerAppPath + '/' + path + '&line=' + line + '">' + vf + '</a>'
+                        let ds = '/', appPath = dtProfilerAppPath;
+                        if(Boolean(useWsl) === true){
+                            path = path.replaceAll('/','\\');
+                            appPath = appPath.replaceAll('/','\\');
+                            appPath = wslPath + appPath;
+                            ds = '\\';
+                        }
+
+                        if(Boolean(useContainer) === true){
+                            appPath = appPath.replaceAll(containerGuestPath,'');
+                            appPath = containerHostPath + '/' + appPath;
+                        }
+
+                        main += '<div><a href="' + dtProfilerEditor + '://open?file=' + appPath + ds + path + '&line=' + line + '">' + vf + '</a>'
                     }
                 } else {
                     main += vf;

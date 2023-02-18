@@ -76,6 +76,7 @@ class _generator extends Controller
 
         ];
         $form = Form::create()->setPrefix('dtcontent_');
+        $form->setDbPrefix(false)->removePrefix();
         $form->addElement('type', 'select')->options([
             'options' => [
                 'none'   => 'Select Type',
@@ -114,7 +115,7 @@ class _generator extends Controller
         if ($values = $form->values()) {
             $url = $this->url;
             $query = [
-                'type'  => $values['type'],
+                'type'  => $values['type'] ,
                 'limit' => $values['limit'],
             ];
 

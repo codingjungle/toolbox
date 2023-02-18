@@ -30,6 +30,7 @@ use UnexpectedValueException;
 use IPS\Helpers\Form\CheckboxSet;
 use IPS\Helpers\Form\FormAbstract;
 
+use function _p;
 use function sha1;
 use function count;
 use function header;
@@ -616,6 +617,7 @@ class _Form extends \IPS\Helpers\Form
                 foreach ($values as $key => $value) {
                     $og = $key;
                     $key = $this->stripPrefix($key);
+
                     $dbPrefix = '';
                     if (
                         $this->dbPrefix === true &&
