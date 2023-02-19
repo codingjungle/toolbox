@@ -105,7 +105,6 @@ class _ClassScanner extends ParserAbstract
             $error = error_get_last();
             $url = \IPS\Request::i()->url();
             if($error['type'] === E_COMPILE_ERROR){
-
                 $url = $url->setQueryString(['do' => 'glitch'])->stripQueryString(['csrfKey','mr','download']);
                 $url = (string) $url;
                 Store::i()->toolbox_code_analyzer_interrupted = $error;
@@ -126,6 +125,7 @@ class _ClassScanner extends ParserAbstract
             'signature' => [],
             'parameters' => [],
             'parentUsage' => [],
+            'case' => [],
             'errors' => [],
         ];
         /** @var SplFileInfo $file */
@@ -140,10 +140,27 @@ class _ClassScanner extends ParserAbstract
             }
             $cs = $tokens['class'];
             $ns = $tokens['namespace'];
+            $filename = $file->getFilenameWithoutExtension();
+
             //lets make sure this is an IPS class!
             if(str_starts_with($cs, '_') === true && str_contains($ns, 'IPS') === true) {
                 $first = mb_substr($cs, 1);
                 $className = '\\' . $tokens['namespace'] . '\\' . $first;
+                if($filename !== $first){
+                    $currentFileName = str_replace($this->app->getApplicationPath(),'',$file->getRealPath());
+                    $warnings['case'][] = [
+                        'error' => 'Case Mismatch',
+                        'path' => [
+                            'url' => $this->buildPath($file->getRealPath(), 0),
+                            'name' => $currentFileName
+                        ],
+                        'class' => $first
+                    ];
+                }
+                //check for case-insensitive/preserving. this wouldn't have been a problem normally, but just recently
+                //found out that ext4 in new versions of the linux kernel support "case folding" which is case-preserving
+                //i'm gonna say this is MS's influence on the kernel!
+
                 try {
                     $currentClass = new \ReflectionClass($className);
                     //okay this is not a class we are gonna check, as its not a child/subclass
@@ -261,8 +278,6 @@ class _ClassScanner extends ParserAbstract
                     $warnings['processing'][] = [
                         'error' => $e->getMessage(),
                         'path' => ['url' => $path, 'name' => $file->getFilename()],
-                        'line' => $e->getLine(),
-                        'method' => $method->getName()
                     ];
                     continue;
                 }

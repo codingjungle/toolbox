@@ -427,17 +427,31 @@ trait Analyzer
                             ->resultsBlock($key.'_title',$count, $op);
                         break;
                     case 'class_scanner_validation':
-                        $headers = [
-                            'Error',
-                            'Path',
-                            'Line',
-                            'Method',
-                        ];
                         $op = '';
                         $count = 0;
                         foreach($val as $k => $data){
                             $count += count($data);
-
+                            if($k === 'processing'){
+                                $headers = [
+                                    'Error',
+                                    'Path'
+                                ];
+                            }
+                            elseif($k === 'case'){
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Class'
+                                ];
+                            }
+                            else{
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Line',
+                                    'Method',
+                                ];
+                            }
                             $op .= Theme::i()->getTemplate('code','toolbox','admin')->results(
                                 $data,
                                 'class_scanner_'.$k,

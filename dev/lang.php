@@ -424,5 +424,7 @@ First thing you should do is check what is listed here, cause you might have an 
     'class_scanner_validation_title_desc' => 'This section will show any of your source folder files that failed any compatibility checks.',
     'hooks_validation_title' => 'Hooks Validation (%s)',
     'hooks_validation_title_desc' => 'This section will show any of your hooks that have failed any of the compatibility checks.',
-    'dt_code_glitch' => 'Code analyzer has hit a fatal error when processing. Below you will find the collected information!'
+    'dt_code_glitch' => 'Code analyzer has hit a fatal error when processing. Below you will find the collected information!',
+    'class_scanner_case' => 'Class/Filename Case Preserving/Sensitivity (%s)',
+    'class_scanner_case_desc' => 'This makes sure the Filename of your class file has the same case as your class name. This could potentially cause problems on different configuration on servers.'
 ];
