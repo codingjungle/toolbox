@@ -156,23 +156,23 @@ class _settings extends Controller
         Output::i()->output = $form;
     }
 
-    protected function writeSpecialHooks()
-    {
-        $apps = Application::appsWithExtension('toolbox', 'SpecialHooks');
+//    protected function writeSpecialHooks()
+//    {
+//        $apps = Application::appsWithExtension('toolbox', 'SpecialHooks');
+//
+//        (new GitHooks($apps))->writeSpecialHooks();
+//
+//        Output::i()->redirect($this->url->setQueryString(['tab' => ''])->csrf(), 'SpecialHooks Created');
+//    }
 
-        (new GitHooks($apps))->writeSpecialHooks();
-
-        Output::i()->redirect($this->url->setQueryString(['tab' => ''])->csrf(), 'SpecialHooks Created');
-    }
-
-    protected function removeSpecialHooks()
-    {
-        $apps = Application::appsWithExtension('toolbox', 'SpecialHooks');
-
-        (new GitHooks($apps))->removeSpecialHooks();
-
-        Output::i()->redirect($this->url->setQueryString(['tab' => ''])->csrf(), 'SpecialHooks Removed');
-    }
+//    protected function removeSpecialHooks()
+//    {
+//        $apps = Application::appsWithExtension('toolbox', 'SpecialHooks');
+//
+//        (new GitHooks($apps))->removeSpecialHooks();
+//
+//        Output::i()->redirect($this->url->setQueryString(['tab' => ''])->csrf(), 'SpecialHooks Removed');
+//    }
 
     protected function patchHelpers()
     {
@@ -276,7 +276,7 @@ class IPS extends \IPS\IPSBU {
                 $mtime = filemtime( $rpath . '/' . $data[ 'file' ] );
                 $name = \str_replace(["\\", '/'], '_', $namespace . $realClass . $finalClass . $data[ 'file' ]);
                 $filename = $name.'_' . $mtime . '.php';
-                
+
                 if (!file_exists( $path.$filename) && \file_exists($rpath . '/' . $data[ 'file' ]))
                 {
 
@@ -287,7 +287,7 @@ class IPS extends \IPS\IPSBU {
                     foreach( $finder as $f ){
                         $fs->remove($f->getRealPath());
                     }
-                    
+
                     $content = file_get_contents($rpath . '/' . $data[ 'file' ]);
                     $content = preg_replace('#\b(?<![\'|"])_HOOK_CLASS_\b#', $realClass, $content);
                     $content = preg_replace( '#\b(?<![\'|"])_HOOK_CLASS_'.$data['class'].'\b#', $realClass, $content);
@@ -304,13 +304,13 @@ class IPS extends \IPS\IPSBU {
                 $realClass = $data[ 'class' ];
             }
         }
-        
+
         $reflection = new \ReflectionClass("{$namespace}\\_{$finalClass}");
         if (eval("namespace {$namespace}; " . $extraCode . ($reflection->isAbstract() ? 'abstract' : '') . " class {$finalClass} extends {$realClass} {}") === false)       {
             trigger_error("There was an error initiating the class {$namespace}\\{$finalClass}.", E_USER_ERROR);
         }
     }
-}    
+}
 IPS::init();
 eof;
             file_put_contents($init, $content);
@@ -329,7 +329,7 @@ eof;
   "main": "toolbox.js",
   "author": "codingjungle.com",
   "dependencies": {
-    "express": "^4.14.0", 
+    "express": "^4.14.0",
     "socket.io": "^4.5.1"
   }
 }

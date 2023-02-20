@@ -64,7 +64,6 @@ class _ClassScanner extends ParserAbstract
      * @var array
      */
     protected array $fullStop = [
-        'IPS\toolbox\Shared\_Lorem' => 1,
         'IPS\Content\_Comment' => 1,
         'IPS\Content\_Item' => 1,
         'IPS\Content\_Review' => 1,
@@ -73,15 +72,48 @@ class _ClassScanner extends ParserAbstract
 
     /**
      * these are methods inside some classes, that we don't need to check if they call the parent on, as
+     * they are usually intended to be overloaded.
      * @var array|array[]
      */
     protected array $autoLint = [
         'IPS\Node\_Model' => [
-            'formValues' => 1
+            'getStore' => 1,
+            'get__title' => 1,
+            'formatFormValues' => 1,
+            'form' => 1,
+            'disabledPermissions' => 1,
+            'titleFromIndexData' => 1
         ],
         'IPS\Helpers\_Form' => [
-            '__construct'
-        ]
+            '__construct' => 1,
+            '__toString' => 1,
+            'addButton' => 1,
+            'customTemplate' => 1,
+            'getLastUsedTab' => 1,
+            'saveAsSettings' => 1,
+            'values' => 1
+        ],
+        'IPS\Content\_Comment' => [
+            'getStore' => 1,
+            'contentTableTemplate' => 1,
+            'titleFromIndexData' => 1
+        ],
+        'IPS\Content\_Item' => [
+            'getStore' => 1,
+            'form' => 1,
+            'supportedMetaDataTypes' => 1,
+            'contentTableTemplate' => 1,
+            'titleFromIndexData' => 1
+        ],
+        'IPS\Content\_Review' => [
+            'getStore' => 1,
+            'titleFromIndexData' => 1
+        ],
+        'IPS\Helpers\Form\_FormAbstract' => [
+            'formatValue' => 1,
+            'getValue' => 1,
+            'setValue' => 1
+        ],
     ];
     protected function getFiles()
     {
@@ -98,10 +130,12 @@ class _ClassScanner extends ParserAbstract
 
     public function validate(): array
     {
-        ob_start();
+        //we do this so we can capture the fatal and redirect if need be
+        if(!Request::i()->isAjax()) {
+            ob_start();
+        }
 
         register_shutdown_function(function(){
-
             $error = error_get_last();
             $url = \IPS\Request::i()->url();
             if($error['type'] === E_COMPILE_ERROR){
@@ -163,6 +197,7 @@ class _ClassScanner extends ParserAbstract
 
                 try {
                     $currentClass = new \ReflectionClass($className);
+                    $currentClass = $currentClass->getParentClass();
                     //okay this is not a class we are gonna check, as its not a child/subclass
                     if($currentClass->getParentClass() === false){
                         continue;
@@ -178,7 +213,7 @@ class _ClassScanner extends ParserAbstract
                         $pc = $parentClass;
                         if ($parentClass instanceof ReflectionClass) {
                             $name = $parentClass->getName();
-                            if(!str_contains($name,'IPS') || !str_contains($name,'')){
+                            if(!str_contains($name,'IPS')){
                                 $done = true;
                                 //if this is not an IPS class, we need to vamoose
                                 continue 2;
@@ -192,87 +227,12 @@ class _ClassScanner extends ParserAbstract
                             $done = true;
                         }
                     }
+                    foreach($currentClass->getTraits() as $trait){
+                        $contentTrait = \file_get_contents($trait->getFileName());
+                        $this->validationChecks( $trait, $parentClass, $contentTrait, $warnings);
 
-                    //due to the monkey patching, we gotta check to make sure we aren't checking the class against
-                    //itself
-                    $cc = explode('\\',$currentClass->getName());
-                    $end = array_pop($cc);
-                    $cn = implode('\\', $cc).'\\_'.$end;
-                    if($cn === $parentClass->getName()){
-                        continue;
                     }
-
-                    //now lets get that money shot!
-                    foreach ($currentClass->getMethods() as $method) {
-                        if ($cn === $method->getDeclaringClass()->getName()) {
-                            $parentName = $parentClass->getName();
-                            $methodName = $method->getName();
-                            $docComment = $method->getDocComment();
-                            //lets check if it is linted or autolinted, we use the parentclass for the class lookup part,
-                            //cause it is most likely the one that will be added here, instead of the subclass
-                            if (
-                                isset($this->autoLint[$parentName][$methodName]) ||
-                                mb_stristr($docComment, '@ips-lint ignore')
-                            ) {
-                                continue;
-                            }
-                            try {
-                                try {
-                                    //we are only interested in parent extend classes here
-                                    $originalMethod = $parentClass->getMethod($method->getName());
-                                } catch (Throwable $e) {
-                                    continue;
-                                }
-                                if(!str_contains($docComment, '@ips-lint ignore-signature')) {
-                                    $this->validateSignature(
-                                        $method,
-                                        $originalMethod,
-                                        $warnings
-                                    );
-                                }
-
-                                if(!str_contains($docComment, '@ips-lint ignore-parameters')) {
-                                    $this->validateParameters(
-                                        $method,
-                                        $originalMethod,
-                                        $warnings
-                                    );
-                                }
-
-                                if(!str_contains($docComment, '@ips-lint ignore-parent')) {
-                                    try {
-                                        try {
-                                            //let's see if the methods that exist in the parent class, are getting called here!
-                                            $parentUsages = $this->findParentUsages($method, $content);
-                                        } catch (\OutOfRangeException $e) {
-                                            $parentUsages = [];
-                                        }
-                                        $methodName = \mb_strtolower($method->getName());
-                                        if (!isset($parentUsages[$methodName])) {
-                                            $path = $this->buildPath($file->getRealPath(), $method->getStartLine());
-                                            $warnings['parentUsage'][] = [
-                                                'error' => "Does not call parent",
-                                                'path' => ['url' => $path, 'name' => $file->getFilename()],
-                                                'line' => $method->getStartLine(),
-                                                'method' => $method->getName()
-                                            ];
-                                        }
-                                    } catch (Throwable $e) {
-                                    }
-                                }
-                            } catch (Throwable $e) {
-                                $warnings['errors'][] = [
-                                    'error' => $e->getMessage(),
-                                    'path' => [
-                                        'url' => $this->buildPath($file->getRealPath(), 0),
-                                        'name' => $file->getRealPath()
-                                    ],
-                                    'line' => $e->getLine(),
-                                    'method' => $method->getName()
-                                ];
-                            }
-                        }
-                    }
+                    $this->validationChecks( $currentClass, $parentClass, $content, $warnings);
                 } catch (Throwable | Exception | Error $e) {
                     $path = $this->buildPath($file->getRealPath(),$e->getLine());
                     $warnings['processing'][] = [
@@ -286,6 +246,107 @@ class _ClassScanner extends ParserAbstract
         return $warnings;
     }
 
+    protected function validationChecks(
+        ReflectionClass $currentClass,
+        Reflectionclass $parentClass,
+        string $content,
+        &$warnings
+    ){
+        //now lets get that money shot!
+        foreach ($currentClass->getMethods() as $method) {
+//                        if($method->getName() === 'parents'){
+//                            _p($cn, $method->getDeclaringClass()->getName());
+//                        }
+            if ($currentClass->getName() === $method->getDeclaringClass()->getName()) {
+                //okay php is a bit moronic at times, trait methods that override parentclass methods,
+                //show up as apart of the class being check, but there is no "real way" to check
+                //if the method is from a trait/current class, so we are gonna get a bit dirty here
+                //who doesn't like getting a bit dirty?
+                //if this fails, it is likely a trait method and i'm not entirely sure how to handle them...
+                //or should i handle them? yes...i'll handle them later
+                //@todo implement for traits
+                if($method->getFileName() !== $currentClass->getFileName()){
+                    continue;
+                }
+//                            if($method->getName() === 'parents'){
+//                                _p(
+//                                    $method->getDeclaringClass()->isTrait(),
+//                                    $method->getDeclaringClass()->getName(),
+//                                    $method->isVariadic(),
+//                                    $method->getFileName(),
+//                                    $currentClass->getFileName(),
+//                                    $currentClass->hasMethod($method->getName())
+//                                );
+//                            }
+                $parentName = $parentClass->getName();
+                $methodName = $method->getName();
+                $docComment = $method->getDocComment();
+                //lets check if it is linted or autolinted, we use the parentclass for the class lookup part,
+                //cause it is most likely the one that will be added here, instead of the subclass
+                if (
+                    isset($this->autoLint[$parentName][$methodName]) ||
+                    mb_stristr($docComment, '@ips-lint ignore')
+                ) {
+                    continue;
+                }
+                try {
+                    try {
+                        //we are only interested in parent extend classes here
+                        $originalMethod = $parentClass->getMethod($method->getName());
+                    } catch (Throwable $e) {
+                        continue;
+                    }
+                    if(!str_contains($docComment, '@ips-lint ignore-signature')) {
+                        $this->validateSignature(
+                            $method,
+                            $originalMethod,
+                            $warnings
+                        );
+                    }
+
+                    if(!str_contains($docComment, '@ips-lint ignore-parameters')) {
+                        $this->validateParameters(
+                            $method,
+                            $originalMethod,
+                            $warnings
+                        );
+                    }
+
+                    if(!str_contains($docComment, '@ips-lint ignore-parent')) {
+                        try {
+                            try {
+                                //let's see if the methods that exist in the parent class, are getting called here!
+                                $parentUsages = $this->findParentUsages($method, $content);
+                            } catch (\OutOfRangeException $e) {
+                                $parentUsages = [];
+                            }
+                            $methodName = \mb_strtolower($method->getName());
+                            if (!isset($parentUsages[$methodName])) {
+                                $path = $this->buildPath($currentClass->getFileName(), $method->getStartLine());
+                                $warnings['parentUsage'][] = [
+                                    'error' => "Does not call parent",
+                                    'path' => ['url' => $path, 'name' => $currentClass->getFileName()],
+                                    'line' => $method->getStartLine(),
+                                    'method' => $method->getName()
+                                ];
+                            }
+                        } catch (Throwable $e) {
+                        }
+                    }
+                } catch (Throwable $e) {
+                    $warnings['errors'][] = [
+                        'error' => $e->getMessage(),
+                        'path' => [
+                            'url' => $this->buildPath($currentClass->getFileName(), 0),
+                            'name' => $currentClass->getFileName()
+                        ],
+                        'line' => $e->getLine(),
+                        'method' => $method->getName()
+                    ];
+                }
+            }
+        }
+    }
     protected function findParentUsages(\ReflectionMethod $method, string $content): array {
         $methodBody = Hooks::extractLines(
             $content,
