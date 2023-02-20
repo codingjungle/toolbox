@@ -51,5 +51,4 @@ class _Hook
         return implode("\n", $exp);
     }
 
-
 }

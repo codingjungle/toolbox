@@ -33,6 +33,7 @@ use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
+use IPS\toolbox\Code\Templates;
 use IPS\toolbox\Editor;
 use OutOfRangeException;
 use UnexpectedValueException;
@@ -114,7 +115,7 @@ trait Analyzer
         Output::i()->output .= new MultipleRedirect(
             $url,
             function ($data) use ($url, $application) {
-                $total = 11;
+                $total = 12;
                 $percent = round(100 / $total);
                 $complete = 0;
                 $app = $application;
@@ -196,6 +197,11 @@ trait Analyzer
                             $warnings['class_scanner_validation'] = (new ClassScanner($app))->validate();
                         }
                         break;
+                    case 11:
+                        if(\IPS\Settings::i()->dtcode_analyze_templates){
+                            $warnings['templates_validation'] = (new Templates($app))->validate();
+                        }
+                        break;
                 }
                 $complete++;
 
@@ -266,7 +272,10 @@ trait Analyzer
                 $warnings['hooks_validation'] = $stored['hooks_validation'];
                 unset($stored['hooks_validation']);
             }
-
+            if (isset($stored['templates_validation'])) {
+                $warnings['templates_validation'] = $stored['templates_validation'];
+                unset($stored['templates_validation']);
+            }
             foreach ($stored as $key => $value) {
                 $warnings[$key] = $value;
             }
@@ -389,6 +398,18 @@ trait Analyzer
                             ]
                         );
                         break;
+                    case 'templates_validation':
+                        foreach ($val as $k => $data) {
+                            $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
+                                $data,
+                                'templates_validation_' . $k,
+                                [
+                                    'File',
+                                    'Path',
+                                ]
+                            );
+                        }
+                        break;
                     case 'hooks_validation':
                         $parse = $val['parse'] ?? null;
                         $loading = $value['processing'] ?? null;
@@ -397,21 +418,29 @@ trait Analyzer
                         $op = '';
                         foreach ($val as $k => $data) {
                             $count += count($data);
-                            $headers = [];
-                            if ($k === 'signature' || $k === 'parameters') {
-                                $headers[] = 'File';
+                            if ($k === 'processing') {
+                                $headers = [
+                                    'Error',
+                                    'Path'
+                                ];
+                            } elseif ($k === 'case') {
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Class'
+                                ];
+                            } else {
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Line',
+                                    'Method',
+                                ];
                             }
-                            $headers[] = 'Path';
-                            $headers[] = 'Error';
-                            $headers[] = 'Line';
                             $op .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                                 $data,
                                 'hooks_' . $k,
-                                [
-                                    'File',
-                                    'Error',
-                                    'Line'
-                                ]
+                                $headers
                             );
                         }
 

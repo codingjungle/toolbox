@@ -44,6 +44,10 @@
         "default": ""
     },
     {
+        "key": "dtcode_analyze_templates",
+        "default": "1"
+    },
+    {
         "key": "dtdevplus_skip_dirs",
         "default": ""
     },
