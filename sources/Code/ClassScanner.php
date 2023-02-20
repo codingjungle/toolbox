@@ -1,26 +1,22 @@
 <?php
 
 /**
-* @brief      ClassScanner Class
-* @author     -storm_author-
-* @copyright  -storm_copyright-
-* @package    IPS Social Suite
-* @subpackage toolbox
-* @since      5.1.3
-* @version    -storm_version-
-*/
+ * @brief      ClassScanner Class
+ * @author     -storm_author-
+ * @copyright  -storm_copyright-
+ * @package    IPS Social Suite
+ * @subpackage toolbox
+ * @since      5.1.3
+ * @version    -storm_version-
+ */
 
 namespace IPS\toolbox\Code;
 
 use Error;
 use Exception;
-
 use IPS\Data\Store;
-use IPS\Http\Url;
 use IPS\Output;
 use IPS\Request;
-use IPS\toolbox\Code\ParserAbstract;
-use IPS\toolbox\Code\Utils\Hook;
 use IPS\toolbox\Code\Utils\ParentVisitor;
 use IPS\toolbox\Proxy\Proxyclass;
 use OutOfRangeException;
@@ -32,15 +28,15 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
-if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
-    header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
+if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
+    header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
     exit;
 }
 
 /**
-* ClassScanner Class
-* @mixin \IPS\toolbox\Code\ClassScanner
-*/
+ * ClassScanner Class
+ * @mixin \IPS\toolbox\Code\ClassScanner
+ */
 class _ClassScanner extends ParserAbstract
 {
     /**
@@ -115,41 +111,28 @@ class _ClassScanner extends ParserAbstract
             'setValue' => 1
         ],
     ];
-    protected function getFiles()
-    {
-        $files = new Finder();
-        $files->in($this->getAppPath().'sources/')->name('*.php');
-        if (empty($this->excludedFiles) === false) {
-            $files->notName($this->excludedFiles);
-        }
-        if(empty($this->excludedFolders) === false){
-            $files->exclude($this->excludedFolders);
-        }
-        $this->files = $files->files();
-    }
 
     public function validate(): array
     {
         //we do this so we can capture the fatal and redirect if need be
-        if(!Request::i()->isAjax()) {
+        if (!Request::i()->isAjax()) {
             ob_start();
         }
 
-        register_shutdown_function(function(){
+        register_shutdown_function(function () {
             $error = error_get_last();
             $url = \IPS\Request::i()->url();
-            if($error['type'] === E_COMPILE_ERROR){
-                $url = $url->setQueryString(['do' => 'glitch'])->stripQueryString(['csrfKey','mr','download']);
-                $url = (string) $url;
+            if ($error['type'] === E_COMPILE_ERROR) {
+                $url = $url->setQueryString(['do' => 'glitch'])->stripQueryString(['csrfKey', 'mr', 'download']);
+                $url = (string)$url;
                 Store::i()->toolbox_code_analyzer_interrupted = $error;
-                if(Request::i()->isAjax()){
-                    Output::i()->json( array(
-                        'redirect' => (string) $url,
-                        'message' => ''
-                    )
+                if (Request::i()->isAjax()) {
+                    Output::i()->json(array(
+                            'redirect' => (string)$url,
+                            'message' => ''
+                        )
                     );
-                }
-                else {
+                } else {
                     header("Location: {$url}");
                 }
             }
@@ -163,25 +146,25 @@ class _ClassScanner extends ParserAbstract
             'errors' => [],
         ];
         /** @var SplFileInfo $file */
-        foreach($this->files as $file){
+        foreach ($this->files as $file) {
             $content = $file->getContents();
             $tokens = Proxyclass::i()->tokenize($content);
             try {
                 if (empty($tokens) === true || $tokens['type'] === T_TRAIT || $tokens['type'] === T_INTERFACE) {
                     continue;
                 }
-            }catch( Throwable $e){
+            } catch (Throwable $e) {
             }
             $cs = $tokens['class'];
             $ns = $tokens['namespace'];
             $filename = $file->getFilenameWithoutExtension();
 
             //lets make sure this is an IPS class!
-            if(str_starts_with($cs, '_') === true && str_contains($ns, 'IPS') === true) {
+            if (str_starts_with($cs, '_') === true && str_contains($ns, 'IPS') === true) {
                 $first = mb_substr($cs, 1);
                 $className = '\\' . $tokens['namespace'] . '\\' . $first;
-                if($filename !== $first){
-                    $currentFileName = str_replace($this->app->getApplicationPath(),'',$file->getRealPath());
+                if ($filename !== $first) {
+                    $currentFileName = str_replace($this->app->getApplicationPath(), '', $file->getRealPath());
                     $warnings['case'][] = [
                         'error' => 'Case Mismatch',
                         'path' => [
@@ -199,7 +182,7 @@ class _ClassScanner extends ParserAbstract
                     $currentClass = new \ReflectionClass($className);
                     $currentClass = $currentClass->getParentClass();
                     //okay this is not a class we are gonna check, as its not a child/subclass
-                    if($currentClass->getParentClass() === false){
+                    if ($currentClass->getParentClass() === false) {
                         continue;
                     }
                     //so we are here, first things first, we have to get the original parent class, we will have to make
@@ -208,33 +191,32 @@ class _ClassScanner extends ParserAbstract
                     // otherwise we will just be comparing the hook to the hook...
                     $done = false;
                     $pc = $currentClass;
-                    while ($done !== true){
+                    while ($done !== true) {
                         $parentClass = $pc->getParentClass();
                         $pc = $parentClass;
                         if ($parentClass instanceof ReflectionClass) {
                             $name = $parentClass->getName();
-                            if(!str_contains($name,'IPS')){
+                            if (!str_contains($name, 'IPS')) {
                                 $done = true;
                                 //if this is not an IPS class, we need to vamoose
                                 continue 2;
                             }
 
                             //is this one of those classes we don't want to go all the back on?
-                            if(isset($this->fullStop[$name]) || $pc->getParentClass() === false){
+                            if (isset($this->fullStop[$name]) || $pc->getParentClass() === false) {
                                 $done = true;
                             }
                         } else {
                             $done = true;
                         }
                     }
-                    foreach($currentClass->getTraits() as $trait){
+                    foreach ($currentClass->getTraits() as $trait) {
                         $contentTrait = \file_get_contents($trait->getFileName());
-                        $this->validationChecks( $trait, $parentClass, $contentTrait, $warnings);
-
+                        $this->validationChecks($trait, $parentClass, $contentTrait, $warnings);
                     }
-                    $this->validationChecks( $currentClass, $parentClass, $content, $warnings);
-                } catch (Throwable | Exception | Error $e) {
-                    $path = $this->buildPath($file->getRealPath(),$e->getLine());
+                    $this->validationChecks($currentClass, $parentClass, $content, $warnings);
+                } catch (Throwable|Exception|Error $e) {
+                    $path = $this->buildPath($file->getRealPath(), $e->getLine());
                     $warnings['processing'][] = [
                         'error' => $e->getMessage(),
                         'path' => ['url' => $path, 'name' => $file->getFilename()],
@@ -251,12 +233,9 @@ class _ClassScanner extends ParserAbstract
         Reflectionclass $parentClass,
         string $content,
         &$warnings
-    ){
+    ) {
         //now lets get that money shot!
         foreach ($currentClass->getMethods() as $method) {
-//                        if($method->getName() === 'parents'){
-//                            _p($cn, $method->getDeclaringClass()->getName());
-//                        }
             if ($currentClass->getName() === $method->getDeclaringClass()->getName()) {
                 //okay php is a bit moronic at times, trait methods that override parentclass methods,
                 //show up as apart of the class being check, but there is no "real way" to check
@@ -265,19 +244,9 @@ class _ClassScanner extends ParserAbstract
                 //if this fails, it is likely a trait method and i'm not entirely sure how to handle them...
                 //or should i handle them? yes...i'll handle them later
                 //@todo implement for traits
-                if($method->getFileName() !== $currentClass->getFileName()){
+                if ($method->getFileName() !== $currentClass->getFileName()) {
                     continue;
                 }
-//                            if($method->getName() === 'parents'){
-//                                _p(
-//                                    $method->getDeclaringClass()->isTrait(),
-//                                    $method->getDeclaringClass()->getName(),
-//                                    $method->isVariadic(),
-//                                    $method->getFileName(),
-//                                    $currentClass->getFileName(),
-//                                    $currentClass->hasMethod($method->getName())
-//                                );
-//                            }
                 $parentName = $parentClass->getName();
                 $methodName = $method->getName();
                 $docComment = $method->getDocComment();
@@ -296,7 +265,7 @@ class _ClassScanner extends ParserAbstract
                     } catch (Throwable $e) {
                         continue;
                     }
-                    if(!str_contains($docComment, '@ips-lint ignore-signature')) {
+                    if (!str_contains($docComment, '@ips-lint ignore-signature')) {
                         $this->validateSignature(
                             $method,
                             $originalMethod,
@@ -304,7 +273,7 @@ class _ClassScanner extends ParserAbstract
                         );
                     }
 
-                    if(!str_contains($docComment, '@ips-lint ignore-parameters')) {
+                    if (!str_contains($docComment, '@ips-lint ignore-parameters')) {
                         $this->validateParameters(
                             $method,
                             $originalMethod,
@@ -312,7 +281,7 @@ class _ClassScanner extends ParserAbstract
                         );
                     }
 
-                    if(!str_contains($docComment, '@ips-lint ignore-parent')) {
+                    if (!str_contains($docComment, '@ips-lint ignore-parent')) {
                         try {
                             try {
                                 //let's see if the methods that exist in the parent class, are getting called here!
@@ -347,35 +316,12 @@ class _ClassScanner extends ParserAbstract
             }
         }
     }
-    protected function findParentUsages(\ReflectionMethod $method, string $content): array {
-        $methodBody = Hooks::extractLines(
-            $content,
-            $method->getStartLine(),
-            $method->getEndLine()
-        );
-        $name = $method->getName();
-        $firstLineNum = $method->getStartLine();
-        $lexer = new Lexer(['usedAttributes' => ['startLine']]);
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-        try {
-            $ast = $parser->parse("<?php class _fake_class_ {\n{$methodBody}\n}");
-        } catch (\Exception $e) {
-            throw new OutOfRangeException($e->getMessage().' Method: '. $name .' File: '.$method->getDeclaringClass()->getFileName());
-        }
-        $visitor = new ParentVisitor($firstLineNum-1);
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor($visitor);
-        $traverser->traverse($ast);
 
-        return $visitor->getParentCalls();
-    }
-
-    protected function validateParameters(
+    public function validateSignature(
         \ReflectionMethod $currentMethod,
         \ReflectionMethod $originalMethod,
         &$warnings
-    )
-    {
+    ) {
         $methodName = $currentMethod->getName();
         $currentMethodStartLine = $currentMethod->getStartLine();
         $currentFileName = $currentMethod->getDeclaringClass()->getFileName();
@@ -384,12 +330,88 @@ class _ClassScanner extends ParserAbstract
             $currentFileName,
             $currentMethodStartLine
         );
-        $currentFileName = str_replace($this->app->getApplicationPath(),'',$currentFileName);
+        $currentFileName = str_replace($this->app->getApplicationPath(), '', $currentFileName);
+
+        //this might not be needed, but check if the parent is private
+        if ($originalMethod->isPrivate()) {
+            $warnings['signature'][] = [
+                'error' => "Method's visibility in parent is private.",
+                'path' => ['url' => $path, 'name' => $currentFileName],
+                'line' => $currentMethodStartLine,
+                'method' => $methodName,
+            ];
+        }
+
+        //check if they have switched visibility
+        if (
+            ($originalMethod->isPublic() !== $currentMethod->isPublic()) ||
+            ($originalMethod->isProtected() !== $currentMethod->isProtected())
+        ) {
+            $originalModifiers = implode(' ', \Reflection::getModifierNames($originalMethod->getModifiers()));
+            $currentModifiers = implode(' ', \Reflection::getModifierNames($currentMethod->getModifiers()));
+            $warnings['signature'][] = [
+                'error' => "Method's visibility mismatch.",
+                'path' => ['url' => $path, 'name' => $currentFileName],
+                'line' => $currentMethodStartLine,
+                'method' => $methodName,
+            ];
+        }
+
+        //lets see if they changed it from a static method to a instance method
+        if ($originalMethod->isStatic() && !$currentMethod->isStatic()) {
+            $warnings['signature'][] = [
+                'error' => "Method should be static",
+                'path' => ['url' => $path, 'name' => $currentFileName],
+                'line' => $currentMethodStartLine,
+                'method' => $methodName,
+            ];
+        }
+        if (!$originalMethod->isStatic() && $currentMethod->isStatic()) {
+            $warnings['signature'][] = [
+                'error' => "Method should not be static",
+                'path' => ['url' => $path, 'name' => $currentFileName],
+                'line' => $currentMethodStartLine,
+                'method' => $methodName
+            ];
+        }
+        if ($originalMethod->hasReturnType() && !$currentMethod->hasReturnType()) {
+            $warnings['signature'][] = [
+                'error' => "Method is missing return type.",
+                'path' => ['url' => $path, 'name' => $currentFileName],
+                'line' => $currentMethodStartLine,
+                'method' => $methodName
+            ];
+        }
+
+        if (!$originalMethod->hasReturnType() && $currentMethod->hasReturnType()) {
+            $warnings['signature'][] = [
+                'error' => "Method return type mismatch.",
+                'path' => ['url' => $path, 'name' => $currentFileName],
+                'line' => $currentMethodStartLine,
+                'method' => $methodName
+            ];
+        }
+    }
+
+    protected function validateParameters(
+        \ReflectionMethod $currentMethod,
+        \ReflectionMethod $originalMethod,
+        &$warnings
+    ) {
+        $methodName = $currentMethod->getName();
+        $currentMethodStartLine = $currentMethod->getStartLine();
+        $currentFileName = $currentMethod->getDeclaringClass()->getFileName();
+        //here we are building an editor path, so if you are using an editors protocol like phpstorm has available
+        $path = $this->buildPath(
+            $currentFileName,
+            $currentMethodStartLine
+        );
+        $currentFileName = str_replace($this->app->getApplicationPath(), '', $currentFileName);
         $zipped = array_map(null, $currentMethod->getParameters(), $originalMethod->getParameters());
 
         /** @var $param \ReflectionParameter[] */
         foreach ($zipped as $param) {
-            if ( $param[0] === null) {
+            if ($param[0] === null) {
                 $extraParams = array_slice($originalMethod->getParameters(), $param[1]->getPosition());
                 $paramNames = [];
                 /** @var $extraParam \ReflectionParameter */
@@ -407,7 +429,6 @@ class _ClassScanner extends ParserAbstract
             $method = "{$originalMethod->getDeclaringClass()->getName()}::{$originalMethod->getName()}";
             if (isset($param[0]) && !$param[0]->isOptional()) {
                 if (isset($param[1]) && $param[1] === null) {
-
                     $warnings['parameters'][] = [
                         'error' => "Parameter \${$param[0]->getName()} is required but missing.",
                         'path' => ['url' => $path, 'name' => $currentFileName],
@@ -459,80 +480,42 @@ class _ClassScanner extends ParserAbstract
         }
     }
 
-    public function validateSignature(
-        \ReflectionMethod $currentMethod,
-        \ReflectionMethod $originalMethod,
-        &$warnings
-    )
+    protected function findParentUsages(\ReflectionMethod $method, string $content): array
     {
-        $methodName = $currentMethod->getName();
-        $currentMethodStartLine = $currentMethod->getStartLine();
-        $currentFileName = $currentMethod->getDeclaringClass()->getFileName();
-        //here we are building an editor path, so if you are using an editors protocol like phpstorm has available
-        $path = $this->buildPath(
-            $currentFileName,
-            $currentMethodStartLine
+        $methodBody = Hooks::extractLines(
+            $content,
+            $method->getStartLine(),
+            $method->getEndLine()
         );
-        $currentFileName = str_replace($this->app->getApplicationPath(),'',$currentFileName);
+        $name = $method->getName();
+        $firstLineNum = $method->getStartLine();
+        $lexer = new Lexer(['usedAttributes' => ['startLine']]);
+        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+        try {
+            $ast = $parser->parse("<?php class _fake_class_ {\n{$methodBody}\n}");
+        } catch (\Exception $e) {
+            throw new OutOfRangeException(
+                $e->getMessage() . ' Method: ' . $name . ' File: ' . $method->getDeclaringClass()->getFileName()
+            );
+        }
+        $visitor = new ParentVisitor($firstLineNum - 1);
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
 
-        //this might not be needed, but check if the parent is private
-        if ($originalMethod->isPrivate()) {
-            $warnings['signature'][] = [
-                'error' => "Method's visibility in parent is private.",
-                'path' => ['url' => $path, 'name' => $currentFileName],
-                'line' => $currentMethodStartLine,
-                'method' => $methodName,
-            ];
-        }
+        return $visitor->getParentCalls();
+    }
 
-        //check if they have switched visibility
-        if (
-            ($originalMethod->isPublic() !== $currentMethod->isPublic() ) ||
-            ($originalMethod->isProtected() !== $currentMethod->isProtected())
-        ) {
-            $originalModifiers = implode(' ', \Reflection::getModifierNames($originalMethod->getModifiers()));
-            $currentModifiers = implode(' ', \Reflection::getModifierNames($currentMethod->getModifiers()));
-            $warnings['signature'][] = [
-                'error' => "Method's visibility mismatch.",
-                'path' => ['url' => $path, 'name' => $currentFileName],
-                'line' => $currentMethodStartLine,
-                'method' => $methodName,
-            ];
+    protected function getFiles()
+    {
+        $files = new Finder();
+        $files->in($this->getAppPath() . 'sources/')->name('*.php');
+        if (empty($this->excludedFiles) === false) {
+            $files->notName($this->excludedFiles);
         }
-
-        //lets see if they changed it from a static method to a instance method
-        if ($originalMethod->isStatic() && !$currentMethod->isStatic()) {
-            $warnings['signature'][] = [
-                'error' => "Method should be static",
-                'path' => ['url' => $path, 'name' => $currentFileName],
-                'line' => $currentMethodStartLine,
-                'method' => $methodName,
-            ];
+        if (empty($this->excludedFolders) === false) {
+            $files->exclude($this->excludedFolders);
         }
-        if (!$originalMethod->isStatic() && $currentMethod->isStatic()) {
-            $warnings['signature'][] = [
-                'error' => "Method should not be static",
-                'path' => ['url' => $path, 'name' => $currentFileName],
-                'line' => $currentMethodStartLine,
-                'method' => $methodName
-            ];
-        }
-        if ($originalMethod->hasReturnType() && !$currentMethod->hasReturnType()) {
-            $warnings['signature'][] = [
-                'error' => "Method is missing return type.",
-                'path' => ['url' => $path, 'name' => $currentFileName],
-                'line' => $currentMethodStartLine,
-                'method' => $methodName
-            ];
-        }
-
-        if (!$originalMethod->hasReturnType() && $currentMethod->hasReturnType()) {
-            $warnings['signature'][] = [
-                'error' => "Method return type mismatch.",
-                'path' => ['url' => $path, 'name' => $currentFileName],
-                'line' => $currentMethodStartLine,
-                'method' => $methodName
-            ];
-        }
+        $this->files = $files->files();
     }
 }
