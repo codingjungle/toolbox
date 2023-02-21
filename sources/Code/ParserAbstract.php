@@ -77,7 +77,6 @@ abstract class _ParserAbstract
 
         register_shutdown_function(function () {
             $error = error_get_last();
-            _p($error);
             $url = \IPS\Request::i()->url();
             if ($error['type'] === E_COMPILE_ERROR) {
                 $url = $url->setQueryString(['do' => 'glitch'])->stripQueryString(['csrfKey', 'mr', 'download']);

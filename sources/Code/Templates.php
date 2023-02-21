@@ -82,6 +82,7 @@ EOF;
                 $warnings['errors'][] = [
                     'error' => $e->getMessage(),
                     'path' => ['url' => $this->buildPath($file->getRealPath(),0), 'name' => $file->getRealPath()],
+                    'class' => 'dtcode_warning'
 
                 ];
             }

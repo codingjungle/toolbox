@@ -1,13 +1,13 @@
 <ips:template parameters="array $data, $lang, $tableHead=[], $warning=false"/>
 {{$count = \count($data);}}
-    {{if $count }}
-        {{$msgType = 'error';}}
-        {{if $warning === true}}
-            {{$msgType = 'warning';}}
-        {{endif}}
-        {{else}}
-        {{$msgType = 'success';}}
+{{if $count }}
+    {{$msgType = 'error';}}
+    {{if $warning === true}}
+        {{$msgType = 'warning';}}
     {{endif}}
+{{else}}
+    {{$msgType = 'success';}}
+{{endif}}
 <div{{if $count }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$lang}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_{$msgType} dtcode_header">
     <div class="ipsType_large ipsType_bold ipsClearfix">
     {lang="{$lang}" sprintf="$count"} {{if $count }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
@@ -30,8 +30,9 @@
         <tbody data-role="tableRows">
         {{foreach $data as $values}}
             {{if \is_array($values) }}
-            <tr class="ipsClearfix">
+            <tr class="ipsClearfix{{if isset($values['class'])}} {$values['class']|raw}{{endif}}">
             {{foreach $values as $key => $value}}
+                {{if $key !== 'class'}}
                 <td class="{{if $key === 'line' }}ipsTable_icon{{else}}ipsTable_wrap{{endif}}">
                     {{if \IPS\DEV_WHOOPS_EDITOR && $key === 'path'}}
                     <a href="{$value['url']}">{$value['name']}</a>
@@ -49,6 +50,7 @@
                     {$value|raw}
                     {{endif}}
                 </td>
+                {{endif}}
             {{endforeach}}
             </tr>
         {{else}}

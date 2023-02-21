@@ -55,6 +55,9 @@ trait Scanner
      * @var array|array[]
      */
     protected array $autoLint = [
+        'IPS\Patterns\_ActiveRecord' => [
+            'getStore' => 1
+        ],
         'IPS\Node\_Model' => [
             'getStore' => 1,
             'get__title' => 1,
@@ -129,11 +132,13 @@ trait Scanner
                 try {
                     try {
                         //we are only interested in parent extend classes here
-                        $originalMethod = $parentClass->getMethod($method->getName());
+                        $originalMethod = $parentClass->getMethod($methodName);
                     } catch (Throwable $e) {
                         continue;
                     }
-                    if (!str_contains($docComment, '@ips-lint ignore-signature')) {
+
+                    //we need to ignore the constructor for the most part, as it is the only method in php that can be overridden, not just overloaded
+                    if (!str_contains($docComment, '@ips-lint ignore-signature') && $methodName !== '__construct') {
                         $this->validateSignature(
                             $method,
                             $originalMethod,
@@ -142,7 +147,8 @@ trait Scanner
                         );
                     }
 
-                    if (!str_contains($docComment, '@ips-lint ignore-parameters')) {
+                    //we need to ignore the constructor for the most part, as it is the only method in php that can be overridden, not just overloaded
+                    if (!str_contains($docComment, '@ips-lint ignore-parameters') && $methodName !== '__construct') {
                         $this->validateParameters(
                             $method,
                             $originalMethod,
@@ -220,9 +226,11 @@ trait Scanner
         if ($originalMethod->isStatic() && !$currentMethod->isStatic()) {
             $errors[] = "Method should be static";
         }
+
         if (!$originalMethod->isStatic() && $currentMethod->isStatic()) {
             $errors[] = "Method should not be static";
         }
+
         if ($originalMethod->hasReturnType() && !$currentMethod->hasReturnType()) {
             $errors[] = "Method is missing return type";
         }
@@ -232,12 +240,12 @@ trait Scanner
         }
 
         if(empty($errors) === false){
-            foreach($errors as $error){
+            foreach($errors as $ii => $error){
                 $warnings['signature'][] = [
                     'error' => $error,
                     'path' => ['url' => $path, 'name' => $currentFileName],
                     'line' => $currentMethodStartLine,
-                    'method' => $methodName,
+                    'method' => $methodName
                 ];
             }
         }
@@ -258,7 +266,6 @@ trait Scanner
         );
         $currentFileName = str_replace($this->app->getApplicationPath(), '', $currentFileName);
         $zipped = array_map(null, $currentMethod->getParameters(), $originalMethod->getParameters());
-
         /** @var $param ReflectionParameter[] */
         foreach ($zipped as $param) {
             $errors = [];
@@ -291,8 +298,15 @@ trait Scanner
             }
 
             if(isset($param[1]) && $param[1] !== null && $param[1]->isOptional()) {
-                $hookDefault = $param[0]->getDefaultValue();
-                $originalDefault = $param[1]->getDefaultValue();
+                $currentDefault = null;
+                try {
+                    $hookDefault = $param[0]->getDefaultValue();
+                }catch(Throwable $e){}
+                $originalDefault = null;
+                try {
+                    $originalDefault = $param[1]->getDefaultValue();
+                }catch(Throwable $e){
+                }
                 if ($hookDefault !== $originalDefault) {
                     $errors[] = "Parameter \${$param[0]->getName()} mismatched default value.";
                 }
@@ -308,7 +322,7 @@ trait Scanner
                 $param[1] &&
                 $param[0]->getName() !== $param[1]->getName()
             ) {
-                $errors[] = "Parameter of \${$param[0]->getName()} name mismatch.";
+                $errors[] = "Parameter \${$param[0]->getName()} name mismatch.";
             }
 
             if (
@@ -319,12 +333,12 @@ trait Scanner
             }
 
             if(empty($errors) === false){
-                foreach($errors as $error){
+                foreach($errors as $ii => $error){
                     $warnings['signature'][] = [
                         'error' => $error,
                         'path' => ['url' => $path, 'name' => $currentFileName],
                         'line' => $currentMethodStartLine,
-                        'method' => $methodName,
+                        'method' => $methodName
                     ];
                 }
             }

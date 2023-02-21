@@ -132,6 +132,7 @@ class _ClassScanner extends ParserAbstract
                             $done = true;
                         }
                     }
+
                     foreach ($currentClass->getTraits() as $trait) {
                         $contentTrait = \file_get_contents($trait->getFileName());
                         $this->validationChecks($trait, $parentClass, $contentTrait,$file->getRealPath(), false, $warnings);
