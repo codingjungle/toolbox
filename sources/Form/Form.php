@@ -555,7 +555,14 @@ class _Form extends \IPS\Helpers\Form
         return $this->elementStore[$name];
     }
 
-    public function add($input, $after = null, $tab = null): ?Element
+    /**
+     * @param $input
+     * @param $after
+     * @param $tab
+     * @return Element
+     * @throws Exception
+     */
+    public function add($input, $after = null, $tab = null)
     {
         if ($input instanceof FormAbstract) {
             $element = $input;
@@ -1242,6 +1249,17 @@ class _Form extends \IPS\Helpers\Form
         return $this;
     }
 
+    /**
+     * @param $lang
+     * @param $css
+     * @param $parse
+     * @param $_id
+     * @param $after
+     * @param $tab
+     * @param array $sprintf
+     * @return $this
+     * @throws Exception
+     */
     public function addMessage(
         $lang,
         $css = '',
@@ -1250,7 +1268,7 @@ class _Form extends \IPS\Helpers\Form
         $after = null,
         $tab = null,
         array $sprintf = []
-    ): self {
+    ) {
         $key = $lang . '_message';
 
         if ($_id === null) {
