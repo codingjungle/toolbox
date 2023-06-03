@@ -540,7 +540,26 @@ class _Proxyclass extends Singleton
             $fs->remove($dir);
         }catch(\Symfony\Component\Filesystem\Exception\IOException $e){}
     }
-
+    public function emptyDirecties()
+    {
+        $dir = $this->save . DIRECTORY_SEPARATOR;
+        $dir2 = 'hookTemp'.DIRECTORY_SEPARATOR;
+        $dir3 = 'toolbox_templates' . DIRECTORY_SEPARATOR;
+        $fs = new Filesystem();
+        try {
+            $fs->remove($dir);
+        }catch(\Symfony\Component\Filesystem\Exception\IOException $e){}
+        try {
+            $fs->remove($dir2);
+        }catch(\Symfony\Component\Filesystem\Exception\IOException $e){
+            Debug::log('Can not empty hookTemp');
+        }
+        try {
+            $fs->remove($dir3);
+        }catch(\Symfony\Component\Filesystem\Exception\IOException $e){
+            Debug::log('Can not empty toolbox_templates.');
+        }
+    }
     public function buildMd5(){
         $store = Store::i()->dtproxy_md5??[];
         if(empty($store)) {

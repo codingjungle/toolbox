@@ -256,7 +256,7 @@ class _bt extends Controller
         \IPS\Data\Cache::i()->clearAll();
         Cache::i()->clearAll();
         Member::clearCreateMenu();
-        Proxyclass::i()->emptyDirectory();
+        Proxyclass::i()->emptyDirecties();
     }
 
     protected function thirdParty(): void
