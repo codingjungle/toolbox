@@ -410,23 +410,5 @@ $lang = [
     'no_fucks_left' => 'Okay this is a message from me CodingJungle.<br>
 First thing you should do is check what is listed here, cause you might have an actual problem that this half assed tool is trying to resolve. Okay, you’ve done that? Good now you can read further. I have written up some of my thoughts about this tool, you can read them on my site.<br><br>
  <a href="https://codingjungle.com/articles/records/failure-r92/">My Thoughts</a><br><h1>Whatever IPS Says:</h1>',
-    'class_scanner_processing' => 'Class Processing Issues (%s)',
-    'class_scanner_processing_desc' => 'Something went wrong with loading these classes. please check to make sure they are without errors.',
-    'class_scanner_signature' => 'Class Method Signatures Mismatch (%s)',
-    'class_scanner_signature_desc' => 'The following class method signatures have been found to mismatch their parent\'s signature. This could cause potential problems, please fix them.',
-    'class_scanner_parameters' => 'Class Method Parameters Mismatch (%s)',
-    'class_scanner_parameters_desc' => 'The follow class method parameters do not match their parent\'s parameters, this could potentially cause problems.',
-    'class_scanner_parentUsage' => 'Class Methods: Parent::method not called (%s)',
-    'class_scanner_parentUsage_desc' => 'Class method does not call parent. This isn\'t a source of problems, but might prevent hooks from operating correctly.',
-    'class_scanner_errors' => 'Class Methods Errors (%s)',
-    'class_scanner_errors_desc' => 'Any errors not cover by the other class method checks, these could be serious or just parsing errors for a check. check them out and see if any are relevant.',
-    'class_scanner_validation_title' => 'Source Folder Validation (%s)',
-    'class_scanner_validation_title_desc' => 'This section will show any of your source folder files that failed any compatibility checks.',
-    'hooks_validation_title' => 'Hooks Validation (%s)',
-    'hooks_validation_title_desc' => 'This section will show any of your hooks that have failed any of the compatibility checks.',
-    'dt_code_glitch' => 'Code analyzer has hit a fatal error when processing. Below you will find the collected information!',
-    'class_scanner_case' => 'Class/Filename Case Preserving/Sensitivity (%s)',
-    'class_scanner_case_desc' => 'This makes sure the Filename of your class file has the same case as your class name. This could potentially cause problems on different configuration on servers.',
-    'templates_validation_errors' => 'Templates Check (%s)',
-    'templates_validation_errors_desc' => 'Checks the templates for possible errors',
+
 ];

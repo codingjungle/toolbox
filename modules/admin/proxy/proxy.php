@@ -36,6 +36,8 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 /**
  * proxy
+ * @deprecated
+ * @todo this should be removed soon
  */
 class _proxy extends Controller
 {

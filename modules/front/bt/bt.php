@@ -239,8 +239,6 @@ class _bt extends Controller
             $fs = new Filesystem();
             $fs->remove([$path]);
         }
-        /* Don't clear CSS/JS when we click "check again" or the page will be broken - it's unnecessary anyways */
-        if (!isset(Request::i()->checkAgain)) {
             /* Clear JS Maps first */
             Output::clearJsFiles();
 
@@ -253,13 +251,12 @@ class _bt extends Controller
                 $set->cache_key = md5(microtime() . mt_rand(0, 1000));
                 $set->save();
             }
-        }
 
         Store::i()->clearAll();
         \IPS\Data\Cache::i()->clearAll();
         Cache::i()->clearAll();
-
         Member::clearCreateMenu();
+        Proxyclass::i()->emptyDirectory();
     }
 
     protected function thirdParty(): void
@@ -616,11 +613,21 @@ class _bt extends Controller
                     '100foo'
                 );
             }
-            Proxyclass::i()->dirIterator();
+//            $content = trim(file_get_contents('/home/michael/public_html/ips/dtProxy/templates/code.php'));
+//            $funcNames = preg_match_all('#function (.*?)\(#msu', $content, $matching);
+//            $v = array_values($matching[1]);
+//            $m = array_combine($v, $v);
+//             _p($v, $m);
+            //Proxyclass::i()->buildMd5();
+            Proxyclass::i()->dirIterator(null, false, false);
             Proxyclass::i()->buildHooks();
             $iterator = Store::i()->dtproxy_proxy_files;
             foreach ($iterator as $key => $file) {
-                Proxyclass::i()->build($file);
+                try {
+                    Proxyclass::i()->build($file);
+                }catch( \InvalidArgumentException $e){
+                    continue;
+                }
             }
             unset(Store::i()->dtproxy_proxy_files);
             Proxy::i()->buildConstants();

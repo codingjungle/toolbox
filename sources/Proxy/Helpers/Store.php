@@ -61,6 +61,7 @@ class _Store implements HelpersAbstract
         $classDoc[] = ['pt' => 'p', 'prop' => 'dt_bitwise_files', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'dt_interfacing', 'type' => 'array'];
         $classDoc[] = ['pt' => 'p', 'prop' => 'dt_traits', 'type' => 'array'];
+        $classDoc[] = ['pt' => 'p', 'prop' => 'dtproxy_md5', 'type' => 'array'];
 
         /* @var Application $app */
         foreach (Application::appsWithExtension('toolbox', 'ProxyHelpers') as $app) {

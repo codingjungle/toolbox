@@ -121,14 +121,9 @@ var _cjProfilerP = _cjProfilerP || {},
                             path = path.replaceAll('/','\\');
                             appPath = appPath.replaceAll('/','\\');
                             appPath = wslPath + appPath;
+
                             ds = '\\';
                         }
-
-                        if(Boolean(useContainer) === true){
-                            appPath = appPath.replaceAll(containerGuestPath,'');
-                            appPath = containerHostPath + '/' + appPath;
-                        }
-
                         main += '<div><a href="' + dtProfilerEditor + '://open?file=' + appPath + ds + path + '&line=' + line + '">' + vf + '</a>'
                     }
                 } else {

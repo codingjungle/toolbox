@@ -121,7 +121,7 @@ class _Group extends GeneratorAbstract
         return \$return;
     }
 eof;
-        $this->generator->addClassBody($body);
+        $this->generator->addBody($body);
         $dbColumns = [
             'id',
             'bitwise',

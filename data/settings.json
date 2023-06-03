@@ -1,9 +1,5 @@
 [
     {
-        "key": "dtcode_analyze_class_scanner",
-        "default": "1"
-    },
-    {
         "key": "dtcode_analyze_db",
         "default": "1"
     },
@@ -42,10 +38,6 @@
     {
         "key": "dtcode_analyze_settings_verify",
         "default": ""
-    },
-    {
-        "key": "dtcode_analyze_templates",
-        "default": "1"
     },
     {
         "key": "dtdevplus_skip_dirs",
@@ -162,6 +154,10 @@
     {
         "key": "toolbox_debug_templates",
         "default": ""
+    },
+    {
+        "key": "toolbox_use_proxy_task",
+        "default": "1"
     },
     {
         "key": "toolbox_use_tabs_applications",

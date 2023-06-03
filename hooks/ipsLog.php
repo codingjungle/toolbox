@@ -1,5 +1,6 @@
 //<?php namespace toolbox_IPS_Log_a282b50cced3eb66f7d56a23302804425;
 
+use IPS\Settings;
 use IPS\toolbox\Profiler\Debug;
 
 use function defined;
@@ -24,8 +25,10 @@ class toolbox_hook_ipsLog extends _HOOK_CLASS_
         if ($category === 'request') {
             return;
         }
-        if(defined('DT_ROUTE_TO_DEBUG') && DT_ROUTE_TO_DEBUG === true){
-            Debug::log($message, $category);
+        if(Settings::i()->dtprofiler_enable_debug &&
+            defined('DT_ROUTE_TO_DEBUG') &&
+            DT_ROUTE_TO_DEBUG === true
+        ){            Debug::log($message, $category);
         }
         return parent::debug($message, $category);
     }

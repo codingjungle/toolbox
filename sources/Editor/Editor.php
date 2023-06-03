@@ -62,11 +62,6 @@ class _Editor
 
                 $path = DT_WSL_PATH . $path;
             }
-            if(defined('DT_USE_CONTAINER') && DT_USE_CONTAINER === true){
-                $path =str_replace(DT_CONTAINER_GUEST_PATH,'', $path);
-
-                $path = DT_CONTAINER_HOST_PATH . '/' . $path;
-            }
             $path = rawurlencode($path);
             if ($line === null) {
                 $line = 0;

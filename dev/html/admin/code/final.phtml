@@ -1,6 +1,5 @@
-<ips:template parameters="$output,bool $show=false, ?\IPS\Http\Url $download = null, ?\IPS\Http\Url $analyze=null,string $title = ''"/>
+<ips:template parameters="$output,bool $show=false, ?\IPS\Http\Url $download = null, ?\IPS\Http\Url $analyze=null"/>
 <div class="ipsPadding ipsBox">
-    <h1>{$title|raw}</h1>
     {$output|raw}
     {{if $show}}
     <div class="ipsBorder_top ipsPadding ipsType_center">

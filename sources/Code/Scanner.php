@@ -1,4 +1,5 @@
 <?php
+
 /**
 * @brief      Scanner Trait
 * @author     -storm_author-
@@ -374,7 +375,6 @@ trait Scanner
         $startLine = $startLineInclusive - 1;
         $numLines = $endLineInclusive - $startLine;
         preg_match("/^(?:.*\n){{$startLine}}((?:.*\n){{$numLines}})/", $str, $matches);
-
         return $matches[1] ?? null;
     }
 }

@@ -91,12 +91,6 @@ class _Profiler extends Singleton
         return null;
     }
 
-    public function justMyApps(){
-        $myapps = $this->myApps();
-        $info = $this->info();
-        return Theme::i()->getTemplate('bar','toolbox','front')->myapps($info,$myapps);
-    }
-
     protected function myApps(): array
     {
         $myApps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
@@ -126,13 +120,6 @@ class _Profiler extends Singleton
                     'admin'
                 );
 
-                if(Dispatcher::i()->controllerLocation === 'admin'){
-                    $analyze = Url::internal('app=toolbox&module=bt&controller=build&myApp='.$app->directory.'&download=0&do=queue');
-                }
-                else{
-                    $analyze = Url::internal('app=toolbox&module=bt&controller=build&myApp='.$app->directory.'&download=0&do=queue');
-                }
-
                 $newMyApps[] = [
                     'name' => $name,
                     'app' => $app->directory,
@@ -140,7 +127,6 @@ class _Profiler extends Singleton
                     'subs' => [
                         'Add Sources' => ['url' => (string) $source, 'icon' => 'fa-arrow-down'],
                         'Add Assets' => ['url' => (string) $assets, 'icon' => 'fa-code'],
-                        'Analyze' => ['url' => (string) $analyze, 'icon' => 'fa-terminal '],
                         'Build' => ['url' => (string) $build, 'icon' => 'fa-fw fa-cog'],
                         'DevCenter' => ['url' => (string) $devCenter, 'icon' => 'fa-fw fa-cogs', 'target' => '']
                     ]

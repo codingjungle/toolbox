@@ -22,7 +22,9 @@ use IPS\toolbox\Application;
 use IPS\toolbox\Generator\DTClassGenerator;
 use IPS\toolbox\Generator\DTFileGenerator;
 use IPS\toolbox\Profiler\Debug;
+use IPS\toolbox\Proxy\PassedChecksum;
 use IPS\toolbox\Proxy\Helpers\HelpersAbstract;
+use IPS\toolbox\Proxy\NotIpsClassException;
 use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\ReservedWords;
 use IPS\toolbox\Shared\Write;
@@ -144,36 +146,39 @@ class _Proxy extends GeneratorAbstract
     /**
      * @param $content
      */
-    public function create(string $content, string $originalFilePath = null)
+    public function create(string $content, string $originalFilePath)
     {
         try {
             $data = Proxyclass::i()->tokenize($content);
             //make sure it is an IPS class
-            if(isset($data['namespace']) && !str_contains($data['namespace'],'IPS')){
+            if (isset($data['namespace']) && !str_contains($data['namespace'], 'IPS')) {
                 throw new \IPS\toolbox\Proxy\NotIpsClassException('Not an IPS class!');
             }
             $proxied = Store::i()->dt_cascade_proxy ?? [];
 
-            if(isset($data['type']) && $data['type'] !== T_CLASS){
+            if (isset($data['type']) && $data['type'] !== T_CLASS) {
                 $interfacing = Store::i()->dt_interfacing ?? [];
                 $traits = Store::i()->dt_traits ?? [];
-                $cc = $data['namespace'] .'\\'. $data['class'];
+                $cc = $data['namespace'] . '\\' . $data['class'];
                 /* Is it an interface? */
-                if ( $data['type'] === T_INTERFACE && !str_contains($cc, 'IPS\\Content') && !str_contains($cc, 'IPS\\Node') )
-                {
+                if ($data['type'] === T_INTERFACE && !str_contains($cc, 'IPS\\Content') && !str_contains(
+                        $cc,
+                        'IPS\\Node'
+                    )) {
                     $interfacing[] = $cc;
                 }
 
                 /* Is it a trait? */
-                if ( $data['type'] === T_TRAIT  && !str_contains($cc, 'IPS\\Content') && !str_contains($cc, 'IPS\\Node') )
-                {
+                if ($data['type'] === T_TRAIT && !str_contains($cc, 'IPS\\Content') && !str_contains(
+                        $cc,
+                        'IPS\\Node'
+                    )) {
                     $traits[] = $cc;
                 }
 
                 Store::i()->dt_interfacing = $interfacing;
                 Store::i()->dt_traits = $traits;
-            }
-            elseif (isset($data['class'], $data['namespace'])) {
+            } elseif (isset($data['class'], $data['namespace'])) {
                 preg_match('#\$bitOptions#', $content, $bitOptions);
 
                 $namespace = $data['namespace'];
@@ -199,7 +204,7 @@ class _Proxy extends GeneratorAbstract
                             $codes[] = $c;
                             $altCodes[$c][] = [
                                 'path' => $originalFilePath,
-                                'app'  => $app,
+                                'app' => $app,
                                 'line' => $line
                             ];
                         },
@@ -293,7 +298,6 @@ class _Proxy extends GeneratorAbstract
                             )
                         );
                         if ($reflect->hasProperty('bitOptions')) {
-
                             $bits = $reflect->getProperty('bitOptions');
                             $bits->setAccessible(true);
 
@@ -358,16 +362,16 @@ class _Proxy extends GeneratorAbstract
                                     $this->buildProperty($dbClass, $classDefinition, $deepAssoc);
                                 }
                             }
-                        }  catch (ParseError $e) {
+                        } catch (ParseError $e) {
                             Debug::log($e, 'ParseError');
                             Debug::log($originalFilePath, 'ParseErrorFile');
-                        } catch (Throwable | Exception $e) {
+                        } catch (Throwable|Exception $e) {
                             Debug::log($e, 'ProxyClass');
                             Debug::log($originalFilePath, 'ProxyClassFile');
                         }
                         $this->runHelperClasses($dbClass, $classDefinition, $ipsClass, $body);
 
-                        if(empty($bb) === false){
+                        if (empty($bb) === false) {
                             $body[] = PropertyGenerator::fromArray(
                                 [
                                     'name' => 'bitOptions',
@@ -395,10 +399,10 @@ class _Proxy extends GeneratorAbstract
                                     );
                                     $body[] = PropertyGenerator::fromArray(
                                         [
-                                            'name'         => $k,
-                                            'static'       => false,
-                                            'docblock'     => $propertyDocBlock,
-                                            'visibility'   => 'public',
+                                            'name' => $k,
+                                            'static' => false,
+                                            'docblock' => $propertyDocBlock,
+                                            'visibility' => 'public',
                                             'defaultValue' => []
                                         ]
                                     );
@@ -437,15 +441,15 @@ class _Proxy extends GeneratorAbstract
                     Store::i()->dt_bitwise_files = $bitWiseFiles;
                 }
             }
-        } catch (Throwable | Exception $e) {
-            // throw $e;
-            if(!($e instanceof \IPS\toolbox\Proxy\NotIpsClassException)) {
+        }
+        catch( NotIpsClassException $e){
+            //do nothing
+        }
+        catch (Throwable | Exception $e) {
                 Debug::add('Proxy Create', $e);
                 Debug::add('Proxy Create File', $originalFilePath);
-            }
         }
     }
-
 
     /**
      * builds the docblock for proxy props

@@ -27,32 +27,6 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
 
     /* End Hook Data */
 
-    public function globalTemplate($title,$html,$location=array()){
-        $return = '';
-        if (\is_callable('parent::globalTemplate')) {
-            $return = \call_user_func_array('parent::' . __FUNCTION__, \func_get_args());
-        }
-        $member = Member::loggedIn()->member_id;
-        $can = json_decode(Settings::i()->dtprofiler_can_use, true);
-        $hide = defined('DT_HIDE_MYAPPS') ? DT_HIDE_MYAPPS : false;
-        if (
-                !$hide &&
-                !\IPS\QUERY_LOG &&
-            !\IPS\Request::i()->isAjax() &&
-            property_exists(Output::i(), 'dtContentType') &&
-            ((!IN_DEV && in_array($member, $can, true)) || IN_DEV)
-        ) {
-            try {
-                $myapps = Profiler::i()->justMyApps();
-                $return = str_replace('</body>', $myapps.'</body>', $return);
-            } catch (Exception $e) {
-                \IPS\toolbox\Profiler\Debug::log($e);
-            }
-        }
-
-        return $return;
-    }
-
     public function queryLog($querylog)
     {
 
@@ -69,7 +43,13 @@ class toolbox_hook_coreFrontGlobalTheme extends _HOOK_CLASS_
             !\IPS\Request::i()->isAjax() &&
             property_exists(Output::i(), 'dtContentType') &&
             Output::i()->dtContentType === 'text/html' &&
-            ((!IN_DEV && in_array($member, $can, true)) || IN_DEV)
+            (
+                (
+                    !IN_DEV &&
+                    in_array($member, $can, true)
+                ) ||
+                IN_DEV
+            )
         ) {
             try {
                 return Profiler::i()->run();

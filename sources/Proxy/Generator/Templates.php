@@ -113,12 +113,10 @@ class _Templates extends GeneratorAbstract
         $templates = [];
         $tempStore = [];
         $tempClass = [];
-
-        if (isset(Store::i()->dtproxy_templates)) {
-            $templates = Store::i()->dtproxy_templates;
-        }
-        if (count($templates)) {
+        $templates = Store::i()->dtproxy_templates??[];
+        if (empty($templates) === false) {
             foreach ($templates as $key => $template) {
+                $og = $key;
                 $key = str_replace(\IPS\Application::getRootPath() . '/applications/', '', $key);
                 if ($key === 'nexus/dev/html/global/forms/businessAddress.phtml' || $key === 'nexus/dev/html/global/forms/businessAddress') {
                     continue;
@@ -131,15 +129,7 @@ class _Templates extends GeneratorAbstract
                 if ($temp === 'global') {
                     $temp = 'nglobal';
                 }
-
-                $tempStore[$ori] = [
-                    'lookup_string' => $ori,
-                    'type'          => 'IPS\\Theme\\Templates\\' . $temp,
-
-                    //                    "type" => \DateTime::class,
-                    'icon'          => "com.jetbrains.php.PhpIcons.CLASS",
-                ];
-
+                $completedPath = $this->save . '/templates/' . $temp . '.php';
                 if (!empty($template['params'])) {
                     $rand = trim($template['method']) . random_int(1, 20000) . random_int(
                             1,
@@ -158,7 +148,6 @@ class _Templates extends GeneratorAbstract
                                     'name' => $param->getName()
                                 ];
 
-
                                 if ($param->getType()) {
                                     $data['hint'] = $param->getType();
                                 }
@@ -175,7 +164,17 @@ class _Templates extends GeneratorAbstract
                         }
                     }
                 }
+                if(file_exists($completedPath) === true){
+                    $this->amendFile($completedPath, $template['method'], $newParams);
+                    continue;
+                }
+                $tempStore[$ori] = [
+                    'lookup_string' => $ori,
+                    'type'          => 'IPS\\Theme\\Templates\\' . $temp,
 
+                    //                    "type" => \DateTime::class,
+                    'icon'          => "com.jetbrains.php.PhpIcons.CLASS",
+                ];
                 $mn = mb_strtolower(trim($template['method']));
                 $tempClass[$temp][$template['method']] = [
                     'name'   => $template['method'],
@@ -192,6 +191,58 @@ class _Templates extends GeneratorAbstract
         ];
         Store::i()->dt_json = $jsonMeta;
         $this->makeTempClasses($tempClass);
+    }
+
+    public function amendFile(string $file, string $method, array $params){
+        $content = trim(file_get_contents($file));
+        $funcNames = preg_match_all('#function (.*?)\(#msu', $content, $matching);
+        $v = array_values($matching[1]);
+        $found = array_combine($v, $v);
+        $append = 0;
+        if(!isset($found[$method])){
+            $cc = array_reverse(explode(PHP_EOL, $content ));
+            $newDoc = [];
+
+            foreach($cc as $line => $value){
+                if($value === "}"){
+                    unset($cc[$line]);
+                    break;
+                }
+            }
+            $cc = implode("\n", array_reverse($cc) );
+
+            $toWrite = 'public function '.$method .'(';
+            $pp = [];
+            if(empty($params) === false) {
+                foreach ($params as $data) {
+                    $paramBody = '';
+                    if (isset($data['hint'])) {
+                        $paramBody .= ' ' . $data['hint'] . ' ';
+                    }
+                    $paramBody .= '$' . $data['name'];
+                    if (isset($data['value'])) {
+                        $val = $data['value'];
+                        $paramBody .= ' = ';
+                        if (is_int($val)) {
+                            $paramBody .= $val;
+                        } elseif (is_bool($val)) {
+                            $paramBody .= $val === false ? 'false' : 'true';
+                        } elseif ($val === 'null' || $val === null) {
+                            $paramBody .= 'null';
+                        }
+                        else{
+                            $paramBody .= '"'.$val.'"';
+                        }
+                    }
+                    $pp[] = $paramBody;
+                }
+
+                $toWrite .= implode(', ', $pp);
+            }
+            $toWrite .= '){}';
+            $cc .= "\n\n".$toWrite."\n\n}";
+            \file_put_contents($file, $cc);
+        }
     }
 
     /**

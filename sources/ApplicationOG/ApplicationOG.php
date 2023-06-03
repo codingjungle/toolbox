@@ -143,6 +143,7 @@ class _ApplicationOG extends Application
     {
         \IPS\toolbox\Application::addCss(['admin_adminer']);
         $_GET["username"] = "michael";
+
         $content = '<div id="toolboxAdminer">';
         ob_start();
         include(\IPS\Application::getRootPath() . '/applications/toolbox/sources/Profiler/Adminer.php');

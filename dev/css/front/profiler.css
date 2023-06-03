@@ -816,18 +816,3 @@
 .json-formatter-dark.json-formatter-row.json-formatter-open.json-formatter-empty:after {
     display: block;
 }
-.dtcode_warning {
-    background-color:var(--intermediate-dark)!important;
-    color:#fff!important;
-}
-
-.dtcode_error {
-    background-color:var(--negative-dark)!important;
-    color:#fff!important;
-}
-.dtcode_warning a:hover,
-.dtcode_warning a,
-.dtcode_error a:hover,
-.dtcode_error a {
-    color:#fff!important;
-}
