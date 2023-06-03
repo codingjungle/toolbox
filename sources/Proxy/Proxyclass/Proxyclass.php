@@ -55,10 +55,8 @@ use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function fopen;
-use function fwrite;
 use function header;
 use function in_array;
-use function is_array;
 use function is_dir;
 use function iterator_to_array;
 use function json_decode;
@@ -81,7 +79,6 @@ use const T_FINAL;
 use const T_INTERFACE;
 use const T_NS_SEPARATOR;
 use const T_STRING;
-use const T_TRAIT;
 use const T_WHITESPACE;
 
 
