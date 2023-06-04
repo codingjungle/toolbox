@@ -33,6 +33,7 @@ use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
+use IPS\toolbox\Code\Todo;
 use IPS\toolbox\Code\Utils\Hook;
 use OutOfRangeException;
 use RuntimeException;
@@ -118,7 +119,7 @@ trait Analyzer
         Output::i()->output = new MultipleRedirect(
             $url,
             function ($data) use( $url, $application ) {
-            $total = 10;
+            $total = 11;
             $percent = round(100 / $total);
             $complete = 0;
             $app = $application;
@@ -208,6 +209,12 @@ trait Analyzer
                     }
                     $complete = 10;
                     break;
+                case 10:
+                    if(\IPS\Settings::i()->dtcode_analyze_todo){
+                        $warnings['todo'] = Todo::analyze($app);
+                    }
+                    $complete = 11;
+                    break;
             }
 
             Store::i()->dtcode_warnings = $warnings;
@@ -243,6 +250,7 @@ trait Analyzer
      * @throws InvalidArgumentException
      * @throws OutOfRangeException
      * @throws UnexpectedValueException
+     * @todo fooooooo oooooooooooooooooooooooo ooooooooooooooooooo ooooooooooooooooo ooooooooooooooooooooooooooooooooooo ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo oooooooooo oooooo
      */
     protected function results()
     {
@@ -401,6 +409,17 @@ trait Analyzer
                                 ]
                             );
                         }
+                        break;
+                    case 'todo':
+                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                            $val,
+                            'code_todo',
+                            [
+                                'File',
+                                'Todo',
+                                'Line'
+                            ]
+                        );
                         break;
                 }
             }

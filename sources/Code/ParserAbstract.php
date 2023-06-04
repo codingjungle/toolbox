@@ -52,6 +52,8 @@ abstract class _ParserAbstract
      */
     protected $skip = [];
 
+    protected array $extendsion = [];
+
     /**
      * _ParserAbstract constructor.
      *
@@ -87,7 +89,19 @@ abstract class _ParserAbstract
     final protected function getLocalFiles()
     {
         $files = new Finder();
-        $files->in($this->getAppPath())->name('*.php')->name('*.js')->name('*.phtml');
+        if(empty($this->extendsion) === true) {
+            $files->in($this->getAppPath())->name('*.php')->name('*.js')->name('*.phtml');
+        }
+        else{
+            $filter = function (SplFileInfo $file) {
+                if (!in_array($file->getExtension(), $this->extendsion)) {
+                    return false;
+                }
+
+                return true;
+            };
+            $files->filter($filter);
+        }
         if ($this->skip !== null) {
             foreach ($this->skip as $name) {
                 $files->notName($name);

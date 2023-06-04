@@ -25,6 +25,7 @@ use IPS\toolbox\Profiler\Debug;
 use IPS\toolbox\Proxy\PassedChecksum;
 use IPS\toolbox\Proxy\Helpers\HelpersAbstract;
 use IPS\toolbox\Proxy\NotIpsClassException;
+use IPS\toolbox\Proxy\NotInstalledException;
 use IPS\toolbox\Proxy\Proxyclass;
 use IPS\toolbox\ReservedWords;
 use IPS\toolbox\Shared\Write;
@@ -134,11 +135,11 @@ class _Proxy extends GeneratorAbstract
         $relations = array_merge(...$relations);
 
         if (isset($relations[$table])) {
-            $class = \IPS\Application::getRootPath() . '/' . $relations[$table];
+            $file = \IPS\Application::getRootPath() . '/' . $relations[$table];
 
-            if (file_exists($class)) {
-                $content = file_get_contents($class);
-                static::i()->create($content);
+            if (file_exists($file)) {
+                $content = file_get_contents($file);
+                static::i()->create($content, $file);
             }
         }
     }
@@ -149,10 +150,25 @@ class _Proxy extends GeneratorAbstract
     public function create(string $content, string $originalFilePath)
     {
         try {
+
             $data = Proxyclass::i()->tokenize($content);
+
             //make sure it is an IPS class
             if (isset($data['namespace']) && !str_contains($data['namespace'], 'IPS')) {
                 throw new \IPS\toolbox\Proxy\NotIpsClassException('Not an IPS class!');
+            }
+            //we need to check to see if the app is installed.
+            if(str_contains($originalFilePath, 'applications')){
+                $explodedNs = explode('\\',$data['namespace']);
+                $firstNs = array_shift($explodedNs);
+                $shouldBeApp = array_shift($explodedNs);
+                try{
+                    Application::load($shouldBeApp);
+                }
+                catch( \OutOfRangeException $e){
+                    throw new NotInstalledException('Not Installed!');
+                }
+
             }
             $proxied = Store::i()->dt_cascade_proxy ?? [];
 
@@ -161,18 +177,18 @@ class _Proxy extends GeneratorAbstract
                 $traits = Store::i()->dt_traits ?? [];
                 $cc = $data['namespace'] . '\\' . $data['class'];
                 /* Is it an interface? */
-                if ($data['type'] === T_INTERFACE && !str_contains($cc, 'IPS\\Content') && !str_contains(
-                        $cc,
-                        'IPS\\Node'
-                    )) {
+                if ($data['type'] === T_INTERFACE &&
+                    !str_contains($cc, 'IPS\\Content') &&
+                    !str_contains($cc,'IPS\\Node')
+                ) {
                     $interfacing[] = $cc;
                 }
 
                 /* Is it a trait? */
-                if ($data['type'] === T_TRAIT && !str_contains($cc, 'IPS\\Content') && !str_contains(
-                        $cc,
-                        'IPS\\Node'
-                    )) {
+                if ($data['type'] === T_TRAIT &&
+                    !str_contains($cc, 'IPS\\Content') &&
+                    !str_contains($cc, 'IPS\\Node')
+                ) {
                     $traits[] = $cc;
                 }
 
@@ -224,17 +240,16 @@ class _Proxy extends GeneratorAbstract
 
                 $ipsClass = $data['class'];
 
-                if (($namespace === 'IPS' && $ipsClass === '_Settings') || mb_strpos(
-                        $namespace,
-                        'IPS\convert'
-                    ) !== false) {
+                if (
+                    ($namespace === 'IPS' && $ipsClass === '_Settings') ||
+                    mb_strpos($namespace, 'IPS\convert') !== false
+                ) {
                     return;
                 }
 
                 $first = mb_substr($ipsClass, 0, 1);
                 if ($first === '_') {
                     $class = mb_substr($ipsClass, 1);
-
                     if (ReservedWords::check($class)) {
                         return;
                     }
@@ -290,6 +305,7 @@ class _Proxy extends GeneratorAbstract
                         $new->setFinal(true);
                     }
                     if (isset($bitOptions[0])) {
+
                         $reflect = new ReflectionClass(
                             $data['namespace'] . '\\' . str_replace(
                                 '_',
@@ -297,6 +313,7 @@ class _Proxy extends GeneratorAbstract
                                 $data['class']
                             )
                         );
+
                         if ($reflect->hasProperty('bitOptions')) {
                             $bits = $reflect->getProperty('bitOptions');
                             $bits->setAccessible(true);
@@ -337,10 +354,11 @@ class _Proxy extends GeneratorAbstract
                         /* @var ActiveRecord $dbClass */
                         $dbClass = $namespace . '\\' . $class;
                         try {
-                            if (property_exists(
-                                    $dbClass,
-                                    'databaseTable'
-                                ) && class_exists($dbClass) && method_exists($dbClass, 'db')) {
+                            if (
+                                property_exists($dbClass, 'databaseTable') &&
+                                class_exists($dbClass) &&
+                                method_exists($dbClass, 'db')
+                            ) {
                                 $table = $dbClass::$databaseTable;
                                 if ($table && $dbClass::db()->checkForTable($table)) {
                                     /* @var array $definitions */
@@ -442,12 +460,12 @@ class _Proxy extends GeneratorAbstract
                 }
             }
         }
-        catch( NotIpsClassException $e){
+        catch( NotIpsClassException | NotInstalledException $e){
             //do nothing
         }
         catch (Throwable | Exception $e) {
-                Debug::add('Proxy Create', $e);
-                Debug::add('Proxy Create File', $originalFilePath);
+            Debug::add('Proxy Create', $e);
+            Debug::add('Proxy Create File', $originalFilePath);
         }
     }
 

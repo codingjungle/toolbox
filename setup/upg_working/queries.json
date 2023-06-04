@@ -1,0 +1,120 @@
+[
+    {
+        "method": "createTable",
+        "params": [
+            {
+                "name": "toolbox_todo",
+                "columns": {
+                    "todo_id": {
+                        "allow_null": false,
+                        "auto_increment": true,
+                        "comment": "ID Number",
+                        "decimals": null,
+                        "default": null,
+                        "length": 0,
+                        "name": "todo_id",
+                        "type": "BIGINT",
+                        "unsigned": false,
+                        "values": []
+                    },
+                    "todo_bitwise": {
+                        "allow_null": true,
+                        "auto_increment": false,
+                        "comment": "bitwise field.",
+                        "decimals": null,
+                        "default": null,
+                        "length": 0,
+                        "name": "todo_bitwise",
+                        "type": "BIGINT",
+                        "unsigned": true,
+                        "values": []
+                    },
+                    "todo_file": {
+                        "name": "todo_file",
+                        "type": "TEXT",
+                        "length": null,
+                        "decimals": null,
+                        "values": null,
+                        "allow_null": false,
+                        "default": null,
+                        "comment": "",
+                        "unsigned": false,
+                        "auto_increment": false
+                    },
+                    "todo_line": {
+                        "name": "todo_line",
+                        "type": "INT",
+                        "length": null,
+                        "decimals": null,
+                        "values": null,
+                        "allow_null": false,
+                        "default": 0,
+                        "comment": "",
+                        "unsigned": true,
+                        "auto_increment": false
+                    },
+                    "todo_msg": {
+                        "name": "todo_msg",
+                        "type": "TEXT",
+                        "length": null,
+                        "decimals": null,
+                        "values": null,
+                        "allow_null": true,
+                        "default": null,
+                        "comment": "",
+                        "unsigned": false,
+                        "auto_increment": false
+                    },
+                    "todo_appt": {
+                        "name": "todo_appt",
+                        "type": "VARCHAR",
+                        "length": 77,
+                        "decimals": null,
+                        "values": null,
+                        "allow_null": true,
+                        "default": null,
+                        "comment": "",
+                        "unsigned": false,
+                        "auto_increment": false
+                    }
+                },
+                "indexes": {
+                    "PRIMARY": {
+                        "type": "primary",
+                        "name": "PRIMARY",
+                        "length": [
+                            null
+                        ],
+                        "columns": [
+                            "todo_id"
+                        ]
+                    },
+                    "lookup": {
+                        "type": "key",
+                        "name": "lookup",
+                        "columns": [
+                            "todo_app"
+                        ],
+                        "length": [
+                            250
+                        ]
+                    },
+                    "lookup2": {
+                        "type": "key",
+                        "name": "lookup2",
+                        "columns": [
+                            "todo_file",
+                            "todo_line"
+                        ],
+                        "length": [
+                            250,
+                            null
+                        ]
+                    }
+                },
+                "collation": "utf8mb4_unicode_ci",
+                "engine": "InnoDB"
+            }
+        ]
+    }
+]
