@@ -410,5 +410,7 @@ $lang = [
     'no_fucks_left' => 'Okay this is a message from me CodingJungle.<br>
 First thing you should do is check what is listed here, cause you might have an actual problem that this half assed tool is trying to resolve. Okay, you’ve done that? Good now you can read further. I have written up some of my thoughts about this tool, you can read them on my site.<br><br>
  <a href="https://codingjungle.com/articles/records/failure-r92/">My Thoughts</a><br><h1>Whatever IPS Says:</h1>',
+    'code_todo' => 'Todo\'s',
+    'code_todo_desc' => 'A list of todo\'s found in the app, incase you missed them, otherwise you can ignore them!'
 
 ];

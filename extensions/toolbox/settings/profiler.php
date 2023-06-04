@@ -102,7 +102,8 @@ class _profiler
             'dtcode_analyze_langs_verify' => 'Language Strings Verify',
             'dtcode_analyze_rootpath' => 'Rootpath Usage Check',
             'dtcode_analyze_settings_check' => 'Settings Usage Check',
-            'dtcode_analyze_settings_verify' => 'Settings Usage Verify'
+            'dtcode_analyze_settings_verify' => 'Settings Usage Verify',
+            'dtcode_analyze_todo' => 'Todo Finder'
         ];
         foreach($options as $key => $label){
             $form->addElement($key,'yn')->label($label);

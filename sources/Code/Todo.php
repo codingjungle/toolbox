@@ -60,13 +60,15 @@ class _Todo extends ParserAbstract
                 preg_match('#@todo (.*?)$#uim', $content, $matches);
 
                 if (empty($matches[1]) === false) {
-                    _p($matches[1]);
                     $db = (new \IPS\toolbox\Code\Utils\Todo());
-
+                    $db->app = $this->app;
+                    $db->line = $line;
+                    $db->file = $name;
+                    $db->msg = $matches[1];
                     $warning[] = [
-                        'path' => ['url' => $path, 'name' => $name],
                         'key'  => $matches[1],
-                        'line' => $line
+                        'path' => ['url' => $path, 'name' => $name],
+                        'line' => $line,
                     ];
                 }
                 $line++;

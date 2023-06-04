@@ -211,7 +211,7 @@ trait Analyzer
                     break;
                 case 10:
                     if(\IPS\Settings::i()->dtcode_analyze_todo){
-                        $warnings['todo'] = Todo::analyze($app);
+                        $warnings['todo'] = (new Todo($app))->check();
                     }
                     $complete = 11;
                     break;
@@ -415,10 +415,11 @@ trait Analyzer
                             $val,
                             'code_todo',
                             [
-                                'File',
                                 'Todo',
+                                'File',
                                 'Line'
-                            ]
+                            ],
+                            true
                         );
                         break;
                 }

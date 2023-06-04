@@ -34,7 +34,8 @@
         {{foreach $values as $key => $value}}
             <td class="{{if $key === 'line' }}ipsTable_icon{{else}}ipsTable_wrap{{endif}}">
                 {{if \IPS\DEV_WHOOPS_EDITOR && $key === 'path'}}
-                <a href="{$value['url']}">{$value['name']}</a>
+                {{$name = \str_replace(\IPS\Application::getRootPath('toolbox').'/','', $value['name']);}}
+                <a href="{$value['url']}">{$name}</a>
                 {{elseif $key === 'loc'}}
                 {{foreach $value as $loc}}
                 <a href="{$loc['url']}">
