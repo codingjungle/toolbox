@@ -1,0 +1,15 @@
+<?php
+
+namespace IPS\{app}\extensions\toolbox\Scanner;
+
+use IPS\toolbox\Code\ScannerAbstract;
+
+/**
+* check out applications/toolbox/extensions/Scanner/Core.php
+* for a more indepth example of how to use this extension!
+*/
+class _{class} extends ScannerAbstract
+{
+
+
+}

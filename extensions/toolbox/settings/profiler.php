@@ -103,6 +103,8 @@ class _profiler
             'dtcode_analyze_rootpath' => 'Rootpath Usage Check',
             'dtcode_analyze_settings_check' => 'Settings Usage Check',
             'dtcode_analyze_settings_verify' => 'Settings Usage Verify',
+            'dtcode_analyze_class_scanner' => 'Class Scanner',
+            'dtcode_analyze_templates' => 'Templates Check',
             'dtcode_analyze_todo' => 'Todo Finder'
         ];
         foreach($options as $key => $label){

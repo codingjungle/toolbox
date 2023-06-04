@@ -7,6 +7,7 @@ use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
+use IPS\toolbox\Profiler;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     exit;
@@ -49,14 +50,29 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
         Member::loggedIn()->language()->words['site'] = '';
 
         Output::i()->cssFiles = array_merge(
-                Output::i()->cssFiles,
-                Theme::i()->css('devbar.css', 'toolbox', 'admin')
-            );
-
+            Output::i()->cssFiles,
+            Theme::i()->css('devbar.css', 'toolbox', 'admin')
+        );
+        $return = '';
         if ( \is_callable('parent::globalTemplate') )
         {
-            return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
+            $return = \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
         }
+        $hide = defined('DT_HIDE_MYAPPS') ? DT_HIDE_MYAPPS : false;
+        if (
+            !$hide &&
+            !\IPS\QUERY_LOG &&
+            !\IPS\Request::i()->isAjax()
+        ) {
+            try {
+                $myapps = Profiler::i()->justMyApps();
+                //$return = str_replace('</body>', $myapps.'</body>', $return);
+            } catch (Exception $e) {
+                //\IPS\toolbox\Profiler\Debug::log($e);
+            }
+        }
+
+        return $return;
     }
 
     public function tabs(
@@ -68,10 +84,13 @@ class toolbox_hook_adminGlobalTemplate extends _HOOK_CLASS_
         $tabClasses = '',
         $panelClasses = ''
     ) {
-            if (Request::i()->app === 'core' && Request::i()->module === 'applications' && Request::i(
-                )->controller === 'developer' && !Request::i()->do) {
-             $tabNames['SchemaImports'] = 'dtdevplus_schema_imports';
-            }
+        if (Request::i()->app === 'core' &&
+            Request::i()->module === 'applications' &&
+            Request::i(
+            )->controller === 'developer' &&
+            !Request::i()->do) {
+            $tabNames['SchemaImports'] = 'dtdevplus_schema_imports';
+        }
         if ( \is_callable('parent::tabs') )
         {
             return \call_user_func_array( 'parent::' . __FUNCTION__, [$tabNames, $activeId, $defaultContent, $url, $tabParam, $tabClasses, $panelClasses] );

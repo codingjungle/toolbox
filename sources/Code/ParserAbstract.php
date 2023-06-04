@@ -15,6 +15,9 @@ namespace IPS\toolbox\Code;
 use Exception;
 use InvalidArgumentException;
 use IPS\Application;
+use IPS\Data\Store;
+use IPS\Output;
+use IPS\Request;
 use IPS\toolbox\Editor;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
@@ -52,7 +55,7 @@ abstract class _ParserAbstract
      */
     protected $skip = [];
 
-    protected array $extendsion = [];
+    protected array $extension = [];
 
     /**
      * _ParserAbstract constructor.
@@ -70,6 +73,28 @@ abstract class _ParserAbstract
             $this->getFiles();
         } catch (Exception $e) {
         }
+
+        //we do this so we can capture the fatal and redirect if need be
+        ob_start();
+
+        register_shutdown_function(function () {
+            $error = error_get_last();
+            $url = \IPS\Request::i()->url();
+            if ($error['type'] === E_COMPILE_ERROR) {
+                $url = $url->setQueryString(['do' => 'glitch'])->stripQueryString(['csrfKey', 'mr', 'download']);
+                $url = (string)$url;
+                Store::i()->toolbox_code_analyzer_interrupted = $error;
+                if (Request::i()->isAjax()) {
+                    Output::i()->json(array(
+                            'redirect' => (string)$url,
+                            'message' => ''
+                        )
+                    );
+                } else {
+                    header("Location: {$url}");
+                }
+            }
+        });
     }
 
     protected function getFiles()
@@ -89,12 +114,12 @@ abstract class _ParserAbstract
     final protected function getLocalFiles()
     {
         $files = new Finder();
-        if(empty($this->extendsion) === true) {
+        if(empty($this->extension) === true) {
             $files->in($this->getAppPath())->name('*.php')->name('*.js')->name('*.phtml');
         }
         else{
             $filter = function (SplFileInfo $file) {
-                if (!in_array($file->getExtension(), $this->extendsion)) {
+                if (!in_array($file->getExtension(), $this->extension)) {
                     return false;
                 }
 

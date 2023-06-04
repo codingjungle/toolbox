@@ -45,17 +45,7 @@ class _ClassScanner extends ParserAbstract
      * paths should be relative to <app path>/sources/
      * @var array
      */
-    protected array $excludedFolders = [
-        'vendor',
-        'Vendor',
-        'ThirdParty',
-        'Thirdparty',
-        'thirdparty',
-        '3rdParty',
-        '3rdparty',
-        'Composer',
-        'composer'
-    ];
+    protected array $excludedFolders = [];
 
     public function validate(): array
     {

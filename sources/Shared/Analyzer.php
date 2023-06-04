@@ -25,6 +25,7 @@ use IPS\Member;
 use IPS\Output;
 use IPS\Request;
 use IPS\Theme;
+use IPS\toolbox\Code\ClassScanner;
 use IPS\toolbox\Code\Db;
 use IPS\toolbox\Code\ErrorCodes;
 use IPS\toolbox\Code\FileStorage;
@@ -33,6 +34,8 @@ use IPS\toolbox\Code\InterfaceFolder;
 use IPS\toolbox\Code\Langs;
 use IPS\toolbox\Code\RootPath;
 use IPS\toolbox\Code\Settings;
+use IPS\toolbox\Code\Templates;
+use IPS\toolbox\Editor;
 use IPS\toolbox\Code\Todo;
 use IPS\toolbox\Code\Utils\Hook;
 use OutOfRangeException;
@@ -64,14 +67,14 @@ trait Analyzer
         ksort($apps);
 
         $form->addElement('dtcode_app', 'select')
-            ->options(['options'=>$apps])
+            ->options(['options' => $apps])
             ->required();
 
         if ($values = $form->values()) {
             Output::i()->redirect(
                 $this->url->setQueryString(
                     [
-                        'do'          => 'queue',
+                        'do' => 'queue',
                         'application' => $values['dtcode_app'],
                     ]
                 )
@@ -90,7 +93,7 @@ trait Analyzer
         $application = Request::i()->myApp ?? Request::i()->application;
         $download = Request::i()->download ?? 0;
 
-        if($download !== 0){
+        if ($download !== 0) {
             $baseUrl = Url::internal('app=toolbox&module=bt&controller=build')
                 ->setQueryString(
                     [
@@ -98,148 +101,145 @@ trait Analyzer
                         'download' => $download
                     ]
                 );
-            $url = $baseUrl->setQueryString(['do'=>'queue']);
-            $redirect = $url->setQueryString(['do'=>'results']);
-        }
-        else{
+            $url = $baseUrl->setQueryString(['do' => 'queue']);
+            $redirect = $url->setQueryString(['do' => 'results']);
+        } else {
             $url = Url::internal('app=toolbox&module=code&controller=analyzer&do=queue&download=1')
                 ->setQueryString(
                     [
                         'application' => $application,
-                        'download'    => $download
+                        'download' => $download
                     ]
                 );
 
             $redirect = Url::internal('app=toolbox&module=code&controller=analyzer&do=results')->setQueryString([
                 'application' => $application,
-                'download'    => $download
+                'download' => $download
             ]);
         }
 
-        Output::i()->output = new MultipleRedirect(
+        Output::i()->output = '<div class="ipsPadding"><h1>Analyzing Application: '.$application.'</h1></div>';
+        Output::i()->output .= new MultipleRedirect(
             $url,
-            function ($data) use( $url, $application ) {
-            $total = 11;
-            $percent = round(100 / $total);
-            $complete = 0;
-            $app = $application;
-            if (is_array($data) && isset($data['complete'])) {
-                $app = (string)$data['app'];
-                $complete = (int)$data['complete'];
-            }
+            function ($data) use ($url, $application) {
+                $total = 12;
+                $percent = round(100 / $total);
+                $complete = 0;
+                $app = $application;
+                if (is_array($data) && isset($data['complete'])) {
+                    $app = (string)$data['app'];
+                    $complete = (int)$data['complete'];
+                }
 
-            $warnings = [];
+                $warnings = [];
 
-            if ($complete !== 0 && isset(Store::i()->dtcode_warnings)) {
-                $warnings = Store::i()->dtcode_warnings;
-            }
+                if ($complete !== 0 && isset(Store::i()->dtcode_warnings)) {
+                    $warnings = Store::i()->dtcode_warnings;
+                }
 
-            switch ($complete) {
-                default:
-                    $complete++;
-                    break;
-                case 0:
-                    if(\IPS\Settings::i()->dtcode_analyze_db) {
-                        $warnings['sql_check'] = (new Db($app))->check();
-                    }
-                    $complete = 1;
-                    break;
-                case 1:
-                    if(\IPS\Settings::i()->dtcode_analyze_filestorage) {
-                        $warnings['filestorage_check'] = (new FileStorage($app))->check();
-                    }
-                    $complete = 2;
-                    break;
-                case 2:
-                    if(\IPS\Settings::i()->dtcode_analyze_rootpath) {
-                        $warnings['root_path'] = (new RootPath($app))->check();
-                    }
-                    $complete = 3;
-                    break;
-                case 3:
-                    if(\IPS\Settings::i()->dtcode_analyze_error_codes) {
-                        $errorsCodes = (new ErrorCodes($app))->check();
-                        if (empty($errorsCodes['warnings']) === false) {
-                            $warnings['error_codes_ips'] = $errorsCodes['warnings'];
+                switch ($complete) {
+                    case 0:
+                        if (\IPS\Settings::i()->dtcode_analyze_db) {
+                            $warnings['sql_check'] = (new Db($app))->check();
                         }
-                        if (empty($errorsCodes['dupes']) === false) {
-                            $warnings['error_codes_dupes'] = $errorsCodes['dupes'];
+                        break;
+                    case 1:
+                        if (\IPS\Settings::i()->dtcode_analyze_filestorage) {
+                            $warnings['filestorage_check'] = (new FileStorage($app))->check();
                         }
-                    }
-                    $complete = 4;
-                    break;
-                case 4:
-                    if(\IPS\Settings::i()->dtcode_analyze_hooks) {
-                        try {
-                            $hooks = new Hooks($app);
-                            $warnings['hooks_exists'] = $hooks->exist();
-                            $warnings['hooks_validation'] = $hooks->validate();
-                        } catch (\InvalidArgumentException $e) {
+                        break;
+                    case 2:
+                        if (\IPS\Settings::i()->dtcode_analyze_rootpath) {
+                            $warnings['root_path'] = (new RootPath($app))->check();
                         }
-                    }
-                    $complete = 5;
-                    break;
-                case 5:
-                    if(\IPS\Settings::i()->dtcode_analyze_interface) {
-                        $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
-                    }
-                    $complete = 6;
-                    break;
-                case 6:
-                    if(\IPS\Settings::i()->dtcode_analyze_settings_verify) {
-                        $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
-                    }
-                    $complete = 7;
-                    break;
-                case 7:
-                    if(\IPS\Settings::i()->dtcode_analyze_settings_check) {
-                        $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
-                    }
-                    $complete = 8;
-                    break;
-                case 8:
-                    if(\IPS\Settings::i()->dtcode_analyze_langs_check) {
-                        $warnings['langs_check'] = (new Langs($app))->check();
-                    }
-                    $complete = 9;
-                    break;
-                case 9:
-                    if(\IPS\Settings::i()->dtcode_analyze_langs_verify) {
-                        $warnings['langs_verify'] = (new Langs($app))->verify();
-                    }
-                    $complete = 10;
-                    break;
-                case 10:
-                    if(\IPS\Settings::i()->dtcode_analyze_todo){
-                        $warnings['todo'] = (new Todo($app))->check();
-                    }
-                    $complete = 11;
-                    break;
-            }
+                        break;
+                    case 3:
+                        if (\IPS\Settings::i()->dtcode_analyze_error_codes) {
+                            $errorsCodes = (new ErrorCodes($app))->check();
+                            if (empty($errorsCodes['warnings']) === false) {
+                                $warnings['error_codes_ips'] = $errorsCodes['warnings'];
+                            }
+                            if (empty($errorsCodes['dupes']) === false) {
+                                $warnings['error_codes_dupes'] = $errorsCodes['dupes'];
+                            }
+                        }
+                        break;
+                    case 4:
+                        if (\IPS\Settings::i()->dtcode_analyze_hooks) {
+                            try {
+                                $hooks = new Hooks($app);
+                                $warnings['hooks_exists'] = $hooks->exist();
+                                $warnings['hooks_validation'] = $hooks->validate();
+                            } catch (\InvalidArgumentException $e) {
+                            }
+                        }
+                        break;
+                    case 5:
+                        if (\IPS\Settings::i()->dtcode_analyze_interface) {
+                            $warnings['interface_occupied'] = (new InterfaceFolder($app))->check();
+                        }
+                        break;
+                    case 6:
+                        if (\IPS\Settings::i()->dtcode_analyze_settings_verify) {
+                            $warnings['settings_verify'] = (new Settings($app))->buildSettings()->verify();
+                        }
+                        break;
+                    case 7:
+                        if (\IPS\Settings::i()->dtcode_analyze_settings_check) {
+                            $warnings['settings_check'] = (new Settings($app))->buildSettings()->check();
+                        }
+                        break;
+                    case 8:
+                        if (\IPS\Settings::i()->dtcode_analyze_langs_check) {
+                            $warnings['langs_check'] = (new Langs($app))->check();
+                        }
+                        break;
+                    case 9:
+                        if (\IPS\Settings::i()->dtcode_analyze_langs_verify) {
+                            $warnings['langs_verify'] = (new Langs($app))->verify();
+                        }
+                        break;
+                    case 10:
+                        if (\IPS\Settings::i()->dtcode_analyze_class_scanner) {
+                            $warnings['class_scanner_validation'] = (new ClassScanner($app))->validate();
+                        }
+                        break;
+                    case 11:
+                        if(\IPS\Settings::i()->dtcode_analyze_templates){
+                            $warnings['templates_validation'] = (new Templates($app))->validate();
+                        }
+                        break;
+                    case 12:
+                        if(\IPS\Settings::i()->dtcode_analyze_todo){
+                            $warnings['todo'] = (new Todo($app))->check();
+                        }
+                        break;
+                }
+                $complete++;
 
-            Store::i()->dtcode_warnings = $warnings;
+                Store::i()->dtcode_warnings = $warnings;
 
-            if ($complete > $total) {
-                return null;
-            }
+                if ($complete > $total) {
+                    return null;
+                }
 
-            $language = Member::loggedIn()->language()->addToStack(
-                'dtcode_queue_complete',
-                false,
-                [
-                    'sprintf' => [
-                        $complete,
-                        $total,
-                    ],
-                ]
-            );
+                $language = Member::loggedIn()->language()->addToStack(
+                    'dtcode_queue_complete',
+                    false,
+                    [
+                        'sprintf' => [
+                            $complete,
+                            $total,
+                        ],
+                    ]
+                );
 
-            return [
-                ['complete' => $complete, 'app' => $app],
-                $language,
-                $percent * $complete,
-            ];
-        },
+                return [
+                    ['complete' => $complete, 'app' => $app],
+                    $language,
+                    $percent * $complete,
+                ];
+            },
             function () use ($redirect) {
                 Output::i()->redirect($redirect, 'dtcode_analyzer_complete');
             }
@@ -250,7 +250,6 @@ trait Analyzer
      * @throws InvalidArgumentException
      * @throws OutOfRangeException
      * @throws UnexpectedValueException
-     * @todo fooooooo oooooooooooooooooooooooo ooooooooooooooooooo ooooooooooooooooo ooooooooooooooooooooooooooooooooooo ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo oooooooooo oooooo
      */
     protected function results()
     {
@@ -267,21 +266,43 @@ trait Analyzer
 
         if (isset(Store::i()->dtcode_warnings)) {
             /**
-             * @var array $warnings
+             * @var array $stored
              */
-            $warnings = Store::i()->dtcode_warnings;
+            $stored = Store::i()->dtcode_warnings;
+            $warnings = [];
+            if (isset($stored['class_scanner_validation'])) {
+                $warnings['class_scanner_validation'] = $stored['class_scanner_validation'];
+                unset($stored['class_scanner_validation']);
+            }
+
+            if (isset($stored['hooks_exists'])) {
+                $warnings['hooks_exists'] = $stored['hooks_exists'];
+                unset($stored['hooks_exists']);
+            }
+
+            if (isset($stored['hooks_validation'])) {
+                $warnings['hooks_validation'] = $stored['hooks_validation'];
+                unset($stored['hooks_validation']);
+            }
+            if (isset($stored['templates_validation'])) {
+                $warnings['templates_validation'] = $stored['templates_validation'];
+                unset($stored['templates_validation']);
+            }
+            foreach ($stored as $key => $value) {
+                $warnings[$key] = $value;
+            }
             $output = '';
             foreach ($warnings as $key => $val) {
                 switch ($key) {
                     case 'langs_check':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val['langs'] ?? [],
                             'dtcode_langs_php',
                             [],
                             true
                         );
 
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val['jslangs'] ?? [],
                             'dtcode_jslangs_php',
                             [],
@@ -289,7 +310,7 @@ trait Analyzer
                         );
                         break;
                     case 'langs_verify':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'dtcode_langs_verify',
                             [
@@ -301,19 +322,19 @@ trait Analyzer
                         );
                         break;
                     case 'settings_check':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'dtcode_settings_check',
                         );
                         break;
                     case 'settings_verify':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'dtcode_settings_verify'
                         );
                         break;
                     case 'filestorage_check':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'filestorage_check',
                             [
@@ -323,7 +344,7 @@ trait Analyzer
                         );
                         break;
                     case 'sql_check':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'dtcode_sql',
                             [
@@ -335,7 +356,7 @@ trait Analyzer
                         );
                         break;
                     case 'interface_occupied':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'interface_occupied',
                             [
@@ -345,7 +366,7 @@ trait Analyzer
                         );
                         break;
                     case 'root_path':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'root_path',
                             [
@@ -356,7 +377,7 @@ trait Analyzer
                         );
                         break;
                     case 'error_codes_ips':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'error_codes_ips',
                             [
@@ -368,7 +389,7 @@ trait Analyzer
                         );
                         break;
                     case 'error_codes_dupes':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                             $val,
                             'error_codes_dupes',
                             [
@@ -379,7 +400,7 @@ trait Analyzer
                         );
                         break;
                     case 'hooks_exists':
-                        $output .= Theme::i()->getTemplate('code','toolbox','admin')->hooksExists(
+                        $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->hooksExists(
                             $val,
                             'hooks_exists',
                             [
@@ -388,27 +409,89 @@ trait Analyzer
                             ]
                         );
                         break;
-                    case 'hooks_validation':
-                        $parse = $val['parse'] ?? null;
-                        $loading = $value['processing'] ?? null;
-                        foreach($val as $key => $data){
-                            $headers = [];
-                            if($key === 'signature' || $key === 'parameters'){
-                                $headers[] = 'File';
-                            }
-                            $headers[] = 'Path';
-                            $headers[] = 'Error';
-                            $headers[] = 'Line';
-                            $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
+                    case 'templates_validation':
+                        foreach ($val as $k => $data) {
+                            $output .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
                                 $data,
-                                'hooks_'.$key,
+                                'templates_validation_' . $k,
                                 [
                                     'File',
-                                    'Error',
-                                    'Line'
+                                    'Path',
                                 ]
                             );
                         }
+                        break;
+                    case 'hooks_validation':
+                        $parse = $val['parse'] ?? null;
+                        $loading = $value['processing'] ?? null;
+                        $count = 0;
+
+                        $op = '';
+                        foreach ($val as $k => $data) {
+                            $count += count($data);
+                            if ($k === 'processing') {
+                                $headers = [
+                                    'Error',
+                                    'Path'
+                                ];
+                            } elseif ($k === 'case') {
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Class'
+                                ];
+                            } else {
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Line',
+                                    'Method',
+                                ];
+                            }
+                            $op .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
+                                $data,
+                                'hooks_' . $k,
+                                $headers
+                            );
+                        }
+
+                        $output .= Theme::i()
+                            ->getTemplate('code', 'toolbox', 'admin')
+                            ->resultsBlock($key . '_title', $count, $op);
+                        break;
+                    case 'class_scanner_validation':
+                        $op = '';
+                        $count = 0;
+                        foreach ($val as $k => $data) {
+                            $count += count($data);
+                            if ($k === 'processing') {
+                                $headers = [
+                                    'Error',
+                                    'Path'
+                                ];
+                            } elseif ($k === 'case') {
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Class'
+                                ];
+                            } else {
+                                $headers = [
+                                    'Error',
+                                    'Path',
+                                    'Line',
+                                    'Method',
+                                ];
+                            }
+                            $op .= Theme::i()->getTemplate('code', 'toolbox', 'admin')->results(
+                                $data,
+                                'class_scanner_' . $k,
+                                $headers
+                            );
+                        }
+                        $output .= Theme::i()
+                            ->getTemplate('code', 'toolbox', 'admin')
+                            ->resultsBlock($key . '_title', $count, $op);
                         break;
                     case 'todo':
                         $output .= Theme::i()->getTemplate('code','toolbox','admin')->results(
@@ -426,23 +509,45 @@ trait Analyzer
             }
             $download = Request::i()->download ?? 0;
 
-                $baseUrl = Url::internal('app=toolbox&module=bt&controller=build')
-                    ->setQueryString(
-                        [
-                            'myApp'=>$application,
-                            'download'=> $download
-                        ]
-                    );
-                $analyze = $baseUrl->setQueryString(['do'=>'queue']);
-                $downloadUrl = $baseUrl->setQueryString(['do'=>'download']);
-            Output::i()->output = Theme::i()->getTemplate('code','toolbox','admin')->final(
+            $baseUrl = Url::internal('app=toolbox&module=bt&controller=build')
+                ->setQueryString(
+                    [
+                        'myApp' => $application,
+                        'download' => $download
+                    ]
+                );
+            $analyze = $baseUrl->setQueryString(['do' => 'queue']);
+            $downloadUrl = $baseUrl->setQueryString(['do' => 'download']);
+            Output::i()->output = Theme::i()->getTemplate('code', 'toolbox', 'admin')->final(
                 $output,
                 (bool)$download,
                 $downloadUrl,
-                $analyze
+                $analyze,
+                Output::i()->title
             );
         }
     }
 
-
+    protected function glitch()
+    {
+        $application = Request::i()->myApp ?? Request::i()->application;
+        $app = Application::load($application);
+        $info = Store::i()->toolbox_code_analyzer_interrupted;
+        $curl = Request::i()->url();
+        $url = (new Editor())->replace($info['file'], $info['line']);
+        $name = str_replace($app->getApplicationPath(), '', $info['file']);
+        $analyze = $curl->setQueryString(['download' => 1, 'do' => 'queue']);
+        if (isset(Request::i()->application)) {
+            $analyze = $analyze->stripQueryString(['application'])->setQueryString(['myApp' => $application]);
+        }
+        Output::i()->output = Theme::i()
+            ->getTemplate('code', 'toolbox', 'admin')
+            ->glitch(
+                'E_COMPILE_ERROR',
+                $url,
+                $name,
+                $info['message'],
+                $analyze
+            );
+    }
 }

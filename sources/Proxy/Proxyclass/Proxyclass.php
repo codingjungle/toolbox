@@ -898,7 +898,9 @@ class _Proxyclass extends Singleton
         $dlm = false;
         $final = false;
         $abstract = false;
-
+        $extends = null;
+        $class = null;
+        $type = null;
         for ($i = 2; $i < $count; $i++) {
             if ((isset($tokens[$i - 2][1]) && ($tokens[$i - 2][1] === 'phpnamespace' || $tokens[$i - 2][1] === 'namespace')) || ($dlm && $tokens[$i - 1][0] === T_NS_SEPARATOR && $tokens[$i][0] === T_STRING)) {
                 if (!$dlm) {
@@ -931,15 +933,29 @@ class _Proxyclass extends Singleton
                 $tokens[$i - 1][0] === T_WHITESPACE &&
                 $tokens[$i][0] === T_STRING
             ) {
+                $type = $tokens[$i - 2][0];
                 $class = $tokens[$i][1];
+                for ($ii = $i; $ii < $count; $ii++) {
+                    if(isset($tokens[$i][1]) && $tokens[$i][1] === 'extends') {
+                        for($iii = $ii; $iii < $count; $iii++) {
+                            if (isset($tokens[$iii][0]) && $tokens[$iii][0] === T_STRING) {
+                                $extends = $tokens[$iii];
+                                break 2;
+                            }
+                        }
+                    }
+                }
                 return [
-                    'type' => $tokens[$i - 2][0],
+                    'type' => $type,
                     'namespace' => $namespace,
                     'class'     => $class,
+                    'extends' => $extends,
                     'abstract'  => $abstract,
                     'final'     => $final,
                 ];
             }
+
+
         }
 
         return null;

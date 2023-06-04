@@ -42,61 +42,14 @@ trait Scanner
      * these are classes we stop before we get to the root parent.
      * @var array
      */
-    protected array $fullStop = [
-        'IPS\Content\_Comment' => 1,
-        'IPS\Content\_Item' => 1,
-        'IPS\Content\_Review' => 1,
-        'IPS\Node\_Model' => 1,
-    ];
+    protected array $fullStop = [];
 
     /**
      * these are methods inside some classes, that we don't need to check if they call the parent on, as
      * they are usually intended to be overloaded.
      * @var array|array[]
      */
-    protected array $autoLint = [
-        'IPS\Patterns\_ActiveRecord' => [
-            'getStore' => 1
-        ],
-        'IPS\Node\_Model' => [
-            'getStore' => 1,
-            'get__title' => 1,
-            'formatFormValues' => 1,
-            'form' => 1,
-            'disabledPermissions' => 1,
-            'titleFromIndexData' => 1
-        ],
-        'IPS\Helpers\_Form' => [
-            '__construct' => 1,
-            '__toString' => 1,
-            'addButton' => 1,
-            'customTemplate' => 1,
-            'getLastUsedTab' => 1,
-            'saveAsSettings' => 1,
-            'values' => 1
-        ],
-        'IPS\Content\_Comment' => [
-            'getStore' => 1,
-            'contentTableTemplate' => 1,
-            'titleFromIndexData' => 1
-        ],
-        'IPS\Content\_Item' => [
-            'getStore' => 1,
-            'form' => 1,
-            'supportedMetaDataTypes' => 1,
-            'contentTableTemplate' => 1,
-            'titleFromIndexData' => 1
-        ],
-        'IPS\Content\_Review' => [
-            'getStore' => 1,
-            'titleFromIndexData' => 1
-        ],
-        'IPS\Helpers\Form\_FormAbstract' => [
-            'formatValue' => 1,
-            'getValue' => 1,
-            'setValue' => 1
-        ],
-    ];
+    protected array $autoLint = [];
 
     protected function validationChecks(
         ReflectionClass $currentClass,

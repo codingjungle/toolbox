@@ -91,6 +91,12 @@ class _Profiler extends Singleton
         return null;
     }
 
+    public function justMyApps(){
+        $myapps = $this->myApps();
+        $info = $this->info();
+        return Theme::i()->getTemplate('bar','toolbox','front')->myapps($info,$myapps);
+    }
+
     protected function myApps(): array
     {
         $myApps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
@@ -120,6 +126,13 @@ class _Profiler extends Singleton
                     'admin'
                 );
 
+                if(Dispatcher::i()->controllerLocation === 'admin'){
+                    $analyze = Url::internal('app=toolbox&module=bt&controller=build&myApp='.$app->directory.'&download=0&do=queue');
+                }
+                else{
+                    $analyze = Url::internal('app=toolbox&module=bt&controller=build&myApp='.$app->directory.'&download=0&do=queue');
+                }
+
                 $newMyApps[] = [
                     'name' => $name,
                     'app' => $app->directory,
@@ -127,6 +140,7 @@ class _Profiler extends Singleton
                     'subs' => [
                         'Add Sources' => ['url' => (string) $source, 'icon' => 'fa-arrow-down'],
                         'Add Assets' => ['url' => (string) $assets, 'icon' => 'fa-code'],
+                        'Analyze' => ['url' => (string) $analyze, 'icon' => 'fa-terminal '],
                         'Build' => ['url' => (string) $build, 'icon' => 'fa-fw fa-cog'],
                         'DevCenter' => ['url' => (string) $devCenter, 'icon' => 'fa-fw fa-cogs', 'target' => '']
                     ]
@@ -223,14 +237,14 @@ class _Profiler extends Singleton
         $info['server'] = [
             'IPS' => Application::load('core')->version,
             'PHP' => '<a href="' . (string) $url->setQueryString(
-                ['do' => 'phpinfo']
-            ) . '" data-ipsDialog data-ipsDialog-title="phpinfo()"><i class="fa">🅟🅗🅟</i><br>' . PHP_VERSION . '</a>',
+                    ['do' => 'phpinfo']
+                ) . '" data-ipsDialog data-ipsDialog-title="phpinfo()"><i class="fa">🅟🅗🅟</i><br>' . PHP_VERSION . '</a>',
             'MySql' => Db::i()->server_info,
 
         ];
         $info['adminer'] = '<a href="' . (string) Url::internal(
-            'app=toolbox&module=bt&controller=bt&do=adminer'
-        ) . '" data-ipsdialog data-ipsdialog-title="Adminer">Adminer</a>';
+                'app=toolbox&module=bt&controller=bt&do=adminer'
+            ) . '" data-ipsdialog data-ipsdialog-title="Adminer">Adminer</a>';
         $slowestLink = Database::$slowestLink;
         $slowestTime = Database::$slowest;
         $info['other'] = [
@@ -414,8 +428,8 @@ class _Profiler extends Singleton
 
                 $data[$key] = [
                     'name' => Theme::i()
-                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
-                                   ->keyvalue('$_GET : ' . $key, $val)
+                        ->getTemplate('dtpsearch', 'toolbox', 'front')
+                        ->keyvalue('$_GET : ' . $key, $val)
                 ];
             }
         }
@@ -431,8 +445,8 @@ class _Profiler extends Singleton
 
                 $data[$key] = [
                     'name' => Theme::i()
-                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
-                                   ->keyvalue('$_POST : ' . $key, $val)
+                        ->getTemplate('dtpsearch', 'toolbox', 'front')
+                        ->keyvalue('$_POST : ' . $key, $val)
                 ];
             }
         }
@@ -448,8 +462,8 @@ class _Profiler extends Singleton
                 }
                 $data[$key] = [
                     'name' => Theme::i()
-                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
-                                   ->keyvalue('$_REQUEST : ' . $key, $val)
+                        ->getTemplate('dtpsearch', 'toolbox', 'front')
+                        ->keyvalue('$_REQUEST : ' . $key, $val)
                 ];
             }
         }
@@ -461,8 +475,8 @@ class _Profiler extends Singleton
                 }
                 $data[$key] = [
                     'name' => Theme::i()
-                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
-                                   ->keyvalue('$_COOKIE : ' . $key, $val)
+                        ->getTemplate('dtpsearch', 'toolbox', 'front')
+                        ->keyvalue('$_COOKIE : ' . $key, $val)
                 ];
             }
         }
@@ -489,8 +503,8 @@ class _Profiler extends Singleton
                 }
                 $data[$key] = [
                     'name' => Theme::i()
-                                   ->getTemplate('dtpsearch', 'toolbox', 'front')
-                                   ->keyvalue('$_SERVER : ' . $key, $val)
+                        ->getTemplate('dtpsearch', 'toolbox', 'front')
+                        ->keyvalue('$_SERVER : ' . $key, $val)
                 ];
             }
         }

@@ -17,6 +17,10 @@ class _Handler extends PrettyPageHandler
             $filePath =str_replace('/','\\', $filePath);
             $filePath = DT_WSL_PATH.$filePath;
         }
+        if(defined('DT_USE_CONTAINER') && DT_USE_CONTAINER === true){
+            $filePath =str_replace(DT_CONTAINER_GUEST_PATH,'', $filePath);
+            $filePath = DT_CONTAINER_HOST_PATH . '/' . $filePath;
+        }
         return parent::getEditorHref($filePath, $line);
     }
 }

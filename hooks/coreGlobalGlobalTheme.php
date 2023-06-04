@@ -36,11 +36,12 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
         if (CACHING_LOG && $key = array_search($cachingCss, $css, true)) {
             unset(Output::i()->cssFiles[$key]);
         }
+        Output::i()->cssFiles = array_merge(
+            Output::i()->cssFiles,
+            Theme::i()->css('profiler.css', 'toolbox', 'front')
+        );
         if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
-            Output::i()->cssFiles = array_merge(
-                Output::i()->cssFiles,
-                Theme::i()->css('profiler.css', 'toolbox', 'front')
-            );
+
             $query = Theme::i()->css('styles/query_log.css', 'core', 'front');
             $queryCss = array_pop($query);
             if ($key = array_search($queryCss, $css, true)) {
@@ -75,10 +76,12 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
             $cjBaseUrl = \IPS\Settings::i()->base_url;
             $cjAppPath = Application::getRootPath('toolbox');
             $cjDebug = \IPS\IN_DEV === true || \IPS\DEBUG_JS === true ? 1 : 0;
-            $cjWsl = (defined('DT_USE_WSL') && DT_USE_WSL) ? 1 : 0;
+            $cjWsl = (defined('DT_USE_WSL') &&  DT_USE_WSL) ? 1 : 0;
             $cjWslPath = (defined('DT_WSL_PATH')) ? DT_WSL_PATH : '';
             $cjWslPath = str_replace('\\','\\\\', $cjWslPath);
-            Output::i()->headJs = $js;
+            $cjContainer = (defined('DT_USE_CONTAINER') && DT_USE_CONTAINER) ? 1 : 0;
+            $cjContainerGuest = (defined('DT_CONTAINER_GUEST_PATH')) ? DT_CONTAINER_GUEST_PATH : '';
+            $cjContainerHost = (defined('DT_CONTAINER_HOST_PATH')) ? : 'DT_CONTAINER_HOST_PATH';
             $data = <<<EOF
 <script type="text/javascript">
     var dtProfilerUseConsole = {$canUse},
@@ -87,13 +90,18 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
     dtProfilerBaseUrl = '{$cjBaseUrl}',
     dtProfilerAppPath = '{$cjAppPath}',
     dtProfilerDebug = '{$cjDebug}',
-    dtProfilerReplacements = {$replacements}, 
+    dtProfilerReplacements = {$replacements},
     useWsl = {$cjWsl},
     wslPath = '{$cjWslPath}';
+useContainer = '{$cjContainer}';
+containerHostPath = '{$cjContainerHost}';
+containerGuestPath = '{$cjContainerGuest}';
 </script>
 {$js}
 EOF;
             $loadJs = [];
+            $loadJs[] = 'front_profiler';
+
             if (defined('DT_NODE') && DT_NODE) {
                 $loadJs[] = 'front_socket';
             }
@@ -101,7 +109,6 @@ EOF;
             $loadJs[] = 'global_proxy';
 
             if (\IPS\QUERY_LOG ) {
-                $loadJs[] = 'front_profiler';
                 if (Settings::i()->dtprofiler_enabled_js) {
                     Store::i()->dtprofiler_js = Output::i()->jsFiles;
                 }

@@ -268,9 +268,42 @@ class _toolbox
                 'type' => 'string',
                 'tab'         => 'Beta',
             ],
+            'DT_USE_CONTAINER' => [
+                'name'        => 'DT_USE_CONTAINER',
+                'default'     => false,
+                'current'     => defined('\DT_USE_CONTAINER') ? DT_USE_CONTAINER : false,
+                'description' => 'Are we using a container like docker/devilbox/etc?',
+                'type' => 'boolean',
+                'tab'         => 'Debug',
+            ],
+            'DT_CONTAINER_GUEST_PATH' => [
+                'name'        => 'DT_CONTAINER_GUEST_PATH',
+                'default'     => \IPS\ROOT_PATH,
+                'current'     => defined('\DT_CONTAINER_GUEST_PATH') ? DT_CONTAINER_GUEST_PATH : \IPS\ROOT_PATH,
+                'description' => 'This is the part of the path to remove, this is usually the DOCUMENT ROOT path.',
+                'type' => 'string',
+                'tab'         => 'Debug',
+            ],
+            'DT_CONTAINER_HOST_PATH' => [
+                'name'        => 'DT_CONTAINER_HOST_PATH',
+                'default'     => '/home/michael/devilbox/data/www/ips/htdocs',
+                'current'     => defined('\DT_CONTAINER_PATH') ? DT_CONTAINER_HOST_PATH : '/home/michael/devilbox/data/www/ips/htdocs',
+                'description' => 'Path to files on disk, this will be something like /home/michael/devilbox/data/www/ips/htdocs.',
+                'type' => 'string',
+                'tab'         => 'Debug',
+            ],
         ];
 
-
+        if(\IPS\QUERY_LOG === false){
+            $return['DT_HIDE_MYAPPS'] = [
+                'name'        => 'DT_HIDE_MYAPPS',
+                'default'     => 0,
+                'current'     => defined('\DT_HIDE_MYAPPS') ? DT_HIDE_MYAPPS : false,
+                'description' => 'Hides the "my apps/dev toolbox when query log is disabled.',
+                'type' => 'boolean',
+                'tab'         => 'DevTools',
+            ];
+        }
 
 
         return $return;
