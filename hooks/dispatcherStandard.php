@@ -3,6 +3,7 @@
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
 use IPS\Data\Store;
+use IPS\Dispatcher\Admin;
 use IPS\Http\Url;
 use IPS\Output;
 use IPS\Request;
@@ -24,6 +25,7 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 
 abstract class toolbox_hook_dispatcherStandard extends _HOOK_CLASS_
 {
+
     public function run()
     {
         Widget::deleteCaches();
