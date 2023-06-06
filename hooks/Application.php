@@ -198,7 +198,7 @@ class toolbox_hook_Application extends _HOOK_CLASS_
         $apps = [];
         $buttons = parent::getButtons($url, $subnode);
         if(defined('DT_MY_APPS')) {
-            $apps = explode(',', DT_MY_APPS);
+            $apps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
             $apps = array_combine($apps, $apps);
         }
         if(isset($thirdParty[$this->directory])){

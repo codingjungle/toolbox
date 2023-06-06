@@ -106,7 +106,10 @@ trait Build
         );
         $app = Request::i()->appToBuild;
         $form = Form::create()->submitLang('Build')->addClass('ipsBox ipsPadding');
-        $myApps = \defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
+        $myApps = [];
+        if(defined('DT_MY_APPS')) {
+            $myApps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
+        }
         if (empty($myApps) === false && \in_array($app, $myApps)) {
             $application = Application::load($app);
             if (empty($application->version) !== true) {

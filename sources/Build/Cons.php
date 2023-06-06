@@ -71,39 +71,38 @@ class _Cons extends Singleton
         $constants = $this->buildConstants();
         $form = Form::create();
         foreach ($constants as $key => $value) {
-            $tab = mb_ucfirst(mb_substr($key, 0, 1));
-
-            if (in_array($key, static::$importantIPS, true)) {
-                $tab = 'Important';
-            }
-
-            if (isset($value['tab'])) {
-                $tab = $value['tab'];
-            }
-
+            $tab = $value['tab'];
             Member::loggedIn()->language()->words[$tab . '_tab'] = $tab;
             if ($key === 'CACHEBUST_KEY') {
                 $value['current'] = 'md5(random_int(0, 10000) . time())';
             }
-
-
-            $form->addElement($key)->label($key)->value($value['current'])->description($value['description'] ?? '')->tab(
+            $v = $value['current'];
+            $form->addElement($key)->label($key)->value($v)->description($value['description'] ?? '')->tab(
                 $tab
             );
 
-            switch (gettype($value['current'])) {
+            switch ($value['type']) {
+                case 'yn':
                 case 'boolean':
                     $form->getElement($key)->changeType('yn')->empty((bool)$value['current']);
                     break;
+                case 'integer':
                 case 'int':
                     $form->getElement($key)->changeType('number');
                     break;
                 case 'url':
                     $form->getElement($key)->changeType('url');
                     break;
+                case 'stack':
+                case 'array':
+                    $form->getElement($key)->changeType('stack');
+                    break;
+
+            }
+            if(isset($value['type']) && $value['type'] === 'stack'){
+                $form->getElement($key)->changeType('stack');
             }
         }
-
 
         if ($values = $form->values()) {
             $this->save($values, $constants);
@@ -132,28 +131,27 @@ class _Cons extends Singleton
             }
 
             $first = array_merge(...$first);
-            static::$importantIPS = array_merge(... $important);
+            $importantIPS = array_merge(... $important);
             foreach ($cons as $key => $con) {
                 if ($key === 'READ_WRITE_SEPARATION' || $key === 'REPORT_EXCEPTIONS') {
                     continue;
                 }
                 $current = constant('\\IPS\\' . $key);
-
                 $data = [
                     'name'    => $key,
                     'default' => $con,
                     'current' => $current,
                     'type'    => gettype(constant('\\IPS\\' . $key)),
+                    'tab' => \in_array($key, $importantIPS) ? 'Important' : mb_ucfirst(mb_substr($key, 0, 1))
                 ];
-
-                if (in_array($key, static::$importantIPS, true)) {
+                if($data['tab'] === 'Important'){
                     $first[$key] = $data;
-                } else {
+                }
+                else{
                     $constants[$key] = $data;
                 }
             }
             ksort($constants);
-
             $this->constants = array_merge($first, $constants);
         }
 
@@ -202,12 +200,19 @@ class _Cons extends Singleton
                 } else {
                     $dataType = "'" . $data . "'";
                     switch ($val['type']) {
-                        case 'integer':
-                            $dataType = (int)$data;
-                            break;
+                        case 'yn':
                         case 'boolean':
                             $dataType = $data ? 'true' : 'false';
                             break;
+                        case 'integer':
+                        case 'int':
+                            $dataType = (int)$data;
+                            break;
+                        case 'stack':
+                        case 'array':
+                            $dataType = var_export($data, true);
+                            break;
+
                     }
                     if ($key === 'SUITE_UNIQUE_KEY') {
                         $dataType = $data;

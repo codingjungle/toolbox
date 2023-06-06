@@ -100,8 +100,10 @@ class _Profiler extends Singleton
 
     protected function myApps(): array
     {
-        $myApps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
-
+        $myApps = [];
+        if(defined('DT_MY_APPS')) {
+            $myApps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
+        }
         if (empty($myApps) === false) {
             $newMyApps = [];
             $applications = Application::applications();

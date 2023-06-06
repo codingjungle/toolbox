@@ -329,7 +329,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
 
     public function _myAppRoots(){
         $rows = array();
-        $myApps = explode(',',DT_MY_APPS);
+        $myApps = \is_array('DT_MY_APPS') ? DT_MY_APPS : explode(',', DT_MY_APPS);
         $sql = Db::i()->select('*','core_applications',Db::i()->in('app_directory', $myApps), 'app_position ASC');
         $roots = new ActiveRecordIterator($sql, Application::class);
         foreach( $roots as $node )
@@ -345,7 +345,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
         $rows = array();
         $apps = \IPS\IPS::$ipsApps;
         if(defined('DT_MY_APPS')) {
-            $myApps = explode(',', DT_MY_APPS);
+            $myApps = \is_array('DT_MY_APPS') ? DT_MY_APPS : explode(',', DT_MY_APPS);
             $apps = array_merge($apps,$myApps);
         }
         $sql = Db::i()->select('*','core_applications',Db::i()->in('app_directory', $apps,true), 'app_position ASC');
@@ -384,7 +384,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
             $values[$k] = $check !== $check2 ? $v['current'] : $v['default'];;
         }
         if(defined('DT_MY_APPS')) {
-            $myApps = explode(',', DT_MY_APPS);
+            $myApps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
             $apps = array_combine($myApps,$myApps);
         }
         if(isset($apps[$app])){
@@ -422,7 +422,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
             $values[$k] = $check !== $check2 ? $v['current'] : $v['default'];;
         }
         if(defined('DT_MY_APPS')) {
-            $myApps = explode(',', DT_MY_APPS);
+            $myApps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
             $apps = array_combine($myApps,$myApps);
         }
         $apps[$app] = $app;

@@ -126,16 +126,19 @@ class _Menu extends Singleton
             }
         }
         else {
-            $myapps = defined('DT_MY_APPS') ? explode(',', DT_MY_APPS) : [];
-            if (empty($myapps) === false) {
-                $myapps = array_combine(array_values($myapps),array_values($myapps));
+            $myApps = [];
+            if(defined('DT_MY_APPS')) {
+                $myApps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
+            }
+            if (empty($myApps) === false) {
+                $myApps = array_combine(array_values($myApps),array_values($myApps));
                 $store['apps']['myapps'] = [
                     'label' => 1,
                     'title' => 'My Apps',
                     'id' => 'myapps2'
                 ];
                 foreach ($applications as $app) {
-                    if (isset($myapps[$app->directory])) {
+                    if (isset($myApps[$app->directory])) {
                         $store['subs']['myapps2'][$app->directory] = [
                             'id' => $app->directory,
                             'name' => '__app_' . $app->directory,

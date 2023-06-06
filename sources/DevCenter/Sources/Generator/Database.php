@@ -36,7 +36,6 @@ use function method_exists;
  * Class _Db
  *
  * @mixin Database
- * @todo next we need to make sure that the "getter" methods are optimized properly
  */
 class _Database
 {

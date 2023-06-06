@@ -37,7 +37,6 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 /**
  * proxy
  * @deprecated
- * @todo this should be removed soon
  */
 class _proxy extends Controller
 {
@@ -89,7 +88,7 @@ class _proxy extends Controller
                 return null;
             } else {
                 /**
-                 * @todo hacky af, but what is a boy to do? :P
+                 * hacky af, but what is a boy to do? :P
                  */
                 if (in_array('current', $run)) {
                     $progress = isset($run['progress']) ? $run['progress'] : 0;
