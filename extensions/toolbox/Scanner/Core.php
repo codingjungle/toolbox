@@ -2,28 +2,13 @@
 
 namespace IPS\toolbox\extensions\toolbox\Scanner;
 
-use IPS\toolbox\Code\ScannerAbstract;
+use IPS\toolbox\Code\Abstracts\ScannerAbstract;
 
 /**
  *
  */
 class _Core extends ScannerAbstract
 {
-
-    public function excludedFolders(): array
-    {
-        return [
-            'vendor',
-            'Vendor',
-            'ThirdParty',
-            'Thirdparty',
-            'thirdparty',
-            '3rdParty',
-            '3rdparty',
-            'Composer',
-            'composer'
-        ];
-    }
 
     public function fullStop(): array
     {

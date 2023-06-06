@@ -13,8 +13,8 @@
 namespace IPS\toolbox\Code;
 
 use IPS\Theme;
-use IPS\toolbox\Code\ParserAbstract;
 use Symfony\Component\Finder\Finder;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
     header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
@@ -27,15 +27,6 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 */
 class _Templates extends ParserAbstract
 {
-    protected function getFiles()
-    {
-        $files = new Finder();
-        $files->in($this->getAppPath() . 'dev/html')->name('*.phtml');
-        if (empty($this->skip) === false) {
-            $files->notName($this->skip);
-        }
-        $this->files = $files->files();
-    }
 
     public function validate(): array
     {
@@ -49,7 +40,7 @@ class _Templates extends ParserAbstract
             $method = $file->getFilenameWithoutExtension();
             $params = array();
             [$loc,$group] = explode('/', $path);
-            $class = $loc.$group.$method;
+            $class = $loc.$group.$method.uniqid('Template');
             /* Parse the header tag */
             preg_match( '/^<ips:template parameters="(.+?)?"(.+?)?\/>(\r\n?|\n)/', $html, $params );
 

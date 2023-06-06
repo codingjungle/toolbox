@@ -15,6 +15,7 @@ namespace IPS\toolbox\Code;
 use IPS\Application;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function count;
 use function defined;
@@ -48,17 +49,6 @@ class _Settings extends ParserAbstract
      * @var array
      */
     protected $appSettings = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($app)
-    {
-        parent::__construct($app);
-        $this->skip = [
-            'settings.json',
-        ];
-    }
 
     /**
      * gathers the defined settings for all the apps and current app, include conf.global settings

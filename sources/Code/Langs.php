@@ -19,6 +19,7 @@ use IPS\Member;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function abs;
 use function array_diff;
@@ -153,17 +154,14 @@ class _Langs extends ParserAbstract
         if ($this->app === null) {
             return;
         }
-
-        $files = new Finder();
-        $files->in($this->getAppPath() . 'dev/')->files()->name('*lang.php');
-        $lf = $this->getAppPath() . 'dev/lang.php';
+        $lf = $this->app->directory . 'dev/lang.php';
         if (file_exists($lf)) {
             $lang = null;
             require $lf;
             $this->langs = $lang;
         }
 
-        $jlf = $this->getAppPath() . 'dev/jslang.php';
+        $jlf = $this->app->directory . 'dev/jslang.php';
         if (file_exists($jlf)) {
             $lang = null;
             require $jlf;

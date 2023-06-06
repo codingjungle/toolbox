@@ -15,6 +15,7 @@ namespace IPS\toolbox\Code;
 use InvalidArgumentException;
 use IPS\toolbox\ReservedWords;
 use Symfony\Component\Finder\Finder;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function defined;
 use function header;
@@ -41,20 +42,6 @@ class _Template extends ParserAbstract
     public static function validateName($name): bool
     {
         return ReservedWords::check($name);
-    }
-
-    /**
-     * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
-     *
-     * @throws InvalidArgumentException
-     */
-    protected function getFiles()
-    {
-        $this->finder = (new Finder())->in($this->getAppPath() . 'dev/')->files();
-
-        foreach (ReservedWords::get() as $invalidName) {
-            $this->finder->name($invalidName . '.php');
-        }
     }
 
     /**

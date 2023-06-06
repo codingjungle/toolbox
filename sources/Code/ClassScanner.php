@@ -27,6 +27,7 @@ use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
     header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0') . ' 403 Forbidden');
@@ -42,10 +43,24 @@ class _ClassScanner extends ParserAbstract
     use Scanner;
 
     /**
-     * paths should be relative to <app path>/sources/
+     * these are classes we stop before we get to the root parent.
      * @var array
      */
-    protected array $excludedFolders = [];
+    protected array $fullStop = [];
+
+    /**
+     * these are methods inside some classes, that we don't need to check if they call the parent on, as
+     * they are usually intended to be overloaded.
+     * @var array|array[]
+     */
+    protected array $autoLint = [];
+
+    public function __construct($app)
+    {
+        parent::__construct($app);
+        $this->fullStop = $this->getFullStop();
+        $this->autoLint = $this->getAutoLint();
+    }
 
     public function validate(): array
     {
@@ -141,16 +156,4 @@ class _ClassScanner extends ParserAbstract
         return $warnings;
     }
 
-    protected function getFiles()
-    {
-        $files = new Finder();
-        $files->in($this->getAppPath() . 'sources/')->name('*.php');
-        if (empty($this->skip) === false) {
-            $files->notName($this->skip);
-        }
-        if (empty($this->excludedFolders) === false) {
-            $files->exclude($this->excludedFolders);
-        }
-        $this->files = $files->files();
-    }
 }

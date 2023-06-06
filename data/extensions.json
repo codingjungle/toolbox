@@ -1,30 +1,7 @@
 {
-    "core": {
-        "Queue": {
-            "Proxy": "IPS\\toolbox\\extensions\\core\\Queue\\Proxy"
-        },
-        "FileStorage": {
-            "FileStorage": "IPS\\toolbox\\extensions\\core\\FileStorage\\FileStorage"
-        }
-    },
     "toolbox": {
-        "phpToolBoxMeta": {
-            "devcenter": "IPS\\toolbox\\extensions\\toolbox\\phpToolBoxMeta\\devcenter",
-            "generators": "IPS\\toolbox\\extensions\\toolbox\\phpToolBoxMeta\\generators"
-        },
         "Headerdoc": {
             "header": "IPS\\toolbox\\extensions\\toolbox\\Headerdoc\\header"
-        },
-        "constants": {
-            "toolbox": "IPS\\toolbox\\extensions\\toolbox\\constants\\toolbox"
-        },
-        "ProxyHelpers": {
-            "proxy": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\proxy",
-            "code": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\code",
-            "dtcontent": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\dtcontent",
-            "devplus": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\devplus",
-            "devfolder": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\devfolder",
-            "profiler": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\profiler"
         },
         "SpecialHooks": {
             "toolbox": "IPS\\toolbox\\extensions\\toolbox\\SpecialHooks\\toolbox"
@@ -32,6 +9,35 @@
         "settings": {
             "proxy": "IPS\\toolbox\\extensions\\toolbox\\settings\\proxy",
             "profiler": "IPS\\toolbox\\extensions\\toolbox\\settings\\profiler"
+        },
+        "Scanner": {
+            "Core": "IPS\\toolbox\\extensions\\toolbox\\Scanner\\Core"
+        },
+        "constants": {
+            "toolbox": "IPS\\toolbox\\extensions\\toolbox\\constants\\toolbox"
+        },
+        "codeAnalyzer": {
+            "Core": "IPS\\toolbox\\extensions\\toolbox\\codeAnalyzer\\Core"
+        },
+        "ProxyHelpers": {
+            "devfolder": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\devfolder",
+            "code": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\code",
+            "proxy": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\proxy",
+            "devplus": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\devplus",
+            "profiler": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\profiler",
+            "dtcontent": "IPS\\toolbox\\extensions\\toolbox\\ProxyHelpers\\dtcontent"
+        },
+        "phpToolBoxMeta": {
+            "generators": "IPS\\toolbox\\extensions\\toolbox\\phpToolBoxMeta\\generators",
+            "devcenter": "IPS\\toolbox\\extensions\\toolbox\\phpToolBoxMeta\\devcenter"
+        }
+    },
+    "core": {
+        "Queue": {
+            "Proxy": "IPS\\toolbox\\extensions\\core\\Queue\\Proxy"
+        },
+        "FileStorage": {
+            "FileStorage": "IPS\\toolbox\\extensions\\core\\FileStorage\\FileStorage"
         }
     }
 }

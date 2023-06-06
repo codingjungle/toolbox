@@ -28,17 +28,11 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 */
 class _MyApps
 {
-
     /**
-    * _MyApps constructor
-    *
-    */
-    public function __construct($checkAccess )
-    {
-
-        
-    }
-
+     * add addditonal fields to the form on the build form
+     * @param Form $form
+     * @return void
+     */
     public function addForm( Form $form )
     {
 
@@ -53,16 +47,33 @@ class _MyApps
 
     }
 
+    /**
+     * to things to the savepath/filename and/or various versions stuff before we build the installer file.
+     * @param Versions $versions
+     * @param $filename
+     * @param $savePath
+     * @return void
+     */
     public function beforeBuild(Versions $versions, &$filename, &$savePath)
     {
 
     }
 
+    /**
+     * directories to exclude from slasher
+     * @param array $dirs
+     * @return void
+     */
     public function slasherDirExclude(array &$dirs)
     {
 
     }
 
+    /**
+     * files to exclude from slasher
+     * @param array $files
+     * @return void
+     */
     public function slasherFileExclude(array &$files)
     {
 

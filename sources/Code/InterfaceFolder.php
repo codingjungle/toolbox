@@ -15,6 +15,7 @@ namespace IPS\toolbox\Code;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function defined;
 use function header;
@@ -54,23 +55,5 @@ class _InterfaceFolder extends ParserAbstract
         return $warning;
     }
 
-    /**
-     * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
-     *
-     * @throws InvalidArgumentException
-     */
-    protected function getFiles()
-    {
-        $files = new Finder();
-        $files->in($this->getAppPath() . 'interface/')->notName('index.html');
-        if ($this->skip !== null) {
-            foreach ($this->skip as $name) {
-                $files->notName($name);
-            }
-        }
-
-
-        $this->files = $files;
-    }
 
 }

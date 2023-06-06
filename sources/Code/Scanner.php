@@ -15,6 +15,7 @@ namespace IPS\toolbox\Code;
 
 use Exception;
 use IPS\toolbox\Code\Utils\ParentVisitor;
+use IPS\toolbox\extensions\toolbox\Scanner\Core;
 use OutOfRangeException;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
@@ -38,18 +39,38 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 */
 trait Scanner
 {
-    /**
-     * these are classes we stop before we get to the root parent.
-     * @var array
-     */
-    protected array $fullStop = [];
 
-    /**
-     * these are methods inside some classes, that we don't need to check if they call the parent on, as
-     * they are usually intended to be overloaded.
-     * @var array|array[]
-     */
-    protected array $autoLint = [];
+
+    protected function getFullStop(): array
+    {
+        $default[] = (new Core())->fullStop();
+        $extension = $this->app->extensions('toolbox', 'Scanner');
+        if (empty($extension) === false) {
+            $merged = [];
+            foreach ($extension as $ext) {
+                $data = $ext->fullStop();
+                if ($data !== null) {
+                    $default[] = $data;
+                }
+            }
+        }
+        return array_merge(...$default);
+    }
+
+    protected function getAutoLint(){
+        $default[] = (new Core())->fullStop();
+        $extension = $this->app->extensions('toolbox', 'Scanner');
+        if (empty($extension) === false) {
+            $merged = [];
+            foreach ($extension as $ext) {
+                $data = $ext->autoLint();
+                if ($data !== null) {
+                    $default[] = $data;
+                }
+            }
+        }
+        return array_merge(...$default);
+    }
 
     protected function validationChecks(
         ReflectionClass $currentClass,

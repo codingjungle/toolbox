@@ -54,9 +54,6 @@ class _build extends \IPS\Dispatcher\Controller
     public function execute()
     {
         Output::i()->cssFiles = array_merge(Output::i()->cssFiles, Theme::i()->css('dtcode.css', 'toolbox', 'admin'));
-
-
-
         parent::execute();
     }
 }

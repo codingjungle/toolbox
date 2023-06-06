@@ -17,6 +17,7 @@ use Exception;
 use InvalidArgumentException;
 use IPS\toolbox\extensions\core\FileStorage\FileStorage;
 use UnderflowException;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function defined;
 use function get_class;

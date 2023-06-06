@@ -189,118 +189,6 @@ class _Proxyclass extends Singleton
     }
 
     /**
-     * this is used for the controller and the MR
-     *
-     * @param array $data
-     *
-     * @return array|null
-     * @throws InvalidArgumentException
-     * @throws OutOfRangeException
-     * @deprecated
-     * @todo this should be removed as it is no longer used
-     */
-    public function run(array $data = [])
-    {
-//        $i = 0;
-//        $totalFiles = 0;
-//        $iterator = 0;
-//        if (isset(Store::i()->dtproxy_proxy_files)) {
-//            if (isset(Store::i()->dtproxy_templates)) {
-//                $this->templates = Store::i()->dtproxy_templates;
-//            }
-//
-//            /**
-//             * @var $iterator array
-//             */
-//            $iterator = Store::i()->dtproxy_proxy_files;
-//            $totalFiles = $data['total'] ?? 0;
-//            $limit = 1;
-//            if (!isset($data['firstRun'])) {
-//                $limit = 250;
-//            }
-//
-//            foreach ($iterator as $key => $file) {
-//                $i++;
-//                $filePath = $file;
-//                $this->build($filePath);
-//                unset($iterator[$key]);
-//                if ($i === $limit) {
-//                    break;
-//                }
-//            }
-//
-//            unset(Store::i()->dtproxy_proxy_files);
-//        }
-//
-//        if ($i) {
-//            if (is_array($iterator) && count($iterator)) {
-//                Store::i()->dtproxy_proxy_files = $iterator;
-//            }
-//
-//            if (is_array($this->templates) && count($this->templates)) {
-//                Store::i()->dtproxy_templates = $this->templates;
-//            }
-//
-//            if (isset($data['current']) && $data['current']) {
-//                $offset = $data['current'] + $i;
-//            } else {
-//                $offset = $i;
-//            }
-//
-//            return ['total' => $totalFiles, 'current' => $offset, 'progress' => $data['progress'] ?? 0];
-//        }
-//
-//        /**
-//         * @todo this is ugly, we should improve this!
-//         */
-//        $steps = 0;
-//        $step = $data['step'] ?? null;
-//        $lastStep = $step;
-//        $complete = $data['complete'] ?? 0;
-//        if ($this->doConstants) {
-//            if ($step === null) {
-//                $step = 'constants';
-//            }
-//            $steps++;
-//        }
-//
-//        /**
-//         * @todo this will get annoying sooner or later, should find a better way to handle the "totals"
-//         */
-//        if ($this->doProxies) {
-//            $steps += 7;
-//        } elseif ($step === 'apps') {
-//            $step = null;
-//        }
-//
-//        if ($step === 'constants') {
-//            Proxy::i()->buildConstants();
-//            $complete++;
-//            $lastStep = $step;
-//            $step = 'apps';
-//
-//            return ['step' => $step, 'lastStep' => $lastStep, 'tot' => $steps, 'complete' => $complete];
-//        }
-//
-//        if ($this->doProxies) {
-//            $step = $this->makeToolboxMeta($step);
-//            $complete++;
-//        } else {
-//            $step = null;
-//        }
-//
-//        if ($step === null) {
-////            (new GitHooks(\IPS\Application::applications()))->writeSpecialHooks();
-//            Proxy::i()->generateSettings();
-//            $this->buildCss();
-//            unset(Store::i()->dtproxy_proxy_files, Store::i()->dtproxy_templates);
-//            return null;
-//        }
-//
-//        return ['step' => $step, 'lastStep' => $lastStep, 'tot' => $steps, 'complete' => $complete];
-    }
-
-    /**
      * this will take a file path, and create proxy classes from it
      *
      * @param $file
@@ -610,25 +498,26 @@ class _Proxyclass extends Singleton
         $finder = new Finder();
         try {
             if ($dir === null) {
-                    if (is_dir($save) && $empty === true) {
+                if (is_dir($save) && $empty === true) {
                         //$this->emptyDirectory();
-                    }
+                }
 
-                    if(!is_dir($save) && !mkdir($save)){
-                        chmod($save, 0777);
-                    }
+                if(!is_dir($save) && !mkdir($save)){
+                    chmod($save, 0777);
+                }
 
-                    if (!is_dir($save . 'class' . $ds) && !mkdir($save . 'class' . $ds)) {
-                        chmod($save . 'class/', 0777);
-                    }
+                if (!is_dir($save . 'class' . $ds) && !mkdir($save . 'class' . $ds)) {
+                    chmod($save . 'class/', 0777);
+                }
 
-                    if (!is_dir($save . 'templates' . $ds) && !mkdir($save . 'templates' . $ds)) {
-                        chmod($save . 'templates' . $ds, 0777);
-                    }
+                if (!is_dir($save . 'templates' . $ds) && !mkdir($save . 'templates' . $ds)) {
+                    chmod($save . 'templates' . $ds, 0777);
+                }
 
-                    if (!is_dir($save . 'extensions' . $ds) && !mkdir($save . 'extensions' . $ds)) {
-                        chmod($save . 'extensions' . $ds, 0777);
-                    }
+                if (!is_dir($save . 'extensions' . $ds) && !mkdir($save . 'extensions' . $ds)) {
+                    chmod($save . 'extensions' . $ds, 0777);
+                }
+
                 foreach ($this->lookIn() as $dirs) {
                     if (is_dir($dirs)) {
                         $finder->in($dirs);

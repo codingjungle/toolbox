@@ -13,6 +13,7 @@
 namespace IPS\toolbox\Code;
 
 use Symfony\Component\Finder\SplFileInfo;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function defined;
 use function explode;

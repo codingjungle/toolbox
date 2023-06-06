@@ -2,7 +2,7 @@
 
 namespace IPS\{app}\extensions\toolbox\Scanner;
 
-use IPS\toolbox\Code\ScannerAbstract;
+use IPS\toolbox\Code\Abstracts\ScannerAbstract;
 
 /**
 * check out applications/toolbox/extensions/Scanner/Core.php

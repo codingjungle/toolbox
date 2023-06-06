@@ -1,0 +1,11 @@
+<?php
+
+namespace IPS\{app}\extensions\toolbox\codeAnalyzer;
+
+use IPS\toolbox\Code\Abstracts\CodeAnalyzerAbstract;
+
+class _{class} extends CodeAnalyzerAbstract
+{
+
+
+}

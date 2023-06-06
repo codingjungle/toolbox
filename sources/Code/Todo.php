@@ -16,12 +16,11 @@ use IPS\Data\Store;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use IPS\Db;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function defined;
 use function explode;
-use function header;
-use function mb_strpos;
-use function preg_match_all;
+use function header; 
 
 
 if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
@@ -43,7 +42,7 @@ class _Todo extends ParserAbstract
             return [];
         }
         try {
-            Db::i()->delete('toolbox_todo', ['todo_app=?', $this->app]);
+            Db::i()->delete('toolbox_todo', ['todo_app=?', $this->app->directory]);
         }catch(\Throwable $e){}
         $warning = [];
         /**

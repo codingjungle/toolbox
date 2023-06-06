@@ -411,9 +411,36 @@ $lang = [
     'no_fucks_left' => 'Okay this is a message from me CodingJungle.<br>
 First thing you should do is check what is listed here, cause you might have an actual problem that this half assed tool is trying to resolve. Okay, you’ve done that? Good now you can read further. I have written up some of my thoughts about this tool, you can read them on my site.<br><br>
  <a href="https://codingjungle.com/articles/records/failure-r92/">My Thoughts</a><br><h1>Whatever IPS Says:</h1>',
-    'code_todo' => 'Todo\'s',
+    'code_todo' => 'Todo\'s (%s)',
     'code_todo_desc' => 'A list of todo\'s found in the app, incase you missed them, otherwise you can ignore them!',
     'toolbox_use_proxy_task' => 'Use proxyclass task',
     'toolbox_show_todo' => 'Show Todo Button',
-    'dtprofiler_console_replacements' => 'Console Replacements'
+    'dtprofiler_console_replacements' => 'Console Replacements',
+    'ext__MyApps' => 'This extension is used for the my apps build feature, to allow you to alter the build process specifically for your app if needs be.',
+    'ext__Providers' => 'Write your own provider files for the phptoolbox extension in phpstorm.',
+    'ext__Scanner' => 'Add in checks for the class scanner to skip files/methods for its various checks.',
+    'ext__langPrefixes' => 'Use this to modify the language checker in analyzer.',
+    'ext__phpToolBoxMeta' => 'add/adjust data going into the toolboxmeta json file. this is similar to providers, but allows for less robust abilities to be added.',
+    'ext__settingsClass' => 'If you are using the settings class from source builder in the dev center, you can use this extension to tell the proxyclass generator on how to build your settings to get proper auto complete for.',
+    'ext__codeAnalyzer' => 'Use this to set excluded files/folders for the various parsers in code analyzer, you can also define what extensions for files to grab for each parser.',
+    'class_scanner_parentUsage' => 'Parent Usage',
+    'class_scanner_parentUsage_desc' => 'methods who do not call their parent.',
+    'class_scanner_validation_title' => 'Class Validation (%s)',
+    'class_scanner_validation_title_desc' => 'Scans thru your php files, checking for various common issues that can cause errors or even bugs in your application.',
+    'class_scanner_processing' => 'Processing Class',
+    'class_scanner_processing_desc' => 'This will contain errors related to not being able to load the class.',
+    'class_scanner_signature' => 'Signature Check',
+    'class_scanner_signature_desc' => 'Checks the signaturs of your overridden methods, to make sure they match the parent class. this will throw errors in PHP 8+',
+    'class_scanner_parameters' => 'Parameters Check',
+    'class_scanner_parameters_desc' => 'Checks the parameters of your overridden methods, to make sure they match the parents!',
+    'class_scanner_case' => 'Case Check',
+    'class_scanner_case_desc' => 'This makes sure you class name and file name have identical cases. this isn\'t a problem in windows, cause windows Test.php and test.php are seen as the same thing, since IPS uses case to autload classes this can be a problem in linux/BSD, ya know, Proper OS\'s :)',
+    'class_scanner_errors' => 'Scanner Errors',
+    'class_scanner_errors_desc' => 'These are errors that the class scanner couldn\'t resolve on its own, but could indicated something is wrong with the source files listed.',
+    'hooks_validation_title' => 'Hooks Validation (%s)',
+    'hooks_validation_title_desc' => 'This contains any errors that your hook files might be causing.',
+    'templates_validation_errors' => 'Template Validation (%s)',
+    'templates_validation_errors_desc' => 'This will contain any errors your template might\'ve thrown while attempting to compile it. note: this does not load the template with any theme hook that might be applied to it. this is done to simplify the debugging process.'
+
+
 ];

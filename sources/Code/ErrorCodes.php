@@ -14,6 +14,7 @@ namespace IPS\toolbox\Code;
 
 use IPS\toolbox\Application;
 use Symfony\Component\Finder\SplFileInfo;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function defined;
 use function file_exists;

@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use IPS\IPS;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 
 use function array_shift;
 use function defined;
@@ -37,9 +38,7 @@ if (!defined('\IPS\SUITE_UNIQUE_KEY')) {
 
 class _Db extends ParserAbstract
 {
-
     protected $warnings;
-
     protected $finder;
 
     /**
@@ -83,23 +82,5 @@ class _Db extends ParserAbstract
         return $warning;
     }
 
-    /**
-     * gathers all the files in an app directory except the lang.php, jslang.php and lang.xml
-     *
-     * @throws InvalidArgumentException
-     */
-    protected function getFiles()
-    {
-        $files = new Finder();
-        $files->in($this->getAppPath() . 'setup/')->name('queries.json');
-        if ($this->skip !== null) {
-            foreach ($this->skip as $name) {
-                $files->notName($name);
-            }
-        }
-
-
-        $this->files = $files->files();
-    }
 
 }

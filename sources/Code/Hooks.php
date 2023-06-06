@@ -22,7 +22,6 @@ use IPS\Http\Url;
 use IPS\IPS;
 use IPS\Request;
 use IPS\toolbox\Application;
-use IPS\toolbox\Code\ParserAbstract;
 use IPS\toolbox\Code\Utils\Hook;
 use IPS\toolbox\Code\Utils\HookClass;
 use IPS\toolbox\Code\Utils\ParentVisitor;
@@ -35,21 +34,13 @@ use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-
+use IPS\toolbox\Code\Abstracts\ParserAbstract;
 use Throwable;
 
-use toolbox_IPS_Plugin_Hook_ab9712a0d65901062b22f5262a724bd72\_HOOK_CLASS_;
-
-use function _d;
-use function _p;
 use function array_pop;
-use function class_exists;
-use function defined;
+ use function defined;
 use function explode;
-use function file_exists;
-use function header;
-use function print_r;
-use function array_slice;
+ use function header;
 
 if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
     header( ( $_SERVER[ 'SERVER_PROTOCOL' ] ?? 'HTTP/1.0' ) . ' 403 Forbidden' );
@@ -67,27 +58,28 @@ class _Hooks extends ParserAbstract
     protected $hookFile;
     protected $existingHooks = [];
     protected $conf;
+    /**
+     * these are classes we stop before we get to the root parent.
+     * @var array
+     */
+    protected array $fullStop = [];
 
-    protected function getAppPath()
+    /**
+     * these are methods inside some classes, that we don't need to check if they call the parent on, as
+     * they are usually intended to be overloaded.
+     * @var array|array[]
+     */
+    protected array $autoLint = [];
+
+    public function __construct($app)
     {
-        $appPath = parent::getAppPath();
-        $this->hookFile = \json_decode(\file_get_contents($appPath.'data/hooks.json'),true);
+        parent::__construct($app);
+        $this->fullStop = $this->getFullStop();
+        $this->autoLint = $this->getAutoLint();
+        $this->hookFile = \json_decode(\file_get_contents($this->app->getApplicationPath(). DIRECTORY_SEPARATOR . 'data'.DIRECTORY_SEPARATOR.'hooks.json'),true);
         if(empty($this->hookFile) === true){
             throw new InvalidArgumentException();
         }
-        return $appPath.'hooks/';
-    }
-
-    protected function getFiles()
-    {
-        $files = new Finder();
-        $files->in($this->getAppPath())->name('*.php');
-        if ($this->skip !== null) {
-            foreach ($this->skip as $name) {
-                $files->notName($name);
-            }
-        }
-        $this->files = $files->files();
     }
 
     public function exist(){
