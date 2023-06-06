@@ -369,6 +369,7 @@ $lang = [
     'dtprofilerImagesConverter_images' => 'Image',
     'dtprofilerImagesConverter_to' => 'Format',
     'hooks_exists' => 'Hook Files Not In Use (%s)',
+    'dt_profiler_todo' => '%s (%s)',
     'hooks_exists_desc' => 'Hook files found in your apps /hooks/ folder, but no longer in use.',
     'hooks_parse' => 'Hook Eval Failures (%s)',
     'hooks_parse_desc' => 'Hooks files that wont eval properly, please check these.',
@@ -411,6 +412,8 @@ $lang = [
 First thing you should do is check what is listed here, cause you might have an actual problem that this half assed tool is trying to resolve. Okay, you’ve done that? Good now you can read further. I have written up some of my thoughts about this tool, you can read them on my site.<br><br>
  <a href="https://codingjungle.com/articles/records/failure-r92/">My Thoughts</a><br><h1>Whatever IPS Says:</h1>',
     'code_todo' => 'Todo\'s',
-    'code_todo_desc' => 'A list of todo\'s found in the app, incase you missed them, otherwise you can ignore them!'
-
+    'code_todo_desc' => 'A list of todo\'s found in the app, incase you missed them, otherwise you can ignore them!',
+    'toolbox_use_proxy_task' => 'Use proxyclass task',
+    'toolbox_show_todo' => 'Show Todo Button',
+    'dtprofiler_console_replacements' => 'Console Replacements'
 ];

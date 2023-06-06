@@ -281,16 +281,16 @@
                 "unsigned": false,
                 "auto_increment": false
             },
-            "todo_appt": {
-                "name": "todo_appt",
-                "type": "VARCHAR",
-                "length": 77,
+            "todo_active": {
+                "name": "todo_active",
+                "type": "TINYINT",
+                "length": null,
                 "decimals": null,
                 "values": null,
-                "allow_null": true,
-                "default": null,
+                "allow_null": false,
+                "default": 0,
                 "comment": "",
-                "unsigned": false,
+                "unsigned": true,
                 "auto_increment": false
             }
         },

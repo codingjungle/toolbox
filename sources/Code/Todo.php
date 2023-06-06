@@ -61,10 +61,11 @@ class _Todo extends ParserAbstract
 
                 if (empty($matches[1]) === false) {
                     $db = (new \IPS\toolbox\Code\Utils\Todo());
-                    $db->app = $this->app;
+                    $db->app = $this->app->directory;
                     $db->line = $line;
                     $db->file = $name;
                     $db->msg = $matches[1];
+                    $db->save();
                     $warning[] = [
                         'key'  => $matches[1],
                         'path' => ['url' => $path, 'name' => $name],

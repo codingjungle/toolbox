@@ -1,0 +1,46 @@
+.dtTodoContainer {
+    position:fixed;
+    bottom:6%;
+    right:15px;
+}
+
+.dtTodoButton {
+    display:block;
+    color:#fff;
+    background:#33cc33;
+    font-size:18px;
+    font-weight: bolder;
+    padding:5px 40px;
+    border-radius:20px;
+    position:relative;
+    text-align: center;
+    cursor: pointer;
+}
+
+.dtTodoButton:hover {
+    color:#fff;
+}
+
+.dtTodoCount {
+    position:absolute;
+    top:-15px;
+    right:-6px;
+    color:#fff;
+    padding:4px;
+    border-radius:100px;
+    background:#CC0000;
+    font-size:12px;
+    text-align: center;
+}
+
+@media screen and (max-width: 1255px) {
+    .dtTodoContainer {
+        bottom:8%;
+    }
+}
+
+@media screen and (max-width: 645px) {
+    .dtTodoContainer {
+        bottom:10%;
+    }
+}

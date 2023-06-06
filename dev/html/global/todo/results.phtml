@@ -1,0 +1,24 @@
+<ips:template parameters=" $data, $lang, $count"/>
+<div{{if $count }} data-ipsdtcodetoggle data-ipsdtcodetoggle-id="{$lang}"{{endif}} class="ipsClearfix ipsMessage ipsMessage_success dtcode_header">
+    <div class="ipsType_large ipsType_bold ipsClearfix">
+    {lang="dt_profiler_todo" sprintf="$lang,$count"} {{if $count }} <i class="fa fa-angle-down ipsPos_right"></i> {{endif}}
+    </div>
+</div>
+<div class="ipsPadding ipsBox ipsHide" id="tab_{$lang}">
+    <table class="ipsTable ipsTable_responsive ipsTable_zebra dtcode_table">
+        <thead>
+            <tr>
+                <th>Todo</th>
+                <th>File::Line</th>
+            </tr>
+        </thead>
+        <tbody data-role="tableRows">
+            {{foreach $data as $todo}}
+            <tr class="ipsClearfix">
+                <td class="ipsTable_wrap">{$todo->msg|raw}</td>
+                <td class="ipsTable_wrap"><a href="{$todo->url}">{$todo->name|raw}::{$todo->line}</a></td>
+            </tr>
+            {{endforeach}}
+        </tbody>
+    </table>
+</div>

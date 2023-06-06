@@ -94,7 +94,8 @@ class _Profiler extends Singleton
     public function justMyApps(){
         $myapps = $this->myApps();
         $info = $this->info();
-        return Theme::i()->getTemplate('bar','toolbox','front')->myapps($info,$myapps);
+        $todo = $this->todo();
+        return Theme::i()->getTemplate('bar','toolbox','front')->myapps($info,$myapps,$todo);
     }
 
     protected function myApps(): array
@@ -179,6 +180,7 @@ class _Profiler extends Singleton
         $cache = CACHING_LOG ? Caching::i()->build() : null;
         $memory = Settings::i()->dtprofiler_enabled_memory ? Memory::build() : null;
         $myApps = $this->myApps();
+        $todo = $this->todo();
 
         if (Settings::i()->dtprofiler_enabled_execution) {
             $total = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4) * 1000;
@@ -206,8 +208,13 @@ class _Profiler extends Singleton
                 $environment,
                 $debug,
                 $executions,
-                $myApps
+                $myApps,
+                $todo
             );
+    }
+
+    protected function todo(){
+        return Db::i()->select('COUNT(*)', 'toolbox_todo', ['todo_active=?',0])->first();
     }
 
     /**

@@ -34,7 +34,10 @@ abstract class toolbox_hook_dispatcherStandard extends _HOOK_CLASS_
 
     protected static function baseJs()
     {
-
+        Output::i()->jsFiles = array_merge(
+            Output::i()->jsFiles,
+            Output::i()->js('admin_toggles.js', 'toolbox', 'admin')
+        );
         parent::baseJs();
         Output::i()->jsVars['cj_debug_key'] = \IPS\SUITE_UNIQUE_KEY;
         Output::i()->jsVars['cj_debug_sockets'] = defined('DT_NODE') && DT_NODE ? 1 : 0;
@@ -48,4 +51,5 @@ abstract class toolbox_hook_dispatcherStandard extends _HOOK_CLASS_
         Output::i()->jsVars['cj_wsl_path'] = null;
         Output::i()->jsVars['cj_use_wsl'] = false;
     }
+
 }

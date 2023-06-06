@@ -1,5 +1,5 @@
-<ips:template parameters="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions,$myApps"/>
-{template="myapps" group="bar" location="front" app="toolbox" params="$info,$myApps"}
+<ips:template parameters="$time, $memory, $files, $templates, $database, $cache, $logs, $extra, $info, $environment, $debug, $executions,$myApps,$todo"/>
+{template="myapps" group="bar" location="front" app="toolbox" params="$info,$myApps,$todo"}
 
 <div id="dtProfilerBarContainer" class="dtProfilerBar">
     <ul class="ipsList_reset dtProfilerBar_list ipsClearfix" data-ipsdtprofiler{{if settings.dtprofiler_enable_debug && settings.dtprofiler_enable_debug_ajax }} data-ipsdtprofilerdebug data-url="{url='app=toolbox&module=bt&controller=bt' base='front'}"{{endif}}>

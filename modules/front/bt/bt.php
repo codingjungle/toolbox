@@ -12,6 +12,7 @@
 
 namespace IPS\toolbox\modules\front\bt;
 
+use IPS\toolbox\Code\Utils\Todo;
 use Phar;
 use IPS\Db;
 use IPS\Log;
@@ -793,4 +794,28 @@ class _bt extends Controller
     //            Output::i()->redirect($redirect);
     //        }
     //    }
+
+    public function todo(){
+        //$sql = Db::i()->select('*', 'toolbox_todo',null, null, null, 'todo_app');
+        $all = Todo::all();
+        $todos = [];
+        /** @var Todo $todo */
+        foreach($all as $todo){
+            $todos[$todo->app][] = $todo;
+        }
+        $output = '';
+        foreach($todos as $app => $todo){
+
+            $output .= Theme::i()->getTemplate('todo', 'toolbox', 'global')->results(
+                $todo,
+                $app,
+                count($todos[$app])
+            );
+        }
+
+        Output::i()->output = Theme::i()->getTemplate('todo', 'toolbox', 'global')->container(
+            $output,
+            'Todo\'s'
+        );
+    }
 }

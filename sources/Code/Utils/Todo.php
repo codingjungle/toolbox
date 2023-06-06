@@ -14,6 +14,7 @@ namespace IPS\toolbox\Code\Utils;
 
 use IPS\Patterns\ActiveRecord;
 use IPS\toolbox\Application;
+use IPS\toolbox\Editor;
 use IPS\toolbox\Traits\Orm;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
@@ -73,7 +74,7 @@ class _Todo extends ActiveRecord
      */
     public static function analyze(string $app){
         $finder = new Finder();
-        $finder->in(Todo . phpApplication::getRootPath($app) . DIRECTORY_SEPARATOR .$app);
+        $finder->in(Application::getRootPath($app) . DIRECTORY_SEPARATOR .$app);
         $filter = function (SplFileInfo $file) {
             if ($file->getExtension() != 'php') {
                 return false;
@@ -83,5 +84,13 @@ class _Todo extends ActiveRecord
         };
 
         $finder->filter($filter);
+    }
+
+    public function get_url(){
+        return (new Editor())->replace($this->file, $this->line);
+    }
+
+    public function get_name(){
+        return str_replace(Application::getRootPath('toolbox').DIRECTORY_SEPARATOR.'applications'.DIRECTORY_SEPARATOR,'', $this->file);
     }
 }

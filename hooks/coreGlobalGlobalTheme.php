@@ -38,7 +38,8 @@ class toolbox_hook_coreGlobalGlobalTheme extends _HOOK_CLASS_
         }
         Output::i()->cssFiles = array_merge(
             Output::i()->cssFiles,
-            Theme::i()->css('profiler.css', 'toolbox', 'front')
+            Theme::i()->css('profiler.css', 'toolbox', 'front'),
+            Theme::i()->css('todo.css','toolbox','front')
         );
         if (\IPS\QUERY_LOG && !Request::i()->isAjax()) {
 

@@ -54,10 +54,7 @@ class _build extends \IPS\Dispatcher\Controller
     public function execute()
     {
         Output::i()->cssFiles = array_merge(Output::i()->cssFiles, Theme::i()->css('dtcode.css', 'toolbox', 'admin'));
-        Output::i()->jsFiles = array_merge(
-            Output::i()->jsFiles,
-            Output::i()->js('admin_toggles.js', 'toolbox', 'admin')
-        );
+
 
 
         parent::execute();

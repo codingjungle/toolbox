@@ -518,7 +518,7 @@ trait Analyzer
                 );
             $analyze = $baseUrl->setQueryString(['do' => 'queue']);
             $downloadUrl = $baseUrl->setQueryString(['do' => 'download']);
-            Output::i()->output = Theme::i()->getTemplate('code', 'toolbox', 'admin')->final(
+            Output::i()->output = Theme::i()->getTemplate('code', 'toolbox', 'admin')->container(
                 $output,
                 (bool)$download,
                 $downloadUrl,

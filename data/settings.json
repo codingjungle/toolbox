@@ -168,6 +168,10 @@
         "default": ""
     },
     {
+        "key": "toolbox_show_todo",
+        "default": "1"
+    },
+    {
         "key": "toolbox_use_proxy_task",
         "default": "1"
     },

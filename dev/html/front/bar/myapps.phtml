@@ -1,5 +1,4 @@
-<ips:template parameters="$info,$myApps"/>
-
+<ips:template parameters="$info,$myApps,$todo"/>
 <div id="dtProfilerOther" class="ipsClearfix dtProfilerOther ipsPos_relative " data-ipstoolboxtoyboxmenu>
     {{if empty($myApps) === false}}
     <div class="celProfileMyapps ipsPos_relative isParent">
@@ -160,3 +159,13 @@
         </div>
     </div>
 </div>
+
+{{if \IPS\Settings::i()->toolbox_show_todo}}
+<div class="dtTodoContainer">
+    {{$url = \IPS\Http\Url::internal('app=toolbox&module=bt&controller=bt&do=todo');}}
+    <a href="{$url}" class="dtTodoButton" data-ipsdialog data-ipsdialog-destructOnClose="true" data-ipsdialog-forcereload="true" data-ipsdialog-title="Todo\'s">
+        Todo's
+        <div class="dtTodoCount">{$todo}</div>
+    </a>
+</div>
+{{endif}}

@@ -133,7 +133,7 @@ class _settings extends Controller
         $form->addElement('toolbox_debug_templates', 'yn');
         $form->addElement('toolbox_use_tabs_applications','yn');
         $form->addElement('toolbox_use_proxy_task', 'yn');
-
+        $form->addElement('toolbox_show_todo', 'yn');
         /* @var \IPS\toolbox\extensions\toolbox\Settings\settings $extension */
         foreach (Application::allExtensions('toolbox', 'settings') as $extension) {
             $extension->elements($form);
