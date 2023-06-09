@@ -26,4 +26,5 @@ class toolbox_hook_ActiveRecord extends _HOOK_CLASS_
         }
         parent::__construct(...\func_get_args());
     }
+
 }

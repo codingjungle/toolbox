@@ -25,6 +25,9 @@ use function _p;
 
 use const DT_MY_APPS;
 
+/**
+ * @todo cleanup and make easier to implement
+ */
 class _Menu extends Singleton
 {
 

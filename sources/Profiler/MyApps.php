@@ -29,7 +29,7 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 class _MyApps
 {
     /**
-     * add addditonal fields to the form on the build form
+     * add additonal fields to the form on the build form
      * @param Form $form
      * @return void
      */

@@ -93,7 +93,7 @@ class _Core extends CodeAnalyzerAbstract
                 'lang.xml'
             ];
         }
-        elseif($class === 'IPS\\toolbox\\Code\\Langs') {
+        elseif($class === 'IPS\\toolbox\\Code\\Settings') {
             return ['settings.json'];
         }
         return null;

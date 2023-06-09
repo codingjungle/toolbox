@@ -329,7 +329,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
 
     public function _myAppRoots(){
         $rows = array();
-        $myApps = \is_array('DT_MY_APPS') ? DT_MY_APPS : explode(',', DT_MY_APPS);
+        $myApps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
         $sql = Db::i()->select('*','core_applications',Db::i()->in('app_directory', $myApps), 'app_position ASC');
         $roots = new ActiveRecordIterator($sql, Application::class);
         foreach( $roots as $node )
@@ -345,7 +345,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
         $rows = array();
         $apps = \IPS\IPS::$ipsApps;
         if(defined('DT_MY_APPS')) {
-            $myApps = \is_array('DT_MY_APPS') ? DT_MY_APPS : explode(',', DT_MY_APPS);
+            $myApps = \is_array(DT_MY_APPS) ? DT_MY_APPS : explode(',', DT_MY_APPS);
             $apps = array_merge($apps,$myApps);
         }
         $sql = Db::i()->select('*','core_applications',Db::i()->in('app_directory', $apps,true), 'app_position ASC');
@@ -372,7 +372,7 @@ class toolbox_hook_moduleApplications extends _HOOK_CLASS_
                     $check2 = (int)$v['default'];
                     break;
                 default:
-                    if (is_array($v['default'])) {
+                    if (is_array($v['current'])) {
                         $check2 = $v['default'];
                         $check = $v['current'];
                     } else {

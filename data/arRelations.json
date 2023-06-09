@@ -1,3 +1,4 @@
 {
-    "toolbox_todo": "applications\/toolbox\/sources\/Code\/Utils\/Todo.php"
+    "toolbox_todo": "applications\/toolbox\/sources\/Code\/Utils\/Todo.php",
+    "toolbox_members": "applications\/toolbox\/sources\/Member\/Member.php"
 }

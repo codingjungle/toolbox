@@ -175,12 +175,16 @@ class _Cons extends Singleton
                     $check2 = (int)$val['default'];
                     break;
                 default:
-                    if (is_array($val['default'])) {
-                        $check2 = $val['default'];
-                        $check = $data;
-                    } else {
-                        $check2 = (string)$val['default'];
-                        $check = (string)$data;
+                    try {
+                        if (is_array($data)) {
+                            $check2 = $val['default'];
+                            $check = $data;
+                        } else {
+                            $check2 = (string)$val['default'];
+                            $check = (string)$data;
+                        }
+                    }catch(\Exception $e){
+                        _p($key);
                     }
                     break;
             }
@@ -198,7 +202,6 @@ class _Cons extends Singleton
                     $prefix = "\$versions = json_decode(file_get_contents(__DIR__ . '/applications/core/data/versions.json'), true);\n";
                     $dataType = "mb_substr(md5(array_pop(\$versions)), 10, 10)";
                 } else {
-                    $dataType = "'" . $data . "'";
                     switch ($val['type']) {
                         case 'yn':
                         case 'boolean':
@@ -212,7 +215,9 @@ class _Cons extends Singleton
                         case 'array':
                             $dataType = var_export($data, true);
                             break;
-
+                        default:
+                            $dataType = "'" . $data . "'";
+                            break;
                     }
                     if ($key === 'SUITE_UNIQUE_KEY') {
                         $dataType = $data;

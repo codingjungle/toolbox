@@ -118,7 +118,7 @@ class _bt extends Controller
         if (isset(Request::i()->time)) {
             Output::i()->json($dates);
         } else {
-            Output::i()->output = Theme::i()->getTemplate('bar', 'toolbox', 'front')->dates($dates);
+            Output::i()->output = Theme::i()->getTemplate('toybox', 'toolbox', 'front')->dates($dates);
         }
     }
 
@@ -343,7 +343,7 @@ class _bt extends Controller
 
     protected function lorem(): void
     {
-        $form = Form::create()->setPrefix('toolbox_lorem_')->submitLang(null)->attributes(
+        $form = Form::create()->setPrefix('toolbox_lorem_')->submitLang(null)->setAttributes(
             ['data-ipstoolboxtoyboxlorem' => 1]
         );
 
@@ -424,8 +424,15 @@ class _bt extends Controller
             if (($i - 1) % 15 === 0) {
                 $bits[] = '</div><div class="ipsPos_left ipsMargin_right">';
             }
-            $f = new NumberFormatter("en", NumberFormatter::SPELLOUT);
-            $bits []= '<div>\'' . $f->format($i) . '\' => ' . $start . ',</div>';
+            $nn = $i;
+            if(class_exists('NumberFormatter')) {
+                $f = new \NumberFormatter("en", NumberFormatter::SPELLOUT);
+                $nn = $f->format($i);
+            }
+            else{
+                $nn = $this->convertNumberToWord($i);
+            }
+            $bits []= '<div>\'' . $nn . '\' => ' . $start . ',</div>';
         }
 
         Output::i()->output = Theme::i()->getTemplate('toybox', 'toolbox', 'front')->bitwise(
@@ -433,6 +440,50 @@ class _bt extends Controller
             $bits,
             $class
         );
+    }
+
+    public function convertNumberToWord($num = false)
+    {
+        $num = \str_replace(array(',', ' '), '' , \trim($num));
+        if(! $num) {
+            return false;
+        }
+        $num = (int) $num;
+        $words = array();
+        $list1 = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
+            'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'
+        );
+        $list2 = array('', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety', 'hundred');
+        $list3 = array('', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion',
+            'octillion', 'nonillion', 'decillion', 'undecillion', 'duodecillion', 'tredecillion', 'quattuordecillion',
+            'quindecillion', 'sexdecillion', 'septendecillion', 'octodecillion', 'novemdecillion', 'vigintillion'
+        );
+        $num_length = \strlen($num);
+        $levels = (int) (($num_length + 2) / 3);
+        $max_length = $levels * 3;
+        $num = \substr('00' . $num, -$max_length);
+        $num_levels = \str_split($num, 3);
+        for ($i = 0; $i < \count($num_levels); $i++) {
+            $levels--;
+            $hundreds = (int) ($num_levels[$i] / 100);
+            $hundreds = ($hundreds ? ' ' . $list1[$hundreds] . ' hundred' . ' ' : '');
+            $tens = (int) ($num_levels[$i] % 100);
+            $singles = '';
+            if ( $tens < 20 ) {
+                $tens = ($tens ? ' ' . $list1[$tens] . ' ' : '' );
+            } else {
+                $tens = (int)($tens / 10);
+                $tens = ' ' . $list2[$tens] . ' ';
+                $singles = (int) ($num_levels[$i] % 10);
+                $singles = ' ' . $list1[$singles] . ' ';
+            }
+            $words[] = $hundreds . $tens . $singles . ( ( $levels && ( int ) ( $num_levels[$i] ) ) ? ' ' . $list3[$levels] . ' ' : '' );
+        } //end for loop
+        $commas = \count($words);
+        if ($commas > 1) {
+            $commas = $commas - 1;
+        }
+        return \trim(\implode(' ', $words));
     }
 
     protected function hash()

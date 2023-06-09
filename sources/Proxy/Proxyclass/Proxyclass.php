@@ -557,7 +557,6 @@ class _Proxyclass extends Singleton
             Store::i()->dtproxy_proxy_files = $files;
             return $finder->count();
         } catch (Exception $e) {
-            throw $e;
             return 0;
         }
     }
