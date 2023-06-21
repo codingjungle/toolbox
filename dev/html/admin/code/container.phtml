@@ -1,12 +1,24 @@
 <ips:template parameters="$output,bool $show=false, ?\IPS\Http\Url $download = null, ?\IPS\Http\Url $analyze=null,string $title = ''"/>
 <div class="ipsPadding ipsBox">
-    <h1>{$title|raw}</h1>
+    <div class="ipsColumns">
+        <div class="ipsColumn ipsColumn_veryWide">
+    <h3>
+        {$title|raw}
+    </h3>
+        </div>
+        <div class="ipsColumn ipsColumn_fluid ipsType_right">
+            <a href='{$analyze}' class="ipsButton ipsButton_large ipsButton_primary">Reanalyze</a>
+            {{if $show}}
+            <a href='{$download}' class="ipsButton ipsButton_large ipsButton_primary">Build</a>
+            {{endif}}
+        </div>
+    </div>
     {$output|raw}
-    {{if $show}}
     <div class="ipsBorder_top ipsPadding ipsType_center">
         <a href='{$analyze}' class="ipsButton ipsButton_large ipsButton_primary">Reanalyze</a>
+    {{if $show}}
         <a href='{$download}' class="ipsButton ipsButton_large ipsButton_primary">Build</a>
-    </div>
     {{endif}}
+    </div>
 </div>
 

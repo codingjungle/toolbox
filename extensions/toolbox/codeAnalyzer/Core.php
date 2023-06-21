@@ -43,7 +43,7 @@ class _Core extends CodeAnalyzerAbstract
         elseif($class === 'IPS\toolbox\Code\InterfaceFolder') {
             return [$app->getApplicationPath() . DIRECTORY_SEPARATOR . 'interface' . DIRECTORY_SEPARATOR];
         }
-        elseif($class === 'IPS\toolbox\Code\Template' && $class === 'IPS\toolbox\Code\Templates') {
+        elseif($class === 'IPS\\toolbox\\Code\\Template' || $class === 'IPS\\toolbox\\Code\\Templates') {
             return [$app->getApplicationPath() . DIRECTORY_SEPARATOR . 'dev' . DIRECTORY_SEPARATOR . 'html' . DIRECTORY_SEPARATOR];
         }
 
@@ -52,7 +52,7 @@ class _Core extends CodeAnalyzerAbstract
 
     public function getExtensions(string $class)
     {
-        if($class === 'IPS\\toolbox\\Code\\ClassScanner' && $class === 'IPS\\toolbox\\Code\\Hooks') {
+        if($class === 'IPS\\toolbox\\Code\\ClassScanner' || $class === 'IPS\\toolbox\\Code\\Hooks') {
             return ['php'];
         }
         elseif($class === 'IPS\\toolbox\\Code\\Db') {

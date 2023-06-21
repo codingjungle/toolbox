@@ -44,11 +44,14 @@ class _Core extends ScannerAbstract
                 'values' => 1
             ],
             'IPS\Content\_Comment' => [
+                'author' => 1,
+                'item' => 1,
                 'getStore' => 1,
                 'contentTableTemplate' => 1,
                 'titleFromIndexData' => 1
             ],
-            'IPS\Content\_Item' => [
+            'IPS\\Content\\_Item' => [
+                'author' => 1,
                 'getStore' => 1,
                 'form' => 1,
                 'supportedMetaDataTypes' => 1,

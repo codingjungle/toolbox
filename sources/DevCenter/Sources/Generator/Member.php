@@ -40,19 +40,7 @@ class _Member extends GeneratorAbstract
 
     protected function addConstructLoadQuery(){
         $body = <<<EOF
-            \$where = [['core_members.' . \$idField . '=?', \$id]];
-            if (\$extraWhereClause !== null) {
-                if (!is_array(\$extraWhereClause) || !is_array(\$extraWhereClause[0])) {
-                    \$extraWhereClause = [\$extraWhereClause];
-                }
-                \$where = array_merge(\$where, \$extraWhereClause);
-            }
-            
-            return static::db()->select(
-                    '*, core_members.member_id AS _member_id',
-                    static::\$databaseTable,
-                    \$where
-                )->join(
+            return parent::constructLoadQuery(\$id,\$idField,\$extraWhereClause)->join(
                     static::\$altDatabaseTable,
                     static::\$altDatabaseTable . '.' . static::\$altPrefix . static::\$altIdField . '=core_members.member_id'
                 );

@@ -40,7 +40,6 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ) {
 trait Scanner
 {
 
-
     protected function getFullStop(): array
     {
         $default[] = (new Core())->fullStop();
@@ -58,7 +57,7 @@ trait Scanner
     }
 
     protected function getAutoLint(){
-        $default[] = (new Core())->fullStop();
+        $default[] = (new Core())->autoLint();
         $extension = $this->app->extensions('toolbox', 'Scanner');
         if (empty($extension) === false) {
             $merged = [];
@@ -95,11 +94,15 @@ trait Scanner
                 $parentName = $parentClass->getName();
                 $methodName = $method->getName();
                 $docComment = $method->getDocComment();
+//                if(str_contains($file, 'Card.php') && $methodName === 'notificationRecipients'){
+//                    _p($parentName, $methodName,isset($this->autoLint[$parentName][$methodName]),$this->autoLint);
+//                }
                 //lets check if it is linted or autolinted, we use the parentclass for the class lookup part,
                 //cause it is most likely the one that will be added here, instead of the subclass
                 if (
+                    isset($this->autoLint[$currentClass->getName()][$methodName]) ||
                     isset($this->autoLint[$parentName][$methodName]) ||
-                    mb_stristr($docComment, '@ips-lint ignore')
+                    str_contains($docComment, '@ips-lint ignore')
                 ) {
                     continue;
                 }

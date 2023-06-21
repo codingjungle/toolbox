@@ -508,6 +508,7 @@ _cjProfilerP = function () {
 var ConsoleCjProfiler = function () {
 };
 ConsoleCjProfiler.prototype.write = function (type, msg, other, trace) {
+    if(1===0){
     if (window.console) {
         switch (type) {
             case 'l':
@@ -567,6 +568,7 @@ ConsoleCjProfiler.prototype.write = function (type, msg, other, trace) {
         if (trace === true) {
             ogLog(getStackTrace(type, _cjProfilerP.getMinNum() + 1, false));
         }
+    }
     }
 };
 _cjProfilerP.addAdapter(new ConsoleCjProfiler);
