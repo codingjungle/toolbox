@@ -440,7 +440,19 @@ First thing you should do is check what is listed here, cause you might have an 
     'hooks_validation_title' => 'Hooks Validation (%s)',
     'hooks_validation_title_desc' => 'This contains any errors that your hook files might be causing.',
     'templates_validation_errors' => 'Template Validation (%s)',
-    'templates_validation_errors_desc' => 'This will contain any errors your template might\'ve thrown while attempting to compile it. note: this does not load the template with any theme hook that might be applied to it. this is done to simplify the debugging process.'
+    'templates_validation_errors_desc' => 'This will contain any errors your template might\'ve thrown while attempting to compile it. note: this does not load the template with any theme hook that might be applied to it. this is done to simplify the debugging process.',
+    'stratagem_stratagem_js_dl' => 'Stratagem.js',
+    'stratagem_stratagem_form' => 'Stratagem Form',
+    'stratagem_pk_keep' => 'Keep PK',
+    'stratagem_pk_keep_desc' => 'If you want to regenerate your PK, in case it has become compromised or if you just wish to change it, uncheck this option. NOTE: this is not "private key" for your ssl, this is a key used internally by stratagem to validate data received.',
+    'stratagem_pk_exists' => 'Saving this form will result in a new Private Key being generated and any old stratagem.js\'s being invalid. if you just need the file, go back to the downloads page and click <span class="fa fa-download"></span>  Stratagem.js instead!',
+    'stratagem_form_title' => 'Stratagem.js Changeable Values',
+    'stratagem_cors' => 'CORS',
+    'stratagem_cors_desc' => 'In the later versions of sockets.io, CORS is explicitly enabled, you will need to provide which URL\'s it is okay to accept CORS from (this is extremely important if your site and node server use different URL\'s)',
+    'stratagem_general_stuff_header' => 'General',
+    'stratagem_ssl_stuff_header' => 'SSL Information',
+    'stratagem_form_do_ssl' => 'Require SSL',
+    'stratagem_form_do_ssl_desc' => 'Require SSL to be added to the stratagem.js.'
 
 
 ];

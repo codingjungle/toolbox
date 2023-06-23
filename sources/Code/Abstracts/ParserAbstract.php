@@ -96,18 +96,20 @@ abstract class _ParserAbstract
 
     protected function getAppPaths()
     {
+        $paths[] = (new \IPS\toolbox\extensions\toolbox\codeAnalyzer\Core())->getPaths(get_called_class(), $this->app);
         $extension = $this->app->extensions('toolbox', 'codeAnalyzer');
         if(empty($extension) === false){
-            $paths = [];
+
             foreach($extension as $ext){
                 $path = $ext->getPaths(get_called_class(), $this->app);
                 if($path !== null){
-                    $paths = array_merge($paths, $path);
+                    $paths[] = $path;
                 }
             }
-            if(empty($paths) === false){
-                return $paths;
-            }
+        }
+
+        if(empty($paths) === false){
+            return array_merge(...$paths);
         }
         return $this->app->getApplicationPath() . '/';
     }

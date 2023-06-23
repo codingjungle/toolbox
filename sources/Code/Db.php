@@ -53,7 +53,7 @@ class _Db extends ParserAbstract
             $queries = json_decode($file->getContents(), true);
             if ($queries) {
                 foreach ($queries as $query) {
-                    if ($query['method'] === 'addColumn') {
+                    if (isset($query['method']) && $query['method'] === 'addColumn') {
                         $params = $query['params'];
                         $table = array_shift($params);
                         $definition = $params;
